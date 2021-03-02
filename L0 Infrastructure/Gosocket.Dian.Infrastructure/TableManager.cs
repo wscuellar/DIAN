@@ -592,6 +592,23 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public List<T> FindOthersDocumentsNitTestSetId<T>(string PartitionKey, string Id) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    PartitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("Id",
+                    QueryComparisons.Equal,
+                    Id));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
 
         public List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new()
         {

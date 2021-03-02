@@ -62,13 +62,13 @@ namespace Gosocket.Dian.Functions.Activation
                 //Se busca el set de pruebas procesado para el testsetid en curso
                 RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId);
+                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, "UPDATE-01");
 
                 //Si existe el set de pruebas se Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
                 {
                     // traigo los datos de RadianTestSetResult
-                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", "UPDATE-02");
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     string code = radianTesSetResult.PartitionKey;
@@ -401,16 +401,17 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 else if (setResultOther != null) //Other Document
                 {
-
+                    SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL", "UPDATE-03");
                     // traigo los datos de RadianTestSetResult
-                    SetLogger(radianTesSetResult, "Step 1 - Nomina", "Ingreso a proceso Other Document Nomina");
 
-                    var docOperationEnable = tableGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(setResultOther.PartitionKey, setResultOther.SoftwareId);
-                    var status = docOperationEnable.State.Equals(OtherDocumentStatus.Habilitado) ? true : false;
+                    // Se verifica si la operacion para el cliente y el software que usa esta habilitada para otros documentos
+                    bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(setResultOther.SoftwareId));
+                    SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
+                    if (isActive)
+                        return;
+               
 
-                    if (status) return;
-
-                    SetLogger(null, "Step 2 - Nomina", "No esta Activo en Nomina");
+                    SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");
 
                     foreach (var item in allGlobalTestSetTracking)
                     {
@@ -440,7 +441,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
                     }                 
    
-                    SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina");
+                    SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina" , "UPDATE-03.3");
 
                     //Validacion Total otros documentos aceptados
                     if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
@@ -450,7 +451,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
                     }
 
-                    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document");
+                    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document", "UPDATE-03.4");
                     
                     //Validacion Total Nomina rechazados 
                     if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
@@ -461,7 +462,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
                     }
 
-                    SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject");
+                    SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
 
                     //Validacion Total Otros Documentos rechazados 
                     if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
@@ -472,7 +473,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
                     }
 
-                    SetLogger(null, "Step 6 - Validacion Other Document Reject", "Paso Validacion de Other Document");
+                    SetLogger(null, "Step 6 - Validacion Other Document Reject", "Paso Validacion de Other Document", "UPDATE-03.6");
 
                     //Registro en la table Azure
                     await tableManagerGlobalTestSetOthersDocumentsResult.InsertOrUpdateAsync(setResultOther);

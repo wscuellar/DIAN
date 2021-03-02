@@ -44,12 +44,15 @@ namespace Gosocket.Dian.Functions.Batch
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-            var testSetId = string.Empty;
-            var TestSetHabOther = string.Empty;
+            var testSetId = string.Empty;            
             var zipKey = string.Empty;
+            string nitNomina = string.Empty;
+            string softwareIdNomina = string.Empty;
+            XmlParseNomina xmlParser = null;
             GlobalBatchFileStatus batchFileStatus = null;
             try
             {
+                
                 var data = string.Empty;
                 try
                 {
@@ -94,14 +97,19 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
 
-                SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse);
+                SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse, "PROC-01");
+
+                var xmlBytes = contentFileList.First().XmlBytes;               
 
                 if (setResultOther != null)
                 {
-                    TestSetHabOther = setResultOther.TestSetId;
+                    xmlParser = new XmlParseNomina();
+                    SetLogger(null, "Step prueba nomina", " Trajo datos setResultOther ", "BATCH-01.0");
+                    xmlParser = new XmlParseNomina(xmlBytes);
+                    nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+                    softwareIdNomina = xmlParser.globalDocPayrolls.SoftwareID;
+                    SetLogger(null, "Step prueba nomina", " Trajo datos testSetId" + testSetId + " nitNomina " + nitNomina, "BATCH-01");
                 }
-
-                SetLogger(null, "Step prueba nomina", " Trajo datos " + TestSetHabOther, "BATCH-01");
 
                 // Check big contributor
                 if (setResultOther == null && string.IsNullOrEmpty(testSetId))
@@ -118,17 +126,6 @@ namespace Gosocket.Dian.Functions.Batch
                         await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                         return;
                     }
-                }
-
-                SetLogger(null, "Step prueba nomina", " Paso el primero If ", "BATCH-01.0");
-                // Check big contributor
-                var xmlBytes = contentFileList.First().XmlBytes;
-                XmlParseNomina xmlParser = new XmlParseNomina();
-                         
-                if (setResultOther != null && !string.IsNullOrEmpty(TestSetHabOther))
-                {
-                    SetLogger(null, "Step prueba nomina", " Trajo datos setResultOther Y habOther ", "BATCH-01.1");
-                    xmlParser = new XmlParseNomina(xmlBytes);                   
                 }
 
                 SetLogger(null, "Step prueba nomina", " Paso el segundo If ");
@@ -152,7 +149,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // check if unique nits
                 var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
-                var nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+               
 
                 SetLogger(null, "Step prueba nomina", " Paso nitNomina " + nitNomina, "BATCH-02");
                 if (nits.Count() > 1)
@@ -181,8 +178,8 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, TestSetHabOther, nitNomina, flagApplicationResponse);
-                SetLogger(null, "Step prueba nomina", " Paso permisos " + result.Count.ToString());
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse);
+                SetLogger(null, "Step prueba nomina", " Paso permisos " + result.Count.ToString(), "PROC-01");
                 if (result.Count > 0)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -201,11 +198,12 @@ namespace Gosocket.Dian.Functions.Batch
                 // Upload all xml's
                 log.Info($"Init upload xml�s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
-                SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count);
+                SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count, "PROC-02");
 
                 bool sendTestSet = !string.IsNullOrWhiteSpace(testSetId);
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
                 {
+                    SetLogger(null, "Step prueba nomina", " INICIO Paso upload ", "UPLOAD-01");
                     Boolean isEvent = flagApplicationResponse;
                     Boolean eventNomina = false;
                     var xmlBase64 = "";
@@ -214,16 +212,16 @@ namespace Gosocket.Dian.Functions.Batch
                     var trackId = "";
                     var softwareId = "";
 
-
                     if (setResultOther != null)
                     {
+                        SetLogger(null, "Step prueba nomina", " Paso setResultOther nomina ", "PROC-02.1");
                         xmlBase64 = response.XpathsValues["XmlBase64"];
                         fileName = response.XpathsValues["FileName"];
                         documentTypeId = !string.IsNullOrWhiteSpace(xmlParser.globalDocPayrolls.CUNEPred)
-                        ? DocumentType.IndividualPayrollAdjustments.ToString() : DocumentType.IndividualPayroll.ToString();
-
+                        ? "103" : "102";
                         trackId = xmlParser.globalDocPayrolls.CUNE;
                         eventNomina = true;
+                        SetLogger(null, "Step prueba nomina", " Paso setResultOther documentTypeId " + documentTypeId, "PROC-02.1");
                     }
                     else
                     {
@@ -253,7 +251,7 @@ namespace Gosocket.Dian.Functions.Batch
                         var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
                         uploadResponses.Add(uploadXmlResponse);
                     }
-                    SetLogger(null, "Step prueba nomina", " Paso upload " +  trackId + "**" +zipKey + "**" + testSetId + "**" + eventNomina);
+                    SetLogger(null, "Step prueba nomina", " Paso upload " +  trackId + "**" +zipKey + "**" + testSetId + "**" + eventNomina, "UPLOAD-02");
 
                 });
 
@@ -262,7 +260,7 @@ namespace Gosocket.Dian.Functions.Batch
                 var failed = uploadFailed.Count();
                 await ProcessUploadFailed(zipKey, uploadFailed);
 
-                SetLogger(null, "Step prueba nomina", " Paso cargue de documento ");
+                SetLogger(null, "Step prueba nomina", " Paso cargue de documento ","PROC-03");
                 // Get success upload
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
 
@@ -282,10 +280,10 @@ namespace Gosocket.Dian.Functions.Batch
                             eventNomina = true;
                             trackId = xmlParser.globalDocPayrolls.CUNE;
                         }
-
+                       
                         var request = new { trackId, draft, testSetId, eventNomina };
                         var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
-
+                    
                         //Registra tablas de negocio AR
                         if (flagApplicationResponse)
                         {
@@ -297,7 +295,7 @@ namespace Gosocket.Dian.Functions.Batch
                             {
                                 //Validaciones reglas Validador Xpath
                                 var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
-                                var notifications = validations.Where(r => r.IsNotification).ToList();                             
+                                var notifications = validations.Where(r => r.IsNotification).ToList();
 
                                 if (!errors.Any() && !notifications.Any()) { validateDocumentUrl = true; }
 
@@ -355,7 +353,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // Update document status on batch
                 await ProcessBatchFileResults(batchFileResults);
-                SetLogger(null, "Step prueba nomina", " Paso update documento status ");
+                SetLogger(null, "Step prueba nomina", " Paso update documento status ", "PROC-04");
 
                 var successAppResponses = appResponses.Where(x => x.Success && x.Content != null).ToList();
                 log.Info($"{successAppResponses.Count()} application responses generated.");
@@ -366,7 +364,7 @@ namespace Gosocket.Dian.Functions.Batch
                     log.Info($"Upload applition responses zip OK.");
                 }
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse);
+                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse, "PROC-05");
                 log.Info($"End.");
             }
             catch (Exception ex)
@@ -375,7 +373,7 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step prueba nomina", " Error " + ex.Message,"Err-PROCBATCH");
                 log.Error($"Error al procesar batch con trackId {zipKey}. Ex: {ex.StackTrace}");
                 batchFileStatus.StatusCode = "ex";
-                batchFileStatus.StatusDescription = $"Error al procesar batch. ZipKey: {zipKey}";
+                batchFileStatus.StatusDescription = $"Error al procesar batch. ZipKey: {zipKey}" + ex.StackTrace;
                 await tableManagerGlobalBatchFileStatus.InsertOrUpdateAsync(batchFileStatus);
                 throw;
             }
@@ -429,12 +427,11 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string habNomina = null, string nitNomina = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
         {
             SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
             SetLogger(null, "Step-Checkpermission 1", authCode, "CHECK-02");
-            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");
-            SetLogger(null, "Step-Checkpermission 3", habNomina, "CHECK-04");
+            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");          
             SetLogger(null, "Step-Checkpermission 4", nitNomina, "CHECK-05");
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
             
@@ -455,8 +452,8 @@ namespace Gosocket.Dian.Functions.Batch
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
                 else
                 {
-                    SetLogger(null, "Step code", "Ingrese a validar", "CHECK-08");
-                    if (!string.IsNullOrEmpty(testSetId) && string.IsNullOrEmpty(nitNomina))
+                    SetLogger(null, "Step code", "Ingrese a validar testSetId " + testSetId + " y nitNomina " + nitNomina, "CHECK-08");
+                    if (!string.IsNullOrEmpty(testSetId))
                     {
                         SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
                         List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
@@ -464,7 +461,7 @@ namespace Gosocket.Dian.Functions.Batch
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                         var softwareId = softwareIds.Last();
 
-                        if (objRadianTestSetResult == null)
+                        if (objRadianTestSetResult == null && string.IsNullOrWhiteSpace(nitNomina))
                         {
                             SetLogger(null, "Step code", "Estoy verificando Factrua", "CHECK-10.1");
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
@@ -506,57 +503,40 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                         }
-                        else if (!string.IsNullOrEmpty(habNomina) && !string.IsNullOrEmpty(nitNomina))
+                        else if (!string.IsNullOrEmpty(testSetId) && !string.IsNullOrEmpty(nitNomina))
                         {
+                            //Validaciones GlobalTestSetOthersDocumentsResult documento de Nomina
                             SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
                             List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
-                            GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(habNomina.Trim(), StringComparison.OrdinalIgnoreCase));
-                            var idSoftware = softwareIds.Last();
+                           
+                            GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));                           
 
-                            if (objGlobalTestSetOthersDocumentResult == null)
-                            {
-                                authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, nitNomina);
-                                if (authEntity == null)
-                                    authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, nitNomina);
-                                if (authEntity == null)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {nitNomina}." });
+                            SetLogger(null, "Step code", "Estoy verificando nomina idSoftware " + softwareIdNomina, "CHECK-10.2.1");
+                            
+                            GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
+                            if (objGlobalTestSetOthersDocumentResult != null &&
+                                (objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.InProcess ||
+                                objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Accepted ||
+                                objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Rejected))
+                                testSetOthersDocumentsResultEntity = objGlobalTestSetOthersDocumentResult;
+                               
+                            SetLogger(testSetOthersDocumentsResultEntity, "Step code", "comprueba validaciones Nomina", "CHECK-10.2.3");
 
-                                GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
-                                var testResult = tableMaganerGlobalTestSetOthersDocuments.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
+                            if (testSetOthersDocumentsResultEntity == null)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {nitNomina} no tiene habilitado set de prueba para software con id {softwareIdNomina}" });
+                            else if (testSetOthersDocumentsResultEntity.Id != testSetId)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
+                            else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Accepted)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
+                            else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Rejected)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
-                                if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.InProcess);
-
-                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Accepted);
-
-                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Biller}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
-
-                                else if (testResult.Any(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected))
-                                    testSetOthersDocumentsResultEntity = testResult.FirstOrDefault(t => !t.Deleted && t.RowKey == $"{(int)ContributorType.Provider}|{softwareId}" && t.Status == (int)TestSetStatus.Rejected);
-
-
-                                if (testSetOthersDocumentsResultEntity == null)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"NIT {nitNomina} no tiene habilitado set de prueba para software con id {softwareId}" });
-                                else if (testSetOthersDocumentsResultEntity.Id != testSetId)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} es incorrecto." });
-                                else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Accepted)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
-                                else if (testSetOthersDocumentsResultEntity.Status == (int)TestSetStatus.Rejected)
-                                    result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
-
-                            }
+                            SetLogger(result, "Step code", "Finaliza validaciones Nomina", "CHECK-10.2.4");
+                            
                         }
                         else
                         {
-                            SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.3");
+                            SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.4");
                             // Validations to RADIAN  
                          
                             RadianTestSetResult radianTestSetResultEntity = null;

@@ -868,15 +868,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var xmlBase64 = Convert.ToBase64String(contentFileList.First().XmlBytes);
             var zone2 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone2) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 2
-
-            // Parser
-            //start = DateTime.UtcNow;
-            //var xmlBytes = contentFileList.First().XmlBytes;
-            //var xmlParser = new XmlParseNomina(xmlBytes);
-            //if (!xmlParser.Parser())
-            //    throw new Exception(xmlParser.ParserError);
-
-
+         
             // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
