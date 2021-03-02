@@ -181,7 +181,8 @@ namespace Gosocket.Dian.Application
 
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.OperationModeId = ODEContributor.OtherDocElecOperationModeId;
-            operation.SoftwareId = ODEOperation.SoftwareId.ToString();
+            //operation.SoftwareId = ODEOperation.SoftwareId.ToString();
+            operation.SoftwareId = software.SoftwareId.ToString();
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.State = OtherDocElecState.Test.GetDescription();
