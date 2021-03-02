@@ -402,5 +402,17 @@ namespace Gosocket.Dian.Services.Properties {
                 return ((string)(this["Param_RegistrateCompletedRadianUrl"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("RegistrateCompletedPayrollUrl")]
+        public string Param_RegistrateCompletedPayrollUrl {
+            get {
+                return ((string)(this["Param_RegistrateCompletedPayrollUrl"]));
+            }
+            set {
+                this["Param_RegistrateCompletedPayrollUrl"] = value;
+            }
+        }
     }
 }
