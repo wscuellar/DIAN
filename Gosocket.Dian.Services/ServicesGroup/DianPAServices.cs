@@ -979,9 +979,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Auth
             start = DateTime.UtcNow;
-            //Si no es un endoso en blanco valida autorizacion
-            if (listId != "2" && senderCode != "01")
+            //Mandato sin CUFES referenciados
+            bool mandato = (eventCode == "043" && listId != "3");
+            bool validaAutho = ( (eventCode == "037" || eventCode == "038" || eventCode == "039" ) && listId != "2" || mandato);
+            
+            //Si no es un endoso en blanco valida autorizacion            
+            if (validaAutho && senderCode != "01")
             {
+                
                 string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 
                 var authEntity = GetAuthorization(senderCode, authCode);
@@ -1000,6 +1005,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     return dianResponse;
                 }
+                           
             }
 
             var auth = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Auth3)
