@@ -131,12 +131,32 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{Bonificaciones}", this.GetMonetaryValueFormatToTemplate(model.BonificacionNS));
             template = template.Replace("{Comisiones}", this.GetMonetaryValueFormatToTemplate(model.Comisiones));
             template = template.Replace("{Compensaciones}", this.GetMonetaryValueFormatToTemplate(model.CompensacionE));
+            template = template.Replace("{Auxilios}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{HuelgasLegales}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{OtrosConceptos}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{BonoEPCTVs}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Dotación}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{ApoyoSost}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Teletrabajo}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{BonifRetiro}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Indemnización}", this.GetMonetaryValueFormatToTemplate(""));
 
             // Deducciones
             template = template.Replace("{Health}", this.GetMonetaryValueFormatToTemplate(model.s_Deduccion));
             template = template.Replace("{Pension}", this.GetMonetaryValueFormatToTemplate(model.FP_Deduccion));
             template = template.Replace("{Retefuent}", this.GetMonetaryValueFormatToTemplate(model.RetencionFuente));
             template = template.Replace("{EmployeeFund}", this.GetMonetaryValueFormatToTemplate(model.FSP_Deduccion));
+            template = template.Replace("{Sindicatos}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Sanciones}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Libranzas}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{ICA}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{AFC}", this.GetMonetaryValueFormatToTemplate(model.AFC));
+            template = template.Replace("{Cooperativa}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{EmbargoFiscal}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{PlanComplementarios}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Educación}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Reintegro}", this.GetMonetaryValueFormatToTemplate(""));
+            template = template.Replace("{Deuda}", this.GetMonetaryValueFormatToTemplate(""));
 
             // TOTAL DEDUCCIONES
             template = template.Replace("{Letters}", this.GetTotalInLetters(model.ComprobanteTotal));
@@ -374,6 +394,7 @@ namespace Gosocket.Dian.Application
 
         public byte[] GetPdfReport(string id)
         {
+            var documentName = "NóminaIndividualElectrónica";
             StringBuilder template = new StringBuilder();
             var payrollModel = this.GetPayrollData(id);
 
@@ -382,6 +403,7 @@ namespace Gosocket.Dian.Application
             // Si es Nómina Individual y tiene DocumentReferencedKey, es porque tiene un Ajuste de Nómina
             if (int.Parse(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll && !string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey))
             {
+                documentName = "AjusteNóminaIndividualElectrónica";
                 // Load template
                 template.Append(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNominaAjuste.html"));
                 // Adjustment data...
@@ -406,7 +428,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{QRCode}", ImgHtml);
 
             // Mapping Events
-            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), "NóminaIndividualElectrónica");
+            byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), documentName);
 
             return report;
         }
