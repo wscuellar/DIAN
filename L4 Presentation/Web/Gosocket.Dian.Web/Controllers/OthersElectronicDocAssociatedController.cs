@@ -261,7 +261,9 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(new OthersElectronicDocAssociatedViewModel());
             }
 
-            string key = model.OperationModeId.ToString() +  "|" + model.SoftwareId.ToString();
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
@@ -272,7 +274,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
 
             var softwareStatusName = string.Empty;
-            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            
             if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
             ViewBag.OtherDocElecSoftwareStatusName = softwareStatusName;
 
