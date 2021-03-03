@@ -462,6 +462,48 @@ namespace Gosocket.Dian.Application
             }
         }
 
+
+        public void SetToEnabledOtherDocElecContributor(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        {
+            using (var context = new SqlDBContext())
+            {
+                //Ubicar el participante que se habilitara
+                OtherDocElecContributor otherDocElec = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
+                                        && t.OtherDocElecContributorTypeId == contributorTypeId);
+
+                if (otherDocElec != null)
+                {
+                    //Cambiar estado habilitado
+                    otherDocElec.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
+                    otherDocElec.Step = 4;
+                    otherDocElec.Update = System.DateTime.Now;
+                    Guid softId = new Guid(softwareId);
+
+                    //Si es software propio lo habilita.
+                    if (otherDocElec.OtherDocElecOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                    {
+                        OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
+                        soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
+                    }
+
+                    //Se ubica la operacion del participante para habilitarla
+                    OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(
+                                                 t => t.OtherDocElecContributorId == otherDocElec.Id
+                                                 && t.SoftwareType == softwareType
+                                                 && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
+                                                 && t.OperationStatusId == (int)Domain.Common.RadianState.Test
+                                                 && !t.Deleted
+                                                 );
+
+
+                    if (otherDocOperation != null)
+                        otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocumentStatus.Habilitado; //Aceptada la operacion.
+
+                    context.SaveChanges();
+                }
+            }
+        }
+
         public void SetToEnabledRadian(int contributorId, int contributorTypeId, string softwareId, int softwareType)
         {
             using (var context = new SqlDBContext())
@@ -534,6 +576,19 @@ namespace Gosocket.Dian.Application
             using (var context = new SqlDBContext())
             {
                 return context.RadianContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.RadianContributorTypeId == contributorTypeId);
+            }
+        }
+
+        /// <summary>
+        /// Metodo que devuelve un objeto OtherDocElecContributor desde SQL
+        /// </summary>
+        /// <param name="radianContributorId">Id a ubicar</param>
+        /// <returns>Un objeto RadianCotributor buscado</returns>
+        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.OtherDocElecContributorTypeId == contributorTypeId);
             }
         }
 

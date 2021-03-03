@@ -50,6 +50,22 @@ namespace Gosocket.Dian.Application
             return item.State == Domain.Common.OtherDocElecState.Habilitado.ToString();
         }
 
+        public GlobalOtherDocElecOperation EnableParticipantOtherDocument(string code, string softwareId, OtherDocElecContributor otherDocElecContributor)
+        {
+            GlobalOtherDocElecOperation operation = globalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId.ToString());
+            if (operation.State != Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Test))
+                return new GlobalOtherDocElecOperation();
+
+            operation.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
+
+            if (otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
+                operation.TecnologicalSupplier = otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider;
+
+            _ = Update(operation);
+
+            return operation;
+        }
+
 
         #endregion
 

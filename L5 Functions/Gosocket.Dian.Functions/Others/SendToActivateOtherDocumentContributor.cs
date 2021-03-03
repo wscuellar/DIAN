@@ -1,24 +1,29 @@
 using Gosocket.Dian.Application;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Functions.Utils;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System;
 using System.Net.Http;
+using System.Net;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Data.Entity.Core;
+using Gosocket.Dian.Domain;
+
 
 namespace Gosocket.Dian.Functions.Others
 {
     public static class SendToActivateOtherDocumentContributor
-    {
+    {        
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        //private static readonly ContributorService contributorService = new ContributorService();
-        //private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
+        private static readonly ContributorService contributorService = new ContributorService();
+        private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();
 
         [FunctionName("SendToActivateOtherDocumentContributor")]
 
@@ -27,7 +32,108 @@ namespace Gosocket.Dian.Functions.Others
             log.Info("C# HTTP trigger function processed a request.");
             SetLogger(null, "Step STA-00", ConfigurationManager.GetValue("Environment"));
 
-      
+            //Solo en ambiente de habilitacion.
+            if (ConfigurationManager.GetValue("Environment") == "Hab")
+            {
+                //Se obtiene la informacion para habilitar
+                OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
+                if (data == null)
+                    throw new Exception("Request body is empty.");
+                SetLogger(data, "Step STA-1.1", "Data");
+
+                //Se obtiene participante otros documentos habilitacion
+                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId);
+                SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor");
+                if (otherDocElecContributor == null)
+                    throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
+
+                try
+                {
+                    if (data.ContributorId == 0)
+                        throw new Exception("Please pass a contributor ud in the request body.");
+                    SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
+
+                    //Se busca el contribuyente en el ambiente de habilitacion.
+                    Contributor contributor = contributorService.Get(data.ContributorId);
+                    SetLogger(null, "Step STA-2.1", contributor != null ? contributor.Id.ToString() : "no tiene");
+                    if (contributor == null)
+                        throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
+
+                    //Se obtiene cadena de conexion de prod, para buscar la existencia del contribuyente en ese ambiente.
+                    string sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
+                    SetLogger(null, "Step STA-1", sqlConnectionStringProd);
+
+                    // Se busca el contribuyente en prod
+                    Contributor contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
+                    SetLogger(null, "Step STA-3", contributorProd != null ? contributorProd.Id.ToString() : "no tiene en prod");
+                    if (contributorProd == null)
+                        throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
+
+                    // Se obtiene el set de pruebas par el cliente
+                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    SetLogger(null, "Step STA-4.1", data.Code, "code123");
+                    SetLogger(null, "Step STA-4.2", key, "key123");
+                    GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
+                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "sta5-2020");
+
+                    //Se valida que pase el set de pruebas.
+                    if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
+                        throw new Exception("Contribuyente no a pasado set de pruebas.");
+
+                    SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ");
+
+                    SetLogger(null, "Step STA-6", " -- OtherDocElecContributor -- " +
+                                            otherDocElecContributor.ContributorId + " "
+                                            + otherDocElecContributor.OtherDocElecContributorTypeId + " "
+                                            + data.SoftwareId + " "
+                                            + data.SoftwareType
+                                            , "Step STA-6");
+
+                    //Se habilita el contribuyente en BD
+                    contributorService.SetToEnabledOtherDocElecContributor(
+                      otherDocElecContributor.ContributorId,
+                      otherDocElecContributor.OtherDocElecContributorTypeId,
+                      data.SoftwareId,
+                      Convert.ToInt32(data.SoftwareType));
+
+                    //Se habilita el contribuyente en la table Storage
+                    globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, data.SoftwareId, otherDocElecContributor);
+
+                    //Se recolecta la informacion para la creacion en prod.
+                    OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
+                    {
+                        Code = data.Code,
+                        ContributorId = otherDocElecContributor.ContributorId,
+                        OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
+                        CreatedBy = otherDocElecContributor.CreatedBy,
+                        OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
+                        SoftwarePassword = data.SoftwarePassword,
+                        SoftwareUser = data.SoftwareUser,
+                        Pin = data.Pin,
+                        SoftwareName = data.SoftwareName,
+                        SoftwareId = data.SoftwareId,
+                        SoftwareType = data.SoftwareType,
+                        Url = data.Url
+                    };
+
+                    //Se envia para la creacion en prod.
+                    await SendToActivateOtherDocumentContributorToProduction(activateOtherDocumentContributorRequestObject);
+
+                    SetLogger(activateOtherDocumentContributorRequestObject, "Step STA-7", " -- SendToActivateOtherDocumentContributorToProduction -- ");
+
+
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"Error al enviar a activar contribuyente con id {otherDocElecContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
+
+                    SetLogger(failResponse, "STA-Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
+
+                    return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
+                }
+            }
+
 
             return null;
         }
@@ -56,6 +162,94 @@ namespace Gosocket.Dian.Functions.Others
             TableManagerGlobalLogger.InsertOrUpdate(lastZone);
         }
 
+        private static async Task SendToActivateOtherDocumentContributorToProduction(OtherDocumentActivateContributorRequestObject activateContributorRequestObject)
+        {
+            List<EventGridEvent> eventsList = new List<EventGridEvent>
+            {
+                new EventGridEvent()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    EventType = "Activate.OtherDocument.Operation.Event",
+                    Data = JsonConvert.SerializeObject(activateContributorRequestObject),
+                    EventTime = DateTime.UtcNow,
+                    Subject = $"|PRIORITY:1|",
+                    DataVersion = "2.0"
+                }
+            };
+            await EventGridManager.Instance("EventGridKeyProd", "EventGridTopicEndpointProd").SendMessagesToEventGridAsync(eventsList);
+        }
 
+
+        class OtherDocumentActivationRequest
+        {
+
+            [JsonProperty(PropertyName = "code")]
+            public string Code { get; set; }
+
+            [JsonProperty(PropertyName = "contributorId")]
+            public int ContributorId { get; set; }
+
+            [JsonProperty(PropertyName = "contributorTypeId")]
+            public int ContributorTypeId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareId")]
+            public string SoftwareId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareType")]
+            public string SoftwareType { get; set; }
+
+            [JsonProperty(PropertyName = "softwareUser")]
+            public string SoftwareUser { get; set; }
+
+            [JsonProperty(PropertyName = "softwarePassword")]
+            public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "pin")]
+            public string Pin { get; set; }
+
+            [JsonProperty(PropertyName = "softwareName")]
+            public string SoftwareName { get; set; }
+
+            [JsonProperty(PropertyName = "url")]
+            public string Url { get; set; }
+        }
+
+        class OtherDocumentActivateContributorRequestObject
+        {
+            [JsonProperty(PropertyName = "code")]
+            public string Code { get; set; }
+            [JsonProperty(PropertyName = "contributorId")]
+            public int ContributorId { get; set; }
+
+            [JsonProperty(PropertyName = "radianContributorTypeId")]
+            public int OtherDocContributorTypeId { get; set; }
+
+            [JsonProperty(PropertyName = "radianOperationModeId")]
+            public int OtherDocOperationModeId { get; set; }
+
+            [JsonProperty(PropertyName = "createdBy")]
+            public string CreatedBy { get; set; }
+
+            [JsonProperty(PropertyName = "softwareType")]
+            public string SoftwareType { get; set; }
+
+            [JsonProperty(PropertyName = "softwareId")]
+            public string SoftwareId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareName")]
+            public string SoftwareName { get; set; }
+
+            [JsonProperty(PropertyName = "pin")]
+            public string Pin { get; set; }
+
+            [JsonProperty(PropertyName = "url")]
+            public string Url { get; set; }
+
+            [JsonProperty(PropertyName = "softwareUser")]
+            public string SoftwareUser { get; set; }
+
+            [JsonProperty(PropertyName = "softwarePassword")]
+            public string SoftwarePassword { get; set; }
+        }
     }
 }

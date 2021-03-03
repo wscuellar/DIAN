@@ -415,28 +415,45 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");
 
-                    //Nomina Individual
+                    string[] nomina = { "102", "103" };
+                    string[] otherDocument = { "05", "101" };
+
+                    //Totales docuemntos
                     setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
                     setResultOther.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                     setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+
                     //Nomina Individual y de Ajuste
-                    setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count();
-                    setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
-                    setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+                    setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count(a => nomina.Contains(a.DocumentTypeId));
+                    setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && nomina.Contains(a.DocumentTypeId));
+                    setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && nomina.Contains(a.DocumentTypeId));
+
                     //OtherDocument
-                    setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count();
-                    setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
-                    setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+                    setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count(a => otherDocument.Contains(a.DocumentTypeId));
+                    setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                    setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && otherDocument.Contains(a.DocumentTypeId));
 
                     //Validacion Total Nomina aceptados
                     if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
-                        && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
+                        && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired
+                        && setResultOther.Status == (int)TestSetStatus.InProcess)
                     {
                         SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina", "UPDATE-03.3");
-                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
-                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
-                    }                 
-                     
+                        setResultOther.Status = (int)TestSetStatus.Accepted;
+                        setResultOther.StatusDescription = TestSetStatus.Accepted.GetDescription();
+                        setResultOther.State = TestSetStatus.Accepted.GetDescription();
+                    }
+
+                    //Validacion Total Nomina rechazados 
+                    if (setResultOther.TotalDocumentsRejected > (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)                        
+                        && setResultOther.Status == (int)TestSetStatus.InProcess)
+                    {
+                        SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
+                        setResultOther.Status = (int)TestSetStatus.Rejected;
+                        setResultOther.StatusDescription = TestSetStatus.Rejected.GetDescription();
+                        setResultOther.State = TestSetStatus.Rejected.GetDescription();
+                    }
+
                     ////Validacion Total otros documentos aceptados
                     //if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
                     //    && setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
@@ -444,19 +461,7 @@ namespace Gosocket.Dian.Functions.Activation
                     //    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document", "UPDATE-03.4");
                     //    setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                     //    setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
-                    //}
-
-                   
-                    
-                    //Validacion Total Nomina rechazados 
-                    if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
-                        && setResultOther.ElectronicPayrollAjustmentRejected >= (setResultOther.ElectronicPayrollAjustmentRequired - setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
-                        && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
-                    {
-                        SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
-                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
-                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
-                    }
+                    //}                   
                  
                     ////Validacion Total Otros Documentos rechazados 
                     //if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
@@ -469,7 +474,6 @@ namespace Gosocket.Dian.Functions.Activation
                     //}
 
                     
-
                     //Registro en la table Azure
                     await tableManagerGlobalTestSetOthersDocumentsResult.InsertOrUpdateAsync(setResultOther);
 
