@@ -194,7 +194,7 @@ namespace Gosocket.Dian.Application
                 string key = existingOperation.SoftwareType.ToString() + "|" + software.SoftwareId.ToString();
                 GlobalTestSetOthersDocumentsResult setResult = new GlobalTestSetOthersDocumentsResult(contributor.Code, key)
                 {
-                    Id = testSet.TestSetId,
+                    Id = Guid.NewGuid().ToString(),
                     OtherDocElecContributorId = ODEContributor.Id,
                     State = TestSetStatus.InProcess.GetDescription(),
                     Status = (int)TestSetStatus.InProcess,
