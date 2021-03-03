@@ -1558,7 +1558,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
+                        Mandatory = false,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC57"),
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC57"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
