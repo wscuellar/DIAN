@@ -411,17 +411,9 @@ namespace Gosocket.Dian.Functions.Activation
                     bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(setResultOther.SoftwareId));
                     SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
                     if (isActive)
-                        return;
-               
+                        return;               
 
                     SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");
-
-                    foreach (var item in allGlobalTestSetTracking)
-                    {
-                        //Consigue informacion del CUDE
-                        GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
-                        item.DocumentTypeId = validatorDocumentMeta.EventCode;
-                    }
 
                     //Nomina Individual
                     setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
@@ -440,43 +432,43 @@ namespace Gosocket.Dian.Functions.Activation
                     if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
                         && setResultOther.ElectronicPayrollAjustmentAccepted >= setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                     {
+                        SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina", "UPDATE-03.3");
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
                     }                 
-   
-                    SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina" , "UPDATE-03.3");
+                     
+                    ////Validacion Total otros documentos aceptados
+                    //if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
+                    //    && setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
+                    //{
+                    //    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document", "UPDATE-03.4");
+                    //    setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
+                    //    setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
+                    //}
 
-                    //Validacion Total otros documentos aceptados
-                    if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
-                        && setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired)
-                    {
-                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Accepted;
-                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Accepted.GetDescription();
-                    }
-
-                    SetLogger(null, "Step 4 - Validacion Other Document", "Paso Validacion de Other Document", "UPDATE-03.4");
+                   
                     
                     //Validacion Total Nomina rechazados 
                     if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
                         && setResultOther.ElectronicPayrollAjustmentRejected >= (setResultOther.ElectronicPayrollAjustmentRequired - setResultOther.ElectronicPayrollAjustmentAcceptedRequired)
                         && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
                     {
+                        SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
                         setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
                         setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
                     }
+                 
+                    ////Validacion Total Otros Documentos rechazados 
+                    //if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
+                    //    && setResultOther.OthersDocumentsRejected >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
+                    //    && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
+                    //{
+                    //    SetLogger(null, "Step 6 - Validacion Other Document Reject", "Paso Validacion de Other Document", "UPDATE-03.6");
+                    //    setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
+                    //    setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
+                    //}
 
-                    SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
-
-                    //Validacion Total Otros Documentos rechazados 
-                    if (setResultOther.TotalDocumentsRejected >= (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)
-                        && setResultOther.OthersDocumentsRejected >= (setResultOther.OthersDocumentsRequired - setResultOther.OthersDocumentsAcceptedRequired)
-                        && setResultOther.Status == (int)OtherDocElecSoftwaresStatus.InProcess)
-                    {
-                        setResultOther.Status = (int)OtherDocElecSoftwaresStatus.Rejected;
-                        setResultOther.StatusDescription = OtherDocElecSoftwaresStatus.Rejected.GetDescription();
-                    }
-
-                    SetLogger(null, "Step 6 - Validacion Other Document Reject", "Paso Validacion de Other Document", "UPDATE-03.6");
+                    
 
                     //Registro en la table Azure
                     await tableManagerGlobalTestSetOthersDocumentsResult.InsertOrUpdateAsync(setResultOther);
@@ -484,6 +476,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (setResultOther.Status == (int)TestSetStatus.Accepted)
                     {
+                        SetLogger(null, "Step 6.1", "Aceptado", "UPDATE-03.7");
 
                         // partition key are sender code.
                         var contributor = contributorService.GetByCode(setResultOther.PartitionKey);
@@ -503,39 +496,38 @@ namespace Gosocket.Dian.Functions.Activation
                             var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
                             await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                         }
-
-                        SetLogger(null, "Step 6.1", "Fui aceptado", "11111111112");
+                      
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
                             try
                             {
-                                SetLogger(null, "Step 6.2", "Estoy en habilitacion", "11111111121");
+                                SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
 
                                 #region Proceso Habilitacion
-                                //Traemos el contribuyente
-                                //var contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
-
-                                //Habilitamos el participante en GlobalRadianOperations
-                                GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(radianTesSetResult.PartitionKey, globalTestSetTracking.SoftwareId);
 
 
-                                SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.RadianState " + isPartipantActiveOtherDoc.State);
+                                //Habilitamos el participante en GlobalOtherDocElecOperation
+                                GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(globalTestSetTracking.PartitionKey, globalTestSetTracking.SoftwareId);
+
+
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.9");
 
                                 //Verificamos si quedo habilitado sino termina
                                 if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
-                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " isPartipantActive.RadianState " + isPartipantActiveOtherDoc.State);
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.10");
 
 
                                 //--GlobalSoftware 
                                 var softwareId = isPartipantActiveOtherDoc.RowKey;
-                                //var software = softwareService.GetByRadian(Guid.Parse(softwareId));
+
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, "UPDATE-03.11");
 
                                 #endregion
 
-                                #region Pendiente migracion SQL
+                                #region migracion SQL
 
                                 var requestObject = new
                                 {

@@ -283,47 +283,76 @@ namespace Gosocket.Dian.Functions.Batch
                        
                         var request = new { trackId, draft, testSetId, eventNomina };
                         var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), request);
-                    
+                        if (validations.Count == 0)
+                        {
+                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                        }
+                        else
+                        {
+                            //Validaciones reglas Validador Xpath
+                            var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
+                            var notifications = validations.Where(r => r.IsNotification).ToList();
+
+                            if (!errors.Any() && !notifications.Any()) { validateDocumentUrl = true; }
+
+                            if (errors.Any()) { validateDocumentUrl = false; }
+
+                            if (notifications.Any()) { validateDocumentUrl = !errors.Any(); }
+                        }
+
+                        //Registra tablas Nomina
+                        if (setResultOther != null)
+                        {
+                            if (validateDocumentUrl)
+                            {
+                                SetLogger(null, "Step prueba nomina", " Ingresa cargue de documento NOMINA ", "PROC-04");
+                                try
+                                {
+                                    byte[] xmlBytesEvent = null;
+                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
+                                    if (processRegistrateComplete.Code == "100")
+                                    {
+                                        xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
+                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
+                                    }
+                                    else
+                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                }
+                                catch (Exception ex)
+                                {
+                                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                    log.Error($"Error al generar registro complemento de datos en NOMINA con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                }
+
+                                SetLogger(null, "Step prueba nomina", " Salida cargue de documento NOMINA ", "PROC-04.1");
+                            }
+                        }
+
                         //Registra tablas de negocio AR
                         if (flagApplicationResponse)
-                        {
-                            if (validations.Count == 0)
+                        {                           
+                            if (validateDocumentUrl)
                             {
-                                appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
-                            }
-                            else
-                            {
-                                //Validaciones reglas Validador Xpath
-                                var errors = validations.Where(r => !r.IsValid && r.Mandatory).ToList();
-                                var notifications = validations.Where(r => r.IsNotification).ToList();
-
-                                if (!errors.Any() && !notifications.Any()) { validateDocumentUrl = true; }
-
-                                if (errors.Any()) { validateDocumentUrl = false; }
-
-                                if (notifications.Any()) { validateDocumentUrl = !errors.Any(); }
-
-                                if (validateDocumentUrl)
+                                SetLogger(null, "Step prueba nomina", " Ingresa cargue de documento RADIAN ", "PROC-05");
+                                try
                                 {
-                                    try
+                                    byte[] xmlBytesEvent = null;
+                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
+                                    if (processRegistrateComplete.Code == "100")
                                     {
-                                        byte[] xmlBytesEvent = null;
-                                        var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
-                                        if (processRegistrateComplete.Code == "100")
-                                        {
-                                            xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
-                                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
-                                        }
-                                        else
-                                            appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                        xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
+                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
                                     }
-                                    catch (Exception ex)
-                                    {
+                                    else
                                         appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
-                                        log.Error($"Error al generar registro complemento de datos en RADIAN con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
-                                    }
                                 }
-                            }
+                                catch (Exception ex)
+                                {
+                                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                    log.Error($"Error al generar registro complemento de datos en RADIAN con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                }
+                                SetLogger(null, "Step prueba nomina", " Salida cargue de documento RADIAN ", "PROC-05.1");
+                            }                            
                         }                       
 
                         var batchFileResult = GetBatchFileResult(zipKey, trackId, validations);
@@ -353,7 +382,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 // Update document status on batch
                 await ProcessBatchFileResults(batchFileResults);
-                SetLogger(null, "Step prueba nomina", " Paso update documento status ", "PROC-04");
+                SetLogger(null, "Step prueba nomina", " Paso update documento status ", "PROC-06");
 
                 var successAppResponses = appResponses.Where(x => x.Success && x.Content != null).ToList();
                 log.Info($"{successAppResponses.Count()} application responses generated.");
@@ -364,7 +393,7 @@ namespace Gosocket.Dian.Functions.Batch
                     log.Info($"Upload applition responses zip OK.");
                 }
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse, "PROC-05");
+                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse, "PROC-07");
                 log.Info($"End.");
             }
             catch (Exception ex)
@@ -455,14 +484,26 @@ namespace Gosocket.Dian.Functions.Batch
                     SetLogger(null, "Step code", "Ingrese a validar testSetId " + testSetId + " y nitNomina " + nitNomina, "CHECK-08");
                     if (!string.IsNullOrEmpty(testSetId))
                     {
-                        SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
-                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+                        //Consulta exista testSetID FE GlobalTestSetResult
+                        List<GlobalTestSetResult> lstResulGlobalTestSetResult = tableManagerGlobalTestSetResult.FindByPartition<GlobalTestSetResult>(code);
+                        GlobalTestSetResult objGlobalTestSetResult = lstResulGlobalTestSetResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
 
+                        SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
+
+                        //Consulta exista testSetID registros RADIAN RadianTestSetResult
+                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);                       
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                         var softwareId = softwareIds.Last();
 
-                        if (objRadianTestSetResult == null && string.IsNullOrWhiteSpace(nitNomina))
+                        //Validaciones exista testSetID GlobalTestSetOthersDocumentsResult
+                        SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
+                        List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
+                        GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
+
+
+                        if (objGlobalTestSetResult != null)
                         {
+                            //Factura Electronica
                             SetLogger(null, "Step code", "Estoy verificando Factrua", "CHECK-10.1");
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
                             if (authEntity == null)
@@ -503,14 +544,11 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                         }
-                        else if (!string.IsNullOrEmpty(testSetId) && !string.IsNullOrEmpty(nitNomina))
-                        {
+                        else if (objGlobalTestSetOthersDocumentResult != null)
+                        {                            
                             //Validaciones GlobalTestSetOthersDocumentsResult documento de Nomina
                             SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
-                            List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
-                           
-                            GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));                           
-
+                          
                             SetLogger(null, "Step code", "Estoy verificando nomina idSoftware " + softwareIdNomina, "CHECK-10.2.1");
                             
                             GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
@@ -534,7 +572,7 @@ namespace Gosocket.Dian.Functions.Batch
                             SetLogger(result, "Step code", "Finaliza validaciones Nomina", "CHECK-10.2.4");
                             
                         }
-                        else
+                        else if(objRadianTestSetResult != null)
                         {
                             SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.4");
                             // Validations to RADIAN  
@@ -554,6 +592,11 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba RADIAN con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Accepted)}." });
                             else if (radianTestSetResultEntity.Status == (int)TestSetStatus.Rejected)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba RADIAN con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
+                        }
+                        else
+                        {
+                            SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
+                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
                         }
                     }
                 }
