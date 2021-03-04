@@ -549,6 +549,28 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public void OperationRejectOtherDoc(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        {
+            using (var context = new SqlDBContext())
+            {
+                OtherDocElecContributor otherDoc = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
+                                      && t.OtherDocElecContributorTypeId == contributorTypeId);
+
+                OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(
+                                                t => t.OtherDocElecContributorId == otherDoc.Id
+                                                && t.SoftwareType == softwareType
+                                                && t.SoftwareId.ToString().Trim().ToLower().Equals(softwareId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
+                                                && !t.Deleted
+                                                );
+                if (otherDocOperation != null)
+                    otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocumentStatus.Cancelado; //cancelo = rechazo.
+
+                context.SaveChanges();
+            }
+        }
+
+
+
         public void OperationReject(int contributorId, int contributorTypeId, string softwareId, int softwareType)
         {
             using (var context = new SqlDBContext())

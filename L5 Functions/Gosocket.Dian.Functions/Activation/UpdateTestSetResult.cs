@@ -3,6 +3,7 @@ using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Functions.Others;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -442,14 +443,21 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.State = TestSetStatus.Accepted.GetDescription();
                     }
 
+                    Contributor contributor = contributorService.GetByCode(setResultOther.PartitionKey);
+                    GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.GetOperation(setResultOther.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+
+                    SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.9");
+
+
                     //Validacion Total Nomina rechazados 
                     if (setResultOther.TotalDocumentsRejected > (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)                        
                         && setResultOther.Status == (int)TestSetStatus.InProcess)
                     {
-                        SetLogger(null, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
+                        SetLogger(isPartipantActiveOtherDoc, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
                         setResultOther.Status = (int)TestSetStatus.Rejected;
                         setResultOther.StatusDescription = TestSetStatus.Rejected.GetDescription();
                         setResultOther.State = TestSetStatus.Rejected.GetDescription();
+                        contributorService.OperationRejectOtherDoc(contributor.Id, isPartipantActiveOtherDoc.ContributorTypeId, isPartipantActiveOtherDoc.SoftwareId, isPartipantActiveOtherDoc.OperationModeId);
                     }
                     
                     //Registro en la table Azure
@@ -458,27 +466,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (setResultOther.Status == (int)TestSetStatus.Accepted)
                     {
-                        SetLogger(null, "Step 6.1", "Aceptado", "UPDATE-03.7");
-
-                        // partition key are sender code.
-                        var contributor = contributorService.GetByCode(setResultOther.PartitionKey);
-                        if (contributor.AcceptanceStatusId == (int)ContributorStatus.Registered)
-                        {
-                            contributorService.SetToEnabled(contributor);
-                            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
-                            await contributorTableManager.InsertOrUpdateAsync(globalContributor);
-                        }
-
-                        var software = softwareService.Get(Guid.Parse(setResultOther.SoftwareId));
-                        if (software.AcceptanceStatusSoftwareId == (int)Domain.Common.OperationMode.Own
-                            && Convert.ToInt32(setResultOther.OperationModeName) != (int)Domain.Common.OperationMode.Free)
-                        {
-                            softwareService.SetToProduction(software);
-                            var softwareId = software.Id.ToString();
-                            var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
-                            await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
-                        }
-                      
+                        SetLogger(null, "Step 6.1", "Aceptado", "UPDATE-03.7");                      
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -486,25 +474,16 @@ namespace Gosocket.Dian.Functions.Activation
                             try
                             {
                                 SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
-
-                                #region Proceso Habilitacion
-                                //Habilitamos el participante en GlobalOtherDocElecOperation
-                                GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(globalTestSetTracking.PartitionKey, globalTestSetTracking.SoftwareId);
-
-                                SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.9");
-
+                              
                                 //Verificamos si quedo habilitado sino termina
-                                if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;
+                                if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;                               
 
-                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.10");
-
-                                //--GlobalSoftware 
-                                var softwareId = isPartipantActiveOtherDoc.RowKey;
+                                //--Traemos la informacion del software
+                                string softwareId = globalTestSetTracking.SoftwareId;
+                                OtherDocElecSoftware software = softwareService.GetByOtherDoc(Guid.Parse(softwareId));
 
                                 SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, "UPDATE-03.11");
-
-                                #endregion
-
+                            
                                 #region migracion SQL
 
                                 var requestObject = new
@@ -513,7 +492,7 @@ namespace Gosocket.Dian.Functions.Activation
                                     contributorId = contributor.Id,
                                     contributorTypeId = isPartipantActiveOtherDoc.ContributorTypeId,
                                     softwareId = isPartipantActiveOtherDoc.RowKey,
-                                    softwareType = isPartipantActiveOtherDoc.SoftwareId,
+                                    softwareType = isPartipantActiveOtherDoc.OperationModeId,
                                     softwareUser = software.SoftwareUser,
                                     softwarePassword = software.SoftwarePassword,
                                     pin = software.Pin,
