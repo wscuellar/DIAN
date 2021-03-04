@@ -170,7 +170,8 @@ namespace Gosocket.Dian.Application
         private void ApplyTestSet(OtherDocElecContributorOperations ODEOperation, GlobalTestSetOthersDocuments testSet, OtherDocElecContributor ODEContributor, OtherDocElecContributorOperations existingOperation, OtherDocElecSoftware software)
         {
             Contributor contributor = ODEContributor.Contributor;
-            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
+            //GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
+            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
             if (operation == null)
                 operation = new GlobalOtherDocElecOperation(contributor.Code, existingOperation.SoftwareId.ToString());
 
@@ -182,7 +183,8 @@ namespace Gosocket.Dian.Application
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.OperationModeId = ODEContributor.OtherDocElecOperationModeId;
             //operation.SoftwareId = ODEOperation.SoftwareId.ToString();
-            operation.SoftwareId = software.SoftwareId.ToString();
+            //operation.SoftwareId = software.SoftwareId.ToString();
+            operation.SoftwareId = existingOperation.SoftwareId.ToString();
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.State = OtherDocElecState.Test.GetDescription();
