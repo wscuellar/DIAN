@@ -215,11 +215,13 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
-            ViewBag.TestSetId = testSet.TestSetId;
+            //ViewBag.TestSetId = testSet.TestSetId;
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
 
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+
+            ViewBag.TestSetId = model.GTestSetOthersDocumentsResult.Id;
 
             model.GTestSetOthersDocumentsResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.OtherDocElecOperationMode), model.OperationModeId.ToString())));
             model.GTestSetOthersDocumentsResult.StatusDescription = testSet.Description;
@@ -268,7 +270,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
 
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
-            ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
+            //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
+            ViewBag.TestSetId = model.GTestSetOthersDocumentsResult.Id;
 
             var softwareStatusName = string.Empty;
             
