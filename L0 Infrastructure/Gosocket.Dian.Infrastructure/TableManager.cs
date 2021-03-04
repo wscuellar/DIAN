@@ -469,6 +469,25 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+
+        public T FindSoftwareId<T>(string partitionKey, string softwareId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("SoftwareId",
+                    QueryComparisons.Equal,
+                    softwareId),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
         public T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("TestSetId", QueryComparisons.Equal, testSetId));
