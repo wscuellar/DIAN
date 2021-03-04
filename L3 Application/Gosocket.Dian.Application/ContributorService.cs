@@ -154,6 +154,12 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId);
         }
 
+        public OtherDocElecContributorOperations GetOtherDocOperations(int OtherDocContributorId, string softwareId)
+        {
+            Guid SoftId = new Guid(softwareId);
+            return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
+        }
+
         public Contributor GetByCode(string code, string connectionString)
         {
             using (var context = new SqlDBContext(connectionString))
@@ -611,7 +617,24 @@ namespace Gosocket.Dian.Application
             }
         }
 
-
+        /// <summary>
+        /// Metodo que activa el RadianContributor en Produccion, lo ubica y cambia los Estados necesarios
+        /// </summary>
+        /// <param name="contributor">Los datos del radian Contributor a actualizar</param>
+        public void ActivateOtherDocument(OtherDocElecContributor contributor)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var contributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == contributor.Id);
+                if (contributorInstance != null)
+                {
+                    contributorInstance.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
+                    contributorInstance.RadianContributorTypeId = contributor.OtherDocElecContributorTypeId;
+                    contributorInstance.Update = DateTime.UtcNow;
+                    context.SaveChanges();
+                }
+            }
+        }
 
         public int AddOrUpdateRadianContributor(RadianContributor radianContributor)
         {
@@ -645,8 +668,52 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public int AddOrUpdateOtherDocContributor(OtherDocElecContributor otherDocContributor)
+        {
+            using (var context = new SqlDBContext())
+            {
+                OtherDocElecContributor otherDocContributorInstance =
+                    context.OtherDocElecContributors.FirstOrDefault(c => c.Id == otherDocContributor.Id);
+
+
+                if (otherDocContributorInstance != null)
+                {
+                    otherDocContributorInstance.OtherDocElecContributorTypeId = otherDocContributor.OtherDocElecContributorTypeId;
+                    otherDocContributorInstance.Update = DateTime.Now;
+                    otherDocContributorInstance.State = otherDocContributor.State;
+                    otherDocContributorInstance.OtherDocElecOperationModeId = otherDocContributor.OtherDocElecOperationModeId;
+                    otherDocContributorInstance.CreatedBy = otherDocContributor.CreatedBy;
+                    otherDocContributorInstance.Description = otherDocContributor.Description;
+                    otherDocContributorInstance.Step = otherDocContributor.Step == 0 ? 1 : otherDocContributor.Step;
+
+                    context.Entry(otherDocContributorInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    otherDocContributor.Step = 4;
+                    otherDocContributor.Update = DateTime.Now;
+                    context.Entry(otherDocContributor).State = System.Data.Entity.EntityState.Added;
+                }
+
+                context.SaveChanges();
+
+                return otherDocContributorInstance != null ? otherDocContributorInstance.Id : otherDocContributorInstance.Id;
+            }
+        }
+
 
         public int AddRadianOperation(RadianContributorOperation operation)
+        {
+            int affectedRecords = 0;
+            using (var context = new SqlDBContext())
+            {
+                context.Entry(operation).State = System.Data.Entity.EntityState.Added;
+                affectedRecords = context.SaveChanges();
+            }
+            return affectedRecords > 0 ? operation.Id : 0;
+        }
+
+        public int AddOtherDocOperation(OtherDocElecContributorOperations operation)
         {
             int affectedRecords = 0;
             using (var context = new SqlDBContext())
@@ -675,7 +742,24 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public bool UpdateOtherDocOperation(OtherDocElecContributorOperations contributorOperation)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var otherDocContributorOperationInstance = context.OtherDocElecContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
 
+                otherDocContributorOperationInstance.OperationStatusId = contributorOperation.OperationStatusId;
+                otherDocContributorOperationInstance.OtherDocElecContributorId = contributorOperation.OtherDocElecContributorId;
+                otherDocContributorOperationInstance.SoftwareId = contributorOperation.SoftwareId;
+                otherDocContributorOperationInstance.SoftwareType = contributorOperation.SoftwareType;
+                otherDocContributorOperationInstance.Deleted = contributorOperation.Deleted;
+                otherDocContributorOperationInstance.Timestamp = System.DateTime.Now;
+                context.Entry(otherDocContributorOperationInstance).State = System.Data.Entity.EntityState.Modified;
+                context.SaveChanges();
+                return true;
+            }
+        }
+       
         #endregion
 
         public Contributor GetContributorById(int Id, int contributorTypeId)

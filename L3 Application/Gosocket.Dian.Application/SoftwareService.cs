@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -182,6 +183,37 @@ namespace Gosocket.Dian.Application
                 context.SaveChanges();
             }
         }
+        
+        #endregion
+
+        #region OtherDocumentos
+
+         public void AddOrUpdateOtherDocSoftware(OtherDocElecSoftware software)
+        {
+            using (var context = new SqlDBContext())
+            {
+                var softwareInstance = context.OtherDocElecSoftwares.FirstOrDefault(c => c.Id == software.Id);
+
+                if (softwareInstance != null)
+                {
+                    softwareInstance.Deleted = software.Deleted;
+                    softwareInstance.Name = software.Name;
+                    softwareInstance.OtherDocElecContributorId = software.OtherDocElecContributorId;
+                    softwareInstance.SoftwareUser = software.SoftwareUser;
+                    softwareInstance.SoftwarePassword = software.SoftwarePassword;
+                    softwareInstance.Url = software.Url;
+                    softwareInstance.Updated = DateTime.UtcNow;
+                    softwareInstance.OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId;
+                    context.Entry(softwareInstance).State = System.Data.Entity.EntityState.Modified;
+                }
+                else
+                {
+                    context.Entry(software).State = System.Data.Entity.EntityState.Added;
+                }
+                context.SaveChanges();
+            }
+        }
+
         #endregion
     }
 }
