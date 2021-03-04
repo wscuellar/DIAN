@@ -49,10 +49,7 @@ namespace Gosocket.Dian.Functions.Activation
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
             try
-            {
-                //Variable de validacion para registro informacion del piloto
-                bool.TryParse(ConfigurationManager.GetValue("IsPilot"), out bool IsPilot);
-
+            {               
                 //Obtengo informacion de la cola e insertamos el registro del tracking de envios
                 EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                 GlobalTestSetTracking globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());

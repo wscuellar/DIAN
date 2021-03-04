@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Functions.Others
 
                 //Se obtiene participante otros documentos habilitacion
                 OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId);
-                SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor");
+                SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
                     throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
@@ -51,43 +51,43 @@ namespace Gosocket.Dian.Functions.Others
                 {
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
-                    SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
+                    SetLogger(null, "Step STA-2", " -- Validaciones OK-- ", "SEND-02");
 
                     //Se busca el contribuyente en el ambiente de habilitacion.
                     Contributor contributor = contributorService.Get(data.ContributorId);
-                    SetLogger(null, "Step STA-2.1", contributor != null ? contributor.Id.ToString() : "no tiene");
+                    SetLogger(null, "Step STA-2.1", contributor != null ? contributor.Id.ToString() : "no tiene","SEND-03");
                     if (contributor == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
 
                     //Se obtiene cadena de conexion de prod, para buscar la existencia del contribuyente en ese ambiente.
                     string sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnectionProd");
-                    SetLogger(null, "Step STA-1", sqlConnectionStringProd);
+                    SetLogger(null, "Step STA-1", sqlConnectionStringProd, "SEND-04");
 
                     // Se busca el contribuyente en prod
                     Contributor contributorProd = contributorService.GetByCode(data.Code, sqlConnectionStringProd);
-                    SetLogger(null, "Step STA-3", contributorProd != null ? contributorProd.Id.ToString() : "no tiene en prod");
+                    SetLogger(null, "Step STA-3", contributorProd != null ? contributorProd.Id.ToString() : "no tiene en prod", "SEND-05");
                     if (contributorProd == null)
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
                     // Se obtiene el set de pruebas par el cliente
                     string key = data.SoftwareType + '|' + data.SoftwareId;
-                    SetLogger(null, "Step STA-4.1", data.Code, "code123");
-                    SetLogger(null, "Step STA-4.2", key, "key123");
+                    SetLogger(null, "Step STA-4.1", data.Code,"SEND-06");
+                    SetLogger(null, "Step STA-4.2", key,"SEND-07");
                     GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
-                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "sta5-2020");
+                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
 
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
 
-                    SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ");
+                    SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
                     SetLogger(null, "Step STA-6", " -- OtherDocElecContributor -- " +
                                             otherDocElecContributor.ContributorId + " "
                                             + otherDocElecContributor.OtherDocElecContributorTypeId + " "
                                             + data.SoftwareId + " "
                                             + data.SoftwareType
-                                            , "Step STA-6");
+                                            , "SEND-10");
 
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledOtherDocElecContributor(
@@ -119,7 +119,7 @@ namespace Gosocket.Dian.Functions.Others
                     //Se envia para la creacion en prod.
                     await SendToActivateOtherDocumentContributorToProduction(activateOtherDocumentContributorRequestObject);
 
-                    SetLogger(activateOtherDocumentContributorRequestObject, "Step STA-7", " -- SendToActivateOtherDocumentContributorToProduction -- ");
+                    SetLogger(activateOtherDocumentContributorRequestObject, "Step STA-7", " -- SendToActivateOtherDocumentContributorToProduction -- ", "SEND-11");
 
 
                 }

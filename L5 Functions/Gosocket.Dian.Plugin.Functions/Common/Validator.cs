@@ -2518,7 +2518,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if ((customizationID == "431" || customizationID == "432"))
                         {
-                            if(tempCode.Length == 1 && tempCode.Contains("ALL17")) codeExist = true;
+                            if(tempCode.Length == 1 && tempCodeAttorney[0] == "ALL17") codeExist = true;
 
                         }
                         else if ((customizationID == "433" || customizationID == "434"))
@@ -2615,7 +2615,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Solo si existe información referenciada del CUFE
                 if (listID != "3")
                 {
-                    if (cufeList.Count >= 2)
+                    if (cufeList.Count > 2)
                     {
                         attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                         attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
