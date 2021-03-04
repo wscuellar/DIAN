@@ -19,7 +19,7 @@ namespace Gosocket.Dian.TestProject2.Controllers.FreeBiller
 
         private readonly UserService userService = new UserService();
 
-        [TestMethod]
+       // [TestMethod]
         public void CreateUser_ValidationTypeDoc()
         {
             UserFreeBillerModel model = this.CreatingWrongModel();
@@ -33,7 +33,7 @@ namespace Gosocket.Dian.TestProject2.Controllers.FreeBiller
             Assert.IsTrue(results.Count > 0);
         }
 
-        [TestMethod]
+       // [TestMethod]
         public void CreateUser_ValidationExistingUser() 
         {
             UserFreeBillerModel model = this.CreatingRightModel();
@@ -48,7 +48,7 @@ namespace Gosocket.Dian.TestProject2.Controllers.FreeBiller
             Assert.IsTrue(results.Count > 0);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void CreateUser_CreateUserOK()
         {
             UserFreeBillerModel model = this.CreatingRightModel();
@@ -71,7 +71,7 @@ namespace Gosocket.Dian.TestProject2.Controllers.FreeBiller
             Assert.AreEqual(0, validationResults.Count);
         }
 
-        [TestMethod]
+      //  [TestMethod]
         public void CreateUser_CreateUserFailUser()
         {
             UserFreeBillerModel model = this.CreatingRightModel();
@@ -95,7 +95,7 @@ namespace Gosocket.Dian.TestProject2.Controllers.FreeBiller
             Assert.IsTrue(validationResults.Count > 0);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void CreateUser_CreateUserFailRole()
         {
             UserFreeBillerModel model = this.CreatingRightModel();
