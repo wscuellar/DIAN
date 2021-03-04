@@ -75,7 +75,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             Assert.IsNull(response.XmlBase64Bytes);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void SendEventUpdateStatus_Acuse_Success_Test()
         {
             StreamReader file = new StreamReader(@".\WebServices\Files\1.Acuse-030.zip");
