@@ -470,26 +470,26 @@ namespace Gosocket.Dian.Web.Controllers
             if (user == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y tipo de identificación no coinciden.");
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage( "Número de documento y tipo de identificación no coinciden.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var contributor = user.Contributors.FirstOrDefault(c => c.Code == model.CompanyCode);
             if (contributor == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage( "Empresa no asociada a representante legal.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage( "Contribuyente tiene RUT en estado cancelado.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage( "Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
@@ -526,7 +526,7 @@ namespace Gosocket.Dian.Web.Controllers
                     if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
                     {
                         ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
-                        return View("CompanyLogin", model);
+                        return Json(new ResponseMessage("Autenticación correcta, su solicitud está siendo procesada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
                     }
                 }
                 catch (Exception ex)
@@ -543,14 +543,15 @@ namespace Gosocket.Dian.Web.Controllers
                     var tableManager = new TableManager("GlobalLogger");
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                    return View("CompanyLogin", model);
+                    return Json(new ResponseMessage( $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
                 }
             }
 
             ViewBag.UserEmail = HideUserEmailParts(auth.Email);
             ViewBag.Url = accessUrl;
-            ViewBag.currentTab = "confirmed";
-            return View("LoginConfirmed", model);
+            ViewBag.currentTab = "confirmed"; 
+            return Json(new ResponseMessage(accessUrl, "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -984,9 +985,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 auth.Status = false;
                 auth.Token = null;
-                dianAuthTableManager.InsertOrUpdate(auth);
-                if (User.Identity.IsAuthenticated)
-                    AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                dianAuthTableManager.InsertOrUpdate(auth); 
             }
             return RedirectToAction(nameof(UserController.Login), "User");
         }
