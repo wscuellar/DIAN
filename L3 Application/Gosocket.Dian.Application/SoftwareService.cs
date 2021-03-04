@@ -90,6 +90,12 @@ namespace Gosocket.Dian.Application
         }
 
 
+        public OtherDocElecSoftware GetByOtherDoc(Guid softwareId)
+        {
+            return sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(x => x.SoftwareId == softwareId);
+        }
+
+
         public IEnumerable<Software> GetAll()
         {
             return sqlDBContext.Softwares;
