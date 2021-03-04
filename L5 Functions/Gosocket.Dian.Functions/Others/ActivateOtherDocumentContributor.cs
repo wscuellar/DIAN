@@ -33,11 +33,11 @@ namespace Gosocket.Dian.Functions.Others
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
-            SetLogger(null, "Step OtherDocument-00", " Ingresamos a ActivateOtherDocumentContributor ");
+            SetLogger(null, "Step OtherDocument-00", " Ingresamos a ActivateOtherDocumentContributor ", "ACTSEND-01");
 
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod ");
+                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod ", "ACTSEND-02");
 
                 OtherDocElecContributor otherDocElecContributor = null;
                 GlobalContributorActivation contributorActivation = null;
@@ -48,12 +48,12 @@ namespace Gosocket.Dian.Functions.Others
                     // Step 1  Validate RadianContributor
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                     requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
-                    SetLogger(requestObject, "Step OtherDocument-1", "RadianContributor ", "ACT-01");
+                    SetLogger(requestObject, "Step OtherDocument-1", "ActivateOtherContributor SoftwareId " + requestObject.SoftwareId, "ACT-01");
 
                     //Contributorid = RadiancontributoriD
                     int otherDocContributorId = 0;
                     otherDocElecContributor = contributorService.GetOtherDocElecContributor(requestObject.ContributorId, requestObject.OtherDocContributorTypeId);
-                    SetLogger(null, "Step RA-1", otherDocElecContributor == null ? "vacio" : "radiancontributor no es null", "ACT-02");
+                    SetLogger(null, "Step ActOther-1", otherDocElecContributor == null ? "vacio" : "radiancontributor no es null", "ACT-02");
 
                     if (otherDocElecContributor != null)
                     {
@@ -62,7 +62,7 @@ namespace Gosocket.Dian.Functions.Others
                         otherDocElecContributor.OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId;
                         contributorService.ActivateOtherDocument(otherDocElecContributor);
                         otherDocContributorId = otherDocElecContributor.Id;
-                        SetLogger(null, "Step RA-3", "ActivateOtherDocument -->  ");
+                        SetLogger(null, "Step ActOther-3", "ActivateOtherDocument -->  ", "ACT-03");
                     }
                     else 
                     {
@@ -78,10 +78,10 @@ namespace Gosocket.Dian.Functions.Others
                             Update = System.DateTime.Now,
                             Step = 4
                         };
-                        SetLogger(otherDocElecContributor, "Step OtherDoc-4", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-03");
+                        SetLogger(otherDocElecContributor, "Step OtherDoc-4", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-04");
 
                         otherDocContributorId = contributorService.AddOrUpdateOtherDocContributor(otherDocElecContributor);
-                        SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-04");
+                        SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
 
                     //si el software No Existe  OtherDocElecOperationMode
@@ -105,7 +105,7 @@ namespace Gosocket.Dian.Functions.Others
 
                         softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
 
-                        SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-05");
+                        SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
 
                         // Crear Software en TableSTorage
                         GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
@@ -117,7 +117,7 @@ namespace Gosocket.Dian.Functions.Others
                         };
                         softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
-                        SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-06");
+                        SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
                     }
 
                     //--1. se busac operation por radiancontributorid y software 
@@ -135,11 +135,11 @@ namespace Gosocket.Dian.Functions.Others
                             Timestamp = System.DateTime.Now,
                             SoftwareType = Convert.ToInt32(requestObject.SoftwareType)
                         };
-                        SetLogger(OtherDocOperation, "OtherDocOperation", string.Empty, "ACT-07");
+                        SetLogger(OtherDocOperation, "OtherDocOperation", string.Empty, "ACT-08");
 
                         _ = contributorService.AddOtherDocOperation(OtherDocOperation);
 
-                        SetLogger(null, "Step OtherDoc-7", "Cree la operacion", "ACT-08");
+                        SetLogger(null, "Step OtherDoc-7", "Cree la operacion", "ACT-09");
                     }
                     else //---3. si existe se actualiza.
                     {
@@ -149,7 +149,7 @@ namespace Gosocket.Dian.Functions.Others
                         OtherDocOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
                         OtherDocOperation.Timestamp = System.DateTime.Now;
                         contributorService.UpdateOtherDocOperation(OtherDocOperation);
-                        SetLogger(null, "Step OtherDoc-8", " -- contributorService.UpdateOtherDocOperation -- ", "ACT-09");
+                        SetLogger(null, "Step OtherDoc-8", " -- contributorService.UpdateOtherDocOperation -- ", "ACT-10");
                     }
 
                     //--1. COnsultar previo por si ya existe
@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Functions.Others
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
                     TableManagerOtherDocElecOperation.InsertOrUpdateAsync(globalOtherDocElecOperation).Wait();
 
-                    SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-10");
+                    SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
 
                     log.Info($"Activation OtherDocument successfully completed. Contributor with given id: {otherDocElecContributor.Id}");
