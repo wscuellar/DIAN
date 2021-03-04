@@ -173,7 +173,7 @@ namespace Gosocket.Dian.Application
             //GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
             GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
             if (operation == null)
-                operation = new GlobalOtherDocElecOperation(contributor.Code, existingOperation.SoftwareId.ToString());
+                operation = new GlobalOtherDocElecOperation(contributor.Code, software.SoftwareId.ToString());
 
             if (ODEContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.Transmitter)
                 operation.Transmitter = true;
@@ -235,5 +235,15 @@ namespace Gosocket.Dian.Application
             }
         }
         #endregion
+
+        public OtherDocElecContributorOperations GetOtherDocElecContributorOperationBySoftwareId(Guid softwareId)
+        {
+            return this._othersDocsElecContributorOperationRepository.Get(t => t.SoftwareId == softwareId);
+        }
+
+        public bool UpdateOtherDocElecContributorOperation(OtherDocElecContributorOperations model)
+        {
+            return _othersDocsElecContributorOperationRepository.Update(model);
+        }
     }
 }

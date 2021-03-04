@@ -419,8 +419,9 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public FileResult DownloadPayrollPDF(string id)
         {
-            var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id);
-            return File(pdfbytes, "application/pdf", $"NóminaIndividualElectrónica.pdf");
+            var documentName = "NóminaIndividualElectrónica";
+            var pdfbytes = this._radianPayrollGraphicRepresentationService.GetPdfReport(id, ref documentName);
+            return File(pdfbytes, "application/pdf", $"{documentName}.pdf");
         }
 
         [ExcludeFilter(typeof(Authorization))]

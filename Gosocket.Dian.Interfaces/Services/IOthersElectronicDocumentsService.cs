@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using System;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -17,5 +18,9 @@ namespace Gosocket.Dian.Interfaces.Services
         PagedResult<OtherDocElecCustomerList> CustormerList(int ContributorId, string code, OtherDocElecState nState, int page, int pagesize);
 
         ResponseMessage OperationDelete(int ODEContributorId);
+
+        OtherDocElecContributorOperations GetOtherDocElecContributorOperationBySoftwareId(Guid softwareId);
+
+        bool UpdateOtherDocElecContributorOperation(OtherDocElecContributorOperations model);
     }
 }

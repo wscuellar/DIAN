@@ -58,7 +58,6 @@ namespace Gosocket.Dian.Web.Controllers
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
         }
 
-
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
             List<UserViewModel> LegalRepresentativeList = new List<UserViewModel>();
@@ -162,7 +161,6 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-
         /// <summary>
         /// Cancelar una asociación de la tabla OtherDocElecContributor, OtherDocElecContributorOperations y OtherDocElecSoftware
         /// </summary>
@@ -194,7 +192,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return Json(new ResponseMessage($"El registro no pudo ser actualizado", "Nulo"), JsonRequestBehavior.AllowGet);
         }
-
 
         public ActionResult GetSetTestResult(int Id)
         {
@@ -303,8 +300,6 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-
-
         public ActionResult SetupOperationMode(int Id)
         {
 
@@ -358,7 +353,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
@@ -424,7 +418,6 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
-
         [HttpPost]
         public JsonResult DeleteOperationMode(string Id)
         {
@@ -434,6 +427,59 @@ namespace Gosocket.Dian.Web.Controllers
                 message = result.Message,
                 success = true,
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult RestartSetTestResult(GlobalTestSetOthersDocumentsResult model, Guid docElecSoftwareId)
+        {
+            model.State = TestSetStatus.InProcess.GetDescription();
+            model.Status = (int)TestSetStatus.InProcess;
+            model.StatusDescription = TestSetStatus.InProcess.GetDescription();
+
+            // Totales Generales
+            model.TotalDocumentSent = 0;
+            model.TotalDocumentAccepted = 0;
+            model.TotalDocumentsRejected = 0;
+            // EndTotales Generales
+
+            // OthersDocuments
+            model.TotalOthersDocumentsSent = 0;
+            model.OthersDocumentsAccepted = 0;
+            model.OthersDocumentsRejected = 0;
+            //End OthersDocuments
+
+            //ElectronicPayrollAjustment
+            model.TotalElectronicPayrollAjustmentSent = 0;
+            model.ElectronicPayrollAjustmentAccepted = 0;
+            model.ElectronicPayrollAjustmentRejected = 0;
+            //EndElectronicPayrollAjustment
+
+            bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model);
+            if(isUpdate)
+            {
+                // OtherDocElecContributor
+                var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);
+                this._othersDocsElecContributorService.CreateContributor(int.Parse(model.PartitionKey),
+                    OtherDocElecState.Test,
+                    int.Parse(model.ContributorTypeId),
+                    operationModeId, 
+                    model.ElectronicDocumentId,
+                    User.UserName());
+
+                // OtherDocElecSoftware
+                var software = _othersDocsElecSoftwareService.Get(docElecSoftwareId);
+                software.OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess;
+                _othersDocsElecSoftwareService.CreateSoftware(software);
+
+                // OtherDocElecContributorOperations
+                var softwareOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId);
+                softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
+            }
+
+            ResponseMessage response = new ResponseMessage();
+            response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
     }
 }

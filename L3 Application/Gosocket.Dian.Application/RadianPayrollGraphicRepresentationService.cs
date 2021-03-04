@@ -392,9 +392,9 @@ namespace Gosocket.Dian.Application
 
         #region [ public methods ]
 
-        public byte[] GetPdfReport(string id)
+        public byte[] GetPdfReport(string id, ref string documentName)
         {
-            var documentName = "NóminaIndividualElectrónica";
+            documentName = "NóminaIndividualElectrónica";
             StringBuilder template = new StringBuilder();
             var payrollModel = this.GetPayrollData(id);
 

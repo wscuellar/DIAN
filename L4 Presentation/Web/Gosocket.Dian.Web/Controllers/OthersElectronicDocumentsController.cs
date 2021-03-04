@@ -171,7 +171,6 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = model.UrlEventReception,
                 Name = model.SoftwareName,
                 Pin = model.PinSW,
-                //ProviderId = model.ProviderId,
                 ProviderId = providerId,
                 CreatedBy = User.UserName(),
                 Deleted = false,
@@ -190,7 +189,6 @@ namespace Gosocket.Dian.Web.Controllers
                 OperationStatusId = (int)OtherDocElecState.Test,
                 Deleted = false,
                 Timestamp = DateTime.Now,
-                //SoftwareType = model.SoftwareType,
                 SoftwareType = model.OperationModeId,
                 SoftwareId = IdS
             };
