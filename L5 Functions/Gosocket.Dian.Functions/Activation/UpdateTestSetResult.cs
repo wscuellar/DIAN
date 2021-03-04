@@ -491,11 +491,8 @@ namespace Gosocket.Dian.Functions.Activation
                                 SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
 
                                 #region Proceso Habilitacion
-
-
                                 //Habilitamos el participante en GlobalOtherDocElecOperation
                                 GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.EnableParticipant(globalTestSetTracking.PartitionKey, globalTestSetTracking.SoftwareId);
-
 
                                 SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.9");
 
@@ -503,7 +500,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;
 
                                 SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.10");
-
 
                                 //--GlobalSoftware 
                                 var softwareId = isPartipantActiveOtherDoc.RowKey;
