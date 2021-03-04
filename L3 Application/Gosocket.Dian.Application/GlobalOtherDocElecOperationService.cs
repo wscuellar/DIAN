@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Application
 
         public bool IsActive(string code, Guid softwareId)
         {
-            GlobalOtherDocElecOperation item = globalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId.ToString());
+            GlobalOtherDocElecOperation item = globalOtherDocElecOperation.FindSoftwareId<GlobalOtherDocElecOperation>(code, softwareId.ToString());
             return item.State == Domain.Common.OtherDocElecState.Habilitado.ToString();
         }
 
