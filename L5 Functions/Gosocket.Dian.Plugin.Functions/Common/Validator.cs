@@ -2510,21 +2510,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else
                         codeExist = true;
 
+                    codeExist = false;
+
                     //Valida codigos facultades mandato General - Limitado
                     string[] tempCodeAttorney = codeAttorney.Split('-');
                     if (modoOperacion == tempCodeAttorney[1])
                     {
                         if ((customizationID == "431" || customizationID == "432"))
                         {
-                            if(tempCode.Contains("ALL17")) codeExist = true;
-
-                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
+                            if(tempCode.Length == 1 && tempCode.Contains("ALL17")) codeExist = true;
 
                         }
                         else if ((customizationID == "433" || customizationID == "434"))
                         {
                             if (tempCode.Contains("MR91")) codeExist = true;
-                            //if (new string[] { "ALL17", "MR91" }.Contains(tempCodeAttorney)) codeExist = true;
                         }                           
                         else
                             codeExist = false;
@@ -2586,6 +2585,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                 }
+
                 if (!codeExist)
                 {
                     validate = false;
