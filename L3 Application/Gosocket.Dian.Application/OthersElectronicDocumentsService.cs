@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Application
                 List<OtherDocElecContributorOperations> currentOperations =
                     _othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
                                                                     && t.SoftwareType == ContributorOperation.SoftwareType
-                                                                    && t.OperationStatusId != (int)OtherDocElecState.Habilitado
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
                                                                     && !t.Deleted);
                 if (currentOperations.Any())
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
