@@ -476,10 +476,7 @@ namespace Gosocket.Dian.Functions.Activation
                             try
                             {
                                 SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
-                              
-                                //Verificamos si quedo habilitado sino termina
-                                if (isPartipantActiveOtherDoc.State != Domain.Common.RadianState.Habilitado.GetDescription()) return;                               
-
+                                                            
                                 //--Traemos la informacion del software
                                 string softwareId = globalTestSetTracking.SoftwareId;
                                 OtherDocElecSoftware software = softwareService.GetByOtherDoc(Guid.Parse(softwareId));
@@ -502,13 +499,11 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwareName = software.Name
                                 };
 
-                                string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributor");
+                                string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                                 SetLogger(null, "Funciton Path", functionPath, "63333334");
                                 SetLogger(requestObject, "Funciton Path", functionPath, "73333334");
 
-
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
-
 
                                 SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
                                 //SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
