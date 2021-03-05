@@ -39,7 +39,7 @@ namespace Gosocket.Dian.Functions.Others
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                 if (data == null)
                     throw new Exception("Request body is empty.");
-                SetLogger(data, "Step STA-1.1", "Data");
+                SetLogger(data, "Step STA-1.1", "Data", "SEND-00");
 
                 //Se obtiene participante otros documentos habilitacion
                 OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId);
