@@ -445,8 +445,10 @@ namespace Gosocket.Dian.Functions.Activation
 
                     Contributor contributor = contributorService.GetByCode(setResultOther.PartitionKey);
                     GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.GetOperation(setResultOther.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+                    if (isPartipantActiveOtherDoc == null)
+                        return;
 
-                    SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation " + isPartipantActiveOtherDoc.State, "UPDATE-03.9");
+                    SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation ", "UPDATE-03.9");
 
 
                     //Validacion Total Nomina rechazados 

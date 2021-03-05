@@ -95,7 +95,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
 
-                var setResultOther = tableMaganerGlobalTestSetOthersDocuments.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocuments>(testSetId);
+                var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
 
                 SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse, "PROC-01");
 

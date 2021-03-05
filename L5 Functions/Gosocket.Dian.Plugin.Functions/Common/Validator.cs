@@ -1984,6 +1984,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validateSigningTime = false;
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
 
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
             XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
@@ -2085,10 +2087,66 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorCode = itemCufe.ErrorCode,
                             ErrorMessage = itemCufe.ErrorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        break;
+                        });                       
                     }
                 }
+               
+                TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
+                TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+                var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(xmlUUID.ToLower(), true);
+                if (docHolderExchange != null)
+                {
+                    //Existe mas de un legitimo tenedor requiere un mandatario
+                    string[] endosatarios = docHolderExchange.PartyLegalEntity.Split('|');
+                    if (endosatarios.Length == 1)
+                    {
+                        if (docHolderExchange.PartyLegalEntity != companyId)
+                        {
+                            validateReference = true;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
+                        validateReference = true;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "89",
+                            ErrorMessage = "Factura cuenta con mas de un Legitimo tenedor, no es posible crear un mandato",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+                else
+                {
+                    var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(xmlUUID.ToLower(), xmlUUID.ToLower());
+                    if (documentMetaCUFE != null)
+                    {
+                        if (documentMetaCUFE.SenderCode != companyId)
+                        {
+                            validateReference = true;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }                        
+                }
+                
+
                 if (validateReference)
                     break;
             }
@@ -2180,7 +2238,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
-            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
+            
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
@@ -2520,22 +2578,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             if(tempCode.Length == 1 && tempCodeAttorney[0] == "ALL17") codeExist = true;
 
+                            //Valida description code acorde al codigo ingresado de mandato general
+                            if (!descriptionCode.Equals("Mandato por documento General"))
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+
                         }
                         else if ((customizationID == "433" || customizationID == "434"))
                         {
                             if (tempCode.Contains("MR91")) codeExist = true;
+
+                            //Valida description code acorde al codigo ingresado de mandato Limitado
+                            if (!descriptionCode.Equals("Mandato por documento Limitado"))
+                            {
+                                validate = false;
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }                           
                         else
                             codeExist = false;
-
-                        if (attorneyModel.facultityCode == null)
-                        {
-                            attorneyModel.facultityCode += tempCodeAttorney[0];
-                        }
-                        else
-                        {
-                            attorneyModel.facultityCode += (";" + tempCodeAttorney[0]);
-                        }
                     }
                     else
                     {
@@ -2549,41 +2626,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
-                    //Valida description code acorde al codigo ingresado de mandato general
-                    if (tempCodeAttorney[0] == "ALL17")
-                    {
-                        if (!descriptionCode.Equals("Mandato por documento General"))
-                        {
-                            validate = false;
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-
-                    //Valida description code acorde al codigo ingresado de mandato general
-                    else if (tempCodeAttorney[0] == "MR91")
-                    {
-                        if (!descriptionCode.Equals("Mandato por documento Limitado"))
-                        {
-                            validate = false;
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-
                 }
 
                 if (!codeExist)
@@ -2611,105 +2653,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                }
-                //Solo si existe información referenciada del CUFE
-                if (listID != "3")
-                {
-                    if (cufeList.Count > 2)
-                    {
-                        attorneyModel.cufe = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                        attorneyModel.idDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                        attorneyModel.idTypeDocumentReference = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
-                    }
-                    else
-                    {
-                        attorneyModel.cufe = cufeListReference.Item(i).SelectNodes("//*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                        attorneyModel.idDocumentReference = cufeListReference.Item(i - 1).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i - 1)?.InnerText.ToString();
-                        attorneyModel.idTypeDocumentReference = cufeListReference.Item(i).SelectNodes("//*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
-                    }
-                    if (validate)
-                    {
-                        TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
-                        TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-                        var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(attorneyModel.cufe.ToLower(), true);
-                        if (docHolderExchange != null)
-                        {
-                            //Existe mas de un legitimo tenedor requiere un mandatario
-                            string[] endosatarios = docHolderExchange.PartyLegalEntity.Split('|');
-                            if (endosatarios.Length == 1)
-                            {
-                                if (docHolderExchange.PartyLegalEntity == companyId)
-                                {
-                                    attorney.Add(attorneyModel);
-                                }
-                                else
-                                {
-                                    validate = false;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                validate = false;
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "89",
-                                    ErrorMessage = "Factura cuenta con mas de un Legitimo tenedor, no es posible crear un mandato",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-                        else
-                        {
-                            var documentMetaCUFE = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyModel.cufe, attorneyModel.cufe);
-                            if (documentMetaCUFE != null)
-                            {
-                                if (companyId == documentMetaCUFE.SenderCode)
-                                {
-                                    attorney.Add(attorneyModel);
-                                }
-                                else
-                                {
-                                    validate = false;
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
-                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                validate = false;
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    attorneyModel.cufe = "01";
-                    attorney.Add(attorneyModel);
-                }
+                }               
             }
 
             foreach (var r in responses)
