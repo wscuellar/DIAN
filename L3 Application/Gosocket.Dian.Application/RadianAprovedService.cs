@@ -399,5 +399,12 @@ namespace Gosocket.Dian.Application
         {
             return _radianContributorOperationRepository.List(t => t.SoftwareId == id);
         }
+
+        public bool ResetRadianOperation(int radianOperationId)
+        {
+            RadianContributorOperation operation = _radianContributorOperationRepository.Get(t => t.Id == radianOperationId);
+            operation.OperationStatusId = (int)RadianState.Test; //=en proceso
+            return _radianContributorOperationRepository.Update(operation);
+        }
     }
 }

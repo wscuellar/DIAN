@@ -276,7 +276,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult RestartSetTestResult(RadianTestSetResult result, string softwareId)
+        public JsonResult RestartSetTestResult(RadianTestSetResult result, string softwareId, int operationId)
         {
             RadianTestSetResult testSetResult = result;
             testSetResult.ApplicationAvailableAccepted = 0;
@@ -337,8 +337,10 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.StatusDescription = "En proceso";
             testSetResult.SoftwareId = softwareId;
             testSetResult.SenderCode = result.PartitionKey;
-            bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult) &&  _radianTestSetAppliedService.ResetPreviousCounts(testSetResult.Id);
-
+            bool isUpdate = _radianTestSetAppliedService.InsertOrUpdateTestSet(testSetResult) &&  
+                            _radianTestSetAppliedService.ResetPreviousCounts(testSetResult.Id) && 
+                            _radianAprovedService.ResetRadianOperation(operationId);
+            
             ResponseMessage response = new ResponseMessage();
             response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
             return Json(response, JsonRequestBehavior.AllowGet);
@@ -450,7 +452,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
 
-        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId, int softwareType)
+        public ActionResult ViewTestSet(int id, int radianTypeId, string softwareId, int softwareType, int operationId)
         {
             RadianApprovedViewModel radianApprovedViewModel = new RadianApprovedViewModel();
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(id, radianTypeId);
@@ -472,6 +474,7 @@ namespace Gosocket.Dian.Web.Controllers
             radianApprovedViewModel.RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId;
             radianApprovedViewModel.Software = _radianAprovedService.GetSoftware(new Guid(softwareId));
             radianApprovedViewModel.SoftwareType = softwareType;
+            radianApprovedViewModel.RadianOperationId = operationId;
             return View("GetSetTestResult", radianApprovedViewModel);
         }
 
