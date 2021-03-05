@@ -563,7 +563,7 @@ namespace Gosocket.Dian.Application
                                                 && !t.Deleted
                                                 );
                 if (otherDocOperation != null)
-                    otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocumentStatus.Cancelado; //cancelo = rechazo.
+                    otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocElecState.Cancelado; //cancelo = rechazo.
 
                 context.SaveChanges();
             }
