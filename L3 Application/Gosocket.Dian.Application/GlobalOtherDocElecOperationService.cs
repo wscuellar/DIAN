@@ -52,11 +52,11 @@ namespace Gosocket.Dian.Application
 
         public GlobalOtherDocElecOperation EnableParticipantOtherDocument(string code, string softwareId, OtherDocElecContributor otherDocElecContributor)
         {
-            GlobalOtherDocElecOperation operation = globalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId.ToString());
-            if (operation.State != Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Test))
+            GlobalOtherDocElecOperation operation = globalOtherDocElecOperation.FindSoftwareId<GlobalOtherDocElecOperation>(code, softwareId.ToString());
+            if (operation.State != Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocElecState.Test))
                 return new GlobalOtherDocElecOperation();
 
-            operation.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
+            operation.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocElecState.Habilitado);
 
             if (otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
                 operation.TecnologicalSupplier = otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider;

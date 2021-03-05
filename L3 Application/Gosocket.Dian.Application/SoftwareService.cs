@@ -189,12 +189,17 @@ namespace Gosocket.Dian.Application
                 context.SaveChanges();
             }
         }
-        
+
         #endregion
 
         #region OtherDocumentos
 
-         public void AddOrUpdateOtherDocSoftware(OtherDocElecSoftware software)
+        public OtherDocElecSoftware GetOtherDocSoftware(Guid id)
+        {
+            return sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(x => x.Id == id);
+        }
+
+        public void AddOrUpdateOtherDocSoftware(OtherDocElecSoftware software)
         {
             using (var context = new SqlDBContext())
             {
