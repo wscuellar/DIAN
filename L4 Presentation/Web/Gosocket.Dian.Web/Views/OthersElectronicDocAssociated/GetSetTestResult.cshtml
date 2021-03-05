@@ -62,7 +62,7 @@
                 @if (Model.Software.OtherDocElecSoftwareStatusName == "Rechazado")
                 {
                     <div>
-                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), @Model.Software.Id)" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
+                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
                     </div>
                 }
                 <div class="row margin-horizontal-0 margin-top-20">
@@ -87,28 +87,29 @@
 </div>
 
 @section scripts{
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    <script src="~/Content/js/Radian/constants.js"></script>
+
     <script type="text/javascript">
-        $(document).ready(function () {
-            function restartCountersTest(url, testResult, docElecSoftwareId) {
-                //console.log(testResult);
-                var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
-                var complement = bootboxMessage.CONFIRMATION_RESTART_COMPLEMENT;
-                var operation = () => {
-                    var actionError = (error) => {
-                        window.location.reload();
-                    }
-                    var actionSuccess = (result) => {
-                        window.location.reload();
-                    }
-                    var data = {
-                        model: testResult,
-                        docElecSoftwareId: docElecSoftwareId
-                    }
-                    ajaxFunction(url, "POST", data, actionError, actionSuccess);
+        function restartCountersTest(url, testResult, docElecSoftwareId) {
+            //console.log(testResult);
+            var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
+            var complement = bootboxMessage.CONFIRMATION_RESTART_COMPLEMENT;
+            var operation = () => {
+                var actionError = (error) => {
+                    window.location.reload();
                 }
-                var buttons = ConfirmExec(operation)
-                showConfirmationComplement(confirmMessage, buttons, null, null, complement);
+                var actionSuccess = (result) => {
+                    window.location.reload();
+                }
+                var data = {
+                    model: testResult,
+                    docElecSoftwareId: docElecSoftwareId
+                }
+                ajaxFunction(url, "POST", data, actionError, actionSuccess);
             }
+            var buttons = ConfirmExec(operation)
+            showConfirmationComplement(confirmMessage, buttons, null, null, complement);
         }
     </script>
 }

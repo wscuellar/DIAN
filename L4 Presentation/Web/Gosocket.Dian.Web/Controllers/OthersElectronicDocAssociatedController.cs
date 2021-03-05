@@ -462,18 +462,18 @@ namespace Gosocket.Dian.Web.Controllers
             if(isUpdate)
             {
                 // OtherDocElecContributor
-                var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);
-                this._othersDocsElecContributorService.CreateContributor(int.Parse(model.PartitionKey),
-                    OtherDocElecState.Test,
-                    int.Parse(model.ContributorTypeId),
-                    operationModeId, 
-                    model.ElectronicDocumentId,
-                    User.UserName());
+                //var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);
+                //this._othersDocsElecContributorService.CreateContributor(int.Parse(model.PartitionKey),
+                //    OtherDocElecState.Test,
+                //    int.Parse(model.ContributorTypeId),
+                //    operationModeId, 
+                //    model.ElectronicDocumentId,
+                //    User.UserName());
 
                 // OtherDocElecSoftware
-                var software = _othersDocsElecSoftwareService.Get(docElecSoftwareId);
-                software.OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess;
-                _othersDocsElecSoftwareService.CreateSoftware(software);
+                //var software = _othersDocsElecSoftwareService.Get(docElecSoftwareId);
+                //software.OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess;
+                //_othersDocsElecSoftwareService.CreateSoftware(software);
 
                 // OtherDocElecContributorOperations
                 var softwareOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId);

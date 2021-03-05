@@ -130,7 +130,7 @@ namespace Gosocket.Dian.Application
         {
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on oc.Id equals oco.OtherDocElecContributorId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
                                                     join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
                                                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
