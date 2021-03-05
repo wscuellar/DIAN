@@ -71,5 +71,7 @@ namespace Gosocket.Dian.Web.Models.RadianApproved
         public List<RadianContributorFileType> FileTypes { get; internal set; }
 
         public int SoftwareType { get; set; }
+
+        public int RadianOperationId { get; set; }
     }
 }

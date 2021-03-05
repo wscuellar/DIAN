@@ -54,5 +54,6 @@ namespace Gosocket.Dian.Interfaces.Services
         RadianSoftware GetSoftware(int radianContributorId, int softwareType);
         void DeleteSoftware(Guid softwareId);
         List<RadianContributorOperation> OperationsBySoftwareId(Guid id);
+        bool ResetRadianOperation(int radianOperationId);
     }
 }
