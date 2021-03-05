@@ -693,12 +693,12 @@ namespace Gosocket.Dian.Services.Utils
 
             switch (docTypeCode)
             {
-                case "11":               
+                case "102":               
                     {
                         codeMessage = "NIE";
                         break;
                     }
-                case "12":          
+                case "103":          
                     {
                         codeMessage = "NIAE";
                         break;
@@ -718,7 +718,7 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "12")
+            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "103")
             {
                 stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
                 errors.Add(stringBuilder.ToString());
