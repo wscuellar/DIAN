@@ -150,7 +150,8 @@ namespace Gosocket.Dian.Application
                                                         Software = s.Name,
                                                         PinSW = s.Pin,
                                                         SoftwareId = s.SoftwareId.ToString(),
-                                                        StateSoftware = ocs.Name,
+                                                        //StateSoftware = ocs.Name,
+                                                        StateSoftware = oco.OperationStatusId.ToString(),
                                                         StateContributor = oc.State,
                                                         CreatedDate = oc.CreatedDate,
                                                         ElectronicDoc = eld.Name,
@@ -281,9 +282,13 @@ namespace Gosocket.Dian.Application
 
         public OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId)
         {
+            //return _othersDocsElecContributorRepository
+            //    .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
+            //        .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
+
             return _othersDocsElecContributorRepository
                 .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
-                    .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
+                    .Any(y => y.OtherDocElecContributorOperations.Any(z => z.OperationStatusId == statusId)));
         }
 
         public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)

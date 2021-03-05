@@ -233,7 +233,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = software.Url,
                 Status = software.Status,
                 OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
-                OtherDocElecSoftwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId),
+                //OtherDocElecSoftwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId),
+                OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State,
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
@@ -273,10 +274,10 @@ namespace Gosocket.Dian.Web.Controllers
             //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
             ViewBag.TestSetId = model.GTestSetOthersDocumentsResult.Id;
 
-            var softwareStatusName = string.Empty;
+            //var softwareStatusName = string.Empty;
             
-            if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
-            ViewBag.OtherDocElecSoftwareStatusName = softwareStatusName;
+            //if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
+            ViewBag.OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State;
 
             return View(model);
         }
