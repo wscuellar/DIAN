@@ -60,9 +60,9 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public bool Update(RadianContributorOperation contributorOperation)
         {
-            using (var context = new SqlDBContext())
+            using (SqlDBContext context = new SqlDBContext())
             {
-                var radianContributorOperationInstance = context.RadianContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
+                RadianContributorOperation radianContributorOperationInstance = context.RadianContributorOperations.FirstOrDefault(c => c.Id == contributorOperation.Id);
 
                 radianContributorOperationInstance.OperationStatusId = contributorOperation.OperationStatusId;
                 radianContributorOperationInstance.RadianContributorId = contributorOperation.RadianContributorId;

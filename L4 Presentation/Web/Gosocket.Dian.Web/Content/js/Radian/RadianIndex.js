@@ -280,7 +280,7 @@ function SetCapcthatoken(configuration) {
         //});
 }
 
-function RestartCounters(url, testResult, softwareId) {
+function RestartCounters(url, testResult, softwareId, operationId) {
     console.log(testResult);
     var confirmMessage = bootboxMessage.CONFIRMATION_RESTART;
     var complement = bootboxMessage.CONFIRMATION_RESTART_COMPLEMENT;
@@ -293,7 +293,8 @@ function RestartCounters(url, testResult, softwareId) {
         }
         var data = {
             result: testResult,
-            softwareId
+            softwareId,
+            operationId
         }
         ajaxFunction(url, "POST", data, actionError, actionSuccess);
     }
