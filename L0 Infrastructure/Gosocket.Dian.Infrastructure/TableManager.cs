@@ -490,7 +490,7 @@ namespace Gosocket.Dian.Infrastructure
 
         public T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new()
         {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("TestSetId", QueryComparisons.Equal, testSetId));
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, testSetId));
 
             var entities = CloudTable.ExecuteQuery(query);
 
