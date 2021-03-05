@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Functions.Others
                     SetLogger(null, "Step STA-6", " -- OtherDocElecContributor -- " +
                                             otherDocElecContributor.ContributorId + " "
                                             + otherDocElecContributor.OtherDocElecContributorTypeId + " "
-                                            + data.SoftwareId + " "
+                                            + results.SoftwareId + " "
                                             + data.SoftwareType
                                             , "SEND-10");
 
@@ -93,11 +93,11 @@ namespace Gosocket.Dian.Functions.Others
                     contributorService.SetToEnabledOtherDocElecContributor(
                       otherDocElecContributor.ContributorId,
                       otherDocElecContributor.OtherDocElecContributorTypeId,
-                      data.SoftwareId,
+                      results.SoftwareId,
                       Convert.ToInt32(data.SoftwareType));
 
                     //Se habilita el contribuyente en la table Storage
-                    globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, data.SoftwareId, otherDocElecContributor);
+                    globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
 
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
@@ -111,7 +111,7 @@ namespace Gosocket.Dian.Functions.Others
                         SoftwareUser = data.SoftwareUser,
                         Pin = data.Pin,
                         SoftwareName = data.SoftwareName,
-                        SoftwareId = data.SoftwareId,
+                        SoftwareId = results.SoftwareId,
                         SoftwareType = data.SoftwareType,
                         Url = data.Url
                     };
