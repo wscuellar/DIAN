@@ -76,8 +76,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             // Validación Software en proceso...
             var softwareActive = false;
-            var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecSoftwaresStatus.InProcess);
-            if(softwareInProcess != null)
+            //var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecSoftwaresStatus.InProcess);
+            var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecState.Test);
+            if (softwareInProcess != null)
             {
                 if (softwareInProcess.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType 
                     && softwareInProcess.OtherDocElecOperationModeId == (int)dataentity.OperationModeId)
@@ -112,7 +113,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Software = t.Software,
                 SoftwareId = t.SoftwareId,
                 PinSW = t.PinSW,
-                StateSoftware = t.StateSoftware,
+                //StateSoftware = t.StateSoftware,
+                StateSoftware = ((OtherDocElecState)int.Parse(t.StateSoftware)).GetDescription(),
                 StateContributor = t.StateContributor,
                 Url = t.Url,
                 CreatedDate = t.CreatedDate,
