@@ -465,7 +465,7 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
             
             var result = new List<XmlParamsResponseTrackId>();
-            var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResProviderIdXpath" : "SenderCodeXpath"]).Distinct();
+            var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
 
