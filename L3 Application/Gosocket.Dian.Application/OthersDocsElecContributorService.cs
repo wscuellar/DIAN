@@ -129,6 +129,37 @@ namespace Gosocket.Dian.Application
 
         public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId)
         {
+            //IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
+            //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+            //                                        join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+            //                                        join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
+            //                                        join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+            //                                        join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+            //                                        join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+            //                                        where oc.ContributorId == contributorId
+            //                                            && oc.OtherDocElecContributorTypeId == contributorTypeId
+            //                                            && oc.OtherDocElecOperationModeId == operationModeId
+            //                                            && oc.State != "Cancelado"
+            //                                            && s.Deleted == false
+            //                                            && oco.Deleted == false
+            //                                        select new OtherDocsElectData()
+            //                                        {
+            //                                            Id = oc.Id,
+            //                                            ContributorId = oc.ContributorId,
+            //                                            OperationMode = ope.Name,
+            //                                            ContributorType = oty.Name,
+            //                                            Software = s.Name,
+            //                                            PinSW = s.Pin,
+            //                                            SoftwareId = s.SoftwareId.ToString(),
+            //                                            //StateSoftware = ocs.Name,
+            //                                            StateSoftware = oco.OperationStatusId.ToString(),
+            //                                            StateContributor = oc.State,
+            //                                            CreatedDate = oc.CreatedDate,
+            //                                            ElectronicDoc = eld.Name,
+            //                                            Url = s.Url,
+            //                                        }).Distinct();
+            //return query.Paginate(0, 100, t => t.Id.ToString());
+
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
                                                     join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
@@ -144,14 +175,14 @@ namespace Gosocket.Dian.Application
                                                         && oco.Deleted == false
                                                     select new OtherDocsElectData()
                                                     {
-                                                        Id = oc.Id,
+                                                        //Id = oc.Id,
+                                                        Id = oco.Id,
                                                         ContributorId = oc.ContributorId,
                                                         OperationMode = ope.Name,
                                                         ContributorType = oty.Name,
                                                         Software = s.Name,
                                                         PinSW = s.Pin,
                                                         SoftwareId = s.SoftwareId.ToString(),
-                                                        //StateSoftware = ocs.Name,
                                                         StateSoftware = oco.OperationStatusId.ToString(),
                                                         StateContributor = oc.State,
                                                         CreatedDate = oc.CreatedDate,

@@ -58,8 +58,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
+            var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
             List<UserViewModel> LegalRepresentativeList = new List<UserViewModel>();
-            OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(Id);
+            OtherDocsElectData entity = _othersDocsElecContributorService.GetCOntrinutorODE(operation.OtherDocElecContributorId);
             if (entity == null)
             {
                 return new OthersElectronicDocAssociatedViewModel()
@@ -122,7 +124,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id = 0)//TODO:
         {
             ViewBag.ValidateRequest = true;
-
+            
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
 
             if (model.Id == -1)
@@ -156,6 +158,9 @@ namespace Gosocket.Dian.Web.Controllers
                 model.Customers = new List<OtherDocElecCustomerListViewModel>();
                 model.CustomerTotalCount = 0;
             }
+
+            ViewBag.Id = Id;
+
             return View(model);
         }
 
@@ -241,6 +246,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
             model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
 
+            ViewBag.Id = Id;
+
             return View(model);
         }
 
@@ -276,6 +283,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             //if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
             ViewBag.OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State;
+
+            ViewBag.Id = Id;
 
             return View(model);
         }
