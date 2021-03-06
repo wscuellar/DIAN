@@ -27,6 +27,11 @@ namespace Gosocket.Dian.Application
             return _othersDocsElecSoftwareRepository.Get(t => t.Id == id);
         }
 
+        public OtherDocElecSoftware GetBySoftwareId(Guid id)
+        {
+            return _othersDocsElecSoftwareRepository.Get(t => t.SoftwareId == id);
+        }
+
         public List<Software> GetSoftwares(int contributorId)
         {
             return _softwareService.GetSoftwares(contributorId);

@@ -409,7 +409,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
-        public T FindByGlobalOtherDocumentId<T>(string Id) where T : ITableEntity, new()
+        public T FindByGlobalOtherDocumentTestId<T>(string Id) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, Id));
 
@@ -476,6 +476,24 @@ namespace Gosocket.Dian.Infrastructure
 
             var prefixCondition = TableQuery.CombineFilters(
                 TableQuery.GenerateFilterCondition("SoftwareId",
+                    QueryComparisons.Equal,
+                    softwareId),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+        public T FindSoftwareRowKey<T>(string partitionKey, string softwareId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
                     QueryComparisons.Equal,
                     softwareId),
                 TableOperators.And,
