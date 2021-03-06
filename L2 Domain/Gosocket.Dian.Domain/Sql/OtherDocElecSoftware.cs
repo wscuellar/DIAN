@@ -58,5 +58,6 @@ namespace Gosocket.Dian.Domain.Sql
         public string CreatedBy { get; set; }
         public virtual ICollection<OtherDocElecContributorOperations> OtherDocElecContributorOperations { get; set; } 
 
+
     }
 }

@@ -707,12 +707,14 @@ namespace Gosocket.Dian.Application
                     otherDocContributorInstance.CreatedBy = otherDocContributor.CreatedBy;
                     otherDocContributorInstance.Description = otherDocContributor.Description;
                     otherDocContributorInstance.Step = otherDocContributor.Step == 0 ? 1 : otherDocContributor.Step;
+                    otherDocContributorInstance.ElectronicDocumentId = otherDocContributor.ElectronicDocumentId;
+
 
                     context.Entry(otherDocContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else
                 {
-                    otherDocContributor.Step = 4;
+                    otherDocContributor.Step = 3;
                     otherDocContributor.Update = DateTime.Now;
                     context.Entry(otherDocContributor).State = System.Data.Entity.EntityState.Added;
                 }
