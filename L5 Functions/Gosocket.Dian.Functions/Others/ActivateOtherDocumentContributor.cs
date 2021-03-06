@@ -60,14 +60,14 @@ namespace Gosocket.Dian.Functions.Others
 
                     if (otherDocElecContributor != null)
                     {
-                        // Step 3 Activo RadianContributor
-                        otherDocElecContributor.Step = 4;
+                        // Step 3 Activo Otros Documentos
+                        otherDocElecContributor.Step = 3;
                         otherDocElecContributor.OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId;
                         contributorService.ActivateOtherDocument(otherDocElecContributor);
                         otherDocContributorId = otherDocElecContributor.Id;
                         SetLogger(null, "Step ActOther-3", "ActivateOtherDocument -->  ", "ACT-03");
                     }
-                    else 
+                    else
                     {
                         // Step 4 Actualizo OtherDocElecSoftware en SQL 
                         otherDocElecContributor = new OtherDocElecContributor()
@@ -76,10 +76,10 @@ namespace Gosocket.Dian.Functions.Others
                             ContributorId = requestObject.ContributorId,
                             OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId,
                             OtherDocElecOperationModeId = requestObject.OtherDocOperationModeId,
-                            State = Domain.Common.OtherDocumentStatus.Habilitado.GetDescription(),
+                            State = Domain.Common.OtherDocElecState.Habilitado.GetDescription(),
                             CreatedDate = System.DateTime.Now,
                             Update = System.DateTime.Now,
-                            Step = 4
+                            Step = 3
                         };
                         SetLogger(otherDocElecContributor, "Step OtherDoc-4", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-04");
 
@@ -111,13 +111,15 @@ namespace Gosocket.Dian.Functions.Others
                         SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
 
                         // Crear Software en TableSTorage
-                        GlobalSoftware globalSoftware = new GlobalSoftware(requestObject.SoftwareId, requestObject.SoftwareId)
+                        var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
+                        GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
                         {
                             Id = new Guid(requestObject.SoftwareId),
                             Deleted = false,
                             Pin = requestObject.Pin,
                             StatusId = (int)Domain.Common.SoftwareStatus.Production
                         };
+
                         softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
                         SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
@@ -132,7 +134,7 @@ namespace Gosocket.Dian.Functions.Others
                         OtherDocOperation = new OtherDocElecContributorOperations()
                         {
                             Deleted = false,
-                            OperationStatusId = (int)Domain.Common.RadianState.Habilitado,
+                            OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado,
                             SoftwareId = new Guid(requestObject.SoftwareId),
                             OtherDocElecContributorId = otherDocContributorId,
                             Timestamp = System.DateTime.Now,
@@ -146,7 +148,7 @@ namespace Gosocket.Dian.Functions.Others
                     }
                     else //---3. si existe se actualiza.
                     {
-                        OtherDocOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado;
+                        OtherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado;
                         OtherDocOperation.SoftwareId = new Guid(requestObject.SoftwareId);
                         OtherDocOperation.OtherDocElecContributorId = otherDocContributorId;
                         OtherDocOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
@@ -156,7 +158,7 @@ namespace Gosocket.Dian.Functions.Others
                     }
 
                     //--1. COnsultar previo por si ya existe
-                    GlobalOtherDocElecOperation globalOtherDocElecOperation = TableManagerOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(requestObject.Code, requestObject.SoftwareId);
+                    GlobalOtherDocElecOperation globalOtherDocElecOperation = TableManagerOtherDocElecOperation.FindSoftwareId<GlobalOtherDocElecOperation>(requestObject.Code, requestObject.SoftwareId);
                     if (globalOtherDocElecOperation == null)
                         globalOtherDocElecOperation = new GlobalOtherDocElecOperation(requestObject.Code, requestObject.SoftwareId);
 
@@ -166,7 +168,7 @@ namespace Gosocket.Dian.Functions.Others
 
                     globalOtherDocElecOperation.Deleted = false;
                     globalOtherDocElecOperation.ContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId;
-                    globalOtherDocElecOperation.State = Domain.Common.OtherDocumentStatus.Habilitado.GetDescription();
+                    globalOtherDocElecOperation.State = Domain.Common.OtherDocElecState.Habilitado.GetDescription();
                     globalOtherDocElecOperation.OperationModeId = Convert.ToInt32(requestObject.SoftwareType);
 
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
