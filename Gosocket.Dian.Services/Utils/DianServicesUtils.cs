@@ -726,18 +726,12 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if (string.IsNullOrEmpty(codigoTrabajador))
-            {
-                stringBuilder.AppendLine($"{codeMessage}009: Se debe indicar el Codigo del Trabajador.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
-
             if (!isValid)
             {
                 dianResponse.StatusCode = "66";
                 dianResponse.ErrorMessage = errors;
+                dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
+                dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
             }
 
             return isValid;
