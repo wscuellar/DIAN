@@ -139,9 +139,9 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(new OthersElectronicDocAssociatedViewModel());
             }
 
-            if (model.Step == 3 && model.ContributorTypeId == 2)
+            if (model.Step == 3 && model.ContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
             {
-                PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(model.Id, string.Empty, OtherDocElecState.none, 1, 10);
+                PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(User.ContributorId(), string.Empty, OtherDocElecState.none, 1, 10);
 
                 model.Customers = customers.Results.Select(t => new OtherDocElecCustomerListViewModel()
                 {
@@ -291,7 +291,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult CustomersList(int ContributorId, string code, OtherDocElecState State, int page, int pagesize)
         {
-            PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(ContributorId, code, State, page, pagesize);
+            PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(User.ContributorId(), code, State, page, pagesize);
 
             List<OtherDocElecCustomerListViewModel> customerModel = customers.Results.Select(t => new OtherDocElecCustomerListViewModel()
             {
@@ -385,9 +385,6 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
         {
-
-            
-
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             
             GlobalTestSetOthersDocuments testSet = null;
@@ -423,6 +420,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareId = model.SoftwareIdBase,
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
+
             OtherDocElecContributorOperations contributorOperation = new OtherDocElecContributorOperations()
             {
                 OtherDocElecContributorId = otherDocElecContributor.Id,
