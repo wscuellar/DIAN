@@ -62,11 +62,12 @@ namespace Gosocket.Dian.Application
         public OtherDocElecContributor CreateContributor(int contributorId, OtherDocElecState State,
            int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
         {
+            var state = OtherDocElecState.Cancelado.GetDescription();
             OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
                                                                                      && t.OtherDocElecContributorTypeId == ContributorType
                                                                                      && t.OtherDocElecOperationModeId == OperationMode
                                                                                      && t.ElectronicDocumentId == ElectronicDocumentId
-                                                                                     && t.State != "Aceptado");
+                                                                                     && t.State != state);
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {

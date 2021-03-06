@@ -308,9 +308,7 @@
 
     <script>
         $(document).ready(function () {
-            //howLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
-
-            RenderStepsOtherDoc(@(@Model.Step - 1));
+            RenderStepsOtherDoc(@((Model.Step == 2) ? (Model.Step - 1) : Model.Step));
 
             $(".cancel-register").click(function () {
                 $("#txtCancelRegistro").val("");

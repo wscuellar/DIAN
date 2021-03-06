@@ -8,6 +8,8 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IOthersDocsElecSoftwareService
     {
         OtherDocElecSoftware Get(Guid id);
+
+        OtherDocElecSoftware GetBySoftwareId(Guid id);
         List<Software> GetSoftwares(int contributorId);
         OtherDocElecSoftware CreateSoftware(OtherDocElecSoftware software);
         Guid DeleteSoftware(Guid id);

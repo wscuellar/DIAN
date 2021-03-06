@@ -17,7 +17,7 @@
             <div class="panel-body padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("UploadFactorOperationMode", "RadianApproved", FormMethod.Post, new { id = "formst" }))
+                        @using (Html.BeginForm("SetupOperationModePost", "OthersElectronicDocAssociated", FormMethod.Post, new { id = "formst" }))
                         {
                             @Html.HiddenFor(m => m.ContributorId)
                             @Html.HiddenFor(m => m.ProviderId)
@@ -28,8 +28,7 @@
                             @Html.Partial("_setupOperationModeForm")
                         }
 
-                        @Html.Partial("_setupOperationModeList") 
-
+                        @Html.Partial("_setupOperationModeList")
                     </div>
                 </div>
             </div>
@@ -41,6 +40,7 @@
 <script src="~/Content/js/Radian/RadianOperationMode.js"></script>
 <script src="~/Content/js/Radian/constants.js"></script>
 <script src="~/Content/js/Radian/RadianSteps.js"></script>
+
 @section Scripts{
 
     <script>
@@ -55,11 +55,12 @@
         $("#SoftwareName").blur(function () {
             fnvalidSoftwareName();
         });
+
         $("#SoftwarePin").blur(function () {
             fnvalidSoftwarePin();
         });
 
-        $("#save-operation-mode").click(function (e) { 
+        $("#save-operation-mode").click(function (e) {
             var form = $('#formst');
             if (form.valid()) {
                 var valid1 = fnvalidSoftwarePin();
@@ -85,7 +86,58 @@
                 AddOperationModeODE("@Url.Action("SetupOperationModePost", "OthersElectronicDocAssociated")", model);
             }
         });
-        function AddOperationModeODE(url, ViewModel) { 
+
+        $('#ProviderId').change(function () {
+            @*if ('@ViewBag.softwareActive' == 'False') {
+                $('#UrlEventReception').val('');
+                $('#SoftwareType').val('');
+                getSoftwares($('#ProviderId').val());
+            }*@
+            $('#SoftwareUrl').val('');
+            //$('#SoftwareType').val('');
+            getSoftwares($('#ProviderId').val());
+        });
+
+        function getSoftwares(ProviderId){
+
+            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+                'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
+
+            cambiarTextoSelect();
+
+            $.ajax({
+                url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocAssociated")",
+                type: "POST",
+                data: { id: ProviderId, electronicDocumentId: @Model.ElectronicDocId },
+                datatype: "json",
+                success: function (result) {
+
+                    if (result != null && result.res != null) {
+
+                        $.each(result.res, function (index, value) {
+                            $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
+                                ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
+                                '<span class="fa fa-check check-mark"></span></a></li>');
+                        });
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la consulta");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
+
+        function AddOperationModeODE(url, ViewModel) {
             var metod = 'POST';
             var data = ViewModel;
             var actionError = (error) => {
@@ -102,8 +154,7 @@
             ajaxFunction(url, metod, data, actionError, actionSuccess);
         }
 
-
-        ODEDeleteOperationMode = function (Id) { 
+        ODEDeleteOperationMode = function (Id) {
             var url ="@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")";
             showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
             var metod = 'POST';
@@ -147,14 +198,34 @@
             $("#validSoftwareName").text('');
             $("#validSoftwarePin").text('');
 
-            if ($("#OperationModeId").val() == "2") {
-                $("#divSoftwareName").hide();
-                $("#divSoftwarePin").hide();
+            if ($("#OperationModeId").val() == "1") {
+                $(".section-own-software").show();
+                $(".section-software-technology-provider").hide();
             }
             else {
-                $("#divSoftwareName").show();
-                $("#divSoftwarePin").show();
+                $(".section-own-software").hide();
+                $(".section-software-technology-provider").show();
             }
+        }
+
+        function cambiarTextoSelect() {
+            var botones = $(":button");
+            var boton;
+
+            $.each(botones, function (index1, val1) {
+                if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
+
+                    boton = val1;
+                    $.each(val1.attributes, function (index, value) {
+
+                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+
+                            boton.firstElementChild.textContent = "Seleccione...";
+
+                        }
+                    });
+                }
+            });
         }
     });
     </script>

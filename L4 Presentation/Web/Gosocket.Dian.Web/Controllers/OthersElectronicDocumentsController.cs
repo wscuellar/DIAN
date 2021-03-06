@@ -113,17 +113,16 @@ namespace Gosocket.Dian.Web.Controllers
                 Software = t.Software,
                 SoftwareId = t.SoftwareId,
                 PinSW = t.PinSW,
-                //StateSoftware = t.StateSoftware,
                 StateSoftware = ((OtherDocElecState)int.Parse(t.StateSoftware)).GetDescription(),
                 StateContributor = t.StateContributor,
                 Url = t.Url,
-                CreatedDate = t.CreatedDate,
+                CreatedDate = t.CreatedDate
             }).ToList();
 
             List<Domain.RadianOperationMode> operationModesList = new List<Domain.RadianOperationMode>();
             if (model.OperationModeId == 1)
             {
-                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.OwnSoftware, Name = RadianOperationModeTestSet.OwnSoftware.GetDescription() });
+                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware, Name = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
                 // get contributor name...
                 var contributor = this._contributorService.GetContributorById(User.ContributorId(), model.ContributorIdType);
                 model.ContributorName = contributor?.Name;
@@ -131,7 +130,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             else
             {
-                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)RadianOperationModeTestSet.SoftwareTechnologyProvider, Name = RadianOperationModeTestSet.SoftwareTechnologyProvider.GetDescription() });
+                operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider, Name = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider.GetDescription() });
                 var providersList = new List<ContributorViewModel>();
                 var contributorsList = _othersDocsElecContributorService.GetTechnologicalProviders(User.ContributorId(), model.ElectronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OtherDocElecState.Habilitado.GetDescription());
                 if (contributorsList != null)
@@ -264,6 +263,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (ValidacionOtherDocs.Accion == "SeleccionOperationMode")
             {
                 List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(ValidacionOtherDocs.ContributorId, (int)ValidacionOtherDocs.ContributorIdType, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Cancelado.GetDescription());
+                //List<OtherDocElecContributor> Lista = _othersDocsElecContributorService.ValidateExistenciaContribuitor(ValidacionOtherDocs.ContributorId, (int)ValidacionOtherDocs.ContributorIdType, (int)ValidacionOtherDocs.OperationModeId, OtherDocElecState.Habilitado.GetDescription());
                 if (Lista.Any())
                 {
                     string ContributorId = null;
@@ -320,7 +320,8 @@ namespace Gosocket.Dian.Web.Controllers
                 electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, 
                 OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
                 {
-                    Id = s.Id,
+                    //Id = s.Id,
+                    Id = s.SoftwareId,
                     Name = s.Name
                 }).ToList();
 
@@ -330,7 +331,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult GetDataBySoftwareId(Guid SoftwareId)
         {
-            var software = _othersDocsElecSoftwareService.Get(SoftwareId);
+            var software = _othersDocsElecSoftwareService.GetBySoftwareId(SoftwareId);
             if (software != null)
             {
                 return Json(new

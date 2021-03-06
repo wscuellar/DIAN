@@ -1,4 +1,6 @@
-﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
+﻿@using Gosocket.Dian.Domain.Common
+
+@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
 
 <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
     <div class="col-md-12 padding-horizontal-0">
@@ -21,25 +23,39 @@
                 </div>
 
                 <div class="row">
-                    <h4 class="panel-title-radian padding-0"><strong>Datos de la Empresa y Software</strong></h4>
+                    <h4 class="panel-title-radian padding-0"><strong>Datos de empresa y software</strong></h4>
                     <hr class="margin-5" />
 
-                    <div class="col-sm-3 padding-xs-0">
-                        <div class="form-group">
-                            @Html.Label("Nombre de la empresa proveedora", new { @class = "control-label" })
-                            @Html.TextBoxFor(m => m.Provider, new { @class = "form-control input-general", disabled = "disabled" })
+                    <div class="section-software-technology-provider">
+                        <div class="col-sm-6 col-md-3 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("ProviderId", "Nombre empresa proveedora", new { @class = "control-label" })
+                                @Html.DropDownListFor(m => m.ProviderId, (SelectList)ViewBag.ListTechnoProviders, "Seleccione...", new { @class = "form-control selectpicker" })
+                                @Html.ValidationMessageFor(m => m.ProviderId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-md-3 padding-xs-0">
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                @Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
+                                @Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
+                            </div>
                         </div>
                     </div>
 
-
-                    @if (Model.OperationModeId == 1)
-                    {
+                    <div class="section-own-software">
+                        <div class="col-sm-3 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("Nombre empresa proveedora", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.Provider, new { @class = "form-control input-general", disabled = "disabled" })
+                            </div>
+                        </div>
                         <div class="col-sm-3 padding-xs-0" id="divSoftwareName">
                             <div class="form-group">
                                 @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.SoftwareName, new { @id = "SoftwareName", @name = "SoftwareName", @class = "form-control input-general", @style = "background: #ffffff;" })
                                 @Html.ValidationMessageFor(m => m.SoftwareName, null, new { @class = "text-danger" })
-                                <div id="validSoftwareName" class="text-danger"></div> 
+                                <div id="validSoftwareName" class="text-danger"></div>
                             </div>
                         </div>
                         <div class="col-sm-3 padding-xs-0" id="divSoftwarePin">
@@ -50,17 +66,21 @@
                                 <div id="validSoftwarePin" class="text-danger"></div>
                             </div>
                         </div>
-                    }
-
-                    <div class="col-sm-3 padding-xs-0">
-                        <div class="form-group">
-                            @Html.Label("ID del Software", new { @class = "control-label" })
-                            @Html.TextBoxFor(m => m.SoftwareId, new { @class = "form-control input-general", @readonly = "readonly" })
+                        <div class="col-sm-3 padding-xs-0">
+                            <div class="form-group">
+                                @Html.Label("ID del Software", new { @class = "control-label" })
+                                @Html.TextBoxFor(m => m.SoftwareId, new { @class = "form-control input-general", @readonly = "readonly" })
+                            </div>
                         </div>
                     </div>
 
+                    @if (Model.OperationModeId == (int)OtherDocElecOperationMode.OwnSoftware)
+                    {
+                        
+                    }
+
                 </div>
-            </div>
+                    </div>
             <div class="panel-footer-grey text-right">
                 <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar</button>
                 <button type="button"  name="Submit" id="save-operation-mode" class="btn btn-radian-success"  >Adicionar</button>
