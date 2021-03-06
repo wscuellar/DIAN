@@ -881,7 +881,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             catch (Exception ex)
             {
-                var failedList = new List<string> { $"Regla: NIE901, El documento debe poseer Todos los Namespace correspondientes a su estructura." };
+                var failedList = new List<string> { $"Regla: ZB01, Fallo en el esquema XML del archivo." };
                 dianResponse.IsValid = false;
                 dianResponse.StatusCode = "99";
                 dianResponse.StatusMessage = "Rechazo: Fallo en el esquema XML del archivo. " + ex.Message;

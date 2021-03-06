@@ -722,6 +722,12 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("SenderCode",
                     QueryComparisons.Equal,
                     senderCode));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Active",
+                    QueryComparisons.Equal,
+                    true));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
@@ -740,6 +746,12 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("SenderCode",
                     QueryComparisons.Equal,
                     senderCode));
+            prefixCondition = TableQuery.CombineFilters(
+              prefixCondition,
+              TableOperators.And,
+              TableQuery.GenerateFilterConditionForBool("Active",
+                  QueryComparisons.Equal,
+                  true));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 

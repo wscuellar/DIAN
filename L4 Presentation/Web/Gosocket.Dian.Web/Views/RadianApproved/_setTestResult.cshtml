@@ -75,7 +75,7 @@
                 @if (status == "Rechazado")
                 {
                     <div>
-                        <button onclick="RestartCounters('@Url.Action("RestartSetTestResult","RadianApproved")',@JsonConvert.SerializeObject(Model.RadianTestSetResult),'@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
+                        <button onclick="RestartCounters('@Url.Action("RestartSetTestResult","RadianApproved")',@JsonConvert.SerializeObject(Model.RadianTestSetResult), '@Model.Software.Id',@Model.RadianOperationId)" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
                     </div>
                 }
 

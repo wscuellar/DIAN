@@ -693,12 +693,12 @@ namespace Gosocket.Dian.Services.Utils
 
             switch (docTypeCode)
             {
-                case "11":               
+                case "102":               
                     {
                         codeMessage = "NIE";
                         break;
                     }
-                case "12":          
+                case "103":          
                     {
                         codeMessage = "NIAE";
                         break;
@@ -718,17 +718,9 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "12")
+            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "103")
             {
                 stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
-
-            if (string.IsNullOrEmpty(codigoTrabajador))
-            {
-                stringBuilder.AppendLine($"{codeMessage}009: Se debe indicar el Codigo del Trabajador.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -738,6 +730,8 @@ namespace Gosocket.Dian.Services.Utils
             {
                 dianResponse.StatusCode = "66";
                 dianResponse.ErrorMessage = errors;
+                dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
+                dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
             }
 
             return isValid;

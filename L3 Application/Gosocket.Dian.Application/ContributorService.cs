@@ -480,13 +480,13 @@ namespace Gosocket.Dian.Application
                 if (otherDocElec != null)
                 {
                     //Cambiar estado habilitado
-                    otherDocElec.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
-                    otherDocElec.Step = 4;
+                    otherDocElec.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocElecState.Habilitado);
+                    otherDocElec.Step = 3;
                     otherDocElec.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
                     //Si es software propio lo habilita.
-                    if (otherDocElec.OtherDocElecOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                    if (otherDocElec.OtherDocElecOperationModeId == (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware)
                     {
                         OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
                         soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
@@ -497,13 +497,13 @@ namespace Gosocket.Dian.Application
                                                  t => t.OtherDocElecContributorId == otherDocElec.Id
                                                  && t.SoftwareType == softwareType
                                                  && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
-                                                 && t.OperationStatusId == (int)Domain.Common.RadianState.Test
+                                                 && t.OperationStatusId == (int)Domain.Common.OtherDocElecState.Test
                                                  && !t.Deleted
                                                  );
 
 
                     if (otherDocOperation != null)
-                        otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocumentStatus.Habilitado; //Aceptada la operacion.
+                        otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado; //Aceptada la operacion.
 
                     context.SaveChanges();
                 }
@@ -647,11 +647,11 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                var contributorInstance = context.RadianContributors.FirstOrDefault(c => c.Id == contributor.Id);
+                var contributorInstance = context.OtherDocElecContributors.FirstOrDefault(c => c.Id == contributor.Id);
                 if (contributorInstance != null)
                 {
-                    contributorInstance.RadianState = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocumentStatus.Habilitado);
-                    contributorInstance.RadianContributorTypeId = contributor.OtherDocElecContributorTypeId;
+                    contributorInstance.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.OtherDocElecState.Habilitado);
+                    contributorInstance.OtherDocElecContributorTypeId = contributor.OtherDocElecContributorTypeId;
                     contributorInstance.Update = DateTime.UtcNow;
                     context.SaveChanges();
                 }
