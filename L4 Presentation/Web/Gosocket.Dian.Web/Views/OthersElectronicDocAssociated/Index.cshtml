@@ -258,11 +258,13 @@
                         </section>
                         <h3></h3>
                         <section>
-                            @Html.Partial("_finish")
+                            @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
                     </div>
                     @if (Model.Step == 3)
                     {
+                        @Html.Partial("_finish")
+
                         <div class="footer-table">
                             <div class="row margin-horizontal-0">
                                 @Html.Partial("_usersLegal")
@@ -309,6 +311,7 @@
     <script>
         $(document).ready(function () {
             RenderStepsOtherDoc(@((Model.Step == 2) ? (Model.Step - 1) : Model.Step));
+            //RenderStepsOtherDoc(2);
 
             $(".cancel-register").click(function () {
                 $("#txtCancelRegistro").val("");
@@ -405,7 +408,7 @@
               });
 
             $('.Set-Prueba').click(function (e) {
-                 var url = "@Url.Action("GetSetTestResult", "OthersElectronicDocAssociated")" + "/" + @Model.Id;
+                 var url = "@Url.Action("GetSetTestResult", "OthersElectronicDocAssociated")" + "/" + @ViewBag.Id;
                  window.location.href = url;
             });
 

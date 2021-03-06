@@ -245,5 +245,10 @@ namespace Gosocket.Dian.Application
         {
             return _othersDocsElecContributorOperationRepository.Update(model);
         }
+
+        public OtherDocElecContributorOperations GetOtherDocElecContributorOperationById(int id)
+        {
+            return this._othersDocsElecContributorOperationRepository.Get(t => t.Id == id);
+        }
     }
 }
