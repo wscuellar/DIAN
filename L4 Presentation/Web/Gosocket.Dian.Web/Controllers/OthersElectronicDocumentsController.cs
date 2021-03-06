@@ -202,7 +202,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             _othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
-            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = model.OtherDocElecContributorId });
+            return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
 
         public ActionResult AddParticipants(int electronicDocumentId, string message)

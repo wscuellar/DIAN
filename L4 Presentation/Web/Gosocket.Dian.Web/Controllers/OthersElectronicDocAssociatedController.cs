@@ -385,6 +385,9 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
         {
+
+            
+
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             
             GlobalTestSetOthersDocuments testSet = null;
