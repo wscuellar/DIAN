@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Application;
-using Gosocket.Dian.Common.Resources;
+﻿using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
@@ -7,7 +6,6 @@ using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
-using Microsoft.AspNet.Identity;
 using Gosocket.Dian.Infrastructure;
 using Microsoft.AspNet.Identity.Owin;
 using System;
@@ -238,7 +236,7 @@ namespace Gosocket.Dian.Web.Controllers
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
-            
+
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
             model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
@@ -275,7 +273,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.TestSetId = model.GTestSetOthersDocumentsResult.Id;
 
             //var softwareStatusName = string.Empty;
-            
+
             //if(software != null) softwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId);
             ViewBag.OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State;
 
@@ -306,12 +304,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult SetupOperationMode(int Id)
         {
-
             OthersElectronicDocAssociatedViewModel entity = DataAssociate(Id);
 
             if (entity.Id == -1)
                 return RedirectToAction("Index", "OthersElectronicDocuments");
-
 
             if (entity.Id == -2)
             {
@@ -321,15 +317,33 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             OtherDocElecSetupOperationModeViewModel model = new OtherDocElecSetupOperationModeViewModel();
+            var operationModesList = new List<SelectListItem>();
 
-            List<SelectListItem> OperationsModes = _othersDocsElecContributorService.GetOperationModes().Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Name }).ToList();
+            if (entity.ContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.Transmitter) // emisor
+            {
+                operationModesList.Add(new SelectListItem { Value = ((int)Domain.Common.OtherDocElecOperationMode.OwnSoftware).ToString(), Text = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
+                operationModesList.Add(new SelectListItem { Value = ((int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider).ToString(), Text = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider.GetDescription() });
+            }
+            else
+            {
+                operationModesList.Add(new SelectListItem { Value = ((int)Domain.Common.OtherDocElecOperationMode.OwnSoftware).ToString(), Text = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
+            }
+
+            var providersList = new List<ContributorViewModel>();
+            var contributorsList = _othersDocsElecContributorService.GetTechnologicalProviders(User.ContributorId(), entity.ElectronicDocId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OtherDocElecState.Habilitado.GetDescription());
+            if (contributorsList != null)
+                providersList.AddRange(contributorsList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+
+            ViewBag.ListTechnoProviders = new SelectList(providersList, "Id", "Name");
+            ViewBag.ListSoftwares = new List<SoftwareViewModel>();
+
             model.Id = entity.Id;
             model.ContributorId = entity.ContributorId;
             model.OperationMode = entity.OperationMode;
             model.OperationModeId = entity.OperationModeId;
             model.ElectronicDoc = entity.ElectronicDoc;
             model.ElectronicDocId = entity.ElectronicDocId;
-            model.OperationModeList = OperationsModes;
+            model.OperationModeList = operationModesList;
             model.ContributorType = entity.ContributorType;
             model.ContributorTypeId = entity.ContributorTypeId;
             model.SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl");
@@ -339,6 +353,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Provider = _contributorService.GetContributorById(model.ProviderId, entity.ContributorTypeId).Name;
 
             PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), model.ContributorTypeId, model.OperationModeId);
+
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
                 Id = t.Id,
@@ -349,10 +364,10 @@ namespace Gosocket.Dian.Web.Controllers
                 Software = t.Software,
                 SoftwareId = t.SoftwareId,
                 PinSW = t.PinSW,
-                StateSoftware = t.StateSoftware,
+                StateSoftware = ((OtherDocElecState)int.Parse(t.StateSoftware)).GetDescription(),
                 StateContributor = t.StateContributor,
                 Url = t.Url,
-                CreatedDate = t.CreatedDate,
+                CreatedDate = t.CreatedDate
             }).ToList();
 
             return View(model);
@@ -418,10 +433,11 @@ namespace Gosocket.Dian.Web.Controllers
             //    if (participant.RadianState != RadianState.Habilitado.GetDescription())
             //        _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
             //}
+
             response.Message = TextResources.OtherDocEleSuccesModeOperation;
             return Json(response, JsonRequestBehavior.AllowGet);
         }
-
+        
         [HttpPost]
         public JsonResult DeleteOperationMode(string Id)
         {
@@ -484,6 +500,37 @@ namespace Gosocket.Dian.Web.Controllers
             ResponseMessage response = new ResponseMessage();
             response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
             return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetSoftwaresByContributorId(int id, int electronicDocumentId)
+        {
+            var softwareList = _othersDocsElecSoftwareService.GetSoftwaresByProviderTechnologicalServices(id,
+                electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name
+                }).ToList();
+
+            return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult GetDataBySoftwareId(Guid SoftwareId)
+        {
+            var software = _othersDocsElecSoftwareService.Get(SoftwareId);
+            if (software != null)
+            {
+                return Json(new
+                {
+                    url = software.Url,
+                    SoftwareType = 1,
+                    SoftwarePIN = software.Pin
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(null, JsonRequestBehavior.AllowGet);
         }
     }
 }
