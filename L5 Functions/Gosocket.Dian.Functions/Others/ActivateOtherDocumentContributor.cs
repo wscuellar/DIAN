@@ -62,6 +62,7 @@ namespace Gosocket.Dian.Functions.Others
                     {
                         // Step 3 Activo Otros Documentos
                         otherDocElecContributor.Step = 3;
+                        otherDocElecContributor.ElectronicDocumentId = requestObject.ElectronicDocumentId;
                         otherDocElecContributor.OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId;
                         contributorService.ActivateOtherDocument(otherDocElecContributor);
                         otherDocContributorId = otherDocElecContributor.Id;
@@ -76,6 +77,7 @@ namespace Gosocket.Dian.Functions.Others
                             ContributorId = requestObject.ContributorId,
                             OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId,
                             OtherDocElecOperationModeId = requestObject.OtherDocOperationModeId,
+                            ElectronicDocumentId = requestObject.ElectronicDocumentId,
                             State = Domain.Common.OtherDocElecState.Habilitado.GetDescription(),
                             CreatedDate = System.DateTime.Now,
                             Update = System.DateTime.Now,
@@ -99,11 +101,13 @@ namespace Gosocket.Dian.Functions.Others
                             SoftwareDate = DateTime.Now,
                             SoftwareUser = requestObject.SoftwareUser,
                             SoftwarePassword = requestObject.SoftwarePassword,
-                            Status = true,
+                            Status = true,                            
                             OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted,
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
-                            OtherDocElecContributorId = requestObject.ContributorId
+                            OtherDocElecContributorId = requestObject.ContributorId,
+                            SoftwareId = new Guid(requestObject.SoftwareProvider),
+                            ProviderId = requestObject.ProviderId
                         };
 
                         softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
@@ -234,10 +238,10 @@ namespace Gosocket.Dian.Functions.Others
             [JsonProperty(PropertyName = "contributorId")]
             public int ContributorId { get; set; }
 
-            [JsonProperty(PropertyName = "radianContributorTypeId")]
+            [JsonProperty(PropertyName = "otherDocContributorTypeId")]
             public int OtherDocContributorTypeId { get; set; }
 
-            [JsonProperty(PropertyName = "radianOperationModeId")]
+            [JsonProperty(PropertyName = "otherDocOperationModeId")]
             public int OtherDocOperationModeId { get; set; }
 
             [JsonProperty(PropertyName = "createdBy")]
@@ -263,6 +267,15 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "electronicDocumentId")]
+            public int ElectronicDocumentId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareProvider")]
+            public string SoftwareProvider { get; set; }
+
+            [JsonProperty(PropertyName = "providerId")]
+            public int ProviderId { get; set; }
         }
 
     }

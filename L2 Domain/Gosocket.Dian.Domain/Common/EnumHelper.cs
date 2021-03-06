@@ -165,6 +165,10 @@ namespace Gosocket.Dian.Domain.Common
         ContingencyDianInvoice = 4,
         [Description("Documento Soporte")]
         DocumentSupportInvoice = 5,
+        [Description("Factura electrónica de AIU")]
+        AIUInvoice = 9,
+        [Description("Factura electrónica de Mandato")]
+        MandateInvoice = 11,
         [Description("Documento de Importacion")]
         ImportDocumentInvoice = 101,
         [Description("Nomina Individual")]

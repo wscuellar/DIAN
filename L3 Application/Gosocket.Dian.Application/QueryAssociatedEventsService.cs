@@ -45,9 +45,9 @@ namespace Gosocket.Dian.Application
             return _radianGlobalDocValidationDocumentMeta.DocumentValidation(reference);
         }
 
-        public GlobalDocValidatorDocument EventVerification(string eventItemIdentifier)
+        public GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem)
         {
-            return _globalDocValidatorDocument.EventVerification(eventItemIdentifier);
+            return _globalDocValidatorDocument.EventVerification(eventItem);
         }
 
         public List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode)
@@ -96,7 +96,7 @@ namespace Gosocket.Dian.Application
             if (string.IsNullOrEmpty(otherEvent.EventCode))
                 return false;
 
-            GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent.Identifier);
+            GlobalDocValidatorDocument eventVerification = EventVerification(otherEvent);
 
             return eventVerification != null
                 && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10);
@@ -132,15 +132,15 @@ namespace Gosocket.Dian.Application
             if (documentKey != "")
             {
                 allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
-                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null).ToList();
-            }
+                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
+            } 
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
-            var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ThenBy(t => t.EventCode);
+            var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ToList();
 
-            bool limitacionAnulation = IsAnulation(events.Count(e => ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())), events.Count(e => LIMITACIONCODES.Contains(e.EventCode.Trim())));
 
-            bool endosoAnulation = IsAnulation(events.Count(e => ANULACIONENDOSOCODES.Contains(e.EventCode.Trim())), events.Count(e => ENDOSOCODES.Contains(e.EventCode.Trim())));
+            events = removeEvents(events, EventStatus.InvoiceOfferedForNegotiation, new List<string>() { $"0{(int)EventStatus.EndosoProcuracion}", $"0{ (int)EventStatus.EndosoGarantia}" });
+            events = removeEvents(events, EventStatus.AnulacionLimitacionCirculacion, new List<string>() { $"0{(int)EventStatus.NegotiatedInvoice}" });
 
             foreach (GlobalDocValidatorDocumentMeta documentMeta in events)
             {
@@ -156,7 +156,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()) && !endosoAnulation)
+                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
                     index++;
@@ -168,7 +168,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()) && !limitacionAnulation )
+                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
@@ -183,6 +183,26 @@ namespace Gosocket.Dian.Application
                 cleanDictionary.Remove(1);
 
             return cleanDictionary;
+        }
+
+
+
+        private List<GlobalDocValidatorDocumentMeta> removeEvents(List<GlobalDocValidatorDocumentMeta> events, EventStatus conditionalStatus, List<string> removeData)
+        {
+            if (events.Count > 0 && events.Last().EventCode == $"0{(int)conditionalStatus }")
+            {
+                events.Remove(events.Last());
+                foreach (var item in events.OrderByDescending(x => x.Timestamp))
+                {
+                    if (removeData.Contains(item.EventCode.Trim()))
+                    {
+                        events.Remove(item);
+                        break;
+                    }
+                }
+                return removeEvents(events, conditionalStatus, removeData);
+            }
+            return events;
         }
 
         //Pass Information to DocumentController for Debit And Credit Notes

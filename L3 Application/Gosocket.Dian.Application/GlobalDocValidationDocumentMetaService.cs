@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Infrastructure;
+﻿using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using System.Collections.Generic;
 
@@ -7,6 +8,7 @@ namespace Gosocket.Dian.Application
     public class GlobalDocValidationDocumentMetaService : IGlobalDocValidationDocumentMetaService
     {
         private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+        private readonly TableManager documentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly TableManager ReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
 
         //Se utiliza en invoice, eventitem, referenceMeta
@@ -38,6 +40,11 @@ namespace Gosocket.Dian.Application
         {
             return documentMetaTableManager
                 .FindDocumentByReference<GlobalDocValidatorDocumentMeta>(documentReferencedKey);
+        } 
+
+        public GlobalDocValidatorDocument EventValidator(GlobalDocValidatorDocumentMeta eventItem)
+        {
+            return documentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
         }
     }
 }

@@ -215,6 +215,8 @@ namespace Gosocket.Dian.Application
                     softwareInstance.Url = software.Url;
                     softwareInstance.Updated = DateTime.UtcNow;
                     softwareInstance.OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId;
+                    softwareInstance.SoftwareId = software.SoftwareId;
+                    softwareInstance.ProviderId = software.ProviderId;
                     context.Entry(softwareInstance).State = System.Data.Entity.EntityState.Modified;
                 }
                 else

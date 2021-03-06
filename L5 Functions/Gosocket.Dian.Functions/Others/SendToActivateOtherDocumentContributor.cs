@@ -113,7 +113,10 @@ namespace Gosocket.Dian.Functions.Others
                         SoftwareName = data.SoftwareName,
                         SoftwareId = results.SoftwareId,
                         SoftwareType = data.SoftwareType,
-                        Url = data.Url
+                        Url = data.Url,
+                        ElectronicDocumentId = otherDocElecContributor.ElectronicDocumentId,
+                        SoftwareProvider = data.SoftwareId,
+                        ProviderId = results.ProviderId
                     };
 
                     //Se envia para la creacion en prod.
@@ -221,10 +224,10 @@ namespace Gosocket.Dian.Functions.Others
             [JsonProperty(PropertyName = "contributorId")]
             public int ContributorId { get; set; }
 
-            [JsonProperty(PropertyName = "radianContributorTypeId")]
+            [JsonProperty(PropertyName = "otherDocContributorTypeId")]
             public int OtherDocContributorTypeId { get; set; }
 
-            [JsonProperty(PropertyName = "radianOperationModeId")]
+            [JsonProperty(PropertyName = "otherDocOperationModeId")]
             public int OtherDocOperationModeId { get; set; }
 
             [JsonProperty(PropertyName = "createdBy")]
@@ -250,6 +253,15 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "electronicDocumentId")]
+            public int ElectronicDocumentId { get; set; }
+
+            [JsonProperty(PropertyName = "softwareProvider")]
+            public string SoftwareProvider { get; set; }
+
+            [JsonProperty(PropertyName = "providerId")]
+            public int ProviderId { get; set; }
         }
     }
 }

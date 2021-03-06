@@ -500,7 +500,7 @@ namespace Gosocket.Dian.Web.Controllers
         [ExcludeFilter(typeof(Authorization))]
         public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
         {
-            string urlBase = Request.Url.OriginalString.Replace(Request.Url.AbsolutePath,string.Empty);
+            string urlBase = Request.Url.OriginalString.Replace(Request.Url.AbsolutePath, string.Empty);
             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe, urlBase);
             String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
             return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
@@ -991,7 +991,17 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList();
 
                 foreach (DocumentViewModel docView in model.Documents)
-                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
+                {
+                    try
+                    {
+                        docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw ex;
+                    }
+                }
             }
 
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
@@ -1035,10 +1045,13 @@ namespace Gosocket.Dian.Web.Controllers
             events = events.Where(t => t.Code != null).OrderBy(t => t.TimeStamp).ToList();
             events = eventListByTimestamp(events).OrderBy(t => t.TimeStamp).ThenBy(t => t.Code).ToList();
 
-            bool limitacionAnulation = IsAnulation(events.Count(e => ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())), events.Count(e => LIMITACIONCODES.Contains(e.Code.Trim())));
-            bool endosoAnulation = IsAnulation(events.Count(e => ANULACIONENDOSOCODES.Contains(e.Code.Trim())), events.Count(e => ENDOSOCODES.Contains(e.Code.Trim())));
+            var eveOrder = events.OrderBy(z => z.Date).ToList();
 
-            foreach (var documentMeta in events)
+            eveOrder = removeEvents(eveOrder, EventStatus.InvoiceOfferedForNegotiation, new List<string>() { $"0{(int)EventStatus.EndosoProcuracion}", $"0{ (int)EventStatus.EndosoGarantia}" });
+            eveOrder = removeEvents(eveOrder, EventStatus.AnulacionLimitacionCirculacion, new List<string>() { $"0{(int)EventStatus.NegotiatedInvoice}" });
+             
+
+            foreach (var documentMeta in eveOrder)
             {
                 if (TITULOVALORCODES.Contains(documentMeta.Code.Trim()))
                     securityTitleCounter++;
@@ -1052,7 +1065,7 @@ namespace Gosocket.Dian.Web.Controllers
                     index++;
                 }
 
-                if (ENDOSOCODES.Contains(documentMeta.Code.Trim()) && !endosoAnulation)
+                if (ENDOSOCODES.Contains(documentMeta.Code.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
                     index++;
@@ -1064,7 +1077,7 @@ namespace Gosocket.Dian.Web.Controllers
                     index++;
                 }
 
-                if (LIMITACIONCODES.Contains(documentMeta.Code.Trim()) && !limitacionAnulation)
+                if (LIMITACIONCODES.Contains(documentMeta.Code.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
@@ -1085,12 +1098,23 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
-        private bool IsAnulation(int counterAnulations, int counterInformation)
-        {
-            if (counterInformation > counterAnulations)
-                return false;
 
-            return true;
+        private List<EventViewModel> removeEvents(List<EventViewModel> events, EventStatus conditionalStatus, List<string> removeData)
+        {
+            if (events.Count > 0 && events.Last().Code == $"0{(int)conditionalStatus }")
+            {
+                events.Remove(events.Last());
+                foreach (var item in events.OrderByDescending(x => x.Date))
+                {
+                    if (removeData.Contains(item.Code.Trim()))
+                    {
+                        events.Remove(item);
+                        break;
+                    }
+                }
+                return removeEvents(events, conditionalStatus, removeData);
+            }
+            return events;
         }
 
         private void SetView(int filterType)
