@@ -4,7 +4,7 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IGlobalDocValidatorDocumentService
     {
-        GlobalDocValidatorDocument EventVerification(string eventItemIdentifier);
+        GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem);
         GlobalDocValidatorDocument FindByGlobalDocumentId(string globalDocumentId);
     }
 }

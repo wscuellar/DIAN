@@ -10,7 +10,7 @@ namespace Gosocket.Dian.Interfaces.Services
         List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments);
         GlobalDocValidatorDocumentMeta DocumentValidation(string reference);
         string EventTitle(EventStatus eventStatus, string customizationId, string eventCode);
-        Domain.Entity.GlobalDocValidatorDocument EventVerification(string eventItemIdentifier);
+        Domain.Entity.GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem);
         Domain.Entity.GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId);
         Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "");
         EventStatus IdentifyEvent(GlobalDocValidatorDocumentMeta eventItem);

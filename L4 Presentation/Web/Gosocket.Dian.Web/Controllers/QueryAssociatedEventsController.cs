@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Web.Controllers
             SetEndoso(model, eventItem, invoice);
             model.RequestType = TextResources.Event_RequestType;
 
-            GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem.Identifier);
+            GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem);
             SetValidations(model, eventItem, eventVerification);
 
             GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
