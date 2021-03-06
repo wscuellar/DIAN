@@ -817,7 +817,10 @@ namespace Gosocket.Dian.Application.Cosmos
                         }
                         break;
                     case 7:
-                        predicate = predicate.And(g => !g.DocumentTypeId.Equals($"0{(int)DocumentType.Invoice}"));
+                        predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.AIUInvoice} ")));
+                        predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.Invoice}")));
+                        predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.MandateInvoice}")));
+                        predicate = predicate.And(g => !g.DocumentTypeId.Equals(((int)DocumentType.MandateInvoice).ToString()));
                         break;
                 }
 
