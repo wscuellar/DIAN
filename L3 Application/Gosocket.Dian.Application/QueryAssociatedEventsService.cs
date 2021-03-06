@@ -132,11 +132,11 @@ namespace Gosocket.Dian.Application
             if (documentKey != "")
             {
                 allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
-                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null).ToList();
-            }
+                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
+            } 
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
-            var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp) .ToList();
+            var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ToList();
 
 
             events = removeEvents(events, EventStatus.InvoiceOfferedForNegotiation, new List<string>() { $"0{(int)EventStatus.EndosoProcuracion}", $"0{ (int)EventStatus.EndosoGarantia}" });
@@ -156,7 +156,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim())  )
+                if (ENDOSOCODES.Contains(documentMeta.EventCode.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Endorsed.GetDescription()}");
                     index++;
@@ -168,7 +168,7 @@ namespace Gosocket.Dian.Application
                     index++;
                 }
 
-                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim())  )
+                if (LIMITACIONCODES.Contains(documentMeta.EventCode.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;

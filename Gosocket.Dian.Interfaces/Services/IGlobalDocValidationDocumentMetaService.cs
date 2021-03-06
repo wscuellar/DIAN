@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Gosocket.Dian.Domain.Entity;
+using System.Collections.Generic;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -9,5 +10,7 @@ namespace Gosocket.Dian.Interfaces.Services
         GlobalDocValidatorDocumentMeta DocumentValidation(string reference);
         List<GlobalDocValidatorDocumentMeta> FindReferencedDocuments(string documentReferencedKey, string documentType);
         List<GlobalDocValidatorDocumentMeta> FindDocumentByReference(string documentReferencedKey);
+        GlobalDocValidatorDocument EventValidator(GlobalDocValidatorDocumentMeta eventItem);
     }
+
 }
