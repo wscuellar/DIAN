@@ -106,8 +106,8 @@ namespace Gosocket.Dian.Functions.Others
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
                             OtherDocElecContributorId = requestObject.ContributorId,
-                            SoftwareId = new Guid(requestObject.SoftwareProvider)
-                            //Provider = requestObject.ProviderId
+                            SoftwareId = new Guid(requestObject.SoftwareProvider),
+                            ProviderId = requestObject.ProviderId
                         };
 
                         softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
