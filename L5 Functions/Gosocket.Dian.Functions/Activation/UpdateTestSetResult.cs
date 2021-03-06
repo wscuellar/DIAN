@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
-                GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
+                GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentTestId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
                 //Se busca el set de pruebas procesado para el testsetid en curso
                 RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
@@ -406,7 +406,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // traigo los datos de RadianTestSetResult
 
                     // Se verifica si la operacion para el cliente y el software que usa esta habilitada para otros documentos
-                    bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(setResultOther.SoftwareId));
+                    bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
                     SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
                     if (isActive)
                         return;               
