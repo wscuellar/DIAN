@@ -8,9 +8,9 @@ namespace Gosocket.Dian.Application
     {
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
 
-        public GlobalDocValidatorDocument EventVerification(string eventItemIdentifier)
+        public GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem)
         {
-            return globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItemIdentifier, eventItemIdentifier);
+            return globalDocValidatorDocumentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
         }
 
         public GlobalDocValidatorDocument FindByGlobalDocumentId(string globalDocumentId)
