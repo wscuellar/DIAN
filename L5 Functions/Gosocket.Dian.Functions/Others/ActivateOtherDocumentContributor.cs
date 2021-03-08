@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Functions.Others
 
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod ", "ACTSEND-02");
+                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod " + IsProduction.ToString(), "ACTSEND-02");
 
                 OtherDocElecContributor otherDocElecContributor = null;
                 GlobalContributorActivation contributorActivation = null;
@@ -64,7 +64,8 @@ namespace Gosocket.Dian.Functions.Others
                         otherDocElecContributor.Step = 3;
                         otherDocElecContributor.ElectronicDocumentId = requestObject.ElectronicDocumentId;
                         otherDocElecContributor.OtherDocElecContributorTypeId = requestObject.OtherDocContributorTypeId;
-                        contributorService.ActivateOtherDocument(otherDocElecContributor);
+                        if(IsProduction)
+                            contributorService.ActivateOtherDocument(otherDocElecContributor);
                         otherDocContributorId = otherDocElecContributor.Id;
                         SetLogger(null, "Step ActOther-3", "ActivateOtherDocument -->  ", "ACT-03");
                     }
@@ -110,7 +111,8 @@ namespace Gosocket.Dian.Functions.Others
                             ProviderId = requestObject.ProviderId
                         };
 
-                        softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
+                        if (IsProduction)
+                            softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
 
                         SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
 
@@ -124,7 +126,8 @@ namespace Gosocket.Dian.Functions.Others
                             StatusId = (int)Domain.Common.SoftwareStatus.Production
                         };
 
-                        softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
+                        if (IsProduction)
+                            softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
                         SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
                     }
@@ -146,7 +149,8 @@ namespace Gosocket.Dian.Functions.Others
                         };
                         SetLogger(OtherDocOperation, "OtherDocOperation", string.Empty, "ACT-08");
 
-                        _ = contributorService.AddOtherDocOperation(OtherDocOperation);
+                        if (IsProduction)
+                            _ = contributorService.AddOtherDocOperation(OtherDocOperation);
 
                         SetLogger(null, "Step OtherDoc-7", "Cree la operacion", "ACT-09");
                     }
@@ -157,7 +161,8 @@ namespace Gosocket.Dian.Functions.Others
                         OtherDocOperation.OtherDocElecContributorId = otherDocContributorId;
                         OtherDocOperation.SoftwareType = Convert.ToInt32(requestObject.SoftwareType);
                         OtherDocOperation.Timestamp = System.DateTime.Now;
-                        contributorService.UpdateOtherDocOperation(OtherDocOperation);
+                        if (IsProduction)
+                            contributorService.UpdateOtherDocOperation(OtherDocOperation);
                         SetLogger(null, "Step OtherDoc-8", " -- contributorService.UpdateOtherDocOperation -- ", "ACT-10");
                     }
 
@@ -176,7 +181,8 @@ namespace Gosocket.Dian.Functions.Others
                     globalOtherDocElecOperation.OperationModeId = Convert.ToInt32(requestObject.SoftwareType);
 
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
-                    TableManagerOtherDocElecOperation.InsertOrUpdateAsync(globalOtherDocElecOperation).Wait();
+                    if (IsProduction)
+                        TableManagerOtherDocElecOperation.InsertOrUpdateAsync(globalOtherDocElecOperation).Wait();
 
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
