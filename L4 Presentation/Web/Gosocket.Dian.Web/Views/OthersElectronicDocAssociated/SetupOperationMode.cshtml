@@ -21,7 +21,7 @@
                         {
                             @Html.HiddenFor(m => m.ContributorId)
                             @Html.HiddenFor(m => m.ContributorTypeId)
-                            @Html.HiddenFor(m => m.SoftwareId)
+                            @*@Html.HiddenFor(m => m.SoftwareTy)*@
                             @Html.HiddenFor(m => m.SoftwareIdBase)
                             @Html.HiddenFor(m => m.ElectronicDocId)
 
@@ -49,10 +49,46 @@
             let selectedValue = $(this).val();
             if (selectedValue != null && selectedValue != '') {
                 $('#SoftwareUrl').val('');
-                //$('#SoftwareType').val('');
                 getSoftwares(selectedValue);
             }
         });
+
+        $(document).on('change', '#SoftwareId', function () {
+            let selectedValue = $(this).val();
+            if (selectedValue != null && selectedValue != '') {
+                $('#SoftwareName').val($('#SoftwareId option:selected').text());
+                getDataSoftwareSeleccionado(selectedValue);
+            }
+        })
+
+        function getDataSoftwareSeleccionado(SoftwareId){
+
+            $.ajax({
+                url: "@Url.Action("GetDataBySoftwareId")",
+                type: "POST",
+                data: { SoftwareId: SoftwareId },
+                datatype: "json",
+                success: function (result) {
+                    if (result != null) {
+                        console.log(result);
+                        $('#SoftwareUrl').val(result.url);
+                        //$('#SoftwareType').val(result.SoftwareType);
+                        $('#SoftwarePin').val(result.SoftwarePIN);
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la consulta");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
 
         function getSoftwares(ProviderId) {
             $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');

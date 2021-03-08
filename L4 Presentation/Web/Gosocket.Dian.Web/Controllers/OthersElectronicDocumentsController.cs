@@ -228,7 +228,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
-            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(registrationData.ContributorId,
+            OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(User.ContributorId(),
                                                 OtherDocElecState.Registrado,
                                                 (int)registrationData.ContributorIdType,
                                                 (int)registrationData.OperationModeId,

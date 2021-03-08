@@ -530,7 +530,8 @@ namespace Gosocket.Dian.Web.Controllers
                 electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
                 OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
                 {
-                    Id = s.Id,
+                    //Id = s.Id,
+                    Id = s.SoftwareId,
                     Name = s.Name
                 }).ToList();
 
@@ -540,7 +541,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult GetDataBySoftwareId(Guid SoftwareId)
         {
-            var software = _othersDocsElecSoftwareService.Get(SoftwareId);
+            var software = _othersDocsElecSoftwareService.GetBySoftwareId(SoftwareId);
             if (software != null)
             {
                 return Json(new
