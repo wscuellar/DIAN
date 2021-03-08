@@ -68,6 +68,8 @@ namespace Gosocket.Dian.Application
                                                                                      && t.OtherDocElecOperationModeId == OperationMode
                                                                                      && t.ElectronicDocumentId == ElectronicDocumentId
                                                                                      && t.State != state);
+            // Si ya esta habilitado, no se debe actualizar el estado...
+            if (existing != null && existing.State == OtherDocElecState.Habilitado.GetDescription()) return existing;
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -80,6 +82,7 @@ namespace Gosocket.Dian.Application
                 State = State.GetDescription(),
                 CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
             };
+
             newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
 
             return newContributor;
@@ -185,7 +188,8 @@ namespace Gosocket.Dian.Application
                                                         SoftwareId = s.SoftwareId.ToString(),
                                                         StateSoftware = oco.OperationStatusId.ToString(),
                                                         StateContributor = oc.State,
-                                                        CreatedDate = oc.CreatedDate,
+                                                        //CreatedDate = oc.CreatedDate,
+                                                        CreatedDate = s.SoftwareDate.Value,
                                                         ElectronicDoc = eld.Name,
                                                         Url = s.Url,
                                                     }).Distinct();
