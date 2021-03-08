@@ -166,6 +166,7 @@ namespace Gosocket.Dian.Web.Controllers
             if(model.OperationModeId != 2) providerId = User.ContributorId();
 
             var IdS = Guid.NewGuid();
+            var now = DateTime.Now;
             OtherDocElecSoftware software = new OtherDocElecSoftware()
             {
                 Id = IdS,
@@ -177,9 +178,9 @@ namespace Gosocket.Dian.Web.Controllers
                 Deleted = false,
                 Status = true,
                 OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess,
-                SoftwareDate = DateTime.Now,
-                Timestamp = DateTime.Now,
-                Updated = DateTime.Now,
+                SoftwareDate = now,
+                Timestamp = now,
+                Updated = now,
                 SoftwareId = new Guid(model.SoftwareId),
                 OtherDocElecContributorId = model.OtherDocElecContributorId
             };
@@ -189,7 +190,7 @@ namespace Gosocket.Dian.Web.Controllers
                 OtherDocElecContributorId = model.OtherDocElecContributorId,
                 OperationStatusId = (int)OtherDocElecState.Test,
                 Deleted = false,
-                Timestamp = DateTime.Now,
+                Timestamp = now,
                 SoftwareType = model.OperationModeId,
                 SoftwareId = IdS
             };

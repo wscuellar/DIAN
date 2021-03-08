@@ -218,8 +218,11 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
                 return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
             //ViewBag.TestSetId = testSet.TestSetId;
-            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            //OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
 
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
@@ -266,7 +269,10 @@ namespace Gosocket.Dian.Web.Controllers
                 return View(new OthersElectronicDocAssociatedViewModel());
             }
 
-            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
+            //OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
 
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
@@ -403,21 +409,26 @@ namespace Gosocket.Dian.Web.Controllers
                                               model.ElectronicDocId,
                                               User.UserName());
 
+            int providerId = model.ProviderId;
+            if (model.OperationModeId != 2) providerId = User.ContributorId();
+
+            var IdS = Guid.NewGuid();
+            var now = DateTime.Now;
             OtherDocElecSoftware software = new OtherDocElecSoftware()
             {
-                Id = model.SoftwareId,
+                Id = IdS,
                 Url = model.SoftwareUrl,
                 Name = model.SoftwareName,
                 Pin = model.SoftwarePin,
-                ProviderId = model.ProviderId,
+                ProviderId = providerId,
                 CreatedBy = User.UserName(),
                 Deleted = false,
                 Status = true,
                 OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess,
-                SoftwareDate = DateTime.Now,
-                Timestamp = DateTime.Now,
-                Updated = DateTime.Now,
-                SoftwareId = model.SoftwareIdBase,
+                SoftwareDate = now,
+                Timestamp = now,
+                Updated = now,
+                SoftwareId = model.SoftwareId,
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 
@@ -426,9 +437,9 @@ namespace Gosocket.Dian.Web.Controllers
                 OtherDocElecContributorId = otherDocElecContributor.Id,
                 OperationStatusId = (int)OtherDocElecState.Test,
                 Deleted = false,
-                Timestamp = DateTime.Now,
+                Timestamp = now,
                 SoftwareType = model.OperationModeId,
-                SoftwareId = model.SoftwareId
+                SoftwareId = IdS
             };
 
             ResponseMessage response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
