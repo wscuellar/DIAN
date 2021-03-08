@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Interfaces.Services
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
+        PagedResult<OtherDocsElectData> List2(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
@@ -29,7 +30,7 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         ResponseMessage CancelRegister(int contributorId,string description);
         GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
-        OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId);
+        List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId);
         List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state);
     }
 }

@@ -173,8 +173,17 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult CancelRegister(int id, string description)
         {
-            ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            {
+                return Json(new
+                {
+                    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
+            }
 
+            ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
@@ -367,7 +376,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.ProviderId = entity.ProviderId;
             model.Provider = _contributorService.GetContributorById(model.ProviderId, entity.ContributorTypeId).Name;
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), model.ContributorTypeId, model.OperationModeId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List2(User.ContributorId());
 
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
@@ -384,6 +393,8 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = t.Url,
                 CreatedDate = t.CreatedDate
             }).ToList();
+
+            ViewBag.Id = Id;
 
             return View(model);
         }
@@ -460,11 +471,23 @@ namespace Gosocket.Dian.Web.Controllers
         }
         
         [HttpPost]
-        public JsonResult DeleteOperationMode(string Id)
+        public JsonResult DeleteOperationMode(int Id)
         {
-            var result = _othersElectronicDocumentsService.OperationDelete(Convert.ToInt32(Id));
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            if(operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            {
+                return Json(new
+                {
+                    code = 500,
+                    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            var result = _othersElectronicDocumentsService.OperationDelete(Id);
             return Json(new
             {
+                code = result.Code,
                 message = result.Message,
                 success = true,
             }, JsonRequestBehavior.AllowGet);

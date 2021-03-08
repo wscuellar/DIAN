@@ -137,10 +137,7 @@ namespace Gosocket.Dian.Application
 
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operationToDelete.SoftwareId);
             if (software != null && software.OtherDocElecSoftwareStatusId == (int)OtherDocElecSoftwaresStatus.Accepted)
-                return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
-
-            //OtherDocElecContributor participant = _othersDocsElecContributorRepository.Get(t => t.Id == ODEContributorId);
-            //_globalOtherDocElecOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
+                return new ResponseMessage() { Message = "El software encuentra en estado aceptado.", Code = 500 };
 
             var result = _othersDocsElecContributorOperationRepository.Delete(operationToDelete.Id);
             _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
@@ -252,6 +249,16 @@ namespace Gosocket.Dian.Application
         public OtherDocElecContributorOperations GetOtherDocElecContributorOperationById(int id)
         {
             return this._othersDocsElecContributorOperationRepository.Get(t => t.Id == id);
+        }
+
+        public OtherDocElecContributorOperations GetOtherDocElecContributorOperationByDocEleContributorId(int id)
+        {
+            return this._othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == id);
+        }
+
+        public List<OtherDocElecContributorOperations> GetOtherDocElecContributorOperationsListByDocElecContributorId(int id)
+        {
+            return this._othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == id);
         }
     }
 }

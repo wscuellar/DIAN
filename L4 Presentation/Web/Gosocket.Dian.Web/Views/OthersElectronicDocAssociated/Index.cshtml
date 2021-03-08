@@ -333,7 +333,7 @@
                             $.ajax({
                             url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
                             type: "POST",
-                                data: { id: @Convert.ToInt32(Model.Id), description: $("#txtCancelRegistro").val() },
+                                data: { id: @Convert.ToInt32(ViewBag.Id), description: $("#txtCancelRegistro").val() },
                             datatype: "json",
                             success: function (result) {
 
@@ -345,7 +345,7 @@
                                     }
 
                                     bootbox.dialog({
-                                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
+                                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se canceló el registro exitosamente</h4></div></div>",
                                     onEscape: () => {
                                         var url = "@Url.Action("Index", "OthersElectronicDocuments")";
                                         window.location.href = url;
@@ -353,13 +353,13 @@
                                     });
                                 }
                                 else
-                                    bootbox.alert("No se pudo realizar la Cancelación");
+                                    bootbox.alert("No se pudo realizar la cancelación");
                             },
                             complete: function () {
 
                             },
                             error: function (result) {
-                                bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                                bootbox.alert("Error de conexión al intentar hacer la cancelación");
                                 console.log(result.status + ' ' + result.statusText);
                                 return false;
                             }

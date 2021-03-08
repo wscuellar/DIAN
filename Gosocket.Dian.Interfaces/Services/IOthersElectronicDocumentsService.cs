@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using System;
+using System.Collections.Generic;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -24,5 +25,9 @@ namespace Gosocket.Dian.Interfaces.Services
         bool UpdateOtherDocElecContributorOperation(OtherDocElecContributorOperations model);
 
         OtherDocElecContributorOperations GetOtherDocElecContributorOperationById(int id);
+
+        OtherDocElecContributorOperations GetOtherDocElecContributorOperationByDocEleContributorId(int id);
+
+        List<OtherDocElecContributorOperations> GetOtherDocElecContributorOperationsListByDocElecContributorId(int id);
     }
 }
