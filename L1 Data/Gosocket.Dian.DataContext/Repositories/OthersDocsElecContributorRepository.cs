@@ -109,9 +109,8 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                 return query.Paginate(page, length, t => t.Id.ToString());
             }
-            catch (Exception ex)
-            {
-                var exs = ex.Message;
+            catch (Exception)
+            { 
             }
 
             return new PagedResult<OtherDocElecContributor>();

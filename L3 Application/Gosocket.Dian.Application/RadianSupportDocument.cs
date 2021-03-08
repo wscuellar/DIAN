@@ -18,7 +18,6 @@ namespace Gosocket.Dian.Application
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
-    using System.Web;
     using System.Xml;
     using System.Xml.Linq;
 
@@ -54,7 +53,6 @@ namespace Gosocket.Dian.Application
 
             // Load xml
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
-            var str = Encoding.Default.GetString(xmlBytes);
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
@@ -465,7 +463,6 @@ namespace Gosocket.Dian.Application
             StringBuilder productsTemplates = new StringBuilder();
 
             XElement xelement = XElement.Load(new StringReader(data));
-            var nsm = new XmlNamespaceManager(new NameTable());
 
             XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
             XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
@@ -531,8 +528,7 @@ namespace Gosocket.Dian.Application
             StringBuilder discountsTemplates = new StringBuilder();
 
             XElement xelement = XElement.Load(new StringReader(data));
-            var nsm = new XmlNamespaceManager(new NameTable());
-
+          
             XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
             XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 

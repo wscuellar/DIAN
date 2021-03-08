@@ -69,8 +69,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                 using (var sr = new StreamReader(ms, System.Text.Encoding.GetEncoding(Encoding)))
                 {
                     xmlDocument.XmlResolver = null;
-                    xmlDocument.Load(sr);
-                    var node = xmlDocument.GetElementsByTagName("xades:SigningTime")[0];
+                    xmlDocument.Load(sr); 
                     var nodeDevengadoTotal = "//*[local-name()='DevengadosTotal']";
                     var nodeDeduccionTotal = "//*[local-name()='DeduccionesTotal']";
                     var nodeComprobanteTotal = "//*[local-name()='ComprobanteTotal']";

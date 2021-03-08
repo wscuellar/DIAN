@@ -11,7 +11,6 @@ namespace Gosocket.Dian.Functions.Utils
     public class HtmlGDoc
     {
         readonly XmlDocument _xml;
-        readonly XmlDocument _xmlApplication;
         readonly XmlNamespaceManager _nsmgr;
         readonly byte[] _document;
 
@@ -19,7 +18,7 @@ namespace Gosocket.Dian.Functions.Utils
         {
             _document = document;
             _xml = new XmlDocument();
-            _xmlApplication = new XmlDocument();
+            XmlDocument _xmlApplication = new XmlDocument();
 
             using (var ms = new MemoryStream(document))
             {
@@ -66,8 +65,8 @@ namespace Gosocket.Dian.Functions.Utils
 
                 XmlNode createElementDocumentResponse = _xml.CreateElement("DocumentResponse", _xml.DocumentElement.NamespaceURI);
                 XmlNode createElementSigningTime = _xml.CreateElement("ConvertSigningTime", _xml.DocumentElement.NamespaceURI);
-                createElementDocumentResponse.InnerText = string.Concat(stringDescription + " " + stringIssueDate + " " + stringIssueTime);
-                createElementSigningTime.InnerText = string.Concat(stringDocument + stringSigningTime);
+                createElementDocumentResponse.InnerText = string.Concat(stringDescription, " ", stringIssueDate, " ", stringIssueTime);
+                createElementSigningTime.InnerText = string.Concat(stringDocument, stringSigningTime);
                 _xml.DocumentElement.AppendChild(createElementDocumentResponse);
                 _xml.DocumentElement.AppendChild(createElementSigningTime);
             }

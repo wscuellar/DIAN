@@ -1,22 +1,12 @@
 ﻿using Gosocket.Dian.Domain.Entity;
-
 using Gosocket.Dian.Infrastructure;
-
 using System;
-
 using System.Collections.Generic;
-
 using System.Linq;
-
 using System.Security.Cryptography;
-
 using System.Security.Cryptography.X509Certificates;
-
 using System.Text;
-
 using System.Xml.Linq;
-
-
 
 namespace Gosocket.Dian.Application
 
@@ -49,25 +39,8 @@ namespace Gosocket.Dian.Application
         public static byte[] GenerateApplicationResponseBytes(string trackId, GlobalDocValidatorDocumentMeta documentMeta, List<GlobalDocValidatorTracking> validations)
 
         {
-
             var responseBytes = new byte[] { };
-
-
-
-            var docTypeCode = documentMeta.DocumentTypeId;
-
-
-
             var messageIdNode = SerieNumberMessageFromDocType(documentMeta);
-
-            var series = messageIdNode.Item1;
-
-            var number = messageIdNode.Item2;
-
-            var messDocType = messageIdNode.Item3;
-
-
-
             var errors = new List<GlobalDocValidatorTracking>();
 
             var notifications = new List<GlobalDocValidatorTracking>();
@@ -336,11 +309,6 @@ namespace Gosocket.Dian.Application
 
             var messageIdNode = SerieNumberMessageFromDocType(processResultEntity);
 
-            var series = messageIdNode.Item1;
-
-            var number = messageIdNode.Item2;
-
-
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
 
@@ -594,10 +562,6 @@ namespace Gosocket.Dian.Application
 
             var messageIdNode = SerieNumberMessageFromDocType(processResultEntity);
 
-            var series = messageIdNode.Item1;
-
-            var number = messageIdNode.Item2;
-
             var approvedMessage = messageIdNode.Item3;
 
 
@@ -748,8 +712,6 @@ namespace Gosocket.Dian.Application
 
             var fileManager = new FileManager();
 
-            var processDate = documentMeta.Timestamp;
-
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
 
             var isValidFolder = "Success";
@@ -791,10 +753,6 @@ namespace Gosocket.Dian.Application
 
 
             byte[] xmlBytes = null;
-
-
-
-            var processDate = documentMeta.Timestamp;
 
 
 

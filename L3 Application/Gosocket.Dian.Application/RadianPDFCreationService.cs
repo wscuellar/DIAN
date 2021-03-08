@@ -1,5 +1,4 @@
 ﻿using Gosocket.Dian.Application.Cosmos;
-using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;

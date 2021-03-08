@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Common;
 using Gosocket.Dian.Plugin.Functions.Models;
@@ -14,6 +6,11 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Plugin.Functions.Cufe
 {

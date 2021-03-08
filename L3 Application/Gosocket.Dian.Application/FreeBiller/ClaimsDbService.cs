@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Domain.Utils;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gosocket.Dian.DataContext;
-using Gosocket.Dian.Domain.Utils;
 
 namespace Gosocket.Dian.Application.FreeBiller
 {

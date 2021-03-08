@@ -79,7 +79,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                      Description = x.Description,
                                      Title = x.Title,
                                      Order = x.Order
-                                 }).OrderBy(x => x.Order).ToList(); ;
+                                 }).OrderBy(x => x.Order).ToList();
 
                     return query;
 
@@ -128,8 +128,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                     //Si la actualizacón fue exitosa, eliminar los aneriores
                                     //context.Permissions.RemoveRange(context.Permissions.Where(p => p.State == System.Data.Entity.EntityState.Deleted.ToString()).ToList());
                                     context.Permissions.RemoveRange(permissions);
-                                    int rePerDeleted = context.SaveChanges();
-
+                                    context.SaveChanges();
                                 }
                                 else //si no fue exitoso la Actualización/Inserción de los nuevos permisos, quitar la marcación de Eliminados
                                 {
@@ -140,9 +139,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                                         item.State = null;
                                         item.UpdatedBy = permissionList.ElementAt(0).UpdatedBy;
                                     }
-
-                                    int rollbackDelete = context.SaveChanges();
-
+                                    context.SaveChanges();
                                 }
                             }
                             else

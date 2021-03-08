@@ -1,20 +1,20 @@
 ﻿using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Services.Utils.Common;
+using Gosocket.Dian.Functions.Models;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Utils;
+using Gosocket.Dian.Services.Utils.Common;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Linq;
-using Gosocket.Dian.Functions.Models;
-using System.Security.Claims;
 
 namespace Gosocket.Dian.Functions.Events
 {
@@ -213,20 +213,23 @@ namespace Gosocket.Dian.Functions.Events
                 {
                     tempCode = code.Split(';');
                 }
-
+                StringBuilder facultityCode = new StringBuilder();
+                facultityCode.Append(string.Empty);
                 foreach (string codeAttorney in tempCode)
                 {
                     string[] tempCodeAttorney = codeAttorney.Split('-');                                        
                     if (attorneyModel.facultityCode == null)
                     {
-                        attorneyModel.facultityCode += tempCodeAttorney[0];
+                        facultityCode.Append(tempCodeAttorney[0]); 
                     }
                     else
                     {
-                        attorneyModel.facultityCode += (";" + tempCodeAttorney[0]);
+                        facultityCode.Append(";" + tempCodeAttorney[0]);
                     }
                     
-                }
+                } 
+                attorneyModel.facultityCode = facultityCode.ToString();
+
                 attorney.Add(attorneyModel);
             }
 
@@ -320,10 +323,11 @@ namespace Gosocket.Dian.Functions.Events
             //validation if is an Endoso en propiedad (Code 037)
             var arrayTasks = new List<Task>();
             string sender = string.Empty;
-            string senderList = string.Empty;
+            StringBuilder senderList = new StringBuilder();
+            senderList.Append(string.Empty);
             string valueStockAmountSender = string.Empty;
-            string valueStockAmountSenderList = string.Empty;
-
+            StringBuilder valueStockAmountSenderList = new StringBuilder();
+            
             List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey.ToLower()).ToList();
             if (documentsHolderExchange != null || documentsHolderExchange.Count > 0)
             {
@@ -342,13 +346,13 @@ namespace Gosocket.Dian.Functions.Events
                 valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
                 if (i == 0)
                 {
-                    senderList += sender;
-                    valueStockAmountSenderList += valueStockAmountSender;
+                    senderList.Append(sender);
+                    valueStockAmountSenderList.Append(valueStockAmountSender); 
                 }
                 else
                 {
-                    senderList += "|" + sender;
-                    valueStockAmountSenderList += "|" + valueStockAmountSender;
+                    senderList.Append("|" + sender);
+                    valueStockAmountSenderList.Append("|" + valueStockAmountSender);
                 }
             }
 
@@ -366,8 +370,8 @@ namespace Gosocket.Dian.Functions.Events
                     CorporateStockAmount = valueStockAmount,
                     GlobalDocumentId = documentMeta.PartitionKey,
                     PartyLegalEntity = companyId,
-                    SenderCode = senderList,
-                    CorporateStockAmountSender = valueStockAmountSenderList
+                    SenderCode = senderList.ToString(),
+                    CorporateStockAmountSender = valueStockAmountSenderList.ToString()
                 };
                 arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
             }

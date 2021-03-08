@@ -1,7 +1,6 @@
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Common;
-using Gosocket.Dian.Plugin.Functions.Contingency;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
