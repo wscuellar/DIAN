@@ -1991,6 +1991,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
             XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
+            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
+            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']");
+            int countCufeListDocumentResponse = cufeListDocumentResponse.Count - 1;
+            int countCufeListDocumentResponseReference = cufeListDocumentResponseReference.Count;
+            string xmlID2 = string.Empty;
+            string xmlUUID2 = string.Empty;
 
             //Valida cantidad de CUFEs referenciados
             if (cufeListResponse.Count > attorneyLimit || cufeListResponseRefeerence.Count > attorneyLimit)
@@ -2005,7 +2011,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-            else if (cufeListResponse.Count != cufeListResponseRefeerence.Count)
+            else if (cufeListResponse.Count != cufeListResponseRefeerence.Count && (customizationID == "431" || customizationID == "432") )
+            {
+                validate = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL04"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL04"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else if (countCufeListDocumentResponse != countCufeListDocumentResponseReference && (customizationID == "433" || customizationID == "434"))
             {
                 validate = true;
                 responses.Add(new ValidateListResponse
@@ -2024,7 +2042,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
                     var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                    var xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    if(customizationID == "431" || customizationID == "432")
+                        xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    else
+                        xmlID2 = cufeListDocumentResponse.Item(i+1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
@@ -2047,7 +2068,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
                     var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                    var xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    if (customizationID == "431" || customizationID == "432")
+                        xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    else
+                        xmlUUID2 = cufeListDocumentResponse.Item(i+1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
                     {
@@ -2504,20 +2529,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }                                             
                 }
-            }
-
-            //Valida Mandato si es Ilimitado o Limitado
-            if (customizationID == "432" || customizationID == "434")
-            {
-                startDateAttorney = string.Empty;
-                endDate = string.Empty;
-            }
-            else if (customizationID == "431" || customizationID == "433")
-            {
-                startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
-                endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
-            }
-
+            }          
 
             var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
             //Si existen mas de 2 documentResposne
@@ -2597,7 +2609,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         else if ((customizationID == "433" || customizationID == "434"))
                         {
-                            if (tempCode.Contains("MR91")) codeExist = true;
+                            if (tempCode.Contains("MR91-" + tempCodeAttorney[1])) codeExist = true;
 
                             //Valida description code acorde al codigo ingresado de mandato Limitado
                             if (!descriptionCode.Equals("Mandato por documento Limitado"))
@@ -2642,7 +2654,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
-                    if (new string[] { "Mandato por documento General", "Mandato con Representación" }.Contains(descriptionCode)) validDescriptionCode = true;
+                    if (new string[] { "Mandato por documento General", "Mandato por documento Limitado" }.Contains(descriptionCode)) validDescriptionCode = true;
                     if (!validDescriptionCode)
                     {
                         validate = false;

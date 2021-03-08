@@ -10,7 +10,7 @@
         </p>
         <div class="underline-title"></div>
 
-        <div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = Model.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        <div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = (int)ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
@@ -184,24 +184,14 @@
                         SoftwarePin: $("#SoftwarePin").val(),
                         SoftwareUrl: $("#SoftwareUrl").val(),
                         SoftwareIdBase: $("#SoftwareIdBase").val(),
-                        Provider: $("#ProviderId").val(),
+                        ProviderId: $("#ProviderId").val(),
                         SoftwareId: $("#SoftwareId").val(),
                     };
                     AddOperationModeODE("@Url.Action("SetupOperationModePost", "OthersElectronicDocAssociated")", model);
                 }
             });
 
-            $('#').change(function () {
-                console.log('Change!');
-                @*if ('@ViewBag.softwareActive' == 'False') {
-                    $('#UrlEventReception').val('');
-                    $('#SoftwareType').val('');
-                    getSoftwares($('#ProviderId').val());
-                }*@
-                $('#SoftwareUrl').val('');
-                //$('#SoftwareType').val('');
-                getSoftwares($('#ProviderId').val());
-            });
+
 
 
 
@@ -223,7 +213,7 @@
             }
 
             ODEDeleteOperationMode = function (Id) {
-                var url ="@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")";
+                @*var url ="@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")";
                 showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
                 var metod = 'POST';
                 var data = {
@@ -233,8 +223,47 @@
                 var actionSuccess = (response) => {
                     showConfirmation(response.message, AlertExec(() => location.reload()))
                 }
-                ajaxFunction(url, metod, data, actionError, actionSuccess)
+                ajaxFunction(url, metod, data, actionError, actionSuccess)*@
 
+
+                showConfirmation("¿Está seguro de eliminar el modo de operación configurado previamente?", ConfirmExec(
+                        function () {
+                            $.ajax({
+                                url: "@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")",
+                                type: "POST",
+                                data: { Id: Id },
+                                datatype: "json",
+                                success: function (result) {
+                                    if (result != null) {
+
+                                        if (result.code != 200) {
+                                            showConfirmation(result.message, AlertExec(null))
+                                            return;
+                                        }
+
+                                        bootbox.dialog({
+                                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se canceló el registro exitosamente</h4></div></div>",
+                                            onEscape: () => {
+                                                location.reload();
+                                             }
+                                        });
+                                    }
+                                    else
+                                        bootbox.alert("No se pudo realizar la cancelación");
+                                    },
+                                complete: function () {
+
+                                },
+                                error: function (result) {
+                                    bootbox.alert("Error de conexión al intentar hacer la cancelación");
+                                    console.log(result.status + ' ' + result.statusText);
+                                    return false;
+                                }
+                        });  //ajax
+
+
+                     }
+                    , "", () => hideLoading('#panel-form')));
             };
 
             function fnvalidSoftwareName() {

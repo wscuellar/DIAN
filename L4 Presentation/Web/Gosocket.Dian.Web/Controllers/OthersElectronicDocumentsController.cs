@@ -73,22 +73,50 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.ContributorName = dataentity.ContributorIdType.GetDescription();
             ViewBag.ElectronicDocumentName = _electronicDocumentService.GetNameById(dataentity.ElectronicDocumentId);
             ViewBag.ListSoftwares = new List<SoftwareViewModel>();
-
+            
             // Validación Software en proceso...
             var softwareActive = false;
             //var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecSoftwaresStatus.InProcess);
-            var softwareInProcess = _othersDocsElecContributorService.GetContributorSoftwareInProcess(User.ContributorId(), (int)OtherDocElecState.Test);
-            if (softwareInProcess != null)
+            var docElecContributorsList = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(User.ContributorId());
+            if (docElecContributorsList != null && docElecContributorsList.Count > 0)
             {
-                if (softwareInProcess.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType 
-                    && softwareInProcess.OtherDocElecOperationModeId == (int)dataentity.OperationModeId)
+                var stateName = OtherDocElecState.Habilitado.GetDescription();
+                var contributorsEnabled = docElecContributorsList.Where(x => x.State == stateName).ToList();
+                if(contributorsEnabled != null && contributorsEnabled.Count > 0)
                 {
-                    softwareActive = true;
+                    var contributorEnabled = contributorsEnabled.FirstOrDefault(x => x.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType
+                        && x.OtherDocElecOperationModeId == (int)dataentity.OperationModeId);
+
+                    if(contributorEnabled != null)
+                    {
+                        var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorEnabled.Id);
+                        if(operations != null && operations.Any(x => x.Deleted == false))
+                        {
+                            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationByDocEleContributorId(contributorEnabled.Id);
+                            return this.RedirectToAction("Index", "OthersElectronicDocAssociated", new { Id = operation.Id });
+                        }
+                    }
                 }
-                else
+
+                stateName = OtherDocElecState.Test.GetDescription();
+                var contributorsInTestSameOperation = docElecContributorsList.Where(x => x.State == stateName).ToList();
+                if (contributorsInTestSameOperation != null && contributorsInTestSameOperation.Count > 0)
                 {
-                    var msg = $"No se puede {ViewBag.Title}, ya que tiene uno en estado: \"En Proceso\"";
-                    return this.RedirectToAction("AddParticipants", new { electronicDocumentId = dataentity.ElectronicDocumentId, message = msg });
+                    var contributorInTestSameOperation = contributorsInTestSameOperation.FirstOrDefault(x => x.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType
+                        && x.OtherDocElecOperationModeId == (int)dataentity.OperationModeId);
+                    if (contributorInTestSameOperation != null)
+                    {
+                        var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorInTestSameOperation.Id);
+                        if (operations != null && operations.Any(x => x.Deleted == false))
+                        {
+                            softwareActive = true;
+                        }
+                    }
+                    else
+                    {
+                        var msg = $"No se puede {ViewBag.Title}, ya que tiene uno en estado: \"En Proceso\"";
+                        return this.RedirectToAction("AddParticipants", new { electronicDocumentId = dataentity.ElectronicDocumentId, message = msg });
+                    }
                 }
             }
 

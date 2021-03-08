@@ -1425,10 +1425,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.GeneralSubsequentRegistration
                 || Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.PriorDirectSubsequentEnrollment)
             {
+                //Valida existen endosos
+                bool validateExistEndoso = false;
+                string validCancelElectronicEvent = string.Empty;
+                var existEndosos = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
+                           || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion)).ToList();
+                if(existEndosos != null || existEndosos.Count > 0 )
+                {
+                    foreach (var itemExistEndosos in existEndosos)
+                    {
+                        var existDocumentEndosos = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemExistEndosos.Identifier, itemExistEndosos.Identifier, itemExistEndosos.PartitionKey);
+                        //Valida existe cancelancion limitacion
+                        validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, existDocumentEndosos.DocumentKey, senderCode);
+                        if (existDocumentEndosos != null && (!string.IsNullOrWhiteSpace(validCancelElectronicEvent)))
+                        {
+                            validateExistEndoso = true;
+                        }
+                        break;
+                    }
+                }
+
                 //Valida exista previamnete un registro de endoso en propiedad
                 var listEndosoPropiedad = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad).ToList();
-                if (listEndosoPropiedad == null || listEndosoPropiedad.Count <= 0)
-                {
+                if(listEndosoPropiedad == null || listEndosoPropiedad.Count <= 0 && !validateExistEndoso)
+                {                   
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -1462,7 +1482,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             validForItem = true;
                     }
 
-                    if (validForItem)
+                    if (validForItem && !validateExistEndoso)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1477,8 +1497,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida que exista una Primera Disponibilizacion
                 bool validForItemDisponibiliza = false;
-                string validCancelElectronicEvent = string.Empty;
-                var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                
+                var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
                 && t.SenderCode == senderCode
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration)
                 || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration).ToList();

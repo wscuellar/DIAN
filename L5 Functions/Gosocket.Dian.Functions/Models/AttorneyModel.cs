@@ -7,6 +7,8 @@
         
         public string idDocumentReference { get; set; }
         public string idTypeDocumentReference { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
 
     }
 }

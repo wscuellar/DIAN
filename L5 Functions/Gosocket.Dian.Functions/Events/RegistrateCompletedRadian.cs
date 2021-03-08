@@ -149,7 +149,10 @@ namespace Gosocket.Dian.Functions.Events
             List<AttorneyModel> attorney = new List<AttorneyModel>();
            
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
+            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
             XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
+            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
+            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']");
 
             string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
@@ -181,34 +184,43 @@ namespace Gosocket.Dian.Functions.Events
                 case "M-PT":
                     modoOperacion = "PT";
                     break;
-            }
+            }           
 
-            //Valida Mandato si es Ilimitado o Limitado
-            if (customizationID == "432" || customizationID == "434")
-            {
-                startDateAttorney = string.Empty;
-                endDate = string.Empty;
-            }
-            else if (customizationID == "431" || customizationID == "433")
-            {
-                startDateAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(0)?.InnerText.ToString();
-                endDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(0)?.InnerText.ToString();
-            }
-
-            
-            for (int i = 0; i < cufeListResponseRefeerence.Count; i++)
+            int j = 1;
+            for (int i = 0; i < cufeListResponse.Count; i++)
             {
                 AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
+                string code = string.Empty;
 
                 //Solo si existe información referenciada del CUFE
-                if (listID != "3")
+                if (listID != "3" && customizationID == "431" || customizationID == "432")
+                {
                     attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                }                                    
+                else if(listID != "3" && customizationID == "433" || customizationID == "434")
+                {
+                    attorneyModel.cufe = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    code = cufeListDocumentResponse.Item(j).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
+                    j++;
+                }                    
                 else                
                     attorneyModel.cufe = "01";
 
+                //Valida Mandato si es Ilimitado o Limitado
+                if (customizationID == "432" || customizationID == "434")
+                {
+                    attorneyModel.startDate = string.Empty;
+                    attorneyModel.endDate = string.Empty;
+                }
+                else if (customizationID == "431" || customizationID == "433")
+                {
+                    attorneyModel.startDate = cufeListDocumentResponseReference.Item(i).SelectNodes("//*[local-name()='ValidityPeriod']/*[local-name()='StartDate']").Item(i)?.InnerText.ToString();
+                    attorneyModel.endDate = cufeListDocumentResponseReference.Item(i).SelectNodes("//*[local-name()='ValidityPeriod']/*[local-name()='EndDate']").Item(i)?.InnerText.ToString();
+                }
 
-                    string code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+
                 if (!string.IsNullOrWhiteSpace(code))
                 {
                     tempCode = code.Split(';');
@@ -240,11 +252,11 @@ namespace Gosocket.Dian.Functions.Events
                     Active = true,
                     Actor = modoOperacion,
                     EffectiveDate = effectiveDate,
-                    EndDate = endDate,
+                    EndDate = attorneyDocument.endDate,
                     FacultityCode = attorneyDocument.facultityCode,
                     IssuerAttorney = issuerPartyCode,
                     SenderCode = senderCode,
-                    StartDate = startDateAttorney,
+                    StartDate = attorneyDocument.startDate,
                     AttorneyType = customizationID,
                     SerieAndNumber = serieAndNumber,
                     SenderName = senderName,

@@ -194,6 +194,39 @@ namespace Gosocket.Dian.Application
             return query.Paginate(0, 100, t => t.Id.ToString());
         }
 
+        public PagedResult<OtherDocsElectData> List2(int contributorId)
+        {
+            IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
+                                                    join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
+                                                    join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+                                                    join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+                                                    join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                                                    where oc.ContributorId == contributorId
+                                                        && oc.State != "Cancelado"
+                                                        && s.Deleted == false
+                                                        && oco.Deleted == false
+                                                    select new OtherDocsElectData()
+                                                    {
+                                                        //Id = oc.Id,
+                                                        Id = oco.Id,
+                                                        ContributorId = oc.ContributorId,
+                                                        OperationMode = ope.Name,
+                                                        ContributorType = oty.Name,
+                                                        Software = s.Name,
+                                                        PinSW = s.Pin,
+                                                        SoftwareId = s.SoftwareId.ToString(),
+                                                        StateSoftware = oco.OperationStatusId.ToString(),
+                                                        StateContributor = oc.State,
+                                                        //CreatedDate = oc.CreatedDate,
+                                                        CreatedDate = s.SoftwareDate.Value,
+                                                        ElectronicDoc = eld.Name,
+                                                        Url = s.Url,
+                                                    }).Distinct();
+            return query.Paginate(0, 100, t => t.Id.ToString());
+        }
+
         public OtherDocsElectData GetCOntrinutorODE(int Id)
         {
             var entity = (from oc in sqlDBContext.OtherDocElecContributors
@@ -236,61 +269,41 @@ namespace Gosocket.Dian.Application
         /// <param name="contributorId">OtherDocElecContributorId</param>
         /// <param name="description">Motivo por el cual se hace la cancelación</param>
         /// <returns></returns>
-        public ResponseMessage CancelRegister(int contributorId, string description)
+        public ResponseMessage CancelRegister(int operationId, string description)
         {
             ResponseMessage result = new ResponseMessage();
 
-            var contributor = sqlDBContext.OtherDocElecContributors.FirstOrDefault(c => c.Id == contributorId);
-
-            if (contributor != null)
+            var operation = sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(c => c.Id == operationId);
+            if (operation != null)
             {
-                contributor.State = "Cancelado";
-                contributor.Update = DateTime.Now;
-                contributor.Description = description;
+                operation.Deleted = true;
 
-                sqlDBContext.Entry(contributor).State = System.Data.Entity.EntityState.Modified;
+                sqlDBContext.Entry(operation).State = System.Data.Entity.EntityState.Modified;
 
                 int re1 = sqlDBContext.SaveChanges();
                 result.Code = System.Net.HttpStatusCode.OK.GetHashCode();
-                result.Message = "Se cancelo el registro exitosamente";
+                result.Message = "Se canceló el registro exitosamente";
 
                 if (re1 > 0) //Update operations state
                 {
-                    var contriOpera = sqlDBContext
-                                        .OtherDocElecContributorOperations
-                                        .FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Deleted == false);
-                    if (contriOpera != null)
+                    var software = sqlDBContext.OtherDocElecSoftwares
+                        .FirstOrDefault(c => c.OtherDocElecContributorId == operation.OtherDocElecContributorId && c.Id == operation.SoftwareId);
+
+                    if (software != null)
                     {
-                        contriOpera.Deleted = true;
+                        software.Deleted = true;
+                        software.Status = true;
+                        software.Updated = DateTime.Now;
 
-                        sqlDBContext.Entry(contriOpera).State = System.Data.Entity.EntityState.Modified;
+                        sqlDBContext.Entry(software).State = System.Data.Entity.EntityState.Modified;
 
-                        int re2 = sqlDBContext.SaveChanges();
+                        int re3 = sqlDBContext.SaveChanges();
 
-                        if (re2 > 0) //Update operations SUCCESS
+                        if (re3 > 0) //Update Software SUCCESS
                         {
-                            var contriSoftware = sqlDBContext
-                                                    .OtherDocElecSoftwares
-                                                    .FirstOrDefault(c => c.OtherDocElecContributorId == contributorId && c.Id == contriOpera.SoftwareId);
 
-                            if (contriSoftware != null)
-                            {
-                                contriSoftware.Deleted = true;
-                                contriSoftware.Status = true;
-                                contriSoftware.Updated = DateTime.Now;
-
-                                sqlDBContext.Entry(contriOpera).State = System.Data.Entity.EntityState.Modified;
-
-                                int re3 = sqlDBContext.SaveChanges();
-
-                                if (re3 > 0) //Update Software SUCCESS
-                                {
-
-                                }
-                            }
                         }
                     }
-
                 }
             }
             else
@@ -301,7 +314,6 @@ namespace Gosocket.Dian.Application
             }
 
             return result;
-
         }
 
         public GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId)
@@ -314,20 +326,20 @@ namespace Gosocket.Dian.Application
                 return null;
         }
 
-        public OtherDocElecContributor GetContributorSoftwareInProcess(int contributorId, int statusId)
+        public List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId)
         {
             //return _othersDocsElecContributorRepository
             //    .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
             //        .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
 
             return _othersDocsElecContributorRepository
-                .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
-                    .Any(y => y.OtherDocElecContributorOperations.Any(z => z.OperationStatusId == statusId)));
+                .List(x => x.ContributorId == contributorId, 0, 0).Results;
         }
 
         public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)
         {
             return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
         }
+
     }
 }

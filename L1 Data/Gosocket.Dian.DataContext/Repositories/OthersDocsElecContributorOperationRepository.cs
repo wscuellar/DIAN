@@ -51,7 +51,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 }
                 else
                 {
-                    responseMessage = new ResponseMessage("Registro no encontrado en la base de datos", "Nulo");
+                    responseMessage = new ResponseMessage("Registro no encontrado en la base de datos", "Nulo", 500);
                 }
 
                 return responseMessage;
