@@ -145,7 +145,9 @@
     "ErrorCode_AAL07": "AAL07",
     "ErrorMessage_AAL07": "El CUFE referenciado no pertenece al emisor del mandato",
     "ErrorCode_AAL05": "AAL05",
-    "ErrorMessage_AAL05": "El número de documento electrónico referenciado no coinciden con un documento valido"
+    "ErrorMessage_AAL05": "El número de documento electrónico referenciado no coinciden con un documento valido",
+    "ErrorCode_AAL04": "AAL04",
+    "ErrorMessage_AAL04": "No fue informado el grupo"
 
 
 
