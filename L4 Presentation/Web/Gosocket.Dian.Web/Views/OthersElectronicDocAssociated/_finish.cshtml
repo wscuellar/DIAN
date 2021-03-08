@@ -1,7 +1,9 @@
-﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+﻿@using Gosocket.Dian.Domain.Common
+
+@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 <div class="panel-footer text-right">
     <div class="form-group">
-        @if (Model.OperationModeId == 2)
+        @if (Model.ContributorTypeId == (int)OtherDocElecContributorType.TechnologyProvider)
         {
             <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
         }

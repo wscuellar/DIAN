@@ -20,7 +20,6 @@
                         @using (Html.BeginForm("SetupOperationModePost", "OthersElectronicDocAssociated", FormMethod.Post, new { id = "formst" }))
                         {
                             @Html.HiddenFor(m => m.ContributorId)
-                            @Html.HiddenFor(m => m.ProviderId)
                             @Html.HiddenFor(m => m.ContributorTypeId)
                             @Html.HiddenFor(m => m.SoftwareId)
                             @Html.HiddenFor(m => m.SoftwareIdBase)
@@ -46,11 +45,72 @@
 
     <script>
 
-        $(document).on('change', '#ProviderId', function () {    // 2nd (B)
-            // do your code here
-            // It will filter the element "Input_Id" from the "body" and apply "onChange effect" on it
-            
+        $(document).on('change', '#ProviderId', function () {
+            let selectedValue = $(this).val();
+            if (selectedValue != null && selectedValue != '') {
+                $('#SoftwareUrl').val('');
+                //$('#SoftwareType').val('');
+                getSoftwares(selectedValue);
+            }
         });
+
+        function getSoftwares(ProviderId) {
+            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+                'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
+
+            cambiarTextoSelect();
+
+            $.ajax({
+                url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocAssociated")",
+                type: "POST",
+                data: { id: ProviderId, electronicDocumentId: @Model.ElectronicDocId },
+                datatype: "json",
+                success: function (result) {
+
+                    if (result != null && result.res != null) {
+
+                        $.each(result.res, function (index, value) {
+                            $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
+                                ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
+                                '<span class="fa fa-check check-mark"></span></a></li>');
+                        });
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la consulta");
+                },
+                complete: function () {
+
+                },
+                error: function (result) {
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+
+        }
+
+        function cambiarTextoSelect() {
+            var botones = $(":button");
+            var boton;
+
+            $.each(botones, function (index1, val1) {
+                if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
+
+                    boton = val1;
+                    $.each(val1.attributes, function (index, value) {
+
+                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+
+                            boton.firstElementChild.textContent = "Seleccione...";
+
+                        }
+                    });
+                }
+            });
+        }
 
         $(document).ready(function () {
 
@@ -107,44 +167,7 @@
                 getSoftwares($('#ProviderId').val());
             });
 
-            function getSoftwares(ProviderId){
 
-                $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
-                $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
-                    'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
-
-                cambiarTextoSelect();
-
-                $.ajax({
-                    url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocAssociated")",
-                    type: "POST",
-                    data: { id: ProviderId, electronicDocumentId: @Model.ElectronicDocId },
-                    datatype: "json",
-                    success: function (result) {
-
-                        if (result != null && result.res != null) {
-
-                            $.each(result.res, function (index, value) {
-                                $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
-                                $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
-                                    ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
-                                    '<span class="fa fa-check check-mark"></span></a></li>');
-                            });
-                        }
-                        else
-                            bootbox.alert("No se pudo realizar la consulta");
-                    },
-                    complete: function () {
-
-                    },
-                    error: function (result) {
-                        bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                        console.log(result.status + ' ' + result.statusText);
-                        return false;
-                    }
-                });  //ajax
-
-            }
 
             function AddOperationModeODE(url, ViewModel) {
                 var metod = 'POST';
@@ -215,26 +238,6 @@
                     $(".section-own-software").hide();
                     $(".section-software-technology-provider").show();
                 }
-            }
-
-            function cambiarTextoSelect() {
-                var botones = $(":button");
-                var boton;
-
-                $.each(botones, function (index1, val1) {
-                    if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
-
-                        boton = val1;
-                        $.each(val1.attributes, function (index, value) {
-
-                            if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
-
-                                boton.firstElementChild.textContent = "Seleccione...";
-
-                            }
-                        });
-                    }
-                });
             }
         });
     </script>

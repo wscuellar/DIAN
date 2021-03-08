@@ -133,16 +133,19 @@ namespace Gosocket.Dian.Application
 
         public ResponseMessage OperationDelete(int ODEContributorId)
         {
-            OtherDocElecContributorOperations operationToDelete = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ODEContributorId);
+            OtherDocElecContributorOperations operationToDelete = _othersDocsElecContributorOperationRepository.Get(t => t.Id == ODEContributorId);
 
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operationToDelete.SoftwareId);
             if (software != null && software.OtherDocElecSoftwareStatusId == (int)OtherDocElecSoftwaresStatus.Accepted)
                 return new ResponseMessage() { Message = "El software encuentra en estado aceptado." };
-             
-            _othersDocsElecSoftwareService.DeleteSoftware(software.Id); 
-            OtherDocElecContributor participant = _othersDocsElecContributorRepository.Get(t => t.Id == ODEContributorId);
-            _globalOtherDocElecOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString()); 
-            return _othersDocsElecContributorOperationRepository.Delete(operationToDelete.Id);
+
+            //OtherDocElecContributor participant = _othersDocsElecContributorRepository.Get(t => t.Id == ODEContributorId);
+            //_globalOtherDocElecOperationService.Delete(participant.Contributor.Code, operationToDelete.SoftwareId.ToString());
+
+            var result = _othersDocsElecContributorOperationRepository.Delete(operationToDelete.Id);
+            _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
+
+            return result;
         }
 
         #region Private methods Cancel Participant
