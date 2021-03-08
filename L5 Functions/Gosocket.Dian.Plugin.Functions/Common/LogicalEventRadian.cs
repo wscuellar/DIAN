@@ -1451,6 +1451,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida que exista una Primera Disponibilizacion
                 bool validForItemDisponibiliza = false;
+                string validCancelElectronicEvent = string.Empty;
                 var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
                 && t.SenderCode == senderCode
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration) 
@@ -1467,7 +1468,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Valida existen Limitaciones activas
                             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
                             if(listLimitaciones != null || listLimitaciones.Count > 0)
                             {
                                 responses.Add(new ValidateListResponse
@@ -1485,15 +1486,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
                                     if (documentLimitacion != null)
                                     {
-                                        responses.Add(new ValidateListResponse
+                                        //Valida existe cancelancion limitacion
+                                        validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, senderCode);
+                                        if(string.IsNullOrWhiteSpace(validCancelElectronicEvent))
                                         {
-                                            IsValid = false,
-                                            Mandatory = true,
-                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC22"),
-                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC22"),
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                        break;
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = true,
+                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC22"),
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC22"),
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                            break;
+                                        }
                                     }                                 
                                 }
                             }
@@ -1579,6 +1585,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
+        #endregion
+
+        #region ValidateCancelElectronicEvent
+        public string ValidateCancelElectronicEvent(List<GlobalDocValidatorDocumentMeta> documentMeta, string cancelElectronicEvent, string SenderCode)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            string eventCanelLimitacion = string.Empty;
+
+            var listCancelElectronicEvent = documentMeta.Where(t => t.CancelElectronicEvent == cancelElectronicEvent && t.SenderCode == SenderCode).ToList();
+            if(listCancelElectronicEvent != null || listCancelElectronicEvent.Count > 0)
+            {               
+                foreach (var itemListCancelElectronicEvent in listCancelElectronicEvent)
+                {
+                    var documentCancelaEvento = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListCancelElectronicEvent.Identifier, itemListCancelElectronicEvent.Identifier, itemListCancelElectronicEvent.PartitionKey);
+                    if (documentCancelaEvento != null)
+                    {
+                        eventCanelLimitacion = documentCancelaEvento.DocumentKey;
+                        break;
+                    }
+                }              
+            }
+
+            return eventCanelLimitacion;
+        }
+
         #endregion
 
         #region ValidateTacitAcceptance
