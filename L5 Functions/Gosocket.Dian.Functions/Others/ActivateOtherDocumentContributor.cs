@@ -85,8 +85,10 @@ namespace Gosocket.Dian.Functions.Others
                             Step = 3
                         };
                         SetLogger(otherDocElecContributor, "Step OtherDoc-4", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-04");
+                        
+                        if (IsProduction)
+                            otherDocContributorId = contributorService.AddOrUpdateOtherDocContributor(otherDocElecContributor);
 
-                        otherDocContributorId = contributorService.AddOrUpdateOtherDocContributor(otherDocElecContributor);
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
 
