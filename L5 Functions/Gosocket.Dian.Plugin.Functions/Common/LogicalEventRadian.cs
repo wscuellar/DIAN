@@ -171,7 +171,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida titulo valor tiene una limitación previa (041)
-            var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice && t.CancelElectronicEvent == null).ToList();
+            string validCancelElectronicEvent = string.Empty;
+            var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
             if(listLimitacion != null || listLimitacion.Count > 0)
             {
                 foreach (var itemListLimitacion in listLimitacion)
@@ -179,28 +180,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitacion.Identifier, itemListLimitacion.Identifier, itemListLimitacion.PartitionKey);
                     if(documentLimitacion != null)
                     {
-                        if (eventPrev.ListId == "2")
+                        //No existe cancelacion de la limitacion permite Pago de la factura electrónica de venta título valor con listId 2
+                        validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, nitModel.SenderCode);
+                        if (string.IsNullOrWhiteSpace(validCancelElectronicEvent))
                         {
-                            responses.Add(new ValidateListResponse
+                            if (eventPrev.ListId == "2")
                             {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = successfulMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                        else
-                        {                            
-                            responses.Add(new ValidateListResponse
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = successfulMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                            else
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC45"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC45"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC45"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC45"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }                       
                     }
                     break;
                 }
@@ -456,14 +462,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {               
                 //Valida exista endoso en garantia
                 bool validForEndoso = false;
-                var endosoGarantia = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia) && t.CancelElectronicEvent == null).ToList();
+                var endosoGarantia = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia)).ToList();
                 if (endosoGarantia != null || endosoGarantia.Count > 0)
                 {
                     foreach (var itemEndosoGarantia in endosoGarantia)
                     {
                         var documentGarantia = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemEndosoGarantia.Identifier, itemEndosoGarantia.Identifier, itemEndosoGarantia.PartitionKey);
                         if (documentGarantia != null)
-                        {
+                        {                            
                             validForEndoso = false;
                             responses.Add(new ValidateListResponse
                             {
@@ -526,7 +532,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Validar exista endoso en procuracion                                   
                 bool validForEndosoProcura = false;
-                var endosoProcuracion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion) && t.CancelElectronicEvent == null).ToList();
+                var endosoProcuracion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion)).ToList();
                 if (endosoProcuracion != null || endosoProcuracion.Count > 0)
                 {
                     foreach (var itemEndosoProcuracion in endosoProcuracion)
@@ -579,7 +585,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(eventPrev.CustomizationID) == (int)EventCustomization.CancellationEndorsementProcurement)
             {
                 //Valida existe limitacion de circulacion
-                var limitacionCirculacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+                var limitacionCirculacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
                 if (limitacionCirculacion != null || limitacionCirculacion.Count > 0)
                 {
                     foreach (var itemLimitacionCirculacion in limitacionCirculacion)
@@ -910,8 +916,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida existen Limitaciones activas
+            string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
             if (listLimitaciones != null || listLimitaciones.Count > 0)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -920,14 +927,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
                     if (documentLimitacion != null)
                     {
-                        responses.Add(new ValidateListResponse
+                        //Valida si existe cancelacion de la limitacion
+                        existCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, senderCode);
+                        if (string.IsNullOrWhiteSpace(existCancelElectronicEvent))
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC31"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC31"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC31"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC31"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });                          
+                        }
                         break;
                     }
                 }
@@ -1060,8 +1072,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida existen Limitaciones activas
+            string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
             if (listLimitaciones != null || listLimitaciones.Count > 0)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -1070,14 +1083,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
                     if (documentLimitacion != null)
                     {
-                        responses.Add(new ValidateListResponse
+                        existCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, senderCode);
+                        if (string.IsNullOrWhiteSpace(existCancelElectronicEvent))
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC28"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC28"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC28"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC28"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });                            
+                        }
                         break;
                     }
                 }
@@ -1190,9 +1207,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida existen Limitaciones activas
+            string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice) && t.CancelElectronicEvent == null).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
             if (listLimitaciones != null || listLimitaciones.Count > 0)
             {               
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -1201,14 +1219,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
                     if (documentLimitacion != null)
                     {
-                        responses.Add(new ValidateListResponse
+                        existCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, senderCode);
+                        if (string.IsNullOrWhiteSpace(existCancelElectronicEvent))
                         {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC25"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC25"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC25"),
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC25"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }                       
                         break;
                     }
                 }
@@ -1261,7 +1283,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
 
                         //Valida no tenga Limitaciones la FETV
-                        var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice && t.CancelElectronicEvent == null).ToList();
+                        string existCancelElectronicEvent = string.Empty;
+                        string senderCode = xmlParserCude.Fields["SenderCode"].ToString();
+                        var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
                         if (listLimitacion != null || listLimitacion.Count > 0)
                         {
                             foreach (var itemListLimitacion in listLimitacion)
@@ -1269,14 +1293,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitacion.Identifier, itemListLimitacion.Identifier, itemListLimitacion.PartitionKey);
                                 if (documentLimitacion != null)
                                 {
-                                    responses.Add(new ValidateListResponse
+                                    existCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, senderCode);
+                                    if (string.IsNullOrWhiteSpace(existCancelElectronicEvent))
                                     {
-                                        IsValid = false,
-                                        Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC39"),
-                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC39"),
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }                                  
                                     break;
                                 }
                             }
@@ -1497,9 +1525,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC22"),
                                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC22"),
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                            break;
+                                            });                                            
                                         }
+                                        break;
                                     }                                 
                                 }
                             }
