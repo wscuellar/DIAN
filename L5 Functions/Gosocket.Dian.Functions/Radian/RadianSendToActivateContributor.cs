@@ -102,7 +102,7 @@ namespace Gosocket.Dian.Functions.Radian
                     RadianaActivateContributorRequestObject activateRadianContributorRequestObject = new RadianaActivateContributorRequestObject()
                     {
                         Code = data.Code,
-                        ContributorId = radianContributor.ContributorId,
+                        ContributorId = contributorProd.Id,
                         RadianContributorTypeId = radianContributor.RadianContributorTypeId,
                         CreatedBy = radianContributor.CreatedBy,
                         RadianOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
