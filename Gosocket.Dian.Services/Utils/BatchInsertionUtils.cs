@@ -5,7 +5,6 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Services.Utils
@@ -29,7 +28,7 @@ namespace Gosocket.Dian.Services.Utils
                     foreach (var item in list)
                         tableBatchOperation.Add(TableOperation.InsertOrReplace(item));
 
-                    var r = tableRef.ExecuteBatch(tableBatchOperation);
+                    tableRef.ExecuteBatch(tableBatchOperation);
                 }
 
                 catch (Exception e)
@@ -48,7 +47,7 @@ namespace Gosocket.Dian.Services.Utils
             foreach (var item in items)
             {
                 var partition = item.PartitionKey;
-                if (itemsByPartion.ContainsKey(partition) == false)
+                if (!itemsByPartion.ContainsKey(partition))
                     itemsByPartion[partition] = new List<GlobalBatchFileResult>();
 
                 item.PartitionKey = partition;

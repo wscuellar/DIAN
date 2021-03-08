@@ -2,7 +2,6 @@
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Services.Models;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
@@ -356,7 +355,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     foreach (var n in notifications)
                         notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                    dianResponse.IsValid = errors.Any() ? false : true;
+                    dianResponse.IsValid = !errors.Any();
                     dianResponse.StatusMessage = errors.Any() ? "Documento con errores en campos mandatorios." : message;
                     dianResponse.ErrorMessage.AddRange(notificationList);
                 }
@@ -491,8 +490,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            var runtime = new GlobalLogger(trackId, "1 GetStatus Runtime") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
-
+            
             //if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD")) isUploaded = true;
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
@@ -574,7 +572,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         foreach (var n in notifications)
                             notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                        response.IsValid = failed.Any() ? response.IsValid : true;
+                        response.IsValid = !failed.Any() || response.IsValid;
                         response.StatusMessage = failed.Any() ? response.StatusMessage : message;
                         response.ErrorMessage.AddRange(notificationList);
                     }
@@ -652,7 +650,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                             StatusCode = "66",
                             StatusDescription = "Error al generar ApplicationResponse. Inténtelo más tarde."
                         });
-                        continue;
                     }
                 }
             }
@@ -686,7 +683,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            var runtime = new GlobalLogger(trackId, "1 GetStatus Runtime") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
 
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
@@ -807,7 +803,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         foreach (var n in notifications)
                             notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                        response.IsValid = failed.Any() ? response.IsValid : true;
+                        response.IsValid = !failed.Any() || response.IsValid;
                         response.StatusMessage = failed.Any() ? response.StatusMessage : message;
                         response.ErrorMessage.AddRange(notificationList);
                     }
@@ -952,18 +948,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = documentParsed.Cude;
-            var receiverCode = documentParsed.ReceiverCode;
-            var signingTime = xmlParser.SigningTime;
+            var trackIdCude = documentParsed.Cude; 
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
-            var UBLVersionID = documentParsed.UBLVersionID;
-            var documentTypeIdRef = documentParsed.DocumentTypeIdRef;
-            var issuerPartyCode = documentParsed.IssuerPartyCode;
-            var issuerPartyName = documentParsed.IssuerPartyName;
-            var endDate = documentParsed.ValidityPeriodEndDate;
-            bool validaMandatoListID = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3") ? false : true;
-            var documentReferenceId = xmlParser.DocumentReferenceId;
 
             var zone3 = new GlobalLogger(trackIdCude, Properties.Settings.Default.Param_Zone3)
             {
@@ -1526,7 +1513,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="document"></param>
         /// <param name="meta"></param>
         /// <returns></returns>
-        private DianResponse CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, string eventCode, GlobalDocValidatorDocumentMeta meta = null)
+        private void CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, string eventCode, GlobalDocValidatorDocumentMeta meta = null)
         {
             List<string> failedList = new List<string>();
             if (document != null)
@@ -1549,9 +1536,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
 
-            }
-
-            return response;
+            } 
         }
 
         /// <summary>
@@ -1656,61 +1641,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
         }
 
-        private void UpdateEndoso(XmlParser xmlParser, DocumentParsed documentParsed)
-        {
-            //validation if is an Endoso en propiedad (Code 037)
-            var arrayTasks = new List<Task>();
-            string sender = string.Empty;
-            string senderList = string.Empty;
-            string valueStockAmountSender = string.Empty;
-            string valueStockAmountSenderList = string.Empty;
-            if (Convert.ToInt32(documentParsed.ResponseCode) == (int)EventStatus.EndosoPropiedad)
-            {
-                List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentParsed.DocumentKey.ToLower()).ToList();
-                foreach (var documentHolderExchange in documentsHolderExchange)
-                {
-                    documentHolderExchange.Active = false;
-                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(documentHolderExchange));
-                }
-                //Lista de endosantes
-                XmlNodeList valueListSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                for (int i = 0; i < valueListSender.Count; i++)
-                {
-                    sender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
-                    valueStockAmountSender = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    if (i == 0)
-                    {
-                        senderList += sender;
-                        valueStockAmountSenderList += valueStockAmountSender;
-                    }
-                    else
-                    {
-                        senderList += "|" + sender;
-                        valueStockAmountSenderList += "|" + valueStockAmountSender;
-                    }
-                }
-
-                //Lista de endosatrios
-                XmlNodeList valueListReceiver = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                for (int i = 0; i < valueListReceiver.Count; i++)
-                {
-                    string companyId = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CompanyID']").Item(i)?.InnerText.ToString();
-                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    string rowKey = senderList + "|" + companyId;
-                    GlobalDocHolderExchange globalDocHolderExchange = new GlobalDocHolderExchange(documentParsed.DocumentKey.ToLower(), rowKey)
-                    {
-                        Timestamp = DateTime.Now,
-                        Active = true,
-                        CorporateStockAmount = valueStockAmount,
-                        GlobalDocumentId = documentParsed.Cude,
-                        PartyLegalEntity = companyId,
-                        SenderCode = senderList,
-                        CorporateStockAmountSender = valueStockAmountSenderList
-                    };
-                    arrayTasks.Add(TableManagerGlobalDocHolderExchange.InsertOrUpdateAsync(globalDocHolderExchange));
-                }
-            }
-        }
-
+        
     }
 }

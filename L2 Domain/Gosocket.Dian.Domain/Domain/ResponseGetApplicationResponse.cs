@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-
-namespace Gosocket.Dian.Domain.Domain
+﻿namespace Gosocket.Dian.Domain.Domain
 {
     public class ResponseGetApplicationResponse
     {

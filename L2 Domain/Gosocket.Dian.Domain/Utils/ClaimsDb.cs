@@ -1,5 +1,4 @@
-﻿
-namespace Gosocket.Dian.Domain.Utils
+﻿namespace Gosocket.Dian.Domain.Utils
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;

@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,4 @@
-﻿
-namespace Gosocket.Dian.Domain.Domain
+﻿namespace Gosocket.Dian.Domain.Domain
 {
     public class ResponseUploadXml
     {

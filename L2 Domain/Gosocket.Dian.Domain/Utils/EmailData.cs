@@ -1,13 +1,10 @@
-﻿using System.Net;
-
-using System.Text.RegularExpressions;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Rebex.Mime.Headers;
-using Rebex.Net;
+﻿using Rebex.Mime.Headers;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 
