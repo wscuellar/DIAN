@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Gosocket.Dian.Web.Utils;
-using System.ComponentModel.DataAnnotations;
-using Gosocket.Dian.Domain;
-
-namespace Gosocket.Dian.Web.Models.RadianApproved
+﻿namespace Gosocket.Dian.Web.Models.RadianApproved
 {
     public class RadianGetSetTestViewModel
     {

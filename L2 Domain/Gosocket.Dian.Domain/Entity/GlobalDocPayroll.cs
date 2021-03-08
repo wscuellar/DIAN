@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Domain.Entity
 {

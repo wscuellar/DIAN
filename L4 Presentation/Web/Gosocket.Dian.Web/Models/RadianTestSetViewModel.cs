@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using helper = Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Web.Models
 {

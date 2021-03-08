@@ -1,6 +1,4 @@
-﻿using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;

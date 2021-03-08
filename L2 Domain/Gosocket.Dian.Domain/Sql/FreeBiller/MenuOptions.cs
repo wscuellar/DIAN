@@ -1,5 +1,4 @@
-﻿
-namespace Gosocket.Dian.Domain.Sql.FreeBiller
+﻿namespace Gosocket.Dian.Domain.Sql.FreeBiller
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;

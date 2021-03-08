@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Domain;
+﻿using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Services.Models;
@@ -362,7 +361,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     foreach (var n in notifications)
                         notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                    dianResponse.IsValid = errors.Any() ? false : true;
+                    dianResponse.IsValid = !errors.Any();
                     dianResponse.StatusMessage = errors.Any() ? "Documento con errores en campos mandatorios." : message;
                     dianResponse.ErrorMessage.AddRange(notificationList);
                 }
@@ -497,8 +496,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            var runtime = new GlobalLogger(trackId, "1 GetStatus Runtime") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
-
+         
             //if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD")) isUploaded = true;
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
@@ -580,7 +578,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         foreach (var n in notifications)
                             notificationList.Add($"Regla: {n.ErrorCode}, Notificación: {n.ErrorMessage}");
 
-                        response.IsValid = failed.Any() ? response.IsValid : true;
+                        response.IsValid = !failed.Any() || response.IsValid;
                         response.StatusMessage = failed.Any() ? response.StatusMessage : message;
                         response.ErrorMessage.AddRange(notificationList);
                     }
@@ -657,8 +655,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         {
                             StatusCode = "66",
                             StatusDescription = "Error al generar ApplicationResponse. Inténtelo más tarde."
-                        });
-                        continue;
+                        }); 
                     }
                 }
             }
@@ -769,7 +766,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="document"></param>
         /// <param name="meta"></param>
         /// <returns></returns>
-        private DianResponse CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, GlobalDocValidatorDocumentMeta meta = null)
+        private void CheckDocument(ref DianResponse response, GlobalDocValidatorDocument document, string documentType, GlobalDocValidatorDocumentMeta meta = null)
         {
             List<string> failedList = new List<string>();
             if (document != null)
@@ -805,9 +802,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
 
-            }
-
-            return response;
+            } 
         }
 
         #endregion
@@ -899,10 +894,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
             start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
-            if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
-            var documentTypeId = documentParsed.DocumentTypeId;
-            var trackId = documentParsed.CUNE;
-            var trackIdPred = documentParsed.CUNEPred;
+            if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse; 
+            var trackId = documentParsed.CUNE; 
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
            
