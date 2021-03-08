@@ -147,7 +147,9 @@
     "ErrorCode_AAL05": "AAL05",
     "ErrorMessage_AAL05": "El número de documento electrónico referenciado no coinciden con un documento valido",
     "ErrorCode_AAL04": "AAL04",
-    "ErrorMessage_AAL04": "No fue informado el grupo"
+    "ErrorMessage_AAL04": "No fue informado el grupo",
+    "ErrorCode_LGC37": "LGC37",
+    "ErrorMessage_LGC37": "No se puede generar un Registro para inscripción posterior si previamente no se ha registrado un evento de endoso en propiedad (037)."
 
 
 
