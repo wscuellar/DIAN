@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gosocket.Dian.Functions.Models
+﻿namespace Gosocket.Dian.Functions.Models
 {
     public class AttorneyModel
     {
@@ -13,6 +7,8 @@ namespace Gosocket.Dian.Functions.Models
         
         public string idDocumentReference { get; set; }
         public string idTypeDocumentReference { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
 
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Gosocket.Dian.Web.Utils;
+﻿using Gosocket.Dian.Web.Utils;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models.RadianApproved

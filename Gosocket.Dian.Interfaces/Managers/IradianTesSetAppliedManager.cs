@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gosocket.Dian.Interfaces.Managers
+﻿namespace Gosocket.Dian.Interfaces.Managers
 {
-    public class IRadianTesSetAppliedManager
+    public interface IRadianTesSetAppliedManager
     {
     }
 }

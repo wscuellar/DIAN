@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gosocket.Dian.Domain.Utils
+﻿namespace Gosocket.Dian.Domain.Utils
 {
     public class EmailSenderVerifyDsnInput
     {

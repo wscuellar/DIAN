@@ -46,12 +46,14 @@ namespace Gosocket.Dian.Services.Utils.Common
         public static string StandardBase64(string base64)
         {
             int num1 = base64.Length / 64;
-            int num2 = 0;
-            string str = "\r\n";
+            int num2 = 0; 
+
+            StringBuilder str = new StringBuilder();
+            str.Append("\r\n");
             for (; num2 < num1; ++num2)
-                str = str + base64.Substring(num2 * 64, 64) + "\r\n";
+                str.Append(base64.Substring(num2 * 64, 64) + "\r\n");
             if (base64.Length % 64 == 0)
-                return str;
+                return str.ToString();
             int length = base64.Length - base64.Length / 64 * 64;
             return str + base64.Substring(base64.Length - length, length) + "\r\n";
         }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 
-
 namespace Gosocket.Dian.Domain.Entity
 {
     public class AuthToken : TableEntity

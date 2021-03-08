@@ -1,6 +1,5 @@
 ﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

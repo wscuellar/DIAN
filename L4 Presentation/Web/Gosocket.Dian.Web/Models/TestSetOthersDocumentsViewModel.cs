@@ -1,6 +1,4 @@
-﻿using ExpressiveAnnotations.Attributes;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gosocket.Dian.Services.Models
+﻿namespace Gosocket.Dian.Services.Models
 {
     class ValidatePayroll
     {
@@ -14,10 +8,6 @@ namespace Gosocket.Dian.Services.Models
         public decimal OvertimeSurcharges { get; set; }
         public decimal Salary { get; set; }
         public decimal PercentageWorked { get; set; }
-        public int AmountAdditionalHours { get; set; }
-
-        
-
-
+        public int AmountAdditionalHours { get; set; } 
     }
 }
