@@ -2609,7 +2609,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         else if ((customizationID == "433" || customizationID == "434"))
                         {
-                            if (tempCode.Contains("MR91")) codeExist = true;
+                            if (tempCode.Contains("MR91-" + tempCodeAttorney[1])) codeExist = true;
 
                             //Valida description code acorde al codigo ingresado de mandato Limitado
                             if (!descriptionCode.Equals("Mandato por documento Limitado"))
@@ -2654,7 +2654,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
-                    if (new string[] { "Mandato por documento General", "Mandato con Representación" }.Contains(descriptionCode)) validDescriptionCode = true;
+                    if (new string[] { "Mandato por documento General", "Mandato por documento Limitado" }.Contains(descriptionCode)) validDescriptionCode = true;
                     if (!validDescriptionCode)
                     {
                         validate = false;
