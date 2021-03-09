@@ -688,8 +688,7 @@ namespace Gosocket.Dian.Services.Utils
 
             var docTypeCode = documentParsed.DocumentTypeId;
             var cune = documentParsed.CUNE;
-            var cunePred = documentParsed.CUNEPred;
-            var codigoTrabajador = documentParsed.CodigoTrabajador;
+            var cunePred = documentParsed.CUNEPred; 
 
             switch (docTypeCode)
             {
@@ -753,12 +752,10 @@ namespace Gosocket.Dian.Services.Utils
             var senderCode = documentParsed.SenderCode;
             var eventCode = documentParsed.ResponseCode;
             var documentCude = documentParsed.Cude;
-            var customizationId = documentParsed.CustomizationId;
-            var documentID = documentParsed.DocumentID;
+            var customizationId = documentParsed.CustomizationId; 
             var serieAndNumber = documentParsed.SerieAndNumber;
             var listID = documentParsed.listID;
-            var UBLVersionID = documentParsed.UBLVersionID;
-            var receiverCode = documentParsed.ReceiverCode;
+            var UBLVersionID = documentParsed.UBLVersionID; 
             var providerCode = documentParsed.ProviderCode;
             txtRegla = "Regla: ";
             txtRechazo = ", Rechazo: ";

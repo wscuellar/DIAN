@@ -1,6 +1,5 @@
 ﻿using Gosocket.Dian.Domain.Entity;
-using System;
-using System.Data.Entity;
+using System; 
 using System.Linq;
 using System.Linq.Expressions;
 

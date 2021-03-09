@@ -3,11 +3,8 @@ using Gosocket.Dian.Infrastructure;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
@@ -53,7 +50,8 @@ namespace Gosocket.Dian.Application
             }
             catch (Exception ex)
             {
-                throw;
+                EmailSenderResponse emailSenderResponse = new EmailSenderResponse(null, ErrorTypes.InternalError, ex.Message, new List<EmailSenderResponseDetails>());
+                return emailSenderResponse;
             }
         }
     }

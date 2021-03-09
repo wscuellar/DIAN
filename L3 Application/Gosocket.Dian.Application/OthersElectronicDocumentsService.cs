@@ -5,13 +5,10 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Data.Entity;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
@@ -58,7 +55,7 @@ namespace Gosocket.Dian.Application
         {
             OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId);
             GlobalTestSetOthersDocuments testSet = null;
-            testSet = _othersDocsElecContributorService.GetTestResult((int)Contributor.OtherDocElecOperationModeId, Contributor.ElectronicDocumentId);
+            testSet = _othersDocsElecContributorService.GetTestResult(Contributor.OtherDocElecOperationModeId, Contributor.ElectronicDocumentId);
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500);
 

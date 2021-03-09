@@ -20,7 +20,6 @@ namespace Gosocket.Dian.Application.Managers
         {
             try
             {
-                TableContinuationToken token = null;
                 var testSets = new List<GlobalTestSetOthersDocumentsResult>();
                 /*foreach (var operationModeId in new List<int> { (int)RadianContributorType.ElectronicInvoice, (int)RadianContributorType.TechnologyProvider, (int)RadianContributorType.TradingSystem, (int)RadianContributorType.Factor })
                 {

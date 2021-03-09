@@ -37,10 +37,8 @@ namespace Gosocket.Dian.Services.Utils
 
             var docTypeCode = documentMeta.DocumentTypeId;
 
-            var messageIdNode = SerieNumberMessageFromDocType(documentMeta);
-            var series = messageIdNode.Item1;
-            var number = messageIdNode.Item2;
-            var messDocType = messageIdNode.Item3;
+            var messageIdNode = SerieNumberMessageFromDocType(documentMeta); 
+            var number = messageIdNode.Item2; 
 
             var errors = new List<GlobalDocValidatorTracking>();
             var notifications = new List<GlobalDocValidatorTracking>();
@@ -56,9 +54,6 @@ namespace Gosocket.Dian.Services.Utils
             XElement root = BuildRootNode(documentMeta);
             root.Add(BuildSenderNode(documentMeta));
             root.Add(BuildReceiverNode(documentMeta));
-
-            List<XElement> notesListObservations = new List<XElement>();
-            List<XElement> notesListErrors = new List<XElement>();
 
             // events...
             if (events != null && events.Count > 0)
@@ -82,8 +77,6 @@ namespace Gosocket.Dian.Services.Utils
                 var folder = "Success";
                 var container = $"{CategoryContainerName}";
                 var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
-                var numberFolder = string.IsNullOrEmpty(number) ? trackId : number;
-                var accountCode = string.IsNullOrEmpty(documentMeta.SenderCode) ? "SenderCode" : documentMeta.SenderCode;
                 var fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{folder}/{documentMeta.SenderCode}/{docTypeCode}/{serieFolder}/{number}/{trackId}.xml";
                 fileManager.Upload(container, fileName, responseBytes);
             }
@@ -132,8 +125,6 @@ namespace Gosocket.Dian.Services.Utils
         public static XElement BuildRootNode(GlobalDocValidatorDocumentMeta processResultEntity)
         {
             var messageIdNode = SerieNumberMessageFromDocType(processResultEntity);
-            var series = messageIdNode.Item1;
-            var number = messageIdNode.Item2;
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
             var profileExecutionId = "1";
@@ -313,9 +304,7 @@ namespace Gosocket.Dian.Services.Utils
 
         public static XElement BuildResponseNode(int line, string code, string message, bool withObservations, bool withErrors, GlobalDocValidatorDocumentMeta processResultEntity)
         {
-            var messageIdNode = SerieNumberMessageFromDocType(processResultEntity);
-            var series = messageIdNode.Item1;
-            var number = messageIdNode.Item2;
+            var messageIdNode = SerieNumberMessageFromDocType(processResultEntity); 
             var approvedMessage = messageIdNode.Item3;
 
             return new XElement(cac + "LineResponse",
@@ -368,8 +357,7 @@ namespace Gosocket.Dian.Services.Utils
 
         public static bool ApplicationResponseExist(GlobalDocValidatorDocumentMeta documentMeta)
         {
-            var fileManager = new FileManager();
-            var processDate = documentMeta.Timestamp;
+            var fileManager = new FileManager(); 
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
             var isValidFolder = "Success";
 
@@ -391,8 +379,7 @@ namespace Gosocket.Dian.Services.Utils
             var fileManager = new FileManager();
 
             byte[] xmlBytes = null;
-
-            var processDate = documentMeta.Timestamp;
+             
 
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
 

@@ -1,20 +1,18 @@
-﻿using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Plugin.Functions.Models;
-using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Plugin.Functions.Cufe;
 using Gosocket.Dian.Plugin.Functions.Event;
+using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
+using Gosocket.Dian.Plugin.Functions.Models;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Plugin.Functions.SigningTime;
-using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
-using Gosocket.Dian.Plugin.Functions.Predecesor;
-using Gosocket.Dian.Plugin.Functions.Cufe;
-using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
 
 
 namespace Gosocket.Dian.Plugin.Functions.Common
@@ -328,8 +326,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            DateTime startDate = DateTime.UtcNow;
-
 
             validateResponses.AddRange(validator.ValidateDocumentReferencePrev(validateReference.TrackId,
                 validateReference.IdDocumentReference, validateReference.EventCode, validateReference.DocumentTypeIdRef,
@@ -342,7 +338,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateSigningTimeAsync(RequestObjectSigningTime data)
         {           
             var validateResponses = new List<ValidateListResponse>();
-            DateTime startDate = DateTime.UtcNow;
             EventStatus code;
             string originalTrackId = data.TrackId;
             switch (int.Parse(data.EventCode))

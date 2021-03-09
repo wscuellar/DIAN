@@ -1,8 +1,10 @@
 ﻿using Gosocket.Dian.DataContext;
+using Gosocket.Dian.DataContext.Middle;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
@@ -10,10 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gosocket.Dian.DataContext.Middle;
-using Gosocket.Dian.Infrastructure;
 
 namespace Gosocket.Dian.Application
 {
@@ -76,8 +74,8 @@ namespace Gosocket.Dian.Application
                 Id = existing != null ? existing.Id : 0,
                 ContributorId = contributorId,
                 CreatedBy = createdBy,
-                OtherDocElecContributorTypeId = (int)ContributorType,
-                OtherDocElecOperationModeId = (int)OperationMode,
+                OtherDocElecContributorTypeId = ContributorType,
+                OtherDocElecOperationModeId = OperationMode,
                 ElectronicDocumentId = ElectronicDocumentId,
                 State = State.GetDescription(),
                 CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now

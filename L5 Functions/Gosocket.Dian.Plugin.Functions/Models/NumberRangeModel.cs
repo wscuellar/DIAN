@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gosocket.Dian.Plugin.Functions.Models
+﻿namespace Gosocket.Dian.Plugin.Functions.Models
 {
     public class NumberRangeModel
     {
