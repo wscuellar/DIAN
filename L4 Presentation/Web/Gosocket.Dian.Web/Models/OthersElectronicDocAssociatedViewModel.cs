@@ -56,8 +56,9 @@ namespace Gosocket.Dian.Web.Models
         public int PageTable { get; set; }
         public int CustomerTotalCount { get; internal set; }
 
+        [Display(Name = "Estado de aprobación")]
         public OtherDocElecState StateSelect { get; set; }
-        [Display(Name = "Nit Facturador")]
+        [Display(Name = "NIT de Emisor")]
         public string NitSearch { get; set; }
         public List<OtherDocElecCustomerListViewModel> Customers { get; set; }
         public List<UserViewModel> LegalRepresentativeList { get; set; }

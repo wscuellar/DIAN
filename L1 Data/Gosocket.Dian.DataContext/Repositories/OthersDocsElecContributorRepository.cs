@@ -154,9 +154,11 @@ namespace Gosocket.Dian.DataContext.Repositories
             IQueryable<OtherDocElecCustomerList> query = (from c in sqlDBContext.Contributors
                                                           join dec in sqlDBContext.OtherDocElecContributors on c.Id equals dec.ContributorId
                                                           join s in sqlDBContext.OtherDocElecSoftwares on dec.Id equals s.OtherDocElecContributorId
-                                                          where dec.OtherDocElecOperationModeId == 2
+                                                          where dec.OtherDocElecOperationModeId == (int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider
                                                             && dec.State != "Cancelado"
                                                             && s.ProviderId == id
+                                                            && (string.IsNullOrEmpty(code) || c.Code == code)
+                                                            && (string.IsNullOrEmpty(State) || dec.State == State)
                                                           select new OtherDocElecCustomerList()
                                                           {
                                                               Id = c.Id,
