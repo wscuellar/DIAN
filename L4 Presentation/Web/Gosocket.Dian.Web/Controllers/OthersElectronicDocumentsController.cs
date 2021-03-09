@@ -89,12 +89,15 @@ namespace Gosocket.Dian.Web.Controllers
 
                     if(contributorEnabled != null)
                     {
-                        var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorEnabled.Id);
-                        if(operations != null && operations.Any(x => x.Deleted == false))
-                        {
-                            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationByDocEleContributorId(contributorEnabled.Id);
-                            return this.RedirectToAction("Index", "OthersElectronicDocAssociated", new { Id = operation.Id });
-                        }
+                        //var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorEnabled.Id);
+                        //if(operations != null && operations.Any(x => x.Deleted == false))
+                        //{
+                        //    var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationByDocEleContributorId(contributorEnabled.Id);
+                        //    return this.RedirectToAction("Index", "OthersElectronicDocAssociated", new { Id = operation.Id });
+                        //}
+
+                        var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationByDocEleContributorId(contributorEnabled.Id);
+                        return this.RedirectToAction("Index", "OthersElectronicDocAssociated", new { Id = operation.Id });
                     }
                 }
 
@@ -106,11 +109,13 @@ namespace Gosocket.Dian.Web.Controllers
                         && x.OtherDocElecOperationModeId == (int)dataentity.OperationModeId);
                     if (contributorInTestSameOperation != null)
                     {
-                        var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorInTestSameOperation.Id);
-                        if (operations != null && operations.Any(x => x.Deleted == false))
-                        {
-                            softwareActive = true;
-                        }
+                        //var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorInTestSameOperation.Id);
+                        //if (operations != null && operations.Any(x => x.Deleted == false))
+                        //{
+                        //    softwareActive = true;
+                        //}
+
+                        softwareActive = true;
                     }
                     else
                     {
