@@ -2,9 +2,9 @@
 {
     public class Roles
     {
-        public static string Administrator = "Administrador";
-        public static string Basic = "Basic";
-        public static string Super = "Super";
-        public static string UsuarioExterno = "UsuarioExterno";
+        public static readonly string Administrator = "Administrador";
+        public static readonly string Basic = "Basic";
+        public static readonly string Super = "Super";
+        public static readonly string UsuarioExterno = "UsuarioExterno";
     }
 }

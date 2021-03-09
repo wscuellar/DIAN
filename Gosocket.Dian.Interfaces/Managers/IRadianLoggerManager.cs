@@ -7,6 +7,6 @@ namespace Gosocket.Dian.Interfaces.Managers
     {
         IEnumerable<RadianLogger> GetAllRadianLogger ();
         RadianLogger GetRadianLogger(string partitionKey, string rowKey);
-        bool InsertOrUpdateRadianLogger(RadianLogger testSetResult);
+        bool InsertOrUpdateRadianLogger(RadianLogger logger);
     }
 }

@@ -45,13 +45,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         static readonly TableManager typeListTableManager = new TableManager("GlobalTypeList");
-        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
-        private TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
-        private TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
-        private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
-        private TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
-        private TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
-        private TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private readonly TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
+        private readonly TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
+        private readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
+        private readonly TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private readonly TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
+        private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
         private static readonly string pdfMimeType = "application/pdf";
 
         readonly XmlDocument _xmlDocument;
@@ -60,8 +60,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         readonly XPathNavigator _navNs;
         readonly XmlNamespaceManager _ns;
         readonly byte[] _xmlBytes;
-
-        static readonly Regex _base64RegexPattern = new Regex(BASE64_REGEX_STRING, RegexOptions.Compiled);
 
         private const String BASE64_REGEX_STRING = @"^[a-zA-Z0-9\+/]*={0,3}$";
 
@@ -257,7 +255,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validFor = true;
 
             responses.Add(new ValidateListResponse
             {
@@ -285,7 +282,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (!int.Equals(xmlID, tempID + 1))
                         {
-                            validFor = false;
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
@@ -567,7 +563,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public List<ValidateListResponse> ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
         {
-            DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             responses.AddRange(this.CheckIndividualPayrollDuplicity(model.EmpleadorNIT, model.SerieAndNumber));
@@ -2227,34 +2222,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Validate Reference Attorney
         public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
         {
-            NitModel nitModel = new NitModel();
-            string issuerPartyName = string.Empty;
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
-            string startDateAttorney = string.Empty;
-            string endDate = string.Empty;
             DateTime startDate = DateTime.UtcNow;
             RequestObjectSigningTime dataSigningtime = new RequestObjectSigningTime();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            List<AttorneyModel> attorney = new List<AttorneyModel>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string providerCode = xmlParser.FieldValue("ProviderCode", true).ToString();
-            //string AttachmentBase64 = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(0)?.InnerText.ToString();
             XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']");
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string effectiveDate = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='EffectiveDate']").Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
             XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
-            //XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']/@schemeID").Item(0)?.InnerText.ToString();
-            string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
-            //string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ValidityPeriod']/*[local-name()='DescriptionCode']").Item(0)?.Attributes["listID"].Value;
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
-            string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
-            string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
-            string name = firstName + " " + familyName;
             dataSigningtime.EventCode = "043";
             dataSigningtime.SigningTime = xmlParser.SigningTime;
             dataSigningtime.DocumentTypeId = "96";
@@ -2439,7 +2420,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-            string actor = modoOperacion;
+            
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                 issuerPartyCode, false, "Habilitado", softwareId);
@@ -2511,7 +2492,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        string base64Decoded = string.Empty;
                         byte[] data = Convert.FromBase64String(AttachmentBase64);
                         var mimeType = GetMimeFromBytes(data);
                         if (mimeType != pdfMimeType)
@@ -2539,7 +2519,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 1; i < listReference && i < attorneyLimit && validate; i++)
             {
                 //Valida facultades madato 
-                AttorneyModel attorneyModel = new AttorneyModel();
                 string[] tempCode = new string[0];
                 string descriptionCode = string.Empty;
 
@@ -2710,7 +2689,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             try
             {
                 string mime = string.Empty;
-                IntPtr suggestPtr = IntPtr.Zero, filePtr = IntPtr.Zero, outPtr = IntPtr.Zero;
+                IntPtr outPtr = IntPtr.Zero;
                 int ret = FindMimeFromData(IntPtr.Zero, null, data, data.Length, null, 0, out outPtr, 0);
                 if (ret == 0 && outPtr != IntPtr.Zero)
                 {
@@ -3612,7 +3591,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region validation to emition to event
         public List<ValidateListResponse> ValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
         {
-            bool validFor = false;
             string eventCode = eventPrev.EventCode;
             string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
             DateTime startDate = DateTime.UtcNow;
@@ -3903,7 +3881,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.ValInfoPago:
-                    //Valida eventos previos Informacion Pago}
+                    //Valida eventos previos Informacion Pago
                     LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
                     var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
                     if (eventRadianPaymentInfo != null || eventRadianPaymentInfo.Count > 0)

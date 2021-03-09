@@ -48,10 +48,9 @@ namespace Gosocket.Dian.Functions.Events
             };
             try
             {
-                var validations = new List<GlobalDocValidatorTracking>();
                 GlobalDocValidatorDocumentMeta documentMeta = null;
                 byte[] xmlBytes = null;
-                validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
+                List<GlobalDocValidatorTracking> validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
                 documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
                 xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
 

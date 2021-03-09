@@ -69,21 +69,5 @@ namespace Gosocket.Dian.Web.Models
         public string CreatedBy { get; set; }
         public string UpdateBy { get; set; }
         public bool Active { get; set; }
-
-        //public List<ElectronicDocumentViewModel> GetListElectronicDocuments()
-        //{
-        //    return new List<ElectronicDocumentViewModel>
-        //    {
-        //        new ElectronicDocumentViewModel{ Id = 1, Name = "Nomina Electronica y Nomina de Ajuste" },
-        //        new ElectronicDocumentViewModel{ Id = 2, Name = "Documento de Importación" },
-        //        new ElectronicDocumentViewModel{ Id = 3, Name = "Documento de Soporte" },
-        //        new ElectronicDocumentViewModel{ Id = 4, Name = "Documento equivalente electrónico" },
-        //        new ElectronicDocumentViewModel{ Id = 5, Name = "POS electrónico" }
-        //    };
-        //}
-
     }
-
-    
-
 }

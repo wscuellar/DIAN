@@ -14,7 +14,7 @@ namespace Gosocket.Dian.Web.Utils
     public class UserService
     {
         ApplicationDbContext _sqlDBContext;
-        SqlDBContext _sqlAspDBContext;
+        readonly SqlDBContext _sqlAspDBContext;
         public UserService()
         {
             if (_sqlDBContext == null)

@@ -6,7 +6,7 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IPermissionService
     {
         /// <summary>
-        /// Obtener todo el Menu de la aplicación
+        /// Obtener All el Menu de la aplicación
         /// </summary>
         /// <returns></returns>
         List<Menu> GetAppMenu(string RolName);

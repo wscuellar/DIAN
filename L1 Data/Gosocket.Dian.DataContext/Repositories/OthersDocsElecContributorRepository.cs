@@ -94,11 +94,6 @@ namespace Gosocket.Dian.DataContext.Repositories
         {
             try
             {
-                //IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
-                //    .Include("Contributor")
-                //    .Include("OtherDocElecContributorTypes")
-                //    .Include("OtherDocElecOperationModes");
-
                 IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
                  .Include("Contributor")
                  .Include("OtherDocElecSoftwares")

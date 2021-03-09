@@ -9,7 +9,7 @@ namespace Gosocket.Dian.DataContext.Repositories
     public class PermissionRepository : IPermissionRepository
     {
 
-        public List<Menu> GetAppMenu(string rolname)
+        public List<Menu> GetAppMenu(string rolsearch)
         {
             try
             {
@@ -18,7 +18,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                     var query = (from m in context.Menus
                                  join mrol in context.MenuRoles on m.Id equals mrol.MenuId
                                  join rol in context.Roles on mrol.RoleId equals rol.Id
-                                 where rol.Name == rolname && mrol.SubMenuId == null
+                                 where rol.Name == rolsearch && mrol.SubMenuId == null
                                  select new
                                  {
                                      m.Id,
@@ -55,7 +55,6 @@ namespace Gosocket.Dian.DataContext.Repositories
             {
                 using (var context = new SqlDBContext())
                 {
-                    //list = context.SubMenus.Where(s => s.MenuId == menuId).ToList();
                     var query = (from sm in context.SubMenus
                                  join mrol in context.MenuRoles on sm.Id equals mrol.SubMenuId
                                  join rol in context.Roles on mrol.RoleId equals rol.Id
@@ -110,8 +109,6 @@ namespace Gosocket.Dian.DataContext.Repositories
                         {
                             foreach (var item in permissions)
                             {
-                                //((Permission)item).State = System.Data.Entity.EntityState.Deleted.ToString();
-                                //((Permission)item).UpdatedBy = System.Data.Entity.EntityState.Deleted;
                                 item.State = System.Data.Entity.EntityState.Deleted.ToString();
                                 item.UpdatedBy = permissionList.ElementAt(0).UpdatedBy;
                             }
@@ -125,8 +122,6 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                                 if (result > 0)//Inserto los nuevos permisos exitosamente
                                 {
-                                    //Si la actualizacón fue exitosa, eliminar los aneriores
-                                    //context.Permissions.RemoveRange(context.Permissions.Where(p => p.State == System.Data.Entity.EntityState.Deleted.ToString()).ToList());
                                     context.Permissions.RemoveRange(permissions);
                                     context.SaveChanges();
                                 }
