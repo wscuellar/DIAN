@@ -42,18 +42,21 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
+        private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
 
         public OthersElectronicDocAssociatedController(IContributorService contributorService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
             IOthersElectronicDocumentsService othersElectronicDocumentsService,
             ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
-            IOthersDocsElecSoftwareService othersDocsElecSoftwareService)
+            IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
+            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService)
         {
             _contributorService = contributorService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
+            _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
         }
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
@@ -173,16 +176,10 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult CancelRegister(int id, string description)
         {
-            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
-            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
-            {
-                return Json(new
-                {
-                    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
-                    success = true,
-                }, JsonRequestBehavior.AllowGet);
-            }
+            var result = DeleteOperationInStorageTable(id);
+            if (result != null) return result;
 
+            // SQL
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
             return Json(response, JsonRequestBehavior.AllowGet);
         }
@@ -473,8 +470,22 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult DeleteOperationMode(int Id)
         {
-            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
-            if(operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            var result = DeleteOperationInStorageTable(Id);
+            if (result != null) return result;
+
+            var _result = _othersElectronicDocumentsService.OperationDelete(Id);
+            return Json(new
+            {
+                code = _result.Code,
+                message = _result.Message,
+                success = true,
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        private JsonResult DeleteOperationInStorageTable(int id)
+        {
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
             {
                 return Json(new
                 {
@@ -484,13 +495,26 @@ namespace Gosocket.Dian.Web.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var result = _othersElectronicDocumentsService.OperationDelete(Id);
-            return Json(new
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(id);
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            // AZURE
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            var globalResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+            if (globalResult != null)
             {
-                code = result.Code,
-                message = result.Message,
-                success = true,
-            }, JsonRequestBehavior.AllowGet);
+                globalResult.Deleted = true;
+                _testSetOthersDocumentsResultService.InsertTestSetResult(globalResult);
+            }
+            //
+            var globalOperation = _globalOtherDocElecOperationService.GetOperation(model.Nit, software.SoftwareId);
+            if (globalOperation != null)
+            {
+                globalOperation.Deleted = true;
+                _globalOtherDocElecOperationService.Update(globalOperation);
+            }
+
+            return null;
         }
 
         [HttpPost]

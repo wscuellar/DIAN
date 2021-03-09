@@ -1339,6 +1339,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public EventResponse GetXmlByDocumentKey(string trackId, string authCode)
         {
             var eventResponse = new EventResponse();
+            XmlParser xmlParser = new XmlParser();
+            DocumentParsed documentParsed = new DocumentParsed();
+            DocumentParsedNomina documentParsedNomina = new DocumentParsedNomina();
+            XmlParseNomina xmlParserNomina = new XmlParseNomina();
+            string senderCode = string.Empty;
+            string receiverCode = string.Empty;
+
             //authCode = "9005089089";
 
             var documentKey = trackId.ToLower();
@@ -1373,19 +1380,42 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
                 return eventResponse;
             }
-
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
+            
+            if (Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                || Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
             {
-                eventResponse.Code = "206";
-                eventResponse.Message = "Xml con errores en los campos número documento emisor o número documento receptor";
-                return eventResponse;
+               
+                xmlParserNomina = new XmlParseNomina(xmlBytes);
+                if (!xmlParserNomina.Parser())
+                {
+                    eventResponse.Code = "206";
+                    eventResponse.Message = "Xml con errores en los campos número documento emisor o número documento receptor";
+                    return eventResponse;
+                }
+
+                documentParsedNomina = xmlParserNomina.Fields.ToObject<DocumentParsedNomina>();
+
+                senderCode = documentParsedNomina.EmpleadorNIT;
+                receiverCode = documentParsedNomina.NumeroDocumento;
+            }
+            else
+            {
+                
+                xmlParser = new XmlParser(xmlBytes);
+                if (!xmlParser.Parser())
+                {
+                    eventResponse.Code = "206";
+                    eventResponse.Message = "Xml con errores en los campos número documento emisor o número documento receptor";
+                    return eventResponse;
+                }
+
+                documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
+
+                senderCode = documentParsed.SenderCode;
+                receiverCode = documentParsed.ReceiverCode;
             }
 
-            var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
-
-            var senderCode = documentParsed.SenderCode;
-            var receiverCode = documentParsed.ReceiverCode;
+            
 
             if (!authCode.Contains(senderCode) && !authCode.Contains(receiverCode))
             {

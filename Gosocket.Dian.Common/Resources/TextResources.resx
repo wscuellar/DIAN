@@ -241,7 +241,7 @@
     <value>Este modo de operación y documento electrónico carece de Set de Pruebas!!!</value>
   </data>
   <data name="OtherDocEleSuccesModeOperation" xml:space="preserve">
-    <value>Mode de operación adicionado correctamente</value>
+    <value>Modo de operación adicionado correctamente</value>
     <comment>\</comment>
   </data>
   <data name="UserCreatedSuccess" xml:space="preserve">

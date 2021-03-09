@@ -220,11 +220,11 @@ function ShowPromptCancel(title, event, label, operationCancel, buttonAceptText)
 
 }
 
-function ShowDetailsTestSet(htmlPartial, id, softwareId, operation, url) {
+function ShowDetailsTestSet(htmlPartial, id, softwareId, type, url) {
     var data = {
         code: id,
         softwareId: softwareId,
-        softwareType: operation
+        type: type
     }
     customDialog(htmlPartial, data, url);
 }

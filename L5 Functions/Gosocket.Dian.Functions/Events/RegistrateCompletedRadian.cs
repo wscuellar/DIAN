@@ -167,8 +167,11 @@ namespace Gosocket.Dian.Functions.Events
             //Registra certificado emisor a mandante
             if (listID == "3")
             {
-                GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, issuerPartyCode);
-                arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                if(authCode != issuerPartyCode)
+                {
+                    GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, issuerPartyCode);
+                    arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                }              
             }
 
             //Descripcion Mandatario 

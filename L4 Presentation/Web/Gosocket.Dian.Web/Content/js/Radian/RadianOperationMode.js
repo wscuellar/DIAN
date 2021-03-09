@@ -52,10 +52,10 @@ function RenderAutocomplete(url, contributorId, contributorTypeId, softwareType)
                 $("#bussiness-name").html("");
                 response.length == 0 && hideLoading('#panel-form');
                 if (response.length) {
-                    LoadSoftwareList(response[0].value);
+                    LoadSoftwareList(response[0].Value);
                 }
                 for (var i = 0; i < response.length; i++) {
-                    $("#bussiness-name").append($("<option>", { value: response[i].value, text: response[i].text }));
+                    $("#bussiness-name").append($("<option>", { value: response[i].Value, text: response[i].Text }));
                 }
             }
         ajaxFunction(url, metod, data, actionError, actionSuccess);
@@ -78,7 +78,7 @@ function LoadSoftwareList(radianId) {
         hideLoading('#panel-form');
         $("#SoftwareNameList").html("");
         for (var i = 0; i < response.length; i++) {
-            $("#SoftwareNameList").append($("<option>", { value: response[i].value, text: response[i].text }));
+            $("#SoftwareNameList").append($("<option>", { value: response[i].Value, text: response[i].Text }));
         }
     }
     ajaxFunction(url, metod, data, actionError, actionSuccess);

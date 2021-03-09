@@ -163,8 +163,8 @@
                 var url = '@Url.Action("GetSetTestByContributor", "Radian")';
                 var softwareId = $(this).parents("tr").children(".set-id").children("a").html();
                 var code = @Model.Code;
-                var softwareType = $(this).parents("tr").children(".operation-name").children("a").html();
-                ShowDetailsTestSet(htmlPartial, code, softwareId, softwareType, url);
+                var type = @Model.RadianContributorTypeId;
+                ShowDetailsTestSet(htmlPartial, code, softwareId, type,url);
             })
 
             DeleteOptions(@Model.RadianOperationModeId, '@Model.RadianState');

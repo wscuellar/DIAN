@@ -291,7 +291,7 @@ namespace Gosocket.Dian.Application
                     if (software != null)
                     {
                         software.Deleted = true;
-                        software.Status = true;
+                        software.Status = false;
                         software.Updated = DateTime.Now;
 
                         sqlDBContext.Entry(software).State = System.Data.Entity.EntityState.Modified;
@@ -326,8 +326,18 @@ namespace Gosocket.Dian.Application
 
         public List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId)
         {
+            //return _othersDocsElecContributorRepository
+            //    .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
+            //        .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
+
+            //return _othersDocsElecContributorRepository
+            //    .List(x => x.ContributorId == contributorId, 0, 0).Results;
+
             return _othersDocsElecContributorRepository
-                .List(x => x.ContributorId == contributorId, 0, 0).Results;
+                .List(x => x.ContributorId == contributorId && x.OtherDocElecContributorOperations.Any(z => z.Deleted == false), 0, 0)
+                .Results
+                .Distinct()
+                .ToList();
         }
 
         public List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state)
