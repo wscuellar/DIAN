@@ -21,7 +21,7 @@
                         {
                             @Html.HiddenFor(m => m.ContributorId)
                             @Html.HiddenFor(m => m.ContributorTypeId)
-                            @*@Html.HiddenFor(m => m.SoftwareTy)*@
+                            @Html.HiddenFor(m => m.SoftwareId)
                             @Html.HiddenFor(m => m.SoftwareIdBase)
                             @Html.HiddenFor(m => m.ElectronicDocId)
 
@@ -53,10 +53,11 @@
             }
         });
 
-        $(document).on('change', '#SoftwareId', function () {
+        $(document).on('change', '#ddlsoftware', function () {
             let selectedValue = $(this).val();
             if (selectedValue != null && selectedValue != '') {
-                $('#SoftwareName').val($('#SoftwareId option:selected').text());
+                $('#SoftwareId').val(selectedValue);
+                $('#SoftwareName').val($('#ddlsoftware option:selected').text());
                 getDataSoftwareSeleccionado(selectedValue);
             }
         })
@@ -91,8 +92,8 @@
         }
 
         function getSoftwares(ProviderId) {
-            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
-            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+            $("#ddlsoftware").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulddlsoftware').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
                 'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
 
             cambiarTextoSelect();
@@ -107,8 +108,8 @@
                     if (result != null && result.res != null) {
 
                         $.each(result.res, function (index, value) {
-                            $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
-                            $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
+                            $('#ddlsoftware').append('<option value="' + value.Id + '">' + value.Name + '</option>');
+                            $('#ulddlsoftware').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
                                 ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
                                 '<span class="fa fa-check check-mark"></span></a></li>');
                         });
@@ -138,7 +139,7 @@
                     boton = val1;
                     $.each(val1.attributes, function (index, value) {
 
-                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+                        if (value.localName == "data-id" && value.nodeValue == "ddlsoftware") {
 
                             boton.firstElementChild.textContent = "Seleccione...";
 
@@ -213,19 +214,6 @@
             }
 
             ODEDeleteOperationMode = function (Id) {
-                @*var url ="@Url.Action("DeleteOperationMode", "OthersElectronicDocAssociated")";
-                showLoading('#table-modes', 'Cargando', 'Buscando datos, por favor espere.');
-                var metod = 'POST';
-                var data = {
-                    Id: Id
-                }
-                var actionError = () => { }
-                var actionSuccess = (response) => {
-                    showConfirmation(response.message, AlertExec(() => location.reload()))
-                }
-                ajaxFunction(url, metod, data, actionError, actionSuccess)*@
-
-
                 showConfirmation("¿Está seguro de eliminar el modo de operación configurado previamente?", ConfirmExec(
                         function () {
                             $.ajax({

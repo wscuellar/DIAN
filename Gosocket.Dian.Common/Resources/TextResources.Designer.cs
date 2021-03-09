@@ -340,7 +340,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Mode de operación adicionado correctamente.
+        ///   Busca una cadena traducida similar a Modo de operación adicionado correctamente.
         /// </summary>
         public static string OtherDocEleSuccesModeOperation {
             get {
