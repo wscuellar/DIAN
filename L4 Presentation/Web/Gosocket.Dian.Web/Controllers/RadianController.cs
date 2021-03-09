@@ -95,6 +95,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     Id = c.Id,
                     Code = c.Code,
+                    RadianContributorTypeId = c.RadianContributorTypeId,
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
@@ -144,6 +145,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Id = c.RadianContributorId,
                     Code = c.Code,
                     TradeName = c.TradeName,
+                    RadianContributorTypeId = c.RadianContributorTypeId,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
                     RadianState = c.RadianState
@@ -166,6 +168,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Id = radianAdmin.Contributor.RadianContributorId,
                 Code = radianAdmin.Contributor.Code,
+                RadianContributorTypeId = radianAdmin.Contributor.RadianContributorTypeId,
                 TradeName = radianAdmin.Contributor.TradeName,
                 BusinessName = radianAdmin.Contributor.BusinessName,
                 Email = radianAdmin.Contributor.Email,
@@ -227,9 +230,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-                string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
-                var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-                var result = fileManager.GetBytes("radiancontributor-files", fileNameURL, out string contentType);
+                byte[] result = _radianContributorService.DownloadContributorFile(code, fileName, out string contentType);
                 return File(result, contentType, $"{fileName}");
             }
             catch (Exception ex)
@@ -333,11 +334,14 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult GetSetTestByContributor(string code, string softwareId, string softwareType)
+        public JsonResult GetSetTestByContributor(string code, string softwareId, int type)
         {
-            RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, softwareType);
+            RadianTestSetResult result = _radianContributorService.GetSetTestResult(code, softwareId, type);
 
             List<EventCountersViewModel> events = new List<EventCountersViewModel>();
+            if (result == null)
+                return Json(events, JsonRequestBehavior.AllowGet); ;
+
             // Acuse de recibo
             events.Add(new EventCountersViewModel() { EventName = EventStatus.Received.GetDescription(), Counter1 = result.ReceiptNoticeTotalAcceptedRequired, Counter2 = result.ReceiptNoticeAccepted, Counter3 = result.ReceiptNoticeRejected });
 

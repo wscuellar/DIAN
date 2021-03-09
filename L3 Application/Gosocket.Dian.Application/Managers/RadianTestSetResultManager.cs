@@ -41,7 +41,8 @@ namespace Gosocket.Dian.Application.Managers
 
         public RadianTestSetResult GetTestSetResult(string partitionKey, string rowKey)
         {
-            return testSetManager.Find<RadianTestSetResult>(partitionKey, rowKey);
+            RadianTestSetResult result = testSetManager.Find<RadianTestSetResult>(partitionKey, rowKey);
+            return result == null ? new RadianTestSetResult() : result;
         }
 
         public IEnumerable<RadianTestSetResult> GetAllTestSetResultByContributor(int contributorId)
