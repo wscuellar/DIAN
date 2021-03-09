@@ -775,7 +775,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                              senderCodeProvider, false, "Habilitado", softwareId);
+                              senderCodeProvider, false, softwareId);
                 if (softwareProviderRadian != null)
                 {
                     switch (softwareProviderRadian.SoftwareType)
@@ -1754,7 +1754,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             //Valida se encuetre habilitado Modo Operacion RadianOperation
                             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                                docReferenceAttorney.IssuerAttorney, false, "Habilitado", softwareId);
+                                docReferenceAttorney.IssuerAttorney, false, softwareId);
                             if (globalRadianOperation == null)
                             {
                                 validError = true;
@@ -2442,7 +2442,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string actor = modoOperacion;
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                issuerPartyCode, false, "Habilitado", softwareId);
+                issuerPartyCode, false, softwareId);
 
             //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
             if (globalRadianOperation == null || (issuerPartyCode != providerCode))

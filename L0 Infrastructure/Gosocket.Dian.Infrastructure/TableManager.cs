@@ -1075,7 +1075,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string radianStatus, string softwareId) where T : ITableEntity, new()
+        public T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string softwareId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
@@ -1093,19 +1093,7 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("RowKey",
                     QueryComparisons.Equal,
                     softwareId));
-
-            var RadianStateHabilitado = TableQuery.GenerateFilterCondition("RadianState",
-               QueryComparisons.Equal,
-               radianStatus);
-
-            var RadianStatePruebas= TableQuery.GenerateFilterCondition("RadianState",
-                QueryComparisons.Equal,
-                "En pruebas");
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(RadianStateHabilitado,
-             TableOperators.Or,
-             RadianStatePruebas));
-
+         
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.FirstOrDefault();
