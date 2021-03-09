@@ -1435,11 +1435,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     foreach (var itemExistEndosos in existEndosos)
                     {
                         var existDocumentEndosos = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemExistEndosos.Identifier, itemExistEndosos.Identifier, itemExistEndosos.PartitionKey);
-                        //Valida existe cancelancion limitacion
-                        validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, existDocumentEndosos.DocumentKey, senderCode);
-                        if (existDocumentEndosos != null && (!string.IsNullOrWhiteSpace(validCancelElectronicEvent)))
+                        //Valida existe cancelancion limitacion                      
+                        if (existDocumentEndosos != null)
                         {
-                            validateExistEndoso = true;
+                            validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, existDocumentEndosos.DocumentKey, senderCode);
+                            if (!string.IsNullOrWhiteSpace(validCancelElectronicEvent)) validateExistEndoso = true;
+
                         }
                         break;
                     }
