@@ -7,6 +7,15 @@ namespace Gosocket.Dian.Infrastructure
 {
     public class QueueManager
     {
+        private static Lazy<CloudQueueClient> lazyClient = new Lazy<CloudQueueClient>(InitializeQueueClient);
+        public static CloudQueueClient queueClient => lazyClient.Value;
+
+        private static CloudQueueClient InitializeQueueClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var tableClient = account.CreateCloudQueueClient();
+            return tableClient;
+        }
         #region Properties
 
         public CloudQueue CloudQueue { get; set; }
@@ -15,11 +24,9 @@ namespace Gosocket.Dian.Infrastructure
 
         #region Constructor
 
-        public QueueManager(string queueName, bool createIfNotExists = true)
+        public QueueManager(string queueName, bool createIfNotExists = false)
         {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));//Get account of azure's main storage
-
-            var queueClient = account.CreateCloudQueueClient();//Create cloud queue client
+            
 
             CloudQueue = queueClient.GetQueueReference(queueName);//Get cloud queue
 
@@ -27,17 +34,7 @@ namespace Gosocket.Dian.Infrastructure
                 CloudQueue.CreateIfNotExists();
         }
 
-        public QueueManager(string queueName, string connectionString, bool createIfNotExists = true)
-        {
-            var account = CloudStorageAccount.Parse(connectionString);//Get account of azure's main storage
-
-            var queueClient = account.CreateCloudQueueClient();//Create cloud queue client
-
-            CloudQueue = queueClient.GetQueueReference(queueName);//Get cloud queue
-
-            if (createIfNotExists)//Create queue if not exist
-                CloudQueue.CreateIfNotExists();
-        }
+        
         #endregion
 
         #region Methods

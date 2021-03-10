@@ -54,7 +54,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 };
 
                 // Objeto que se Conecta al Storage 
-                var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+                var fileManager = new FileManager();
 
 
                 // Transformar **XML** to **HTML**

@@ -36,6 +36,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
 
+        private static HttpClient client = new HttpClient();
+
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
             var requestObj = new { trackId };
@@ -489,13 +491,12 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return client.PostAsync(url, byteContent).Result;
-            }
+            
+            var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return client.PostAsync(url, byteContent).Result;
+            
         }
 
         /// <summary>

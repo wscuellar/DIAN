@@ -9,6 +9,8 @@ namespace Gosocket.Dian.Infrastructure
 {
     public class CertificateManager
     {
+        private static HttpClient client = new HttpClient();
+
         public Dictionary<string, string> GetCertificateFromHSM()
         {
             var apiUrl = "https://global-function-cryptography-sbx.azurewebsites.net/api/ExportCertificate?code=Z4iOposKBXigmFaORT76xQ9eqr5alqnR3zTu5haY8vdOS/2VWYBg/w==";//SANDBOX
@@ -49,14 +51,14 @@ namespace Gosocket.Dian.Infrastructure
         ///---
         private static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            
+            
+            var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                return client.PostAsync(url, byteContent).Result;
-            }
+            return client.PostAsync(url, byteContent).Result;
+            
         }
     }
 

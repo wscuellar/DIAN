@@ -17,26 +17,26 @@ namespace Gosocket.Dian.Functions.Utils
 {
     public class Utils
     {
+        private static HttpClient client = new HttpClient();
+
         public static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return client.PostAsync(url, byteContent).Result;
-            }
+            
+            var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return client.PostAsync(url, byteContent).Result;
+            
         }
 
         public static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return await client.PostAsync(url, byteContent);
-            }
+            
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return await client.PostAsync(url, byteContent);
+            
         }
 
         public static ResponseDownloadXml DownloadXml<T>(T requestObj)

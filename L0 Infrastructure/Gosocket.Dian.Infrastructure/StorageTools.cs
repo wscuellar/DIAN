@@ -11,14 +11,21 @@ namespace Gosocket.Dian.Infrastructure
 {
     public static class StorageTools
     {
+
+        private static Lazy<CloudBlobClient> lazyClient = new Lazy<CloudBlobClient>(InitializeBlobClient);
+        public static CloudBlobClient blobClient => lazyClient.Value;
+
+        private static CloudBlobClient InitializeBlobClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var blobClient = account.CreateCloudBlobClient();
+            return blobClient;
+        }
+
         public static bool UploadFileFromStream(string blobName, Stream fileStream, string containerName = "provider-files")
         {
             blobName = blobName.ToLower();
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            
 
             // Retrieve reference to a previously created container.
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -34,12 +41,6 @@ namespace Gosocket.Dian.Infrastructure
 
         public static List<CloudBlockBlob> GetBlobFileList(string prefix, string containerName = "provider-files")
         {
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
             // Retrieve reference to a previously created container.
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 
@@ -62,11 +63,6 @@ namespace Gosocket.Dian.Infrastructure
         public static bool UploadFile(string blobName, string text, string containerName = "provider-files")
         {
             blobName = blobName.ToLower();
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-            // Create the blob client.
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
             // Retrieve reference to a previously created container.
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -88,11 +84,6 @@ namespace Gosocket.Dian.Infrastructure
 
                 blobName = blobName.ToLower();
 
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -118,11 +109,6 @@ namespace Gosocket.Dian.Infrastructure
             {
                 blobName = blobName.ToLower();
 
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -143,12 +129,6 @@ namespace Gosocket.Dian.Infrastructure
             {
                 blobName = blobName.ToLower();
                 Stream outPutStream = new MemoryStream();
-
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -178,11 +158,6 @@ namespace Gosocket.Dian.Infrastructure
 
                 blobName = blobName.ToLower();
 
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
@@ -207,12 +182,6 @@ namespace Gosocket.Dian.Infrastructure
             try
             {
                 blobName = blobName.ToLower();
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 
@@ -236,12 +205,6 @@ namespace Gosocket.Dian.Infrastructure
             try
             {
                 blobName = blobName.ToLower();
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 
@@ -263,12 +226,6 @@ namespace Gosocket.Dian.Infrastructure
             try
             {
                 blobName = blobName.ToLower();
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-
-                // Create the blob client.
-                CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
                 // Retrieve reference to a previously created container.
                 CloudBlobContainer container = blobClient.GetContainerReference(containerName);
 

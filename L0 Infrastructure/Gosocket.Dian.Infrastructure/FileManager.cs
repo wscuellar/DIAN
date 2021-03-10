@@ -20,19 +20,24 @@ namespace Gosocket.Dian.Infrastructure
     {
         private static FileManager _instance = null;
 
-        public CloudBlobClient BlobClient { get; set; }
+        //public CloudBlobClient BlobClient { get; set; }
+
+        private static Lazy<CloudBlobClient> lazyClient = new Lazy<CloudBlobClient>(InitializeBlobClient);
+        public static CloudBlobClient BlobClient => lazyClient.Value;
+
+        private static CloudBlobClient InitializeBlobClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var blobClient = account.CreateCloudBlobClient();
+            return blobClient;
+        }
 
         public FileManager()
         {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-            BlobClient = account.CreateCloudBlobClient();
+            
         }
 
-        public FileManager(string connectionString)
-        {
-            var account = CloudStorageAccount.Parse(connectionString);
-            BlobClient = account.CreateCloudBlobClient();
-        }
+        
 
         public static FileManager Instance => _instance ?? (_instance = new FileManager());
 

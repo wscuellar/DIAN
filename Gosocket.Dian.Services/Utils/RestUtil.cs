@@ -10,6 +10,8 @@ namespace Gosocket.Dian.Services.Utils
 {
     public class RestUtil
     {
+        private static HttpClient client = new HttpClient();
+
         public static RestResponse ExecuteRequest<T>(string method, T requestData)
         {
             var client = new RestClient(ConfigurationManager.GetValue("FunctionsUrl"));
@@ -24,24 +26,21 @@ namespace Gosocket.Dian.Services.Utils
 
         public static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return await client.PostAsync(url, byteContent);
-            }
+            
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return await client.PostAsync(url, byteContent);
+            
         }
 
         public static HttpResponseMessage ConsumeApi<T>(string url, T requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return client.PostAsync(url, byteContent).Result;
-            }
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return client.PostAsync(url, byteContent).Result;
+            
         }
     }
 }

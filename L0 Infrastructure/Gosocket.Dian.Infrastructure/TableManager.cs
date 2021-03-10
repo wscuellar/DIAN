@@ -14,10 +14,19 @@ namespace Gosocket.Dian.Infrastructure
     {
         public CloudTable CloudTable { get; set; }
 
-        public TableManager(string tableName, bool createIfNotExists = true)
+
+        private static Lazy<CloudTableClient> lazyClient = new Lazy<CloudTableClient>(InitializeTableClient);
+        public static CloudTableClient tableClient => lazyClient.Value;
+
+        private static CloudTableClient InitializeTableClient()
         {
             var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
             var tableClient = account.CreateCloudTableClient();
+            return tableClient;
+        }
+
+        public TableManager(string tableName, bool createIfNotExists = false)
+        {            
 
             CloudTable = tableClient.GetTableReference(tableName);
 
