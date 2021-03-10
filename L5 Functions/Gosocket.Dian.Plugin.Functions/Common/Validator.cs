@@ -483,7 +483,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune?.ValDesc.ToString("F2");
             var ValTol = objCune?.ValTol.ToString("F2");
 
-            var errorCode = Convert.ToInt32(objCune.DocumentType) == (int)DocumentType.IndividualPayroll ? ConfigurationManager.GetValue("ErrorCode_NIE024") : ConfigurationManager.GetValue("ErrorCode_NIAE024");
+            var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
+                ? ConfigurationManager.GetValue("ErrorCode_NIE024") : ConfigurationManager.GetValue("ErrorCode_NIAE024");
 
             string key = string.Empty;
 
@@ -723,7 +724,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId != "96")
             {
                 // Sender
-                if(senderSchemeCode == "31")
+                if (senderSchemeCode == "31")
                 {
                     string senderDvErrorCode = "FAJ24";
                     string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
@@ -764,7 +765,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-            
+
             // Software provider RADIAN
             if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268")
             {
@@ -927,7 +928,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //valida si existe los permisos del mandatario
-            if (party.SenderParty != xmlParserCude.ProviderCode 
+            if (party.SenderParty != xmlParserCude.ProviderCode
                 && xmlParserCude.ProviderCode != "800197268"
                 && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato)
             {
@@ -1737,150 +1738,153 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                //Valida existan permisos para firmar evento por mandatario
-                foreach (var docReferenceAttorney in docsReferenceAttorney)
+                if (docsReferenceAttorney != null)
                 {
-                    validError = false;
-                    if (docReferenceAttorney.IssuerAttorney == issueAtorney)
+                    //Valida existan permisos para firmar evento por mandatario
+                    foreach (var docReferenceAttorney in docsReferenceAttorney)
                     {
-                        if ((String.IsNullOrEmpty(docReferenceAttorney.EndDate)
-                            || (DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture) >= DateTime.Now)
-                            ) && docReferenceAttorney.Active)
+                        validError = false;
+                        if (docReferenceAttorney.IssuerAttorney == issueAtorney)
                         {
-                            //Valida se encuetre habilitado Modo Operacion RadianOperation
-                            var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                                docReferenceAttorney.IssuerAttorney, false, softwareId);
-                            if (globalRadianOperation == null)
+                            if ((String.IsNullOrEmpty(docReferenceAttorney.EndDate)
+                                || (DateTime.ParseExact(docReferenceAttorney.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture) >= DateTime.Now)
+                                ) && docReferenceAttorney.Active)
+                            {
+                                //Valida se encuetre habilitado Modo Operacion RadianOperation
+                                var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                                    docReferenceAttorney.IssuerAttorney, false, softwareId);
+                                if (globalRadianOperation == null)
+                                {
+                                    validError = true;
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "AAH62b",
+                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                    break;
+                                }
+                                else
+                                {
+                                    switch (docReferenceAttorney.Actor)
+                                    {
+                                        case "PT":
+                                            if (!globalRadianOperation.TecnologicalSupplier)
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC59"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC59"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            break;
+                                        case "F":
+                                            if (!globalRadianOperation.Factor)
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC60"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC60"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            break;
+                                        case "SNE":
+                                            if (!globalRadianOperation.NegotiationSystem)
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC61"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC61"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            break;
+                                    }
+                                }
+
+                                if (!validError)
+                                {
+                                    string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
+                                    foreach (string codeFacultity in tempFacultityCode)
+                                    {
+                                        //Valida permisos/facultades firma para el evento emitido
+                                        var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
+                                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
+                                        if (attorneyFacultity != null)
+                                        {
+                                            if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
+                                            {
+                                                //Valida exista note mandatario
+                                                if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                                {
+                                                    if (noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                                    {
+                                                        validError = true;
+                                                        responses.Add(new ValidateListResponse
+                                                        {
+                                                            IsValid = false,
+                                                            Mandatory = true,
+                                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                        });
+                                                        break;
+                                                    }
+
+                                                }
+
+                                                //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
+                                                if (!validError)
+                                                    return null;
+
+                                            }
+                                            else if (codeFacultity != "MR91")
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
+                                                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
                             {
                                 validError = true;
                                 responses.Add(new ValidateListResponse
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = "AAH62b",
-                                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC35"),
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
-                                break;
-                            }
-                            else
-                            {
-                                switch (docReferenceAttorney.Actor)
-                                {
-                                    case "PT":
-                                        if (!globalRadianOperation.TecnologicalSupplier)
-                                        {
-                                            validError = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC59"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC59"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        break;
-                                    case "F":
-                                        if (!globalRadianOperation.Factor)
-                                        {
-                                            validError = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC60"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC60"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        break;
-                                    case "SNE":
-                                        if (!globalRadianOperation.NegotiationSystem)
-                                        {
-                                            validError = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC61"),
-                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC61"),
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                        }
-                                        break;
-                                }
-                            }
-
-                            if (!validError)
-                            {
-                                string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
-                                foreach (string codeFacultity in tempFacultityCode)
-                                {
-                                    //Valida permisos/facultades firma para el evento emitido
-                                    var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
-                                    var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                                    if (attorneyFacultity != null)
-                                    {
-                                        if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
-                                        {
-                                            //Valida exista note mandatario
-                                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-                                            {
-                                                if (noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
-                                                {
-                                                    validError = true;
-                                                    responses.Add(new ValidateListResponse
-                                                    {
-                                                        IsValid = false,
-                                                        Mandatory = true,
-                                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                    });
-                                                    break;
-                                                }
-
-                                            }
-
-                                            //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
-                                            if (!validError)
-                                                return null;
-
-                                        }
-                                        else if (codeFacultity != "MR91")
-                                        {
-                                            validError = true;
-                                            responses.Add(new ValidateListResponse
-                                            {
-                                                IsValid = false,
-                                                Mandatory = true,
-                                                ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
-                                                ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
-                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                            });
-                                            break;
-                                        }
-                                    }
-                                }
                             }
                         }
-                        else
-                        {
-                            validError = true;
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC35"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+
+                        if (validError)
+                            return responses;
                     }
-
-                    if (validError)
-                        return responses;
                 }
 
                 if (validError)
@@ -2006,7 +2010,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-            else if (cufeListResponse.Count != cufeListResponseRefeerence.Count && (customizationID == "431" || customizationID == "432") )
+            else if (cufeListResponse.Count != cufeListResponseRefeerence.Count && (customizationID == "431" || customizationID == "432"))
             {
                 validate = true;
                 responses.Add(new ValidateListResponse
@@ -2037,10 +2041,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
                     var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                    if(customizationID == "431" || customizationID == "432")
+                    if (customizationID == "431" || customizationID == "432")
                         xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
                     else
-                        xmlID2 = cufeListDocumentResponse.Item(i+1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        xmlID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
@@ -2066,7 +2070,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (customizationID == "431" || customizationID == "432")
                         xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                     else
-                        xmlUUID2 = cufeListDocumentResponse.Item(i+1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        xmlUUID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
 
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
@@ -2109,10 +2113,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorCode = itemCufe.ErrorCode,
                             ErrorMessage = itemCufe.ErrorMessage,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });                       
+                        });
                     }
                 }
-               
+
                 TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
                 TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
                 var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(xmlUUID.ToLower(), true);
@@ -2165,9 +2169,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                    }                        
+                    }
                 }
-                
+
 
                 if (validateReference)
                     break;
@@ -2246,7 +2250,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
-            
+
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
@@ -2420,7 +2424,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
             }
-            
+
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                 issuerPartyCode, false, softwareId);
@@ -2476,7 +2480,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
                     string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString().Trim();
-                  
+
                     if (!IsBase64(AttachmentBase64))
                     {
                         validate = false;
@@ -2507,9 +2511,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                             break;
                         }
-                    }                                             
+                    }
                 }
-            }          
+            }
 
             var facultitys = TableManagerGlobalAttorneyFacultity.FindAll<GlobalAttorneyFacultity>();
             //Si existen mas de 2 documentResposne
@@ -2569,7 +2573,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if ((customizationID == "431" || customizationID == "432"))
                         {
-                            if(tempCode.Length == 1 && tempCodeAttorney[0] == "ALL17") codeExist = true;
+                            if (tempCode.Length == 1 && tempCodeAttorney[0] == "ALL17") codeExist = true;
 
                             //Valida description code acorde al codigo ingresado de mandato general
                             if (!descriptionCode.Equals("Mandato por documento General"))
@@ -2603,7 +2607,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                        }                           
+                        }
                         else
                             codeExist = false;
                     }
@@ -2646,7 +2650,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                }               
+                }
             }
 
             foreach (var r in responses)
@@ -3439,7 +3443,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
-                var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(trackId.ToLower());
+                var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(trackId?.ToLower());
                 if (referenceAttorneyResult == null)
                 {
                     responses.Add(new ValidateListResponse
@@ -3483,7 +3487,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else
             {
                 //Valida exista CUFE/CUDE en sistema DIAN
-                var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId.ToLower()).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId?.ToLower()).FirstOrDefault();
                 if (documentMeta != null)
                 {
                     responses.Add(new ValidateListResponse
@@ -3607,7 +3611,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Rechazo de la FEV
                     LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
                     var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(documentMeta);
-                    if (eventRadianRejected != null || eventRadianRejected.Count > 0)
+                    if (eventRadianRejected != null)
                     {
                         foreach (var itemEventRadianRejected in eventRadianRejected)
                         {
@@ -3626,7 +3630,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Constancia de recibo del Bien de la FEV
                     LogicalEventRadian logicalEventRadianReceipt = new LogicalEventRadian();
                     var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(documentMeta);
-                    if (eventRadianReceipt != null || eventRadianReceipt.Count > 0)
+                    if (eventRadianReceipt != null)
                     {
                         foreach (var itemeventRadianReceipt in eventRadianReceipt)
                         {
@@ -3645,7 +3649,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Aceptacion expresa de la FEV
                     LogicalEventRadian logicalEventRadianAccepted = new LogicalEventRadian();
                     var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(documentMeta);
-                    if (eventRadianAccepted != null || eventRadianAccepted.Count > 0)
+                    if (eventRadianAccepted != null)
                     {
                         foreach (var itemeventRadianAccepted in eventRadianAccepted)
                         {
@@ -3664,7 +3668,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Aceptacion Tacita de la FEV
                     LogicalEventRadian logicalEventRadianTacitAcceptance = new LogicalEventRadian();
                     var eventRadianTacitAcceptance = logicalEventRadianTacitAcceptance.ValidateTacitAcceptanceEventPrev(documentMeta);
-                    if (eventRadianTacitAcceptance != null || eventRadianTacitAcceptance.Count > 0)
+                    if (eventRadianTacitAcceptance != null)
                     {
                         foreach (var itemEventRadianTacitAcceptance in eventRadianTacitAcceptance)
                         {
@@ -3683,7 +3687,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Aval
                     LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
                     var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, xmlParserCufe, xmlParserCude);
-                    if (eventRadianAval != null || eventRadianAval.Count > 0)
+                    if (eventRadianAval != null)
                     {
                         foreach (var itemEventRadianAval in eventRadianAval)
                         {
@@ -3702,7 +3706,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Solicitud Disponibilizacion
                     LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
                     var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianDisponibilizacion != null || eventRadianDisponibilizacion.Count > 0)
+                    if (eventRadianDisponibilizacion != null)
                     {
                         foreach (var itemEventRadianDisponibilizacion in eventRadianDisponibilizacion)
                         {
@@ -3721,7 +3725,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Endoso en Propiedad
                     LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
                     var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoPropiedad != null || eventRadianEndosoPropiedad.Count > 0)
+                    if (eventRadianEndosoPropiedad != null)
                     {
                         foreach (var itemEventRadianEndosoPropiedad in eventRadianEndosoPropiedad)
                         {
@@ -3740,7 +3744,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Endoso en Garantia
                     LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
                     var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoGarantia != null || eventRadianEndosoGarantia.Count > 0)
+                    if (eventRadianEndosoGarantia != null)
                     {
                         foreach (var itemEventRadianEndosoGarantia in eventRadianEndosoGarantia)
                         {
@@ -3759,7 +3763,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Endoso en Procuracion
                     LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
                     var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoProcuracion != null || eventRadianEndosoProcuracion.Count > 0)
+                    if (eventRadianEndosoProcuracion != null)
                     {
                         foreach (var itemEventRadianEndosoProcuracion in eventRadianEndosoProcuracion)
                         {
@@ -3778,7 +3782,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Cancelacion Endosos
                     LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
                     var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev, xmlParserCude);
-                    if (eventRadianCancelaEndoso != null || eventRadianCancelaEndoso.Count > 0)
+                    if (eventRadianCancelaEndoso != null)
                     {
                         foreach (var itemEventRadianCancelaEndoso in eventRadianCancelaEndoso)
                         {
@@ -3797,7 +3801,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Limitacion de Circulacion
                     LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
                     var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
-                    if (eventRadianNegotiatedInvoice != null || eventRadianNegotiatedInvoice.Count > 0)
+                    if (eventRadianNegotiatedInvoice != null)
                     {
                         foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
                         {
@@ -3816,7 +3820,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Anulacion de la Limitacion de Circulacion
                     LogicalEventRadian logicalEventRadianNegotiatedInvoiceCancell = new LogicalEventRadian();
                     var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(documentMeta);
-                    if (eventRadianNegotiatedInvoiceCancell != null || eventRadianNegotiatedInvoiceCancell.Count > 0)
+                    if (eventRadianNegotiatedInvoiceCancell != null)
                     {
                         foreach (var itemEventRadianNegotiatedInvoiceCancell in eventRadianNegotiatedInvoiceCancell)
                         {
@@ -3846,7 +3850,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Terminacion de Mandato
                     LogicalEventRadian logicalEventRadianMandatoCancell = new LogicalEventRadian();
                     var eventRadianMandatoCancell = logicalEventRadianMandatoCancell.ValidateMandatoCancell(eventPrev);
-                    if (eventRadianMandatoCancell != null || eventRadianMandatoCancell.Count > 0)
+                    if (eventRadianMandatoCancell != null)
                     {
                         foreach (var itemEventRadianMandatoCancell in eventRadianMandatoCancell)
                         {
@@ -3865,7 +3869,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Pago parcial o Total
                     LogicalEventRadian logicalEventRadianPartialPayment = new LogicalEventRadian();
                     var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(documentMeta, eventPrev, xmlParserCude, nitModel);
-                    if (eventRadianPartialPayment != null || eventRadianPartialPayment.Count > 0)
+                    if (eventRadianPartialPayment != null)
                     {
                         foreach (var itemEventRadianPartialPayment in eventRadianPartialPayment)
                         {
@@ -3884,7 +3888,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida eventos previos Informacion Pago
                     LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
                     var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
-                    if (eventRadianPaymentInfo != null || eventRadianPaymentInfo.Count > 0)
+                    if (eventRadianPaymentInfo != null)
                     {
                         foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
                         {

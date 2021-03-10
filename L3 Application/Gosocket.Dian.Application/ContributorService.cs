@@ -721,7 +721,7 @@ namespace Gosocket.Dian.Application
 
                 context.SaveChanges();
 
-                return otherDocContributorInstance != null ? otherDocContributorInstance.Id : otherDocContributorInstance.Id;
+                return otherDocContributorInstance != null ? otherDocContributorInstance.Id : 0;
             }
         }
 

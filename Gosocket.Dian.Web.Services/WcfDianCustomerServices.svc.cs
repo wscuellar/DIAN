@@ -609,14 +609,14 @@ namespace Gosocket.Dian.Web.Services
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendEventUpdateStatus " + seconds);
                     if (seconds >= 10)
                     {
-                        var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
+                        var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result?.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
                         tableManagerGlobalLogger.InsertOrUpdate(logger);
                     }
 
                     //Logged if response do not have AR
                     if (result?.XmlBase64Bytes == null)
                     {
-                        var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
+                        var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result?.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
                         tableManagerGlobalLogger.InsertOrUpdate(logger);
                     }
 
