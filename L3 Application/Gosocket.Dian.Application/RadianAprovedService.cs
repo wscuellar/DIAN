@@ -249,14 +249,14 @@ namespace Gosocket.Dian.Application
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
                 string key = radianContributor.RadianContributorTypeId.ToString()    + "|" + radianContributorOperation.SoftwareId;
-                string sType = radianContributor.RadianOperationModeId == 1 ? "1" : radianContributor.RadianContributorTypeId.ToString();
+                string sType = radianContributor.RadianOperationModeId == 1 ? "1" : operation.SoftwareType.ToString();
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
                     ContributorId = radianContributor.Id,
                     State = TestSetStatus.InProcess.GetDescription(),
                     Status = (int)TestSetStatus.InProcess,
-                    StatusDescription = TestSetStatus.InProcess.GetDescription(),
+                    StatusDescription = testSet.Description, //TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
                     OperationModeId = radianContributor.RadianOperationModeId,
                     OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType))),
