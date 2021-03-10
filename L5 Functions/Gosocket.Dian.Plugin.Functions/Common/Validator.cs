@@ -912,7 +912,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -1073,7 +1073,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
 
                 case (int)EventStatus.Avales:
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
 
+                    if (party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        if (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty))
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC64",
+                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    
                     //Valida receptor documento AR coincida con DIAN
                     if (party.ReceiverParty != "800197268")
                     {
@@ -1086,17 +1120,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = errorMessageParty,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+
                     return responses;
                 case (int)EventStatus.SolicitudDisponibilizacion:
 
@@ -1253,6 +1277,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 case (int)EventStatus.NegotiatedInvoice:
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    if (party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        if (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty))
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC64",
+                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
                     // Valida receptor documento AR coincida con DIAN
                     if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                     {
@@ -1265,17 +1324,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = errorMessageParty,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+
                     return responses;
 
                 case (int)EventStatus.TerminacionMandato:

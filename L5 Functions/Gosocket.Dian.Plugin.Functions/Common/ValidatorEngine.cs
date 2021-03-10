@@ -585,6 +585,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
 
+            // ...
+            List<string> issuerAttorneyList = null;
+            var eventCode = int.Parse(party.ResponseCode);
+            if(eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var attorneyList = documentAttorneyTableManager.FindDocumentReferenceAttorneyByCUFEList<GlobalDocReferenceAttorney>(party.TrackId);
+                if(attorneyList != null && attorneyList.Count > 0)
+                {
+                    issuerAttorneyList = new List<string>();
+                    // ForEach...
+                    attorneyList.ForEach(item =>
+                    {
+                        if(!string.IsNullOrWhiteSpace(item.EndDate))
+                        {
+                            var endDate = Convert.ToDateTime(item.EndDate);
+                            if (endDate.Date > DateTime.Now.Date) issuerAttorneyList.Add(item.IssuerAttorney);
+                        }
+                    });
+                }
+            }
+
             //Valida existe cambio legitimo tenedor
             GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);            
             if (documentHolderExchange != null)
@@ -624,7 +645,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Enodsatario Anulacion endoso
                 nitModel.ReceiverCode = ReceiverCancelacion != "" ? ReceiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
-                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude));
+                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList));
             }
             return validateResponses;
         }

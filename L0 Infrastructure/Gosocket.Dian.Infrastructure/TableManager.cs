@@ -1416,5 +1416,23 @@ namespace Gosocket.Dian.Infrastructure
 
             return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
         }
+        // FindDocumentReferenceAttorneyList
+        public List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Active",
+                    QueryComparisons.Equal,
+                    true));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
     }
 }
