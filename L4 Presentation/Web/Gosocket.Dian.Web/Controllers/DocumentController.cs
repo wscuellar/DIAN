@@ -1,12 +1,10 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
-using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
-using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
@@ -22,25 +20,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
-using EnumHelper = Gosocket.Dian.Web.Models.EnumHelper;
-using Gosocket.Dian.Services.Utils.Common;
-using iTextSharp.text.pdf;
-using iTextSharp.text;
-using iTextSharp.tool.xml;
-using System.Web;
-using System.Drawing;
-using QRCoder;
-using IronPdf;
-using Image = iTextSharp.text.Image;
-using iTextSharp.tool.xml.pipeline.html;
-using iTextSharp.tool.xml.html;
-using iTextSharp.tool.xml.pipeline.css;
-using iTextSharp.tool.xml.pipeline.end;
-using iTextSharp.tool.xml.parser;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -53,34 +35,6 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
-        private readonly IRadianPdfCreationService _radianPdfCreationService;
-        private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
-        private readonly IRadianSupportDocument _radianSupportDocument;
-        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
-        #region Properties
-
-
-        private readonly FileManager _fileManager;
-      
-        #endregion
-       
-       
-        #region Constructor
-
-        public DocumentController(IRadianPdfCreationService radianPdfCreationService,
-                                  IRadianGraphicRepresentationService radianGraphicRepresentationService,
-                                  IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager)
-        {
-            _radianSupportDocument = radianSupportDocument;
-            _radianPdfCreationService = radianPdfCreationService;
-            _radianPdfCreationService = radianPdfCreationService;
-            _radianGraphicRepresentationService = radianGraphicRepresentationService;
-            _queryAssociatedEventsService = queryAssociatedEventsService;
-            _fileManager = fileManager;
-        }
-
-        #endregion
 
         private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
         {
@@ -100,25 +54,118 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
-        public async Task<ActionResult> Index(SearchDocumentViewModel model) => await GetDocuments(model, 1);
+        public async Task<ActionResult> Index(SearchDocumentViewModel model)
+        {
+            return await GetDocuments(model, 1);
+        }
 
-        public async Task<ActionResult> Sent(SearchDocumentViewModel model) => await GetDocuments(model, 2);
+        public async Task<ActionResult> Sent(SearchDocumentViewModel model)
+        {
+            return await GetDocuments(model, 2);
+        }
 
-        public async Task<ActionResult> Received(SearchDocumentViewModel model) => await GetDocuments(model, 3);
+        public async Task<ActionResult> Received(SearchDocumentViewModel model)
+        {
+            return await GetDocuments(model, 3);
+        }
 
         [CustomRoleAuthorization(CustomRoles = "Proveedor")]
-        public async Task<ActionResult> Provider(SearchDocumentViewModel model) => await GetDocuments(model, 4);
+        public async Task<ActionResult> Provider(SearchDocumentViewModel model)
+        {
+            return await GetDocuments(model, 4);
+        }
 
-        [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> Details(string trackId)
         {
-            DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
-            model.IconsData = _queryAssociatedEventsService.IconType(null, trackId);
+            var validations = GetValidatedRules(trackId);
+
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            var emissionDateNumber = globalDocValidatorDocumentMeta.EmissionDate.ToString("yyyyMMdd");
+            var partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocumentMeta.DocumentKey.Substring(0, 2)}";
+
+            var date = DateNumberToDateTime(emissionDateNumber);
+
+            var globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
+
+            var document = new DocumentViewModel
+            {
+                DocumentKey = globalDataDocument.DocumentKey,
+                Amount = globalDataDocument.FreeAmount,
+                DocumentTypeId = globalDataDocument.DocumentTypeId,
+                DocumentTypeName = globalDataDocument.DocumentTypeName,
+                GenerationDate = globalDataDocument.GenerationTimeStamp,
+                Id = globalDataDocument.DocumentKey,
+                EmissionDate = globalDataDocument.EmissionDate,
+                Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
+                //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
+                TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
+                ReceiverName = globalDataDocument.ReceiverName,
+                ReceiverCode = globalDataDocument.ReceiverCode,
+                ReceptionDate = globalDataDocument.ReceptionTimeStamp,
+                Serie = globalDataDocument.Serie,
+                SenderName = globalDataDocument.SenderName,
+                SenderCode = globalDataDocument.SenderCode,
+                Status = globalDataDocument.ValidationResultInfo.Status,
+                StatusName = globalDataDocument.ValidationResultInfo.StatusName,
+                TaxAmountIva = globalDataDocument.TaxAmountIva,
+                TotalAmount = globalDataDocument.TotalAmount
+            };
+
+            document.TaxesDetail.TaxAmountIva5Percent = globalDataDocument.TaxesDetail?.TaxAmountIva5Percent ?? 0;
+            document.TaxesDetail.TaxAmountIva14Percent = globalDataDocument.TaxesDetail?.TaxAmountIva14Percent ?? 0;
+            document.TaxesDetail.TaxAmountIva16Percent = globalDataDocument.TaxesDetail?.TaxAmountIva16Percent ?? 0;
+            document.TaxesDetail.TaxAmountIva19Percent = globalDataDocument.TaxesDetail?.TaxAmountIva19Percent ?? 0;
+            document.TaxesDetail.TaxAmountIva = globalDataDocument.TaxesDetail?.TaxAmountIva ?? 0;
+            document.TaxesDetail.TaxAmountIca = globalDataDocument.TaxesDetail?.TaxAmountIca ?? 0;
+            document.TaxesDetail.TaxAmountIpc = globalDataDocument.TaxesDetail?.TaxAmountIpc ?? 0;
+
+            document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
+            {
+                Code = t.Value,
+                Description = t.Description,
+                Value = t.Value,
+                TimeStamp = t.TimeStamp
+            }).ToList();
+
+            document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
+            {
+                Code = e.Code,
+                Date = e.Date,
+                DateNumber = e.DateNumber,
+                Description = e.Description,
+                ReceiverCode = e.ReceiverCode,
+                ReceiverName = e.ReceiverName,
+                SenderCode = e.SenderCode,
+                SenderName = e.SenderName,
+                TimeStamp = e.TimeStamp
+            }).ToList();
+
+            document.References = globalDataDocument.References.Select(r => new ReferenceViewModel()
+            {
+                DocumentKey = r.DocumentKey,
+                DocumentTypeId = r.DocumentTypeId,
+                DocumenTypeName = r.DocumenTypeName,
+                Date = r.Date,
+                DateNumber = r.DateNumber,
+                Description = r.Description,
+                ReceiverCode = r.ReceiverCode,
+                ReceiverName = r.ReceiverName,
+                SenderCode = r.SenderCode,
+                SenderName = r.SenderName,
+                TimeStamp = r.TimeStamp,
+                ShowAsReference = true
+            }).ToList();
+
+            var model = new DocValidatorModel
+            {
+                Document = document,
+                Validations = validations
+            };
+
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
-                
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -206,6 +253,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
 
+
         }
 
         public ActionResult Export()
@@ -230,7 +278,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> FindDocument(string documentKey, string partitionKey, string emissionDate)
         {
             var date = DateNumberToDateTime(emissionDate);
-            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
+            var globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(documentKey, partitionKey, date);
 
             if (globalDataDocument == null)
             {
@@ -239,447 +287,6 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Search", searchViewModel);
             }
 
-            DocValidatorModel model = ReturnDocValidationModel(documentKey, globalDataDocument);
-
-            return View(model);
-        }
-       
-    
-     
-
-        #region GetXmlFromStorageAsync
-
-        /// <summary>
-        /// Método de extracción del xml de la representación grafica
-        /// TODO: pendiente de incorporar, hasta q se haga consulta por cufe
-        /// </summary>
-        /// <param name="trackId"></param>
-        /// <returns></returns>
-        private async Task<byte[]> GetXmlFromStorageAsync(string trackId)
-        {
-            var TableManager = new TableManager("GlobalDocValidatorRuntime");
-            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
-            if (documentStatusValidation == null)
-                return null;
-
-            var fileManager = new FileManager();
-            var container = $"global";
-            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
-
-            return xmlBytes;
-        }
-
-        #endregion
-
-        #region TemplateGlobalMapping
-
-        private StringBuilder TemplateGlobalMappingNomina(StringBuilder template, XmlParseNomina dataValues)
-        {
-            //Set Variables
-            DateTime expeditionDate = DateTime.Now;
-
-
-
-            template = template.Replace("{SupportDocumentNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-            template = template.Replace("{Cune}", dataValues.globalDocPayrolls.CUNE);
-            template = template.Replace("{EmissionDate}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
-            template = template.Replace("{CityType}", dataValues.globalDocPayrolls.MunicipioCiudad.ToString());
-            template = template.Replace("{DepartamentoType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-
-            // Seller Data
-            template = template.Replace("{Nit}", dataValues.globalDocPayrolls.NIT.ToString());
-            template = template.Replace("{DirType}", dataValues.globalDocPayrolls.LugarTrabajoDireccion.ToString());
-            template = template.Replace("{PaisType}", dataValues.globalDocPayrolls.Pais.ToString());
-            template = template.Replace("{DepType}", dataValues.globalDocPayrolls.DepartamentoEstado.ToString());
-            template = template.Replace("{MunType}", dataValues.globalDocPayrolls.LugarTrabajoMunicipioCiudad.ToString());
-            template = template.Replace("{CelType}", dataValues.globalDocPayrolls.Celular.ToString());
-
-            // Employer Data
-            template = template.Replace("{NitEmp}", dataValues.globalDocPayrolls.Emp_NIT.ToString());
-            template = template.Replace("{SocialType}", dataValues.globalDocPayrolls.Emp_RazonSocial.ToString());
-            template = template.Replace("{DirTypeEmp}", dataValues.globalDocPayrolls.Emp_Direccion.ToString());
-            template = template.Replace("{PaisTypeEmp}", dataValues.globalDocPayrolls.Emp_Pais.ToString());
-            template = template.Replace("{DepTypeEmp}", dataValues.globalDocPayrolls.Emp_DepartamentoEstado.ToString());
-            template = template.Replace("{MunTypeEmp}", dataValues.globalDocPayrolls.Emp_MunicipioCiudad.ToString());
-            template = template.Replace("{CelTypeEmp}", dataValues.globalDocPayrolls.Emp_Celular.ToString());
-            template = template.Replace("{NomTypeEmp}", dataValues.globalDocPayrolls.PrimerNombre.ToString());
-            template = template.Replace("{AreaTypeEmp}", dataValues.globalDocPayrolls.NombreArea.ToString());
-            template = template.Replace("{CodAreaTypeEmp}", dataValues.globalDocPayrolls.CodigoArea.ToString());
-            template = template.Replace("{CargoType}", dataValues.globalDocPayrolls.NombreCargo.ToString());
-            template = template.Replace("{CodCargo}", dataValues.globalDocPayrolls.CodigoCargo.ToString());
-            template = template.Replace("{FrecuencyNomina}", dataValues.globalDocPayrolls.PeriodoNomina.ToString());
-            template = template.Replace("{DateEmpIngType}", dataValues.globalDocPayrolls.FechaIngreso.ToString());
-            template = template.Replace("{AntType}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
-            template = template.Replace("{TConType}", dataValues.globalDocPayrolls.TipoContrato.ToString());
-            template = template.Replace("{TimeWorkTypeEmp}", dataValues.globalDocPayrolls.TiempoLaborado.ToString());
-            template = template.Replace("{DatePayType}", dataValues.globalDocPayrolls.FechaPagoFin.ToString());
-            template = template.Replace("{SalaryType}", dataValues.globalDocPayrolls.Salario.ToString());
-            template = template.Replace(" {SalaryIntegralType}", dataValues.globalDocPayrolls.SalarioIntegral.ToString());
-
-            // Acquirer Data
-            template = template.Replace("{QRCode}", dataValues.globalDocPayrolls.Pago.ToString());
-            template = template.Replace("{PayType}", dataValues.globalDocPayrolls.Pago.ToString());
-            template = template.Replace("{CoinType}", dataValues.globalDocPayrolls.TipoMoneda.ToString());
-            template = template.Replace("{BankType}", dataValues.globalDocPayrolls.Banco.ToString());
-            template = template.Replace("{LibraryType}", dataValues.globalDocPayrolls.TipoCuenta.ToString());
-            template = template.Replace("{NumberLibraryType}", dataValues.globalDocPayrolls.NumeroCuenta.ToString());
-            template = template.Replace("{TotalDevType}", dataValues.globalDocPayrolls.devengadosTotal.ToString());
-            template = template.Replace("{TotalDedType}", dataValues.globalDocPayrolls.deduccionesTotal.ToString());
-           
-            // ToTal Advances
-            template = template.Replace("{NumNomType}", dataValues.globalDocPayrolls.Numero.ToString());
-            template = template.Replace("{DateGenType}", dataValues.globalDocPayrolls.FechaGen.ToString());
-            template = template.Replace("{ComTotalType}", dataValues.globalDocPayrolls.comprobanteTotal.ToString());
-
-            // ToTal Retentions
-            template = template.Replace("{RetentionNumber}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-            template = template.Replace("{RetentionAmount}", dataValues.globalDocPayrolls.NumeroDocumento.ToString());
-
-            return template;
-        }
-
-        #endregion
-
-        #region SplitAndSum
-
-        private double SplitAndSum(string concateField)
-        {
-            // TotalDiscountsDetail
-            var aux = concateField.Split('|');
-            double fieldValue = 0;
-
-            foreach (var dataField in aux)
-            {
-                if (!string.IsNullOrEmpty(dataField))
-                {
-                    fieldValue += double.Parse(dataField, CultureInfo.InvariantCulture);
-                }
-            }
-            return fieldValue;
-        }
-
-        #endregion
-
-        public ActionResult ExportPDF()
-        {
-            var model = new ExportDocumentTableViewModel();
-
-            GetExportDocumentTasks(ref model);
-
-            return View(model);
-        }
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<ActionResult> ExportPDF(ExportDocumentTableViewModel model)
-        {
-            var xmlBytes = await GetXmlFromStorageAsync("660ebb7fdd77b6d67a00448e7afde2959992c53ad1bf14b9a394272c56ee8cc64b75dc08940625e39390a0af3d8d7cb9");
-            var xmlParser = new XmlParseNomina(xmlBytes);
-             //parseo xml
-            Console.WriteLine(xmlParser.globalDocPayrolls);
-           
-            // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
-            // Load xpaths
-           
-            string temp = string.Empty;
-            try
-            {
-            
-                // Mapping Fields
-                template = TemplateGlobalMappingNomina(template, xmlParser);
-                temp = template.ToString();
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-          
-            try
-            {
-                StringReader sr = new StringReader(temp);
-                Document pdfDoc = new Document(PageSize.A4);
-                BarcodeQRCode qrCode = new BarcodeQRCode("https://catalogo-vpfe.dian.gov.co/document/searchqr?documentkey=abf83aa055de79de4d4df482e91b2fe452065d4698020ad4d5f5039b12227149bfc7f4fdeb88da5e9f6b0b3f5905fd94", 125, 125, null);
-               
-                Image codeQRImage = qrCode.GetImage();
-                codeQRImage.ScaleAbsolute(125, 125);
-                PdfWriter writer = PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
-                pdfDoc.Open();
-
-                XMLWorkerHelper.GetInstance().ParseXHtml(writer, pdfDoc, sr);
-                pdfDoc.Add(codeQRImage);
-                pdfDoc.Close();
-                Response.ContentType = "application/pdf";
-                Response.AddHeader("content-disposition", "attachment;filename=NominaPDF.pdf");
-                Response.Cache.SetCacheability(HttpCacheability.NoCache);
-                Response.Write(pdfDoc);
-                Response.BufferOutput = true;
-                Response.End();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-         
-
-            GetExportDocumentTasks(ref model);
-            return View(model);
-        }
-
-        #region GenerateQR
-
-        public static Bitmap GenerateQR(string invoiceUrl)
-        {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(invoiceUrl, QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
-            Bitmap qrCodeImage = qrCode.GetGraphic(20);
-            return qrCodeImage;
-        }
-
-        #endregion
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Search()
-        {
-            return RedirectToAction(nameof(UserController.SearchDocument), "User");
-        }
-
-        [HttpPost]
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Search(SearchViewModel model)
-        {
-            return RedirectToAction(nameof(UserController.SearchDocument), "User");
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
-            if (globalDocValidatorDocumentMeta == null)
-            {
-                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
-                return View(model);
-            }
-
-            var identifier = $"{globalDocValidatorDocumentMeta.SenderCode}{globalDocValidatorDocumentMeta.DocumentTypeId}{globalDocValidatorDocumentMeta.SerieAndNumber}".EncryptSHA256();
-            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
-            if (globalDocValidatorDocument == null)
-            {
-                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
-                return View(model);
-            }
-
-            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
-
-            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult SearchQR(string documentKey)
-        {
-            documentKey = documentKey.ToLower();
-            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
-            if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
-
-            return RedirectToAction(nameof(ShowDocumentToPublic), new { id = documentKey });
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public ActionResult SearchInvalidQR()
-        {
-            return View();
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public async Task<JsonResult> PrintDocument(string cufe)
-        {
-            string webPath = Url.Action("searchqr", "Document", null, Request.Url.Scheme);
-            byte[] pdfDocument = await _radianPdfCreationService.GetElectronicInvoicePdf(cufe, webPath);
-            String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
-            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
-        }
-
-        public async Task<JsonResult> PrintGraphicRepresentation(string cufe)
-        {
-            byte[] suportDoc = await _radianSupportDocument.GetGraphicRepresentation(cufe);
-             byte[] pdfDocument = await _radianGraphicRepresentationService.GetPdfReport(cufe);
-            // String base64EncodedPdf = Convert.ToBase64String(pdfDocument);
-            String base64EncodedPdf = Convert.ToBase64String(suportDoc);
-            return Json(base64EncodedPdf, JsonRequestBehavior.AllowGet);
-        }
-
-        [ExcludeFilter(typeof(Authorization))]
-        public async Task<ActionResult> ShowDocumentToPublic(string Id)
-        {
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
-            List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
-            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
-
-            DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
-            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
-            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
-
-            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
-            listDocValidatorModels.Add(docModel);
-
-            foreach (var item in listGlobalValidatorDocumentMeta)
-            {
-                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
-                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
-
-                docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey, globalDataDocument);
-
-                listDocValidatorModels.Add(docModel);
-            }
-
-            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2, listDocValidatorModels, invoiceAndNotes.Item3);
-
-            return View(invoiceNotes);
-        }
-
-        #region Private methods               
-
-        private string ReturnPartitionKey(string emissionDateNumber, string documentKey)
-        {
-            return $"co|{emissionDateNumber.Substring(6, 2)}|{documentKey.Substring(0, 2)}";
-        }
-
-        private async Task<DocValidatorModel> ReturnDocValidatorModelByCufe(string trackId, GlobalDataDocument globalDataDocument = null)
-        {
-            List<DocValidatorTrackingModel> validations = GetValidatedRules(trackId);
-
-            GlobalDocValidatorDocumentMeta globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            string emissionDateNumber = globalDocValidatorDocumentMeta.EmissionDate.ToString("yyyyMMdd");
-            string partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocumentMeta.DocumentKey.Substring(0, 2)}";
-
-            DateTime date = DateNumberToDateTime(emissionDateNumber);
-
-            if (globalDataDocument == null)
-                globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
-
-            DocumentViewModel document = new DocumentViewModel();
-
-            if (globalDataDocument != null)
-            {
-                document = new DocumentViewModel
-                {
-                    DocumentKey = globalDataDocument.DocumentKey,
-                    Amount = globalDataDocument.FreeAmount,
-                    DocumentTypeId = globalDataDocument.DocumentTypeId,
-                    DocumentTypeName = globalDataDocument.DocumentTypeName,
-                    GenerationDate = globalDataDocument.GenerationTimeStamp,
-                    Id = globalDataDocument.DocumentKey,
-                    EmissionDate = globalDataDocument.EmissionDate,
-                    Number = Services.Utils.StringUtil.TextAfter(globalDataDocument.SerieAndNumber, globalDataDocument.Serie),
-                    //TechProviderName = globalDataDocument?.TechProviderInfo?.TechProviderName,
-                    TechProviderCode = globalDataDocument?.TechProviderInfo?.TechProviderCode,
-                    ReceiverName = globalDataDocument.ReceiverName,
-                    ReceiverCode = globalDataDocument.ReceiverCode,
-                    ReceptionDate = globalDataDocument.ReceptionTimeStamp,
-                    Serie = globalDataDocument.Serie,
-                    SenderName = globalDataDocument.SenderName,
-                    SenderCode = globalDataDocument.SenderCode,
-                    Status = globalDataDocument.ValidationResultInfo.Status,
-                    StatusName = globalDataDocument.ValidationResultInfo.StatusName,
-                    TaxAmountIva = globalDataDocument.TaxAmountIva,
-                    TotalAmount = globalDataDocument.TotalAmount
-                };
-
-                document.TaxesDetail.TaxAmountIva5Percent = globalDataDocument.TaxesDetail?.TaxAmountIva5Percent ?? 0;
-                document.TaxesDetail.TaxAmountIva14Percent = globalDataDocument.TaxesDetail?.TaxAmountIva14Percent ?? 0;
-                document.TaxesDetail.TaxAmountIva16Percent = globalDataDocument.TaxesDetail?.TaxAmountIva16Percent ?? 0;
-                document.TaxesDetail.TaxAmountIva19Percent = globalDataDocument.TaxesDetail?.TaxAmountIva19Percent ?? 0;
-                document.TaxesDetail.TaxAmountIva = globalDataDocument.TaxesDetail?.TaxAmountIva ?? 0;
-                document.TaxesDetail.TaxAmountIca = globalDataDocument.TaxesDetail?.TaxAmountIca ?? 0;
-                document.TaxesDetail.TaxAmountIpc = globalDataDocument.TaxesDetail?.TaxAmountIpc ?? 0;
-
-                document.DocumentTags = globalDataDocument.DocumentTags.Select(t => new DocumentTagViewModel()
-                {
-
-                    Code = t.Value,
-                    Description = t.Description,
-                    Value = t.Value,
-                    TimeStamp = t.TimeStamp
-                }).ToList();
-
-                document.Events = globalDataDocument.Events.Select(e => new EventViewModel()
-                {
-                    DocumentKey = e.DocumentKey,
-                    Code = e.Code,
-                    Date = e.Date,
-                    DateNumber = e.DateNumber,
-                    Description = e.Description,
-                    ReceiverCode = e.ReceiverCode,
-                    ReceiverName = e.ReceiverName,
-                    SenderCode = e.SenderCode,
-                    SenderName = e.SenderName,
-                    TimeStamp = e.TimeStamp
-                }).ToList();
-
-                document.References = globalDataDocument.References.Select(r => new ReferenceViewModel()
-                {
-                    DocumentKey = r.DocumentKey,
-                    DocumentTypeId = r.DocumentTypeId,
-                    DocumenTypeName = r.DocumenTypeName,
-                    Date = r.Date,
-                    DateNumber = r.DateNumber,
-                    Description = r.Description,
-                    ReceiverCode = r.ReceiverCode,
-                    ReceiverName = r.ReceiverName,
-                    SenderCode = r.SenderCode,
-                    SenderName = r.SenderName,
-                    TimeStamp = r.TimeStamp,
-                    ShowAsReference = true
-                }).ToList();
-            }
-
-            var model = new DocValidatorModel
-            {
-                Document = document,
-                Validations = validations
-            };
-
-
-            model.Events = new List<EventsViewModel>();
-            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-                if (eventsByInvoice.Any())
-                {
-
-                    foreach (var eventItem in eventsByInvoice)
-                    {
-                        if (!string.IsNullOrEmpty(eventItem.EventCode))
-                        {
-                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier);
-                            if (eventVerification != null && (eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
-                            {
-                                string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                                model.Events.Add(new EventsViewModel()
-                                {
-                                    DocumentKey = eventItem.DocumentKey,
-                                    EventCode = eventItem.EventCode,
-                                    Description = eventcodetext,
-                                    EventDate = eventItem.SigningTimeStamp,
-                                    SenderCode = eventItem.SenderCode,
-                                    Sender = eventItem.SenderName,
-                                    ReceiverCode = eventItem.ReceiverCode,
-                                    Receiver = eventItem.ReceiverName
-                                });
-                                model.Events = model.Events.OrderBy(t => t.EventCode).ToList();
-                            }
-
-                        }
-                    }
-                
-            }
-
-            return model;
-        }
-
-        private DocValidatorModel ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
-        {
             var model = new DocValidatorModel();
             model.Validations.AddRange(GetValidatedRules(documentKey));
 
@@ -752,8 +359,69 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList());
             }
 
-            return model;
+            return View(model);
         }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult Search()
+        {
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
+        }
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult Search(SearchViewModel model)
+        {
+            return RedirectToAction(nameof(UserController.SearchDocument), "User");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+            if (globalDocValidatorDocumentMeta == null)
+            {
+                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
+                return View(model);
+            }
+
+            var identifier = $"{globalDocValidatorDocumentMeta.SenderCode}{globalDocValidatorDocumentMeta.DocumentTypeId}{globalDocValidatorDocumentMeta.SerieAndNumber}".EncryptSHA256();
+            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+            if (globalDocValidatorDocument == null)
+            {
+                ModelState.AddModelError("DocumentKey", "Documento no encontrado en los registros de la DIAN.");
+                return View(model);
+            }
+
+            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
+
+            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult SearchQR(string documentKey)
+        {
+            documentKey = documentKey.ToLower();
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentKey, documentKey);
+            if (globalDocValidatorDocumentMeta == null) return RedirectToAction(nameof(SearchInvalidQR));
+
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+            var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+            if (globalDocValidatorDocument == null) return RedirectToAction(nameof(SearchInvalidQR));
+
+            if (globalDocValidatorDocument.DocumentKey != documentKey) return RedirectToAction(nameof(SearchInvalidQR));
+
+            var partitionKey = $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocument.DocumentKey.Substring(0, 2)}";
+
+            return RedirectToAction(nameof(FindDocument), new { documentKey = globalDocValidatorDocument.DocumentKey, partitionKey, emissionDate = globalDocValidatorDocument.EmissionDateNumber });
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult SearchInvalidQR()
+        {
+            return View();
+        }
+
+        #region Private methods
 
         private bool IsValidCaptcha(string token)
         {
@@ -830,110 +498,55 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="filterType"></param>
+        /// <returns></returns>
         private async Task<ActionResult> GetDocuments(SearchDocumentViewModel model, int filterType)
         {
             SetView(filterType);
-            string continuationToken = (string)Session["Continuation_Token_" + model.Page];
 
-            if (string.IsNullOrEmpty(continuationToken))
-                continuationToken = "";
+            string continuationToken = (string)Session["Continuation_Token_" + model.Page];
+            if (string.IsNullOrEmpty(continuationToken)) continuationToken = "";
 
             List<string> pks = null;
             model.DocumentKey = model.DocumentKey?.ToLower();
-
             if (!string.IsNullOrEmpty(model.DocumentKey))
             {
-                GlobalDocValidatorDocumentMeta documentMeta =
-                    documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
-                GlobalDocValidatorDocument globalDocValidatorDocument =
-                    globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(model.DocumentKey, model.DocumentKey);
+                var globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
+                if (globalDocValidatorDocument == null) return View("Index", model);
 
-                if (globalDocValidatorDocument == null)
-                    return View("Index", model);
-
-                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey)
-                    return View("Index", model);
+                if (globalDocValidatorDocument.DocumentKey != model.DocumentKey) return View("Index", model);
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
 
-            if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
-                model.DocumentTypeId = "01";
-
-            (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
-                (false, null, new List<GlobalDataDocument>());
+            Tuple<bool, string, List<GlobalDataDocument>> result = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
 
             switch (filterType)
             {
                 case 1:
-                    cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
-                                                                                                                      model.StartDate,
-                                                                                                                      model.EndDate,
-                                                                                                                      model.Status,
-                                                                                                                      model.DocumentTypeId,
-                                                                                                                      model.SenderCode,
-                                                                                                                      model.SerieAndNumber,
-                                                                                                                      model.ReceiverCode,
-                                                                                                                      null,
-                                                                                                                      model.MaxItemCount,
-                                                                                                                      model.DocumentKey,
-                                                                                                                      model.ReferencesType,
-                                                                                                                      pks,
-                                                                                                                      model.RadianStatus);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 2:
-                    cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
-                                                                                                                      model.StartDate,
-                                                                                                                      model.EndDate,
-                                                                                                                      model.Status,
-                                                                                                                      model.DocumentTypeId,
-                                                                                                                      User.ContributorCode(),
-                                                                                                                      model.SerieAndNumber,
-                                                                                                                      model.ReceiverCode,
-                                                                                                                      null,
-                                                                                                                      model.MaxItemCount,
-                                                                                                                      model.DocumentKey,
-                                                                                                                      model.ReferencesType,
-                                                                                                                      pks,
-                                                                                                                      model.RadianStatus);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, User.ContributorCode(), model.SerieAndNumber, model.ReceiverCode, null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 3:
-                    cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
-                                                                                                                      model.StartDate,
-                                                                                                                      model.EndDate,
-                                                                                                                      model.Status,
-                                                                                                                      model.DocumentTypeId,
-                                                                                                                      model.SenderCode,
-                                                                                                                      model.SerieAndNumber,
-                                                                                                                      User.ContributorCode(),
-                                                                                                                      null,
-                                                                                                                      model.MaxItemCount,
-                                                                                                                      model.DocumentKey,
-                                                                                                                      model.ReferencesType,
-                                                                                                                      pks,
-                                                                                                                      model.RadianStatus);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, User.ContributorCode(), null, model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
                     break;
                 case 4:
-                    cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
-                                                                                                                      model.StartDate,
-                                                                                                                      model.EndDate,
-                                                                                                                      model.Status,
-                                                                                                                      model.DocumentTypeId,
-                                                                                                                      model.SenderCode,
-                                                                                                                      model.SerieAndNumber,
-                                                                                                                      model.ReceiverCode,
-                                                                                                                      User.ContributorCode(),
-                                                                                                                      model.MaxItemCount,
-                                                                                                                      model.DocumentKey,
-                                                                                                                      model.ReferencesType,
-                                                                                                                      pks,
-                                                                                                                      model.RadianStatus);
+                    result = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsync(continuationToken, model.StartDate, model.EndDate, model.Status, model.DocumentTypeId, model.SenderCode, model.SerieAndNumber, model.ReceiverCode, User.ContributorCode(), model.MaxItemCount, model.DocumentKey, model.ReferencesType, pks);
+                    break;
+                default:
                     break;
             }
 
-            if ((cosmosResponse.globalDataDocuments?.Count ?? 0) > 0)
+            if (result.Item3 != null && result.Item3.Count > 0)
             {
-                model.Documents = cosmosResponse.globalDataDocuments.Select(d => new DocumentViewModel
+                model.Documents = result.Item3.Select(d => new DocumentViewModel
                 {
                     PartitionKey = d.PartitionKey,
                     Amount = d.FreeAmount,
@@ -945,6 +558,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Number = d.Number,
                     Serie = d.Serie,
                     SerieAndNumber = d.SerieAndNumber,
+                    //TechProviderName = d?.TechProviderInfo?.TechProviderName,
                     TechProviderCode = d?.TechProviderInfo?.TechProviderCode,
                     ReceiverName = d.ReceiverName,
                     ReceiverCode = d.ReceiverCode,
@@ -955,60 +569,13 @@ namespace Gosocket.Dian.Web.Controllers
                     StatusName = d.ValidationResultInfo.StatusName,
                     TaxAmountIva = d.TaxAmountIva,
                     TotalAmount = d.TotalAmount,
-                    Events = d.Events.Select(
-                        e => new EventViewModel()
-                        {
-                            Code = e.Code,
-                            Date = e.Date,
-                            Description = e.Description
-                        }).ToList()
                 }).ToList();
-
-                foreach (DocumentViewModel docView in model.Documents)
-                    docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
             }
 
-            if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
-                model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
-
-            model.IsNextPage = cosmosResponse.hasMoreResults;
-            Session["Continuation_Token_" + (model.Page + 1)] = cosmosResponse.continuation;
+            model.IsNextPage = result.Item1;
+            this.Session["Continuation_Token_" + (model.Page + 1)] = result.Item2;
 
             return View("Index", model);
-        }
-
-        private string DeterminateRadianStatus(List<EventViewModel> events, string documentTypeId)
-        {
-            if (events.Count() == 0)
-                return RadianDocumentStatus.DontApply.GetDescription();
-
-            int lastEventCode = int.Parse(events.OrderBy(t => t.Date).Last().Code);
-
-            if (lastEventCode == ((int)EventStatus.NegotiatedInvoice)
-                || lastEventCode == ((int)EventStatus.AnulacionLimitacionCirculacion))
-                return RadianDocumentStatus.Limited.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.NotificacionPagoTotalParcial))
-                return RadianDocumentStatus.Paid.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.EndosoPropiedad)
-                || lastEventCode == ((int)EventStatus.EndosoGarantia)
-                || lastEventCode == ((int)EventStatus.EndosoProcuracion)
-                || lastEventCode == ((int)EventStatus.InvoiceOfferedForNegotiation))
-                return RadianDocumentStatus.Endorsed.GetDescription();
-
-            if (lastEventCode == ((int)EventStatus.SolicitudDisponibilizacion))
-                return RadianDocumentStatus.Readiness.GetDescription();
-
-            if (events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Received))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Receipt))
-                && events.Any(e => int.Parse(e.Code) == ((int)EventStatus.Accepted)))
-                return RadianDocumentStatus.SecurityTitle.GetDescription();
-
-            if (documentTypeId == "01")
-                return RadianDocumentStatus.ElectronicInvoice.GetDescription();
-
-            return RadianDocumentStatus.DontApply.GetDescription();
         }
 
         private void SetView(int filterType)
@@ -1035,7 +602,6 @@ namespace Gosocket.Dian.Web.Controllers
                     break;
             }
         }
-
         private void GetExportDocumentTasks(ref ExportDocumentTableViewModel model)
         {
             string pk = "ADMIN";
@@ -1058,7 +624,6 @@ namespace Gosocket.Dian.Web.Controllers
                 TotalResult = t.TotalResult
             }).ToList();
         }
-
         private async Task CreateGlobalTask(ExportDocumentTableViewModel model)
         {
             string pk = "ADMIN";
@@ -1100,7 +665,6 @@ namespace Gosocket.Dian.Web.Controllers
             globalTaskTableManager.InsertOrUpdate(globalTask);
             await SentTask(globalTask);
         }
-
         private async Task SentTask(GlobalTask task)
         {
             string subject = "ADMIN";

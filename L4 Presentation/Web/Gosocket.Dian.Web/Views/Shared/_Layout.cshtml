@@ -262,12 +262,11 @@
                                         <!--Rol Administrador-->
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
-                                    <ul class="collapse">
-                                        <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
-                                        <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
-                                        <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
-                                        <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("ExportPDF", "Document")">Consultar Nomina</a></li>
-                                    </ul>
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
+                                                <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
+                                            </ul>
                                         }
                                         <!--Rol Administrador-->
                                         <!--Rol Facturador and Proveedor-->

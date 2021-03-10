@@ -2658,7 +2658,6 @@
     <Content Include="Views\Support\_companyLogin.cshtml" />
     <Content Include="Views\Support\_personLogin.cshtml" />
     <Content Include="Views\Support\_adminCredentials.cshtml" />
-    <Content Include="Views\Document\ExportPDF.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
