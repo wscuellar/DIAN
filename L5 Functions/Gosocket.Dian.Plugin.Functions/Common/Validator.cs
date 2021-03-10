@@ -1685,7 +1685,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string issueAtorney = xmlParserCude.ProviderCode;
             string eventCode = party.ResponseCode;
             string cufe = party.TrackId;
-            string senderCode = nitModel.SenderCode;
+            string senderCode = xmlParserCude.Fields["SenderCode"].ToString();
             string noteMandato = xmlParserCude.NoteMandato;
             string noteMandato2 = xmlParserCude.NoteMandato2;
             string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
@@ -1727,6 +1727,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
+                    //Valida asociacion mandato abierto
                     docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(issueAtorney, senderCode);
                     if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
                     {
