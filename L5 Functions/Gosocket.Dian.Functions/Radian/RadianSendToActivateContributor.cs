@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Functions.Radian
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
                     // Se obtiene el set de pruebas par el cliente
-                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    string key = data.ContributorTypeId.ToString() + '|' + data.SoftwareId;
                     SetLogger(null, "Step STA-4.1", data.Code, "code123");
                     SetLogger(null, "Step STA-4.2", key, "key123");
                     RadianTestSetResult results = globalTestSetResultTableManager.Find<RadianTestSetResult>(data.Code, key);

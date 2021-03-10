@@ -571,7 +571,7 @@ namespace Gosocket.Dian.Application
 
 
 
-        public void OperationReject(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        public void OperationUpdate(int contributorId, int contributorTypeId, string softwareId, int softwareType, Domain.Common.RadianState radianState)
         {
             using (var context = new SqlDBContext())
             {
@@ -585,7 +585,7 @@ namespace Gosocket.Dian.Application
                                                 && !t.Deleted
                                                 );
                 if (radianOperation != null)
-                    radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Cancelado; //cancelo = rechazo.
+                    radianOperation.OperationStatusId = (int)radianState; //cancelo = rechazo.
 
                 context.SaveChanges();
             }
