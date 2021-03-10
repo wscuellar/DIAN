@@ -18,29 +18,27 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class LogicalNMService : IDisposable
     {
-        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");       
-        private TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
-        private TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
-        private TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
+        private readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
+        private readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
+        private readonly TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
+        private readonly TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
 
-        private TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
-        private TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
-        private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
-        private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
-        private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");    
-        private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private readonly TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
+        private readonly TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
+        private readonly TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
+        private readonly TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
+        private readonly TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
+        private readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
-        private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
-        private TableManager TableManagerGlobalDocPayrollHistoric = new TableManager("GlobalDocPayrollHistoric");
+        private readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
         private FileManager fileManager = new FileManager();
 
         private readonly string blobContainer = "global";
         private readonly string blobContainerFolder = "batchValidator";
 
-        public LogicalNMService(){}
+        public LogicalNMService() { }
 
         public void Dispose()
         {
@@ -118,11 +116,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <returns></returns>
         private GlobalAuthorization GetAuthorization(string code, string authCode)
         {
-
-            var authorization = new GlobalAuthorization();
             var trimAuthCode = authCode?.Trim();
             var newAuthCode = trimAuthCode?.Substring(0, trimAuthCode.Length - 1);
-            authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
+            GlobalAuthorization authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
             if (authorization == null) authorization = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
             if (authorization == null) return null;
 
@@ -130,10 +126,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
         }
         private GlobalContributor GetGlobalContributor(string authCode)
         {
-            var globalContributor = new GlobalContributor();
             var trimAuthCode = authCode?.Trim();
             var newAuthCode = trimAuthCode?.Substring(0, trimAuthCode.Length - 1);
-            globalContributor = TableManagerGlobalContributor.Find<GlobalContributor>(trimAuthCode, trimAuthCode);
+            GlobalContributor globalContributor = TableManagerGlobalContributor.Find<GlobalContributor>(trimAuthCode, trimAuthCode);
             if (globalContributor == null) globalContributor = TableManagerGlobalContributor.Find<GlobalContributor>(newAuthCode, newAuthCode);
 
             return globalContributor;
@@ -145,10 +140,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
+            var fileManager2 = new FileManager();
             var container = $"global";
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = fileManager.GetBytes(container, fileName);
+            var xmlBytes = fileManager2.GetBytes(container, fileName);
 
             tableManager = null;
             return xmlBytes;
@@ -330,8 +325,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Task secondLocalRun = Task.Run(() =>
                 {
                     documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                    //var prefix = !string.IsNullOrEmpty(serie) ? serie : string.Empty;
-                    message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada."; // (string.IsNullOrEmpty(prefix)) ? $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {prefix}-{number}, ha sido autorizada.";
+                    message = $"La {documentMeta.DocumentTypeName} {serieAndNumber}, ha sido autorizada."; 
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
@@ -492,32 +486,20 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public DianResponse GetStatus(string trackId)
         {
             var globalStart = DateTime.UtcNow;
-            var start = DateTime.UtcNow;
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-         
-            //if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD")) isUploaded = true;
+
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
-                //var isFinished = DianServicesUtils.CheckIfDocumentValidationsIsFinished(trackId);
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
                 {
-                    start = DateTime.UtcNow;
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
                     bool existDocument = false;
-                    //bool existNsu = false;
+
                     var validations = new List<GlobalDocValidatorTracking>();
                     List<Task> arrayTasks = new List<Task>();
-
-                    //Task firstLocalRun = Task.Run(() =>
-                    //{
-                    //    var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                    //    response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                    //    if (!applicationResponse.Success)
-                    //        Debug.WriteLine(applicationResponse.Message);
-                    //});
 
                     Task secondLocalRun = Task.Run(() =>
                     {
@@ -530,10 +512,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     Task fourLocalRun = Task.Run(() =>
                     {
                         validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-                    });
+                   });
 
-                    //arrayTasks.Add(firstLocalRun);
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(fourLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
@@ -655,7 +635,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         {
                             StatusCode = "66",
                             StatusDescription = "Error al generar ApplicationResponse. Inténtelo más tarde."
-                        }); 
+                        });
                     }
                 }
             }
@@ -802,7 +782,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
 
-            } 
+            }
         }
 
         #endregion
@@ -863,11 +843,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var xmlBase64 = Convert.ToBase64String(contentFileList.First().XmlBytes);
             var zone2 = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Zone2) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // ZONE 2
-         
+
             // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
-            XmlParseNomina xmlParser = new XmlParseNomina();
+            XmlParseNomina xmlParser;
             try
             {
                 xmlParser = new XmlParseNomina(xmlBytes);
@@ -890,15 +870,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             DocumentParsedNomina.SetValues(ref documentParsed);
             var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Parser
-                        
+
             // ZONE 3
             start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
-            if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse; 
-            var trackId = documentParsed.CUNE; 
+            if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
+            var trackId = documentParsed.CUNE;
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
-           
+
             // upload xml
             start = DateTime.UtcNow;
             bool sendTestSet = false;
@@ -907,7 +887,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             //var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
-                //dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
                 dianResponse.StatusCode = Properties.Settings.Default.Code_89;
                 dianResponse.StatusDescription = uploadXmlResponse.Message;
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
@@ -949,8 +928,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 Task secondLocalRun = Task.Run(() =>
                 {
-                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);                   
-                    message = $"La {documentMeta.DocumentTypeName} {SerieAndNumber}, ha sido autorizada."; 
+                    documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                    message = $"La {documentMeta.DocumentTypeName} {SerieAndNumber}, ha sido autorizada.";
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                 });
 
@@ -971,7 +950,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     dianResponse.IsValid = false;
                     dianResponse.StatusMessage = Properties.Settings.Default.Msg_Error_FieldMandatori;
-                    dianResponse.ErrorMessage.AddRange(failedList);                   
+                    dianResponse.ErrorMessage.AddRange(failedList);
                 }
 
                 if (notifications.Any())
@@ -989,19 +968,19 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 Task.WhenAll(arrayTasks).Wait();
 
                 var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
-                dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);                
+                dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
                 dianResponse.XmlDocumentKey = trackId;
 
                 GlobalDocValidatorDocument validatorDocument = null;
-           
+
                 if (dianResponse.IsValid)
                 {
                     dianResponse.StatusCode = Properties.Settings.Default.Code_00;
                     dianResponse.StatusMessage = message;
                     dianResponse.StatusDescription = Properties.Settings.Default.Msg_Procees_Sucessfull;
-                    validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackId, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };                   
+                    validatorDocument = new GlobalDocValidatorDocument(documentMeta?.Identifier, documentMeta?.Identifier) { DocumentKey = trackId, EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd") };
 
-          
+
                 }
                 else
                 {
@@ -1021,11 +1000,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
-                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2)                   
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(zone2)
                 };
 
                 if (dianResponse.IsValid)
-                {                   
+                {
 
                     if (!existDocument) arrayTasks.Add(TableManagerGlobalDocValidatorDocument.InsertOrUpdateAsync(validatorDocument));
 
@@ -1049,7 +1028,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     #endregion
 
                     var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
-                    //var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/RegistrateCompletedPayroll", new { TrackId = trackId });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
@@ -1064,113 +1042,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var lastZone = new GlobalLogger(trackId, Properties.Settings.Default.Param_LastZone) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
                 TableManagerGlobalLogger.InsertOrUpdate(lastZone);
 
-                return dianResponse;                
-            }            
+                return dianResponse;
+            }
         }
-
-        private ValidatePayroll CalculatePayrollvalues(ValidatePayroll payroll)
-        {
-            if (payroll.AccruedTotal != decimal.Zero && payroll.DeductionsTotal != decimal.Zero)
-            {
-                payroll.VoucherTotal = payroll.AccruedTotal - payroll.DeductionsTotal;
-
-
-            }
-            if (payroll.Salary != decimal.Zero && payroll.PercentageWorked != decimal.Zero && payroll.AmountAdditionalHours != decimal.Zero)
-            {
-                payroll.OvertimeSurcharges =
-                    (payroll.Salary / 240) * payroll.PercentageWorked * payroll.AmountAdditionalHours;
-            }
-
-            return payroll;
-        }
-
-        /// <summary>
-        /// Función que realiza el cálculo del tiempo laborado en base a un rango de fechas.
-        /// </summary>
-        /// <param name="initialDate">Fecha inicial del rango</param>
-        /// <param name="finalDate">Fecha final del rango</param>
-        /// <returns>Cadena con formato '00A00M00D'</returns>
-        private string GetTotalTimeWorkedFormatted(DateTime initialDate, DateTime finalDate)
-        {
-            const int monthsInYear = 12,
-                      daysInMonth = 30;
-
-            var totalYears = finalDate.Year - initialDate.Year;
-            var totalMonths = finalDate.Month - initialDate.Month;
-            var totalDays = finalDate.Day - initialDate.Day;
-
-            if (totalYears == 0) // mismo año
-            {
-                if (totalMonths > 0) // diferente mes, en el mismo año
-                {
-                    if (totalDays < 0) // no se completaron los 30 días...se elimina 1 mes y se hace el cálculo de los días
-                    {
-                        totalMonths--;
-                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
-                    }
-                    else
-                        totalDays++; // se suma 1 día
-                }
-                else // mismo mes
-                    totalDays++; // se suma 1 día
-            }
-            else
-            {
-                // 12 o más meses...
-                if (totalMonths >= 0)
-                {
-                    if (totalDays < 0)
-                    {
-                        // no alcanza el mes completo, se elimina un mes y se sumas los días
-                        if (totalMonths == 0)
-                        {
-                            totalYears--;
-                            totalMonths = (monthsInYear - 1);
-                        }
-                        else
-                            totalMonths--;
-
-                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
-                    }
-                    else
-                        totalDays++; // se suma 1 día
-                }
-                else
-                {
-                    // no se completan los 12 meses, se tiene que restar 1 año y sumar los meses (totalMonths)
-                    totalYears--;
-                    totalMonths = (monthsInYear - initialDate.Month) + finalDate.Month;
-
-                    // no se completan los 30 días
-                    if (totalDays < 0)
-                    {
-                        // no se completan los 30 días, se tiene que restar 1 mes y sumar los días (totalDays)
-                        totalMonths--;
-                        totalDays = (daysInMonth - initialDate.Day) + finalDate.Day;
-                    }
-                    else
-                        totalDays++; // se suma 1 día
-                }
-            }
-
-            // validaciones finales para ajustar unidades...
-            if (totalDays == 30) // si se completan 30 días, se suma 1 mes y se reinician los días
-            {
-                totalMonths++;
-                totalDays = 0;
-            }
-            if (totalMonths == 12) // si se completan 12 meses, se suma 1 año y se reinician los meses
-            {
-                totalYears++;
-                totalMonths = 0;
-            }
-
-            string yearsStringFormatted = $"{totalYears.ToString().PadLeft(2, char.Parse("0"))}A",
-                   monthsStringFormatted = $"{totalMonths.ToString().PadLeft(2, char.Parse("0"))}M",
-                   daysStringFormatted = $"{totalDays.ToString().PadLeft(2, char.Parse("0"))}D";
-
-            return $"{yearsStringFormatted}{monthsStringFormatted}{daysStringFormatted}";
-        }      
     }
 }

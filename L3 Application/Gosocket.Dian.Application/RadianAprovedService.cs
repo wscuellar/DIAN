@@ -127,7 +127,7 @@ namespace Gosocket.Dian.Application
             //-----------------marca como elimnado el set de prueba.
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributor.Id);
             string key = operationToDelete.SoftwareType.ToString() + "|" + operationToDelete.SoftwareId.ToString();
-            RadianTestSetResult oper =  _radianTestSetResultService.GetTestSetResult(radianContributor.Contributor.Code, key);
+            RadianTestSetResult oper = _radianTestSetResultService.GetTestSetResult(radianContributor.Contributor.Code, key);
             oper.Deleted = true;
             _radianTestSetResultService.InsertTestSetResult(oper);
             //------------------
@@ -208,7 +208,7 @@ namespace Gosocket.Dian.Application
             if (validateOperation)
             {
                 //&& t.SoftwareType == radianContributorOperation.SoftwareType
-                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId  && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
+                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
                 if (currentOperations.Any())
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
@@ -224,7 +224,7 @@ namespace Gosocket.Dian.Application
                 radianContributorOperation.SoftwareId = soft.Id;
             }
 
-            if(radianContributorOperation.OperationStatusId != (int)RadianState.Test)
+            if (radianContributorOperation.OperationStatusId != (int)RadianState.Test)
                 radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
             int operationId = _radianContributorOperationRepository.Add(radianContributorOperation);
             existingOperation = _radianContributorOperationRepository.Get(t => t.Id == operationId);
@@ -248,15 +248,19 @@ namespace Gosocket.Dian.Application
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
-                string key = existingOperation.SoftwareType.ToString() + "|" + radianContributorOperation.SoftwareId;
+                string key = radianContributor.RadianContributorTypeId.ToString()    + "|" + radianContributorOperation.SoftwareId;
+                string sType = radianContributor.RadianOperationModeId == 1 ? "1" : operation.SoftwareType.ToString();
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
                     ContributorId = radianContributor.Id,
                     State = TestSetStatus.InProcess.GetDescription(),
                     Status = (int)TestSetStatus.InProcess,
-                    StatusDescription = TestSetStatus.InProcess.GetDescription(),
+                    StatusDescription = testSet.Description, //TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = radianContributor.RadianContributorTypeId.ToString(),
+                    OperationModeId = radianContributor.RadianOperationModeId,
+                    OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.RadianOperationModeTestSet), sType))),
+
                     // Totales Generales
                     TotalDocumentRequired = testSet.TotalDocumentRequired,
                     TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
@@ -310,7 +314,7 @@ namespace Gosocket.Dian.Application
                     EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
                     //Reporte para el pago
                     ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
-                    ReportForPaymentTotalAcceptedRequired= testSet.ReportForPaymentTotalAcceptedRequired
+                    ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired
                 };
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
@@ -327,7 +331,7 @@ namespace Gosocket.Dian.Application
 
         public RadianTestSetResult RadianTestSetResultByNit(string nit, string idTestSet)
         {
-            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault(t=> t.Id == idTestSet);
+            return _radianTestSetResultService.GetTestSetResultByNit(nit).FirstOrDefault(t => t.Id == idTestSet);
         }
 
         /// <summary>
@@ -340,7 +344,7 @@ namespace Gosocket.Dian.Application
         /// <returns></returns>
         public List<RadianSoftware> SoftwareList(int radianContributorId)
         {
-           return _radianContributorRepository.RadianSoftwareByParticipante(radianContributorId);
+            return _radianContributorRepository.RadianSoftwareByParticipante(radianContributorId);
         }
 
         public RadianSoftware GetSoftware(Guid id)
@@ -362,9 +366,9 @@ namespace Gosocket.Dian.Application
             else
             {
                 participants = _radianContributorRepository.ActiveParticipantsWithSoftware((int)softwareType);
-                
+
             }
-                
+
             return participants.Distinct().ToList();
         }
 

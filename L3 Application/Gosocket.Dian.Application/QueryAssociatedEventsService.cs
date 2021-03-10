@@ -272,14 +272,6 @@ namespace Gosocket.Dian.Application
             return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())).ToList();
         }
 
-        private bool IsAnulation(int counterAnulations, int counterInformation)
-        {
-            if (counterInformation > counterAnulations)
-                return false;
-
-            return true;
-        }
-
         public GlobalDocPayroll GetPayrollById(string partitionKey)
         {
             return this._globalDocPayrollService.Find(partitionKey);

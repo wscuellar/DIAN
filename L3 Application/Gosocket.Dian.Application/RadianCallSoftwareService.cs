@@ -32,9 +32,9 @@ namespace Gosocket.Dian.Application
             return _softwareService.GetSoftwares(contributorId);
         }
 
-        public List<RadianSoftware> List(int contributorId)
+        public List<RadianSoftware> List(int id)
         {
-            return _RadianSoftwareRepository.List(t => t.ContributorId == contributorId, 0, 0).Results;
+            return _RadianSoftwareRepository.List(t => t.ContributorId == id, 0, 0).Results;
         }
 
 

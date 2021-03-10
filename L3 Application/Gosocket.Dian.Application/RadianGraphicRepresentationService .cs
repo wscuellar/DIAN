@@ -84,7 +84,6 @@
         {
             GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(cude);
             byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(cude);
-            //var str = Encoding.Default.GetString(xmlBytes);
 
             Domain.Entity.EventDataModel model =
                 new Domain.Entity.EventDataModel()
@@ -204,7 +203,6 @@
                 default:
                     model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
                     model.ReceiverType = string.Empty;
-                    //model.RequestType = model.Title;
                     break;
             }
 
@@ -240,9 +238,6 @@
                     TotalAmount = referenceMeta.TotalAmount
                 });
             }
-
-            //model.EntityName = referenceMeta.Serie;
-            //model.CertificateNumber = referenceMeta.SerieAndNumber;
 
             Domain.Entity.GlobalDocValidatorDocument eventVerification =
                     globalDocValidatorDocumentTableManager.Find<Domain.Entity.GlobalDocValidatorDocument>(referenceMeta?.Identifier, referenceMeta?.Identifier);
@@ -315,7 +310,6 @@
 
         private StringBuilder DataTemplateMapping(StringBuilder template, DateTime expeditionDate, Domain.Entity.EventDataModel model)
         {
-            //string sectionHtml = "<div class='text-section padding-top20'> Sección {SectionNumber}</ div > ";
             bool isInEvent = false;
 
             if (model.EventCode == "035" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "041" || model.EventCode == "042" || model.EventCode == "045" || model.EventCode == "046")
@@ -393,8 +387,6 @@
             htmlInvoice += "</td>";
             htmlInvoice += "<td>";
 
-            //htmlInvoice += "<div id='TotalValue' class='text-subtitle text-gray'>Valor Total de la Factura: <a class='text-data'>{TotalValue}</a></div>";
-            
             if (model.EventCode == "036" || model.CustomizationID == "372" || model.EventCode == "038" || model.EventCode == "045")
             {
                 htmlInvoice += "<div id='ExpirationDate' class='text-subtitle text-gray'>Fecha de Vencimiento: <a class='text-data'>{ExpirationDate}</a></div>";
@@ -504,9 +496,7 @@
                 StringBuilder subjects = new StringBuilder();
 
 
-                // Section 1
-
-                //subjects.Append(sectionHtml);
+                // Section 1 
                 subjects.Append(templateSujeto);
 
                 subjects = SubjectTemplateMapping(subjects, "1", "Datos del Emisor",
@@ -520,9 +510,7 @@
                     , model.SenderPhoneNumber
                     , "emisor");
 
-                // Section 2
-
-                //subjects.Append(sectionHtml);
+                // Section 2 
                 subjects.Append(templateSujeto);
 
                 subjects = SubjectTemplateMapping(subjects, "2", "Datos del Receptor",

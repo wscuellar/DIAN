@@ -25,17 +25,15 @@ namespace Gosocket.Dian.Application
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IGlobalDocValidationDocumentMetaService _globalDocValidationDocumentMetaService;
         private readonly FileManager _fileManager;
-        private readonly CosmosDBService _cosmosDBService;
 
         #endregion
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
-            _cosmosDBService = cosmosDBService;
             _globalDocValidationDocumentMetaService = globalDocValidationDocumentMetaService;
         }
 
@@ -72,8 +70,7 @@ namespace Gosocket.Dian.Application
                 #region hilo1
                 // load xml
                 byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
-                Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
-                xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
+                Dictionary<string, string> xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
                 fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
                 #endregion
 
@@ -197,9 +194,9 @@ namespace Gosocket.Dian.Application
 
             // se realiza el mapeo del primer evento
             // si tiene más eventos realiza el mapeo del siguiente template
-            StringBuilder middleTemplate = new StringBuilder();
-            StringBuilder eventTemplate = new StringBuilder();
-            StringBuilder headerTemplate = new StringBuilder();
+            StringBuilder middleTemplate;
+            StringBuilder eventTemplate;
+            StringBuilder headerTemplate;
 
             if (events.Any())
             {

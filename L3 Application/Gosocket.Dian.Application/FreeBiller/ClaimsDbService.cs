@@ -7,7 +7,7 @@ namespace Gosocket.Dian.Application.FreeBiller
 {
     public class ClaimsDbService
     {
-        SqlDBContext sqlDBContext;
+        readonly SqlDBContext sqlDBContext;
 
         public ClaimsDbService()
         {

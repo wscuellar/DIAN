@@ -95,7 +95,6 @@ namespace Gosocket.Dian.Services.Utils.Common
                     var node = XmlDocument.GetElementsByTagName("xades:SigningTime")[0];
                     var nodePaymentMeansValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='ID']";                    
                     var nodePaymentDueDateValuesXpath = "//*[local-name()='PaymentMeans']/*[local-name()='PaymentDueDate']";
-                    var listIDValueXpath = XmlDocument.GetElementsByTagName("cbc:ResponseCode")[0];
                     var documentReferenceIdValueXpath = "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']";                 
                     var valueTotalInvoice = "//*[local-name()='LegalMonetaryTotal']/*[local-name()='PayableAmount']";
                     var valueNote = "//*[local-name()='Note']";
