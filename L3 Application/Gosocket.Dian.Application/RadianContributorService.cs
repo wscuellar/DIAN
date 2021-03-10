@@ -193,10 +193,8 @@ namespace Gosocket.Dian.Application
                  testSet = testSet.Where(t => !t.Deleted).ToList();
                  foreach (var item in testSet)
                  {
-
                      string[] parts = item.RowKey.Split('|');
                      item.SoftwareId = parts[1];
-                     item.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), parts[0]));
                  }
                  List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
                  List<RadianContributorFileType> fileTypes = _radianContributorFileTypeRepository.List(t => t.RadianContributorTypeId == c.RadianContributorTypeId && !t.Deleted);
