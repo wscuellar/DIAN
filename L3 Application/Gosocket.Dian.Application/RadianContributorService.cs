@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -269,14 +270,14 @@ namespace Gosocket.Dian.Application
 
             return true;
 
-        }
+            }
 
 
         #region Private methods Cancel Participant
 
         private void UpdateGlobalRadianOperation(RadianContributor competitor)
         {
-            RadianContributorOperation radianOperation = competitor.RadianContributorOperations.FirstOrDefault(t => t.OperationStatusId == (int)Domain.Common.RadianState.Registrado);
+            RadianContributorOperation radianOperation = competitor.RadianContributorOperations.FirstOrDefault(t => t.OperationStatusId == (int)Domain.Common.RadianState.Registrado || t.OperationStatusId == (int)Domain.Common.RadianState.Test);
             if (radianOperation == null)
                 return;
 
@@ -430,10 +431,9 @@ namespace Gosocket.Dian.Application
             return customerLists.Count;
         }
 
-        public RadianTestSetResult GetSetTestResult(string code, string softwareId, string softwareType)
+        public RadianTestSetResult GetSetTestResult(string code, string softwareId, int type)
         {
-            RadianOperationModeTestSet softwareTypeEnum = EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
-            string key = ((int)softwareTypeEnum).ToString() + "|" + softwareId;
+            string key = type.ToString() + "|" + softwareId;
             return _radianTestSetResultManager.GetTestSetResult(code, key);
         }
 
@@ -507,6 +507,13 @@ namespace Gosocket.Dian.Application
                 testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && int.Parse(t.ContributorTypeId) == (int)Domain.Common.ContributorType.Biller && t.SoftwareId == softwareId && t.OperationModeId == operation.OperationModeId);
 
             return testSetResult;
+        }
+
+        public byte[] DownloadContributorFile(string code, string fileName, out string contentType)
+        {
+            string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
+            var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            return fileManager.GetBytes("radiancontributor-files", fileNameURL, out contentType);
         }
         #endregion
 

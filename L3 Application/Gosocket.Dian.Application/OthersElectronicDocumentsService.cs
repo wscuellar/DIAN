@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Application
 {
     public class OthersElectronicDocumentsService : IOthersElectronicDocumentsService
     {
-        private SqlDBContext sqlDBContext;
+        private readonly SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
@@ -167,7 +167,6 @@ namespace Gosocket.Dian.Application
         private void ApplyTestSet(OtherDocElecContributorOperations ODEOperation, GlobalTestSetOthersDocuments testSet, OtherDocElecContributor ODEContributor, OtherDocElecContributorOperations existingOperation, OtherDocElecSoftware software)
         {
             Contributor contributor = ODEContributor.Contributor;
-            //GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, existingOperation.SoftwareId);
             GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
             if (operation == null)
                 operation = new GlobalOtherDocElecOperation(contributor.Code, software.SoftwareId.ToString());
@@ -179,8 +178,7 @@ namespace Gosocket.Dian.Application
 
             operation.OtherDocElecContributorId = ODEContributor.Id;
             operation.OperationModeId = ODEContributor.OtherDocElecOperationModeId;
-            //operation.SoftwareId = ODEOperation.SoftwareId.ToString();
-            //operation.SoftwareId = software.SoftwareId.ToString();
+
             operation.SoftwareId = existingOperation.SoftwareId.ToString();
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;

@@ -44,8 +44,7 @@ namespace Gosocket.Dian.Domain.Entity
         public int ElectronicPayrollAjustmentAcceptedRequired { get; set; }
 
         public DateTime Date { get; set; }
-        //public DateTime StartDate { get; set; }
-        //public DateTime EndDate { get; set; }
+
         public string CreatedBy { get; set; }
         public string UpdateBy { get; set; }
         public bool Active { get; set; }

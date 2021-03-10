@@ -19,11 +19,6 @@ namespace Gosocket.Dian.Web.Models
 
         public string Id { get; set; }
 
-        //[DataType(DataType.Text)]
-        //[Display(Name = "Nombre de Usuario")]
-        ////[Required(ErrorMessage = "{0} es requerido.")]
-        //public string UserName { get; set; }
-
         [DataType(DataType.Text)]
         [Display(Name = "Nombre")]
         [Required(ErrorMessage = "{0} es requerido.")]

@@ -28,20 +28,6 @@ namespace Gosocket.Dian.Domain.Entity
 
         public bool Deleted { get; set; }
 
-        //public bool UpdateOtherDocument(GlobalOtherDocElecOperation item)
-        //{
-        //    return globalGlobalOtherDocElecOperation.InsertOrUpdate(item);
-        //}
-
-        //public GlobalOtherDocElecOperation EnableParticipantOtherDocument(string code, string softwareId)
-        //{
-        //    GlobalOtherDocElecOperation operation = globalGlobalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId.ToString());
-        //    if (operation.State != Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Test))
-        //        return new GlobalOtherDocElecOperation();
-        //    operation.State = Domain.Common.EnumHelper.GetDescription(Domain.Common.RadianState.Habilitado);
-        //    _ = UpdateOtherDocument(operation);
-        //    return operation;
-        //}
     }
 
 }

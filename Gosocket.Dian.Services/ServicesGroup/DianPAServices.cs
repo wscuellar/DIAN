@@ -31,17 +31,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
         private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
         private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
-        private TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
+        private readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
 
         private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
         //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
-        private TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
+        private readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
 
-        private TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
+        private readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
 
         private FileManager fileManager = new FileManager();
 
@@ -176,17 +175,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var zone2 = new GlobalLogger("", "Zone 2") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
             // ZONE 2
 
-
-            // Parser
-            //start = DateTime.UtcNow;
-            //var xmlBytes = contentFileList.First().XmlBytes;
-            //var xmlParser = new XmlParser(xmlBytes);
-            //if (!xmlParser.Parser())
-            //    throw new Exception(xmlParser.ParserError);
-
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
-            XmlParser xmlParser = new XmlParser();
+            XmlParser xmlParser;
             try
             {
                 xmlParser = new XmlParser(xmlBytes);
@@ -485,7 +476,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public DianResponse GetStatus(string trackId)
         {
             var globalStart = DateTime.UtcNow;
-            var start = DateTime.UtcNow;
+            DateTime start;
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
@@ -677,8 +668,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <returns></returns>
         public DianResponse GetStatusEvent(string trackId)
         {
-            var globalStart = DateTime.UtcNow;
-            var start = DateTime.UtcNow;
+            var globalStart = DateTime.UtcNow; 
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
@@ -686,8 +676,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
-                {
-                    start = DateTime.UtcNow;
+                { 
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
                     bool existDocument = false;
@@ -907,7 +896,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
-            XmlParser xmlParser = new XmlParser();
+            XmlParser xmlParser;
             try
             {
                 xmlParser = new XmlParser(xmlBytes);
@@ -1183,7 +1172,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     };
 
                     var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });
-                    //var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/RegistrateCompletedRadian", new { TrackId = trackIdCude });
+                   
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
@@ -1195,7 +1184,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
 
                     var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
-                    //var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>("http://localhost:7071/api/ApplicationResponseProcess", new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
+                    
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
@@ -1646,28 +1635,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 }
             }
-        }
-
-        private void UpdateFinishAttorney(string trackId, string trackIdAttorney, string eventCode)
-        {
-            //validation if is an anulacion de mandato (Code 044)
-            var arrayTasks = new List<Task>();
-            if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
-            {
-                List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
-                foreach (var documentAttorney in documentsAttorney)
-                {
-                    documentAttorney.Active = false;
-                    documentAttorney.DocReferencedEndAthorney = trackId;
-                    arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(documentAttorney));
-                }
-            }
-        }
-
-        private void InsertGlobalDocRegisterProviderAR(GlobalDocRegisterProviderAR documentRegisterAR)
-        {
-            var arrayTasks = new List<Task>();
-            arrayTasks.Add(TableManagerGlobalDocRegisterProviderAR.InsertOrUpdateAsync(documentRegisterAR));
         }
 
         

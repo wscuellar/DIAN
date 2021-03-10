@@ -7,7 +7,7 @@ namespace Gosocket.Dian.Application.FreeBiller
 {
     public class ProfileService 
     {
-        SqlDBContext sqlDBContext;
+        readonly SqlDBContext sqlDBContext;
 
         public ProfileService()
         {

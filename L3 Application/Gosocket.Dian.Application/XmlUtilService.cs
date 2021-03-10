@@ -40,7 +40,6 @@ namespace Gosocket.Dian.Application
 
         {
             var responseBytes = new byte[] { };
-            var messageIdNode = SerieNumberMessageFromDocType(documentMeta);
             var errors = new List<GlobalDocValidatorTracking>();
 
             var notifications = new List<GlobalDocValidatorTracking>();
@@ -306,9 +305,6 @@ namespace Gosocket.Dian.Application
         public static XElement BuildRootNode(GlobalDocValidatorDocumentMeta processResultEntity)
 
         {
-
-            var messageIdNode = SerieNumberMessageFromDocType(processResultEntity);
-
 
             var uuId = $"{processResultEntity.UblVersion}{processResultEntity.DocumentTypeId}{processResultEntity.SenderCode}{processResultEntity.ReceiverCode}{processResultEntity.Serie}{processResultEntity.Number}";
 
@@ -724,23 +720,13 @@ namespace Gosocket.Dian.Application
 
             var exist = fileManager.Exists(container, fileName);
 
-            //var xmlBytes = fileManager.GetBytes(container, fileName);
-
             if (!exist)
-
             {
-
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-
                 exist = fileManager.Exists(container, fileName);
-
             }
-
             return exist;
-
         }
-
-
 
         public static byte[] GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
 

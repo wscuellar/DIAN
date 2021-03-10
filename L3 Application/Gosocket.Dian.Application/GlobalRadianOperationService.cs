@@ -79,9 +79,9 @@ namespace Gosocket.Dian.Application
             return operation;
         }
 
-        public bool Delete(string code, string softwareId)
+        public bool Delete(string code, string v)
         {
-            GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(code, softwareId);
+            GlobalRadianOperations operation = globalRadianOperations.Find<GlobalRadianOperations>(code, v);
             return globalRadianOperations.Delete(operation);
         }
 

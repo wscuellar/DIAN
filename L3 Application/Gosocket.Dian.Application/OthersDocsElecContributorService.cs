@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Application
     public class OthersDocsElecContributorService : IOthersDocsElecContributorService
     {
         private static readonly TableManager testSetManager = new TableManager("GlobalTestSetOthersDocuments");
-        private SqlDBContext sqlDBContext;
+        private readonly SqlDBContext sqlDBContext;
         private readonly IContributorService _contributorService;
         private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
 
@@ -102,7 +102,6 @@ namespace Gosocket.Dian.Application
         {
             Contributor contributor = _contributorService.Get(contributorId);
             var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
-            //var testSetResults = _radianTestSetResultManager.GetTestSetResulByCatalog(contributor.Code);
 
             List<string> softwareAccepted = new List<string>();
             foreach (var item in contributorOperations)
@@ -308,7 +307,6 @@ namespace Gosocket.Dian.Application
             }
             else
             {
-                //sqlDBContext.Entry(contributor).State = System.Data.Entity.EntityState.Added;
                 result.Code = System.Net.HttpStatusCode.NotFound.GetHashCode();
                 result.Message = System.Net.HttpStatusCode.NotFound.ToString();
             }

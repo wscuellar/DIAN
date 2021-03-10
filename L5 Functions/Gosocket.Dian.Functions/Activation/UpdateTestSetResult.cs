@@ -259,6 +259,11 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 19.a", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_005");
                     SetLogger(null, "Step 19.b", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_006");
+
+                    Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
+                    GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+
+
                     // Determinamos si se puede ya dar por aceptado al set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeAccepted >= radianTesSetResult.ReceiptNoticeTotalAcceptedRequired
                             && radianTesSetResult.ReceiptServiceAccepted >= radianTesSetResult.ReceiptServiceTotalAcceptedRequired
@@ -281,10 +286,8 @@ namespace Gosocket.Dian.Functions.Activation
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
                         radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
+                        contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Habilitado);
                     }
-
-                    Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
-                    GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
 
 
                     SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
@@ -311,7 +314,7 @@ namespace Gosocket.Dian.Functions.Activation
                         SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_010");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
-                        contributorService.OperationReject(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType);
+                        contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
 
                     }
                     SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
