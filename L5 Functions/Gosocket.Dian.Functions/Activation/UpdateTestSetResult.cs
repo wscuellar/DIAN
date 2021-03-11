@@ -285,7 +285,7 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
-                        radianTesSetResult.StatusDescription = TestSetStatus.Accepted.GetDescription();
+                        radianTesSetResult.State = TestSetStatus.Accepted.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Habilitado);
                     }
 
@@ -313,7 +313,7 @@ namespace Gosocket.Dian.Functions.Activation
                     {
                         SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_010");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
-                        radianTesSetResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+                        radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
 
                     }
