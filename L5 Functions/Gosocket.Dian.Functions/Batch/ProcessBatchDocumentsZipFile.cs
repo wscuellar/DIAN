@@ -475,13 +475,17 @@ namespace Gosocket.Dian.Functions.Batch
                 if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
                 {
                     foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
-                    {
-                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active) 
+                    {                        
+                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active)
+                        {
+                            SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato " + itemDocsReferenceAttorney.IssuerAttorney, "ATT-2");
                             return itemDocsReferenceAttorney.IssuerAttorney;
+                        }                           
                     }
                 }
             }
-                                 
+
+            SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato return null", "ATT-3");
             return null;
         }
 
@@ -495,6 +499,7 @@ namespace Gosocket.Dian.Functions.Batch
 
             var result = new List<XmlParamsResponseTrackId>();
             List<RadianTestSetResult> lstResult = null;
+            bool messageMandato = false;
 
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
@@ -513,7 +518,8 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step code", "NIT Mandato: " + codeMandato + "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
-                GlobalAuthorization authEntity = null;               
+                GlobalAuthorization authEntity = null;
+                RadianTestSetResult objRadianTestSetResult = null;
 
                 if (string.IsNullOrEmpty(trimAuthCode))
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
@@ -530,19 +536,24 @@ namespace Gosocket.Dian.Functions.Batch
 
                         //Consulta exista testSetID registros RADIAN RadianTestSetResult
                         if (!string.IsNullOrWhiteSpace(codeMandato))
+                        {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(codeMandato);
+                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase) 
+                            && Convert.ToInt32(t.ContributorTypeId) == (int)RadianContributorType.TechnologyProvider);
+                            messageMandato = true;
+                        }
                         else
+                        {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
-
-
-                        RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
+                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
+                        }
+                        
                         var softwareId = softwareIds.Last();
 
                         //Validaciones exista testSetID GlobalTestSetOthersDocumentsResult
                         SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
                         List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-
 
                         if (objGlobalTestSetResult != null)
                         {
@@ -638,8 +649,16 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
-                            SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
+                            if (messageMandato)
+                            {
+                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });
+                            }
+                            else
+                            {
+                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.6");
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
+                            }                           
                         }
                     }
                 }
