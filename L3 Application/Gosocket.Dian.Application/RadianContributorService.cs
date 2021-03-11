@@ -190,10 +190,14 @@ namespace Gosocket.Dian.Application
              {
 
                  List<RadianTestSetResult> testSet = _radianTestSetResultManager.GetAllTestSetResultByContributor(c.Id).ToList();
-                 testSet = testSet.Where(t => !t.Deleted).ToList();
+                 testSet = testSet.Where(t => t.ContributorTypeId == c.RadianContributorTypeId.ToString() && !t.Deleted).ToList();
+                 string softwareTypeName = c.RadianOperationModeId == 1 ?
+                                            RadianOperationModeTestSet.OwnSoftware.GetDescription() :
+                                            Domain.Common.EnumHelper.GetEnumDescription(Enum.Parse(typeof(RadianOperationModeTestSet), c.RadianContributorTypeId.ToString()));
                  foreach (var item in testSet)
                  {
                      string[] parts = item.RowKey.Split('|');
+                     item.OperationModeName = string.IsNullOrEmpty(item.OperationModeName) ?  softwareTypeName : item.OperationModeName;
                      item.SoftwareId = parts[1];
                  }
                  List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();
@@ -268,7 +272,7 @@ namespace Gosocket.Dian.Application
 
             return true;
 
-            }
+        }
 
 
         #region Private methods Cancel Participant
@@ -468,12 +472,12 @@ namespace Gosocket.Dian.Application
             List<string> softwareAccepted = new List<string>();
             foreach (var item in contributorOperations)
             {
-                if(item.SoftwareId != null)
+                if (item.SoftwareId != null)
                 {
                     GlobalTestSetResult testset = GetTestSetResult(testSetResults, item, contributor.ContributorTypeId.Value);
                     if (testset != null && ((TestSetStatus)testset.Status) == TestSetStatus.Accepted)
                         softwareAccepted.Add(testset.SoftwareId);
-                }               
+                }
             }
 
             return softwareAccepted;
