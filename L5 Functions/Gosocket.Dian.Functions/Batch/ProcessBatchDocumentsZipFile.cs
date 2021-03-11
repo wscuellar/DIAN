@@ -476,7 +476,8 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
                     {
-                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3") return itemDocsReferenceAttorney.IssuerAttorney;
+                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active) 
+                            return itemDocsReferenceAttorney.IssuerAttorney;
                     }
                 }
             }
