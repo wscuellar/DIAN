@@ -35,7 +35,8 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
-       
+        private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
 
@@ -455,6 +456,23 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
+        private static string validateReferenceAttorney(string code, string codeProvider, string uuidReferences)
+        {
+            string senderCode = string.Empty;
+            var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(uuidReferences, code);
+            //Existe Mandato para el CUFE referenciado
+            if (docsReferenceAttorney != null && docsReferenceAttorney.Count >0) { 
+            }
+
+            //    var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(codeProvider, code);
+            //if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
+            //{
+                
+            //}
+
+            return senderCode;
+        }
+
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
         {
             SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
@@ -464,7 +482,13 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
             
             var result = new List<XmlParamsResponseTrackId>();
+         
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
+            var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
+            var uuidReferences = responseXpathDataValue.Select(x => x.XpathsValues["AppResDocumentReferenceKeyXpath"]).Distinct();  
+
+            //Valida existe un mandato
+
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
 
