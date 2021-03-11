@@ -465,17 +465,22 @@ namespace Gosocket.Dian.Functions.Batch
             foreach (var codeProvider in codeProviders.ToList())
                 IssuerAttorney = codeProvider;
 
-                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
-            
-            //Existe Mandato para el CUFE referenciado
-            if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
+            SetLogger(null, "Step-validateReferenceAttorney", " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
+
+            if(senderCode != IssuerAttorney)
             {
-                foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
+                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
+
+                //Existe Mandato Abierto
+                if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
                 {
-                    return itemDocsReferenceAttorney.IssuerAttorney;
+                    foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
+                    {
+                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3") return itemDocsReferenceAttorney.IssuerAttorney;
+                    }
                 }
             }
-                     
+                                 
             return null;
         }
 
@@ -488,6 +493,7 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
 
             var result = new List<XmlParamsResponseTrackId>();
+            List<RadianTestSetResult> lstResult = null;
 
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
@@ -495,17 +501,18 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
 
+            //Aplica para eventos AR 
+            string codeMandato = string.Empty;
+            if (flagApplicationResponse)
+                codeMandato = validateReferenceAttorney(codes, codeProviders);
+
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.2");
             foreach (var code in codes.ToList())
-            {
-                string codeSender = string.Empty;
-                if (flagApplicationResponse)
-                    codeSender = validateReferenceAttorney(codes, codeProviders);
-
-                SetLogger(null, "Step code", "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
+            {                
+                SetLogger(null, "Step code", "NIT Mandato: " + codeMandato + "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
-                GlobalAuthorization authEntity = null;
+                GlobalAuthorization authEntity = null;               
 
                 if (string.IsNullOrEmpty(trimAuthCode))
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
@@ -521,7 +528,12 @@ namespace Gosocket.Dian.Functions.Batch
                         SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
 
                         //Consulta exista testSetID registros RADIAN RadianTestSetResult
-                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+                        if (!string.IsNullOrWhiteSpace(codeMandato))
+                            lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(codeMandato);
+                        else
+                            lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+
+
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                         var softwareId = softwareIds.Last();
 
