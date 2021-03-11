@@ -1077,7 +1077,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
-                    if (party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                    if ((party.SenderParty == senderCode || party.SenderParty == receiverCode) 
+                        || (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty)))
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1087,20 +1088,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }
-                    else
-                    {
-                        if (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty))
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "LGC64",
-                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
                     }
                     
                     //Valida receptor documento AR coincida con DIAN
@@ -1281,7 +1268,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
-                    if (party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                    if ((party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                        || (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty)))
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -1291,20 +1279,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
-                    }
-                    else
-                    {
-                        if (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty))
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "LGC64",
-                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
                     }
 
                     // Valida receptor documento AR coincida con DIAN
@@ -4111,7 +4085,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateSigningTime
-        public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null)
+        public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null,
+            DateTime? signingTimeAvailability = null)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             int businessDays = 0;
@@ -4503,26 +4478,43 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoGarantia:
                 case (int)EventStatus.EndosoProcuracion:
                 case (int)EventStatus.EndosoPropiedad:
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageSign,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
                     DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
                     DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime);
                     string errorCode = string.Empty;
                     string errorMessage = string.Empty;
+                    string errorCodeAvailability = string.Empty;
+                    string errorMessageAvailability = string.Empty;
+
                     if ((int)EventStatus.EndosoPropiedad == Convert.ToInt32(data.EventCode))
                     {
                         errorCode = "DC24j";
                         errorMessage = "No se puede generar el evento endoso en propiedad antes de la fecha de generación del documento referenciado.";
+                        errorCodeAvailability = "DC24k";
+                        errorMessageAvailability = "No se puede generar el evento endoso en propiedad antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
                     }
                     else if ((int)EventStatus.EndosoGarantia == Convert.ToInt32(data.EventCode))
                     {
                         errorCode = "DC24l";
                         errorMessage = "No se puede generar el evento endoso en garantía antes de la fecha de generación del documento referenciado.";
+                        errorCodeAvailability = "DC24m";
+                        errorMessageAvailability = "No se puede generar el evento endoso en garantía antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
                     }
                     else
                     {
                         errorCode = "DC24o";
                         errorMessage = "No se puede generar el evento endoso en procuración antes de la fecha de generación del documento referenciado.";
+                        errorCodeAvailability = "DC24p";
+                        errorMessageAvailability = "No se puede generar el evento endoso en procuración antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
                     }
-
 
                     if (signingTimeEndoso.Date < signingTimeFEV.Date)
                     {
@@ -4535,17 +4527,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    else
+
+                    // validación contra de la fecha de firma de la Disponibilización.
+                    if (signingTimeEndoso.Date < signingTimeAvailability.Value.Date)
                     {
                         responses.Add(new ValidateListResponse
                         {
-                            IsValid = true,
+                            IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = errorMessageSign,
+                            ErrorCode = errorCodeAvailability,
+                            ErrorMessage = errorMessageAvailability,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+
                     break;
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);

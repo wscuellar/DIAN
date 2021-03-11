@@ -12,6 +12,7 @@ using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -328,6 +329,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             var validateResponses = new List<ValidateListResponse>();
             EventStatus code;
+            string trackIdAvailability = null;
             string originalTrackId = data.TrackId;
             switch (int.Parse(data.EventCode))
             {
@@ -342,6 +344,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 case (int)EventStatus.Avales:
+                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
                     code = EventStatus.SolicitudDisponibilizacion;
                     break;
                 default:
@@ -411,11 +416,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
             }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad 
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
+                    "0" + (int)code);
+                if (documentMeta != null || documentMeta.Count > 0)
+                {
+                    // se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
+                    documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
+                    // ...
+                    foreach (var itemDocumentMeta in documentMeta)
+                    {
+                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                        if (documentValidator != null)
+                        {
+                            trackIdAvailability = itemDocumentMeta.PartitionKey;
+                            break;
+                        }
+                    }
+                }
+            }
+
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
-
+            
             // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
             // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
             string parameterPaymentDueDateFE = null;
@@ -430,9 +458,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
             }
 
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            DateTime? signingTimeAvailability = null;
+            if ((Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion) && !string.IsNullOrWhiteSpace(trackIdAvailability))
+            {
+                var availabilityXmlBytes = await GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                signingTimeAvailability = Convert.ToDateTime(availabilityXmlParser.SigningTime);
+            }
+
+                var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE));
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+                signingTimeAvailability: signingTimeAvailability));
 
             return validateResponses;
         }
