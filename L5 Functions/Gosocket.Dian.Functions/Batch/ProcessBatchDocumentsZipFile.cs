@@ -456,38 +456,41 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static string validateReferenceAttorney(string code, string codeProvider, string uuidReferences)
+        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders)
         {
             string senderCode = string.Empty;
-            var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(uuidReferences, code);
+            string IssuerAttorney = string.Empty;
+            foreach (var code in codes.ToList())
+                senderCode = code;
+            foreach (var codeProvider in codeProviders.ToList())
+                IssuerAttorney = codeProvider;
+
+                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
+            
             //Existe Mandato para el CUFE referenciado
-            if (docsReferenceAttorney != null && docsReferenceAttorney.Count >0) { 
+            if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
+            {
+                foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
+                {
+                    return itemDocsReferenceAttorney.IssuerAttorney;
+                }
             }
-
-            //    var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(codeProvider, code);
-            //if (docsReferenceAttorney == null || !docsReferenceAttorney.Any())
-            //{
-                
-            //}
-
-            return senderCode;
+                     
+            return null;
         }
 
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
         {
             SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
             SetLogger(null, "Step-Checkpermission 1", authCode, "CHECK-02");
-            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");          
+            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");
             SetLogger(null, "Step-Checkpermission 4", nitNomina, "CHECK-05");
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
-            
+
             var result = new List<XmlParamsResponseTrackId>();
-         
+
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
-            var uuidReferences = responseXpathDataValue.Select(x => x.XpathsValues["AppResDocumentReferenceKeyXpath"]).Distinct();  
-
-            //Valida existe un mandato
 
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
@@ -495,6 +498,10 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.2");
             foreach (var code in codes.ToList())
             {
+                string codeSender = string.Empty;
+                if (flagApplicationResponse)
+                    codeSender = validateReferenceAttorney(codes, codeProviders);
+
                 SetLogger(null, "Step code", "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
@@ -514,7 +521,7 @@ namespace Gosocket.Dian.Functions.Batch
                         SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
 
                         //Consulta exista testSetID registros RADIAN RadianTestSetResult
-                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);                       
+                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                         RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                         var softwareId = softwareIds.Last();
 
@@ -568,19 +575,19 @@ namespace Gosocket.Dian.Functions.Batch
 
                         }
                         else if (objGlobalTestSetOthersDocumentResult != null)
-                        {                            
+                        {
                             //Validaciones GlobalTestSetOthersDocumentsResult documento de Nomina
                             SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
-                          
+
                             SetLogger(null, "Step code", "Estoy verificando nomina idSoftware " + softwareIdNomina, "CHECK-10.2.1");
-                            
+
                             GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
                             if (objGlobalTestSetOthersDocumentResult != null &&
                                 (objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.InProcess ||
                                 objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Accepted ||
                                 objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Rejected))
                                 testSetOthersDocumentsResultEntity = objGlobalTestSetOthersDocumentResult;
-                               
+
                             SetLogger(testSetOthersDocumentsResultEntity, "Step code", "comprueba validaciones Nomina", "CHECK-10.2.3");
 
                             if (testSetOthersDocumentsResultEntity == null)
@@ -593,13 +600,13 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                             SetLogger(result, "Step code", "Finaliza validaciones Nomina", "CHECK-10.2.4");
-                            
+
                         }
-                        else if(objRadianTestSetResult != null)
+                        else if (objRadianTestSetResult != null)
                         {
                             SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.4");
                             // Validations to RADIAN  
-                         
+
                             RadianTestSetResult radianTestSetResultEntity = null;
                             if (objRadianTestSetResult != null &&
                                 (objRadianTestSetResult.Status == (int)TestSetStatus.InProcess ||
@@ -626,8 +633,7 @@ namespace Gosocket.Dian.Functions.Batch
             }
 
             return result;
-        }
-
+        }       
 
         private static async Task ProcessBatchFileResults(IEnumerable<GlobalBatchFileResult> batchFileResults)
         {
