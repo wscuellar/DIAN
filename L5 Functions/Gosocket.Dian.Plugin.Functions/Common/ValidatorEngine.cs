@@ -633,6 +633,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             var endDate = Convert.ToDateTime(item.EndDate);
                             if (endDate.Date > DateTime.Now.Date) issuerAttorneyList.Add(item.IssuerAttorney);
                         }
+                        else issuerAttorneyList.Add(item.IssuerAttorney);
                     });
                 }
             }

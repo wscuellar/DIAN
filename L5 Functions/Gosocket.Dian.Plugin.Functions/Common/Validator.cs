@@ -4490,9 +4490,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime);
                     string errorCode = string.Empty;
                     string errorMessage = string.Empty;
-                    string errorCodeAvailability = string.Empty;
-                    string errorMessageAvailability = string.Empty;
-
+                    string errorMessageAvailability;
+                    string errorCodeAvailability;
                     if ((int)EventStatus.EndosoPropiedad == Convert.ToInt32(data.EventCode))
                     {
                         errorCode = "DC24j";
@@ -4528,7 +4527,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     // validación contra de la fecha de firma de la Disponibilización.
-                    if (signingTimeEndoso.Date < signingTimeAvailability.Value.Date)
+                    if (signingTimeEndoso < signingTimeAvailability.Value)
                     {
                         responses.Add(new ValidateListResponse
                         {
