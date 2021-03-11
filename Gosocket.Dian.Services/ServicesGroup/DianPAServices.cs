@@ -31,14 +31,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
         private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
         private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
-        private readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
 
         private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
         //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
 
         private readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
 

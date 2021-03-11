@@ -4,7 +4,6 @@ namespace Gosocket.Dian.Application
 {
     #region Using
 
-    using Gosocket.Dian.Application.Cosmos;
     using Gosocket.Dian.Domain.Common;
     using Gosocket.Dian.Domain.Domain;
     using Gosocket.Dian.Domain.Entity;
@@ -348,8 +347,6 @@ namespace Gosocket.Dian.Application
             template = template.Replace(" {AcquirerDocumentNumber}", string.Empty);
             template = template.Replace( "{AcquirerTradeName}", dataValues.XpathsValues["AcquirerTradeName"]);
 
-
-            //template = template.Replace( "{AcquirerTaxpayerType}", dataValues.XpathsValues["AcquirerTaxpayerType"]);
             if (dataValues.XpathsValues["AcquirerTaxpayerType"] != null)
             {
                 template = template.Replace("{AcquirerTaxpayerType}",

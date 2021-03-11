@@ -1,7 +1,6 @@
 ﻿using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Services.Models;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
@@ -145,7 +144,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
             var xmlBytes = fileManager2.GetBytes(container, fileName);
 
-            tableManager = null;
             return xmlBytes;
         }
 
@@ -872,7 +870,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Parser
 
             // ZONE 3
-            start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
             if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
             var trackId = documentParsed.CUNE;

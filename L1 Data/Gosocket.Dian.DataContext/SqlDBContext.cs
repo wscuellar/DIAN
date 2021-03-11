@@ -114,45 +114,6 @@ namespace Gosocket.Dian.DataContext
 
             #endregion
 
-
-            #region OthersDocsElec Contributor relations
-            ////Contributor-AcceptanceStatus one-to-one 
-            //modelBuilder.Entity<OtherDocElecContributor>()
-            //.HasRequired<AcceptanceStatus>(s => s.AcceptanceStatus)
-            //.WithMany()
-            //.HasForeignKey<int>(s => s.AcceptanceStatusId);
-
-            ////Contributor-OperationMode one-to-one 
-            //modelBuilder.Entity<OtherDocElecContributor>()
-            //.HasOptional<OtherDocElecOperationMode>(s => s.OtherDocElecOperationModes)
-            //.WithMany()
-            //.HasForeignKey<int?>(s => s.OtherDocElecOperationModeId);
-
-            ////Contributor-ContributorType one-to-one 
-            //modelBuilder.Entity<OtherDocElecContributor>()
-            //.HasOptional<ContributorType>(s => s.ContributorType)
-            //.WithMany()
-            //.HasForeignKey<int?>(s => s.ContributorTypeId);
-
-            ////Contributor - Contributor one-to-many Provider as many Clients
-            //modelBuilder.Entity<Contributor>()
-            //.HasOptional<Contributor>(s => s.Provider)
-            //.WithMany(g => g.Clients)
-            //.HasForeignKey<int?>(s => s.ProviderId);
-
-            //// Contributor has many Software 
-            //modelBuilder.Entity<Contributor>()
-            //    .HasMany<Software>(c => c.Softwares)
-            //    .WithMany();
-
-
-            //modelBuilder.Entity<OtherDocElecContributorOperations>()
-            //.HasOptional(co => co.OtherDocElecSoftwares)
-            //.WithMany()
-            //.HasForeignKey(co => co.SoftwareId);
-
-            #endregion
-
         }
 
         public DbSet<Software> Softwares { set; get; }
