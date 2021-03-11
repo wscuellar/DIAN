@@ -137,7 +137,8 @@ namespace Gosocket.Dian.Application
                 return new ResponseMessage() { Message = "El software encuentra en estado aceptado.", Code = 500 };
 
             var result = _othersDocsElecContributorOperationRepository.Delete(operationToDelete.Id);
-            _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
+            if (software != null)
+                _othersDocsElecSoftwareService.DeleteSoftware(software.Id);
 
             return result;
         }

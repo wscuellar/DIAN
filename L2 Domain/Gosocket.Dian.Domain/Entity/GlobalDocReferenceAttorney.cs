@@ -1,6 +1,8 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 
-public class GlobalDocReferenceAttorney : TableEntity
+namespace Gosocket.Dian.Domain.Entity
+{
+    public class GlobalDocReferenceAttorney : TableEntity
 {
     public GlobalDocReferenceAttorney() { }
 
@@ -24,4 +26,4 @@ public class GlobalDocReferenceAttorney : TableEntity
     public string SerieAndNumber { get; set; }
     public string ResponseCodeListID { get; set; }
 }
-
+}

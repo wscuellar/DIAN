@@ -219,7 +219,7 @@ namespace Gosocket.Dian.Web.Controllers
                 OperationModeName = t.OperationModeName,
                 SoftwareId = t.SoftwareId,
                 Status = t.Status,
-                StatusDescription = t.StatusDescription
+                StatusDescription = t.State
             }).ToList();
 
 

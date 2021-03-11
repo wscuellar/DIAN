@@ -33,7 +33,7 @@
             documentParsed.DocumentTypeIdRef = documentParsed?.DocumentTypeIdRef;
             documentParsed.IssuerPartyName = documentParsed?.IssuerPartyName;
             documentParsed.IssuerPartyCode = documentParsed?.IssuerPartyCode;
-            documentParsed.ProviderCode = documentParsed.ProviderCode;
+            documentParsed.ProviderCode = documentParsed?.ProviderCode;
             documentParsed.ValidityPeriodEndDate = documentParsed?.ValidityPeriodEndDate;
         }
     }
