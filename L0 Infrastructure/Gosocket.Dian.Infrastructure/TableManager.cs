@@ -244,6 +244,25 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
+        public T ExistTarifa<T>(string rowkey, string tarifa) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("Rowkey",
+                    QueryComparisons.Equal,
+                    rowkey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("Tarifa",
+                    QueryComparisons.Equal,
+                    tarifa));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
+ 
         public IEnumerable<T> FindAll<T>(string partitionKey) where T : ITableEntity, new()
         {
             TableContinuationToken token = null;

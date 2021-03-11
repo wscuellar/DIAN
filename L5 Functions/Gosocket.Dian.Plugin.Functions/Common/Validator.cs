@@ -201,8 +201,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool existTaxRate = false;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();           
             bool validTax = true;
             string xmlID = string.Empty;
             string xmlPercent = string.Empty;
@@ -228,8 +227,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     xmlPercent = percentCategoryListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString();
 
-                    existTaxRate = TableManagerGlobalTaxRate.Exist<GlobalTaxRate>(xmlID, xmlPercent);
-                    if (!existTaxRate)
+                    GlobalTaxRate existTaxRate = TableManagerGlobalTaxRate.ExistTarifa<GlobalTaxRate>(xmlID, xmlPercent);
+                    if (existTaxRate == null)
                     {
                         responses.Add(new ValidateListResponse
                         {
