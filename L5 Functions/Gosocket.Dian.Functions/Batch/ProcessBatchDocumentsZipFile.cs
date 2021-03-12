@@ -648,8 +648,7 @@ namespace Gosocket.Dian.Functions.Batch
                         if (!string.IsNullOrWhiteSpace(codeMandato))
                         {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(codeMandato);
-                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase) 
-                            && Convert.ToInt32(t.ContributorTypeId) == (int)RadianContributorType.TechnologyProvider);
+                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
                             messageMandato = true;
                         }
                         else
