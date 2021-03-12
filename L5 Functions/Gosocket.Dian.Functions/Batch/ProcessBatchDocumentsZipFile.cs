@@ -523,6 +523,7 @@ namespace Gosocket.Dian.Functions.Batch
                 { "AppResDocumentKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='UUID']"},
                 { "AppResDocumentReferenceKeyXpath","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']"},
                 { "AppResCustomizationIDXpath","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']"},
+                { "AppResListIDXpath","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID"},
 
                 //Xpath Nomina Individual
                 { "NominaCUNE", "//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@CUNE"},
@@ -540,18 +541,30 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders)
+        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders, IEnumerable<string> eventCodes, IEnumerable<string> responseListIds)
         {
             string senderCode = string.Empty;
             string IssuerAttorney = string.Empty;
+            string eventCode = string.Empty;
+            string listId = string.Empty;
+
             foreach (var code in codes.ToList())
                 senderCode = code;
             foreach (var codeProvider in codeProviders.ToList())
                 IssuerAttorney = codeProvider;
+            foreach (var responseCode in eventCodes.ToList())
+                eventCode = responseCode;
+            foreach (var itemListId in responseListIds)
+                listId = itemListId;
 
-            SetLogger(null, "Step-validateReferenceAttorney", " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
+            SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
 
-            if(senderCode != IssuerAttorney)
+            //Evento Mandato el provider es el mandatario
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
+                return IssuerAttorney;
+
+            //Otros eventos se evalua el sender es diferente al provider para consultar existe un mandato
+            if (senderCode != IssuerAttorney)
             {
                 var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
 
@@ -594,11 +607,13 @@ namespace Gosocket.Dian.Functions.Batch
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
+            var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
+            var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();            
 
             //Aplica para eventos AR 
             string codeMandato = string.Empty;
             if (flagApplicationResponse)
-                codeMandato = validateReferenceAttorney(codes, codeProviders);           
+                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds);           
 
             foreach (var code in codes.ToList())
             {
