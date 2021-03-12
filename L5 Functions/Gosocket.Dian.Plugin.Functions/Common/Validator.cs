@@ -1556,7 +1556,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateEndosoTrusted"), out bool ValidateEndosoTrusted);
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -1567,7 +1567,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1586,7 +1586,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1618,7 +1618,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1631,7 +1631,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -4091,6 +4091,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime? signingTimeAvailability = null)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
             int businessDays = 0;
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
@@ -4162,7 +4163,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                          ? new ValidateListResponse
                          {
                              IsValid = false,
-                             Mandatory = true,
+                             Mandatory = ValidateManadatory,
                              ErrorCode = "DC24z",
                              ErrorMessage =
                                 "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación " +
@@ -4186,7 +4187,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ? new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "DC24c",
                             ErrorMessage = "No se puede generar el evento pasado los 3 días hábiles de la fecha de generación " +
                             "del evento Recibo del bien y prestación del servicio.",
@@ -4215,7 +4216,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         : new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "DC24e",
                             ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación" +
                             " del evento Recibo del bien y prestación del servicio.",
@@ -4231,7 +4232,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "LGC55",
                             ErrorMessage = "No se puede registrar el evento ya que la fecha de firma es superior " +
                                 "a la fecha de vencimiento de la factura electrónica de venta ",
