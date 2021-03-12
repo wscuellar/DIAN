@@ -1279,7 +1279,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         string existCancelElectronicEvent = string.Empty;
                         string senderCode = xmlParserCude.Fields["SenderCode"].ToString();
                         var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
-                        if (listLimitacion != null || listLimitacion.Count > 0)
+                        if (listLimitacion != null)
                         {
                             foreach (var itemListLimitacion in listLimitacion)
                             {

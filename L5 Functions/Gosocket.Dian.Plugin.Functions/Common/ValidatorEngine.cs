@@ -383,7 +383,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     code = EventStatus.AceptacionTacita;
                     documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                         "0" + (int)code);
-                    if (documentMeta != null || documentMeta.Count > 0)
+                    if (documentMeta != null)
                     {
                         foreach (var itemDocumentMeta in documentMeta)
                         {

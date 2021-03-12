@@ -34,14 +34,13 @@ namespace Gosocket.Dian.DataContext.Repositories
             return query.FirstOrDefault();
         }
 
-        public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId)
+        public bool GetParticipantWithActiveProcess(int contributorId)
         {
             List<RadianContributor> participants = (from p in sqlDBContext.RadianContributors.Where(t => t.ContributorId == contributorId && t.RadianState != "Cancelado")
                                                     join o in sqlDBContext.RadianContributorOperations on p.Id equals o.RadianContributorId
-                                                    where p.RadianContributorTypeId != contributorTypeId
-                                                    && p.RadianOperationModeId == 1
-                                                    && o.OperationStatusId < 4
-                                                    && !o.Deleted
+                                                    where 
+                                                         o.OperationStatusId < 4
+                                                        && !o.Deleted
                                                     select p).ToList();
             return participants.Any();
 

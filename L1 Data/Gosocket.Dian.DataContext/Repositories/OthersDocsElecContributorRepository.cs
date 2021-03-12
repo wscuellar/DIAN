@@ -92,60 +92,29 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public PagedResult<OtherDocElecContributor> List(Expression<Func<OtherDocElecContributor, bool>> expression, int page = 0, int length = 0)
         {
-            try
-            {
-                IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
-                 .Include("Contributor")
-                 .Include("OtherDocElecSoftwares")
-                 .Include("OtherDocElecSoftwares.OtherDocElecContributorOperations")
-                 .Include("OtherDocElecContributorType")
-                 .Include("OtherDocElecOperationMode")
-                 .Include("OtherDocElecContributorOperations");
+            IQueryable<OtherDocElecContributor> query = sqlDBContext.OtherDocElecContributors.Where(expression)
+             .Include("Contributor")
+             .Include("OtherDocElecSoftwares")
+             .Include("OtherDocElecSoftwares.OtherDocElecContributorOperations")
+             .Include("OtherDocElecContributorType")
+             .Include("OtherDocElecOperationMode")
+             .Include("OtherDocElecContributorOperations");
 
-                return query.Paginate(page, length, t => t.Id.ToString());
-            }
-            catch (Exception)
-            { 
-            }
-
-            return new PagedResult<OtherDocElecContributor>();
+            return query.Paginate(page, length, t => t.Id.ToString());
         }
 
         public bool GetParticipantWithActiveProcess(int contributorId, int contributorTypeId, int OperationModeId, int statusSowftware)
         {
             return (from p in sqlDBContext.OtherDocElecContributors.Where(t => t.ContributorId == contributorId)
-                                                          join o in sqlDBContext.OtherDocElecSoftwares on p.Id equals o.OtherDocElecContributorId
-                                                          where p.OtherDocElecOperationModeId == OperationModeId
-                                                          && o.OtherDocElecSoftwareStatusId == statusSowftware
-                                                          && o.Deleted==false
-                                                          select p).ToList().Any();
+                    join o in sqlDBContext.OtherDocElecSoftwares on p.Id equals o.OtherDocElecContributorId
+                    where p.OtherDocElecOperationModeId == OperationModeId
+                    && o.OtherDocElecSoftwareStatusId == statusSowftware
+                    && o.Deleted == false
+                    select p).ToList().Any();
         }
 
         public PagedResult<OtherDocElecCustomerList> CustomerList(int id, string code, string State, int page = 0, int length = 0)
         {
-            //IQueryable<OtherDocElecCustomerList> query = (from oc in sqlDBContext.OtherDocElecContributors
-            //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-            //                                        join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
-            //                                        join oc2 in sqlDBContext.OtherDocElecContributors on oco.OtherDocElecContributorId equals oc2.Id
-            //                                        join c in sqlDBContext.Contributors on oc2.ContributorId equals c.Id 
-            //                                        where oc.Id == id
-            //                                        && oc.OtherDocElecOperationModeId == 2
-            //                                        && oc.State != "Cancelado"
-            //                                        && (string.IsNullOrEmpty(code) || c.Code == code)
-            //                                        && (string.IsNullOrEmpty(State) || oc2.State == State)
-
-            //                                        select new OtherDocElecCustomerList()
-            //                                        {
-            //                                            Id = oc2.Id,
-            //                                            BussinessName = c.BusinessName,
-            //                                            Nit = c.Code,
-            //                                            State = oc2.State,
-            //                                            Page = page,
-            //                                            Length = length
-            //                                        }).Distinct();
-
-            //return query.Paginate(page, length, t => t.Id.ToString());
-
             IQueryable<OtherDocElecCustomerList> query = (from c in sqlDBContext.Contributors
                                                           join dec in sqlDBContext.OtherDocElecContributors on c.Id equals dec.ContributorId
                                                           join s in sqlDBContext.OtherDocElecSoftwares on dec.Id equals s.OtherDocElecContributorId

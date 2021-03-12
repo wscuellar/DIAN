@@ -326,13 +326,6 @@ namespace Gosocket.Dian.Application
 
         public List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId)
         {
-            //return _othersDocsElecContributorRepository
-            //    .Get(x => x.ContributorId == contributorId && x.OtherDocElecSoftwares
-            //        .Any(y => y.OtherDocElecSoftwareStatusId == statusId));
-
-            //return _othersDocsElecContributorRepository
-            //    .List(x => x.ContributorId == contributorId, 0, 0).Results;
-
             return _othersDocsElecContributorRepository
                 .List(x => x.ContributorId == contributorId && x.OtherDocElecContributorOperations.Any(z => z.Deleted == false), 0, 0)
                 .Results

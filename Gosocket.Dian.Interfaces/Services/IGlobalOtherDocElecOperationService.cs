@@ -14,6 +14,6 @@ namespace Gosocket.Dian.Interfaces.Services
         List<GlobalOtherDocElecOperation> OperationList(string code);
         bool SoftwareAdd(GlobalSoftware item);
         GlobalOtherDocElecOperation EnableParticipant(string code, string softwareId);
-        bool Delete(string code, string v);
+        bool Delete(string code, string softwareId);
     }
 }

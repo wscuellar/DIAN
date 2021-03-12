@@ -126,7 +126,7 @@ namespace Gosocket.Dian.Application
 
             //-----------------marca como elimnado el set de prueba.
             RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == operationToDelete.RadianContributor.Id);
-            string key = operationToDelete.SoftwareType.ToString() + "|" + operationToDelete.SoftwareId.ToString();
+            string key = participant.RadianContributorTypeId + "|" + operationToDelete.SoftwareId.ToString();
             RadianTestSetResult oper = _radianTestSetResultService.GetTestSetResult(radianContributor.Contributor.Code, key);
             oper.Deleted = true;
             _radianTestSetResultService.InsertTestSetResult(oper);
@@ -205,15 +205,15 @@ namespace Gosocket.Dian.Application
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
 
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
+
             if (validateOperation)
             {
-                //&& t.SoftwareType == radianContributorOperation.SoftwareType
-                List<RadianContributorOperation> currentOperations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.OperationStatusId != (int)RadianState.Habilitado && !t.Deleted);
-                if (currentOperations.Any())
+                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(radianContributor.ContributorId);
+                if (otherActiveProcess)
                     return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
             }
 
-            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorOperation.RadianContributorId);
             RadianContributorOperation existingOperation = _radianContributorOperationRepository.Get(t => t.RadianContributorId == radianContributorOperation.RadianContributorId && t.SoftwareId == radianContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);

@@ -3,10 +3,16 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
+using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
+using Gosocket.Dian.Plugin.Functions.Event;
 using Gosocket.Dian.Plugin.Functions.Models;
+using Gosocket.Dian.Plugin.Functions.SigningTime;
+using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Services.Utils;
+using Gosocket.Dian.Services.Utils.Common;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
@@ -15,22 +21,15 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.XPath;
-using Gosocket.Dian.Infrastructure.Utils;
 using ContributorType = Gosocket.Dian.Domain.Common.ContributorType;
 using OperationMode = Gosocket.Dian.Domain.Common.OperationMode;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
-using Gosocket.Dian.Plugin.Functions.ValidateParty;
-using Gosocket.Dian.Services.Utils.Common;
-using Gosocket.Dian.Plugin.Functions.SigningTime;
-using Gosocket.Dian.Plugin.Functions.Event;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Gosocket.Dian.Services.Utils;
-using System.Runtime.InteropServices;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -490,7 +489,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
-            var softwareId = objCune.SoftwareId;
+            var softwareId = objCune?.SoftwareId;
             if (softwareId == billerSoftwareId)
             {
                 key = billerSoftwarePin;

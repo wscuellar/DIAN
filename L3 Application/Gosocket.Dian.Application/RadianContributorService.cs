@@ -83,11 +83,11 @@ namespace Gosocket.Dian.Application
             if (!indirectElectronicBiller && GetSoftwareOwn(contributor.Id) == null)
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
-            if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
+            //if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id, (int)radianContributorType);
+                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id);
                 if (otherActiveProcess)
-                    return new ResponseMessage(TextResources.OnlyActiveProcess, TextResources.alertType);
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType);
             }
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
