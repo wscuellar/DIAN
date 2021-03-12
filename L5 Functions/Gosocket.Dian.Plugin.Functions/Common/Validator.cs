@@ -4274,7 +4274,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
 
                                     IsValid = false,
-                                    Mandatory = true,
+                                    Mandatory = ValidateManadatory,
                                     ErrorCode = "LGC56",
                                     ErrorMessage = "No se puede registrar el evento ya que la fecha de vencimiento de la factura electrónica de venta  " +
                                     "es superior a 3 días de la fecha de firma del evento ",

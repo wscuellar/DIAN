@@ -43,10 +43,10 @@ namespace Gosocket.Dian.Services.Utils
 
             byte[] resultArray = new byte[] { };
 
-            foreach (var item in responses)
+            foreach (var item in responses.Distinct())
             {
                 if (item.Content == null) continue;
-                zipFile.AddEntry($"{item.DocumentKey}.xml", item.Content);
+                zipFile.AddEntry($"{item.DocumentKey}.xml", item.Content);                
             }
 
             using (var memoryStream = new MemoryStream())

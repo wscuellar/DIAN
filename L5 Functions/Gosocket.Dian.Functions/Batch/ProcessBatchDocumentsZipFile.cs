@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Functions.Batch
@@ -454,10 +455,23 @@ namespace Gosocket.Dian.Functions.Batch
                 var successAppResponses = appResponses.Where(x => x.Success && x.Content != null).ToList();
                 log.Info($"{successAppResponses.Count()} application responses generated.");
                 if (successAppResponses.Any())
-                {
-                    var multipleZipBytes = ZipExtensions.CreateMultipleZip(zipKey, successAppResponses);
-                    var uploadResult = new FileManager().Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
-                    log.Info($"Upload applition responses zip OK.");
+                {                    
+                    var thread = new Thread(() =>
+                    {                      
+                        try
+                        {
+                            SetLogger(null, "Step Hilo successAppResponses ", " Upload applition responses zip OK ", "PROC-04");
+                            var multipleZipBytes = ZipExtensions.CreateMultipleZip(zipKey, successAppResponses);
+                            var uploadResult = new FileManager().Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
+                            log.Info($"Upload applition responses zip OK.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SetLogger(null, "Step Hilo successAppResponses ", " CreateMultipleZip " + ex.Message, "PROC-05");
+                        }                       
+                    });
+                    // Iniciar el hilo
+                    thread.Start();
                 }
 
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));               
@@ -575,7 +589,7 @@ namespace Gosocket.Dian.Functions.Batch
                         if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active)
                         {
                             SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato " + itemDocsReferenceAttorney.IssuerAttorney, "ATT-2");
-                            return itemDocsReferenceAttorney.IssuerAttorney;
+                            return itemDocsReferenceAttorney.SenderCode;
                         }                           
                     }
                 }
