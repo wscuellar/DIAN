@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,15 +45,16 @@ namespace Gosocket.Dian.Functions.Batch
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-            var testSetId = string.Empty;            
+            var testSetId = string.Empty;
+            var start = DateTime.UtcNow;
             var zipKey = string.Empty;
             string nitNomina = string.Empty;
             string softwareIdNomina = string.Empty;
             XmlParseNomina xmlParser = null;
             GlobalBatchFileStatus batchFileStatus = null;
+           
             try
-            {
-                
+            {                
                 var data = string.Empty;
                 try
                 {
@@ -69,6 +71,13 @@ namespace Gosocket.Dian.Functions.Batch
                 zipKey = obj.ZipKey;
                 log.Info($"Init batch process for zipKey {zipKey}.");
                 tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "START", ""));
+
+                var startBatch = new GlobalLogger(zipKey, "1 Start ProcessBatchDocumentsZipFile")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Start ProcessBatchZip"
+                };              
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(startBatch);
 
                 // Get zip from storgae
                 var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/{obj.BlobPath}/{zipKey}.zip");
@@ -97,18 +106,30 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
 
-                SetLogger(null, "Step prueba nomina", " validando consulta " + flagApplicationResponse, "PROC-01");
+                start = DateTime.UtcNow;
+                var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "validando consulta " + flagApplicationResponse
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
 
                 var xmlBytes = contentFileList.First().XmlBytes;               
 
                 if (setResultOther != null)
                 {
-                    xmlParser = new XmlParseNomina();
-                    SetLogger(null, "Step prueba nomina", " Trajo datos setResultOther ", "BATCH-01.0");
+                    xmlParser = new XmlParseNomina();                   
                     xmlParser = new XmlParseNomina(xmlBytes);
                     nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
                     softwareIdNomina = xmlParser.globalDocPayrolls.SoftwareID;
-                    SetLogger(null, "Step prueba nomina", " Trajo datos testSetId" + testSetId + " nitNomina " + nitNomina, "BATCH-01");
+
+                    start = DateTime.UtcNow;
+                    var flagNomina = new GlobalLogger(zipKey, "3 flagNomina")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "Step prueba nomina Trajo datos testSetId " + testSetId + " nitNomina " + nitNomina
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(flagNomina);
                 }
 
                 // Check big contributor
@@ -128,8 +149,14 @@ namespace Gosocket.Dian.Functions.Batch
                     }
                 }
 
-                SetLogger(null, "Step prueba nomina", " Paso el segundo If ");
-                SetLogger(null, "Step" , ConfigurationManager.GetValue("BatchThreads"), "PN-02");
+                start = DateTime.UtcNow;
+                var batchThreads = new GlobalLogger(zipKey, "4 batchThreads")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step BatchThreads " + ConfigurationManager.GetValue("BatchThreads")
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchThreads);
+
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
                 BlockingCollection<ResponseXpathDataValue> xPathDataValueResponses = new BlockingCollection<ResponseXpathDataValue>();
@@ -140,18 +167,13 @@ namespace Gosocket.Dian.Functions.Batch
                     xPathDataValueResponses.Add(xpathDataValueResponse);
                 });
 
-                SetLogger(null, "Step prueba nomina", " Paso servicio");
-
                 var multipleResponsesXpathDataValue = xPathDataValueResponses.ToList();
 
                 // filer by success
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => c.Success).ToList();
 
                 // check if unique nits
-                var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
-               
-
-                SetLogger(null, "Step prueba nomina", " Paso nitNomina " + nitNomina, "BATCH-02");
+                var nits = multipleResponsesXpathDataValue.GroupBy(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();               
                 if (nits.Count() > 1)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -160,7 +182,13 @@ namespace Gosocket.Dian.Functions.Batch
                     return;
                 }
 
-                SetLogger(null, "Step prueba nomina", " nits mayores a 1 paso ");
+                start = DateTime.UtcNow;
+                var checkNits = new GlobalLogger(zipKey, "5 checkNits")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step nits.Count() " + nits.Count()
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(checkNits);
 
                 if (setResultOther == null)
                 {
@@ -175,11 +203,27 @@ namespace Gosocket.Dian.Functions.Batch
 
                         responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResSeriesXpath" : "SeriesXpath"]}-{responseXpathValues.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]}";
                     }
+
+                    start = DateTime.UtcNow;
+                    var checkXpath = new GlobalLogger(zipKey, "6 checkXpath")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "Step checkXpath "
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checkXpath);
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse);
-                SetLogger(null, "Step prueba nomina", " Paso permisos " + result.Count.ToString(), "PROC-01");
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse);
+
+                start = DateTime.UtcNow;
+                var checkPermissions = new GlobalLogger(zipKey, "8 checkPermissions")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step checkPermissions Paso permisos " + result.Count.ToString()
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
+               
                 if (result.Count > 0)
                 {
                     batchFileStatus.StatusCode = "2";
@@ -199,6 +243,14 @@ namespace Gosocket.Dian.Functions.Batch
                 log.Info($"Init upload xml�s.");
                 BlockingCollection<ResponseUploadXml> uploadResponses = new BlockingCollection<ResponseUploadXml>();
                 SetLogger(null, "Step prueba nomina", " Paso multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count, "PROC-02");
+
+                start = DateTime.UtcNow;
+                var upload = new GlobalLogger(zipKey, "9 Upload")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step  multipleResponsesXpathDataValue.Count " + multipleResponsesXpathDataValue.Count
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(upload);
 
                 bool sendTestSet = !string.IsNullOrWhiteSpace(testSetId);
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
@@ -263,6 +315,15 @@ namespace Gosocket.Dian.Functions.Batch
                 SetLogger(null, "Step prueba nomina", " Paso cargue de documento ","PROC-03");
                 // Get success upload
                 multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(x => !uploadFailed.Select(e => e.DocumentKey).Contains(x.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
+
+                start = DateTime.UtcNow;
+                var validador = new GlobalLogger(zipKey, "10 Validations")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step  multipleResponsesXpathDataValue.Count " + multipleResponsesXpathDataValue.Count
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(validador);
+
 
                 log.Info($"Init validation xml�s.");
                 BlockingCollection<GlobalBatchFileResult> batchFileResults = new BlockingCollection<GlobalBatchFileResult>();
@@ -381,8 +442,15 @@ namespace Gosocket.Dian.Functions.Batch
                 log.Info($"End validation xml�s.");
 
                 // Update document status on batch
-                await ProcessBatchFileResults(batchFileResults);
-                SetLogger(null, "Step prueba nomina", " Paso update documento status ", "PROC-06");
+                start = DateTime.UtcNow;
+                var batchUpdate = new GlobalLogger(zipKey, "11 batchUpdate")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step  ProcessBatchFileResults.Count "
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchUpdate);
+
+                await ProcessBatchFileResults(batchFileResults);              
 
                 var successAppResponses = appResponses.Where(x => x.Success && x.Content != null).ToList();
                 log.Info($"{successAppResponses.Count()} application responses generated.");
@@ -392,14 +460,30 @@ namespace Gosocket.Dian.Functions.Batch
                     var uploadResult = new FileManager().Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
                     log.Info($"Upload applition responses zip OK.");
                 }
-                tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));
-                SetLogger(null, "Step prueba nomina", " proceso terminado " + flagApplicationResponse, "PROC-07");
+
+                tableManagerGlobalBatchFileRuntime.InsertOrUpdate(new GlobalBatchFileRuntime(zipKey, "END", xpathResponse.XpathsValues["FileName"]));               
                 log.Info($"End.");
+
+                start = DateTime.UtcNow;
+                var batchFileRuntime = new GlobalLogger(zipKey, "12 GlobalBatchFileRuntime")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step proceso terminado"
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchFileRuntime);
+
             }
             catch (Exception ex)
             {
-                SetLogger(null, "Step prueba nomina", " Error " + ex.StackTrace, "Err-PROCBATCH-trace");
-                SetLogger(null, "Step prueba nomina", " Error " + ex.Message,"Err-PROCBATCH");
+                start = DateTime.UtcNow;
+                var batchException = new GlobalLogger(zipKey, "13 batchException")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step proceso Exception => " + ex.Message,
+                    StackTrace = ex.StackTrace 
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchException);
+              
                 log.Error($"Error al procesar batch con trackId {zipKey}. Ex: {ex.StackTrace}");
                 batchFileStatus.StatusCode = "ex";
                 batchFileStatus.StatusDescription = $"Error al procesar batch. ZipKey: {zipKey}" + ex.StackTrace;
@@ -489,13 +573,19 @@ namespace Gosocket.Dian.Functions.Batch
             return null;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
         {
-            SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
-            SetLogger(null, "Step-Checkpermission 1", authCode, "CHECK-02");
-            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");
-            SetLogger(null, "Step-Checkpermission 4", nitNomina, "CHECK-05");
-            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
+            var start = DateTime.UtcNow;
+            var checkPermissions = new GlobalLogger(zipKey, "7 checkPermissions")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = "Step-responseXpathDataValue " + responseXpathDataValue.Count().ToString() +
+                " Step-authCode " + authCode +
+                " Step-testSetId " + testSetId +
+                " Step-nitNomina " + nitNomina +
+                " Step-flagApplicationResponse " + flagApplicationResponse.ToString()
+            };
+            var insertLog = TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
 
             var result = new List<XmlParamsResponseTrackId>();
             List<RadianTestSetResult> lstResult = null;
@@ -503,21 +593,30 @@ namespace Gosocket.Dian.Functions.Batch
 
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
-
-            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
 
             //Aplica para eventos AR 
             string codeMandato = string.Empty;
             if (flagApplicationResponse)
-                codeMandato = validateReferenceAttorney(codes, codeProviders);
+                codeMandato = validateReferenceAttorney(codes, codeProviders);           
 
-            SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.2");
             foreach (var code in codes.ToList())
-            {                
-                SetLogger(null, "Step code", "NIT Mandato: " + codeMandato + "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
+            {
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
+                var softwareId = softwareIds.Last();
+
+                start = DateTime.UtcNow;
+                var checkVariables = new GlobalLogger(zipKey, "7.1 checkPermissions")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step-codeMandato " + codeMandato +                    
+                    " Step-code " + code +
+                    " Step-trimAuthCode " + trimAuthCode +
+                    " Step-softwareId " + softwareId
+                };
+                var insertCheckVariables = TableManagerGlobalLogger.InsertOrUpdateAsync(checkVariables);
+               
                 GlobalAuthorization authEntity = null;
                 RadianTestSetResult objRadianTestSetResult = null;
 
@@ -525,14 +624,11 @@ namespace Gosocket.Dian.Functions.Batch
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
                 else
                 {
-                    SetLogger(null, "Step code", "Ingrese a validar testSetId " + testSetId + " y nitNomina " + nitNomina, "CHECK-08");
                     if (!string.IsNullOrEmpty(testSetId))
                     {
                         //Consulta exista testSetID FE GlobalTestSetResult
                         List<GlobalTestSetResult> lstResulGlobalTestSetResult = tableManagerGlobalTestSetResult.FindByPartition<GlobalTestSetResult>(code);
-                        GlobalTestSetResult objGlobalTestSetResult = lstResulGlobalTestSetResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-
-                        SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
+                        GlobalTestSetResult objGlobalTestSetResult = lstResulGlobalTestSetResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));                      
 
                         //Consulta exista testSetID registros RADIAN RadianTestSetResult
                         if (!string.IsNullOrWhiteSpace(codeMandato))
@@ -546,25 +642,28 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-                        }
-                        
-                        var softwareId = softwareIds.Last();
+                        }                                              
 
-                        //Validaciones exista testSetID GlobalTestSetOthersDocumentsResult
-                        SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
+                        //Consulta exista testSetID registros Otros Documentos           
                         List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
 
                         if (objGlobalTestSetResult != null)
                         {
                             //Factura Electronica
-                            SetLogger(null, "Step code", "Estoy verificando Factrua", "CHECK-10.1");
+                            start = DateTime.UtcNow;
+                            var checkFE = new GlobalLogger(zipKey, "7.2 checkPermissions")
+                            {
+                                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                                Action = "Step-checkFE Factura Electronica"
+                            };
+                            var insertCheckFE = TableManagerGlobalLogger.InsertOrUpdateAsync(checkFE);
+                            
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
                             if (authEntity == null)
                                 authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(newAuthCode, code);
                             if (authEntity == null)
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT {trimAuthCode} no autorizado a enviar documentos para emisor con NIT {code}." });
-
 
                             GlobalTestSetResult testSetResultEntity = null;
                             var testSetResults = tableManagerGlobalTestSetResult.FindByPartition<GlobalTestSetResult>(code);
@@ -600,10 +699,15 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (objGlobalTestSetOthersDocumentResult != null)
                         {
-                            //Validaciones GlobalTestSetOthersDocumentsResult documento de Nomina
-                            SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
-
-                            SetLogger(null, "Step code", "Estoy verificando nomina idSoftware " + softwareIdNomina, "CHECK-10.2.1");
+                            //Otros Docuemntos Electronicos
+                            start = DateTime.UtcNow;
+                            var checkOtherDoc = new GlobalLogger(zipKey, "7.3 checkPermissions")
+                            {
+                                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                                Action = "Step-checkOtherDoc softwareIdNomina " + softwareIdNomina +
+                                " Step-nitNomina " + nitNomina
+                            };
+                            var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
 
                             GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
                             if (objGlobalTestSetOthersDocumentResult != null &&
@@ -627,9 +731,16 @@ namespace Gosocket.Dian.Functions.Batch
 
                         }
                         else if (objRadianTestSetResult != null)
-                        {
-                            SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.4");
-                            // Validations to RADIAN  
+                        {                            
+                            // Validations to RADIAN 
+                            start = DateTime.UtcNow;
+                            var checkRadian = new GlobalLogger(zipKey, "7.3 checkPermissions")
+                            {
+                                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                                Action = "Step-checkRadian softwareIdNomina " + softwareId +
+                                " Step-code " + code
+                            };
+                            var insertRadian = TableManagerGlobalLogger.InsertOrUpdateAsync(checkRadian);
 
                             RadianTestSetResult radianTestSetResultEntity = null;
                             if (objRadianTestSetResult != null &&
@@ -649,16 +760,18 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
-                            if (messageMandato)
+                            start = DateTime.UtcNow;
+                            var checkElse = new GlobalLogger(zipKey, "7.7 checkPermissions")
                             {
-                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });
-                            }
-                            else
-                            {
-                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.6");
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
-                            }                           
+                                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                                Action = "Step-messageMandato " + messageMandato.ToString()
+                            };
+                            var insertCheckElse = TableManagerGlobalLogger.InsertOrUpdateAsync(checkElse);
+
+                            if (messageMandato)                                                            
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });                            
+                            else                                                            
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });                                                       
                         }
                     }
                 }
