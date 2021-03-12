@@ -30,7 +30,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Debe existir solicitud de disponibilizacion
             var listDispnibiliza = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
-            if (listDispnibiliza != null || listDispnibiliza.Count > 0)
+            if (listDispnibiliza != null)
             {
                 bool validForItem = false;
                 foreach (var itemDispnibiliza in listDispnibiliza)
@@ -42,7 +42,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         validForItem = false;
                         var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                         && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-                        if (listPagoTotal != null || listPagoTotal.Count > 0)
+                        if (listPagoTotal != null)
                         {
                             foreach (var itemPagoTotal in listPagoTotal)
                             {
@@ -170,7 +170,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida titulo valor tiene una limitación previa (041)
             string validCancelElectronicEvent = string.Empty;
             var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
-            if (listLimitacion != null || listLimitacion.Count > 0)
+            if (listLimitacion != null)
             {
                 foreach (var itemListLimitacion in listLimitacion)
                 {
@@ -212,7 +212,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existe Pago Total FETV
             var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
             && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-            if (listPagoTotal != null || listPagoTotal.Count > 0)
+            if (listPagoTotal != null)
             {
                 bool validForItemPago = false;
                 foreach (var itemListPagoTotal in listPagoTotal)
@@ -460,7 +460,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida exista endoso en garantia
                 bool validForEndoso = false;
                 var endosoGarantia = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia)).ToList();
-                if (endosoGarantia != null || endosoGarantia.Count > 0)
+                if (endosoGarantia != null)
                 {
                     foreach (var itemEndosoGarantia in endosoGarantia)
                     {
@@ -530,7 +530,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Validar exista endoso en procuracion                                   
                 bool validForEndosoProcura = false;
                 var endosoProcuracion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion)).ToList();
-                if (endosoProcuracion != null || endosoProcuracion.Count > 0)
+                if (endosoProcuracion != null)
                 {
                     foreach (var itemEndosoProcuracion in endosoProcuracion)
                     {
@@ -583,7 +583,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 //Valida existe limitacion de circulacion
                 var limitacionCirculacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
-                if (limitacionCirculacion != null || limitacionCirculacion.Count > 0)
+                if (limitacionCirculacion != null)
                 {
                     foreach (var itemLimitacionCirculacion in limitacionCirculacion)
                     {
@@ -605,7 +605,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida existe endoso en propiedad
                 var endosoPropiedad = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad)).OrderByDescending(x => x.SigningTimeStamp).ToList();
-                if (endosoPropiedad != null || endosoPropiedad.Count > 0)
+                if (endosoPropiedad != null)
                 {
                     foreach (var itemEndosoPropiedad in endosoPropiedad)
                     {
@@ -832,7 +832,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
-            if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
+            if (listDisponibilizacion != null)
             {
                 bool validForItem = false;
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
@@ -891,7 +891,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existe Pago Total FETV
             var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
             && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-            if (listPagoTotal != null || listPagoTotal.Count > 0)
+            if (listPagoTotal != null)
             {
                 foreach (var itemListPagoTotal in listPagoTotal)
                 {
@@ -915,7 +915,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
-            if (listLimitaciones != null || listLimitaciones.Count > 0)
+            if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
                 {
@@ -985,7 +985,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
-            if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
+            if (listDisponibilizacion != null)
             {
                 bool validForItem = false;
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
@@ -1044,7 +1044,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existe Pago Total FETV
             var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
             && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-            if (listPagoTotal != null || listPagoTotal.Count > 0)
+            if (listPagoTotal != null)
             {
                 foreach (var itemListPagoTotal in listPagoTotal)
                 {
@@ -1068,7 +1068,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
-            if (listLimitaciones != null || listLimitaciones.Count > 0)
+            if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
                 {
@@ -1120,7 +1120,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
-            if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
+            if (listDisponibilizacion != null)
             {
                 bool validForItem = false;
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
@@ -1179,7 +1179,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existe Pago Total FETV
             var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
             && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-            if (listPagoTotal != null || listPagoTotal.Count > 0)
+            if (listPagoTotal != null)
             {
                 foreach (var itemListPagoTotal in listPagoTotal)
                 {
@@ -1204,7 +1204,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
-            if (listLimitaciones != null || listLimitaciones.Count > 0)
+            if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
                 {
@@ -1241,7 +1241,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
-            if (listDisponibilizacion != null || listDisponibilizacion.Count > 0)
+            if (listDisponibilizacion != null)
             {
                 bool validForItem = false;
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
@@ -1306,7 +1306,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         //Valida existe Pago Total FETV
                         var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                         && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
-                        if (listPagoTotal != null || listPagoTotal.Count > 0)
+                        if (listPagoTotal != null)
                         {
                             foreach (var itemListPagoTotal in listPagoTotal)
                             {
@@ -1425,7 +1425,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string validCancelElectronicEvent = string.Empty;
                 var existEndosos = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion)).ToList();
-                if(existEndosos != null || existEndosos.Count > 0 )
+                if(existEndosos != null)
                 {
                     foreach (var itemExistEndosos in existEndosos)
                     {
@@ -1635,7 +1635,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string eventCanelLimitacion = string.Empty;
 
             var listCancelElectronicEvent = documentMeta.Where(t => t.CancelElectronicEvent == cancelElectronicEvent && t.SenderCode == SenderCode).ToList();
-            if (listCancelElectronicEvent != null || listCancelElectronicEvent.Count > 0)
+            if (listCancelElectronicEvent != null)
             {
                 foreach (var itemListCancelElectronicEvent in listCancelElectronicEvent)
                 {
@@ -1692,7 +1692,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista evento Reclamo de la Factura Electrónica de Venta
                         var listRejected = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Rejected).ToList();
-                        if (listRejected != null || listRejected.Count > 0)
+                        if (listRejected != null)
                         {
                             foreach (var itemRejected in listRejected)
                             {
@@ -1714,7 +1714,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista evento Aceptación Expresa
                         var listAceptacionExpresa = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Accepted).ToList();
-                        if (listAceptacionExpresa != null || listAceptacionExpresa.Count > 0)
+                        if (listAceptacionExpresa != null)
                         {
                             foreach (var itemAceptacionExpresa in listAceptacionExpresa)
                             {
@@ -1845,7 +1845,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista evento Reclamo de la Factura Electrónica de Venta
                         var listRejected = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Rejected).ToList();
-                        if (listRejected != null || listRejected.Count > 0)
+                        if (listRejected != null)
                         {
                             foreach (var itemRejected in listRejected)
                             {
@@ -1867,7 +1867,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista evento Aceptación Tácita
                         var listAceptacionTacita = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.AceptacionTacita).ToList();
-                        if (listAceptacionTacita != null || listAceptacionTacita.Count > 0)
+                        if (listAceptacionTacita != null)
                         {
                             foreach (var itemAceptacionTacita in listAceptacionTacita)
                             {
@@ -2009,7 +2009,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista Aceptacion Expresa aprobada
                         var listAceptaExpresa = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Accepted).ToList();
-                        if (listAceptaExpresa != null || listAceptaExpresa.Count > 0)
+                        if (listAceptaExpresa != null)
                         {
                             foreach (var itemAceptaExpresa in listAceptaExpresa)
                             {
@@ -2031,7 +2031,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                         //Valida exista Aceptacion Tacita aprobada
                         var listAceptaTacita = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.AceptacionTacita).ToList();
-                        if (listAceptaTacita != null || listAceptaTacita.Count > 0)
+                        if (listAceptaTacita != null)
                         {
                             foreach (var itemAceptaTacita in listAceptaTacita)
                             {

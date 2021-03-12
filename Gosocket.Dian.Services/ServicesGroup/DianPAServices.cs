@@ -721,7 +721,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                 {
                                     atLeastOneApproved = true;
                                     // se consulta el evento por el código y así obtener su descripción.
-                                    var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e.EventCode, e.CustomizationID, "96");
+                                    var docEvent = TableManagerGlobalDocEvent.FindGlobalEvent<GlobalDocEvent>(e?.EventCode, e?.CustomizationID, "96");
                                     e.EventCodeDescription = (docEvent != null) ? docEvent.Description : string.Empty;
                                     // se consulta la información del evento original.
                                     originalEvents.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(e.DocumentKey, e.DocumentKey));

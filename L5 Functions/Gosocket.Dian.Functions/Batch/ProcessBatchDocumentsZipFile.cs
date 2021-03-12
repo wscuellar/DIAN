@@ -35,7 +35,8 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
-       
+        private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
 
@@ -455,26 +456,70 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
+        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders)
+        {
+            string senderCode = string.Empty;
+            string IssuerAttorney = string.Empty;
+            foreach (var code in codes.ToList())
+                senderCode = code;
+            foreach (var codeProvider in codeProviders.ToList())
+                IssuerAttorney = codeProvider;
+
+            SetLogger(null, "Step-validateReferenceAttorney", " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
+
+            if(senderCode != IssuerAttorney)
+            {
+                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
+
+                //Existe Mandato Abierto
+                if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
+                {
+                    foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
+                    {                        
+                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active)
+                        {
+                            SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato " + itemDocsReferenceAttorney.IssuerAttorney, "ATT-2");
+                            return itemDocsReferenceAttorney.IssuerAttorney;
+                        }                           
+                    }
+                }
+            }
+
+            SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato return null", "ATT-3");
+            return null;
+        }
+
         private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
         {
             SetLogger(null, "Step-Checkpermission 1", responseXpathDataValue.Count().ToString(), "CHECK-01");
             SetLogger(null, "Step-Checkpermission 1", authCode, "CHECK-02");
-            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");          
+            SetLogger(null, "Step-Checkpermission 2", testSetId, "CHECK-03");
             SetLogger(null, "Step-Checkpermission 4", nitNomina, "CHECK-05");
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06");
-            
+
             var result = new List<XmlParamsResponseTrackId>();
+            List<RadianTestSetResult> lstResult = null;
+            bool messageMandato = false;
+
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
+            var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
+
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.1");
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
 
+            //Aplica para eventos AR 
+            string codeMandato = string.Empty;
+            if (flagApplicationResponse)
+                codeMandato = validateReferenceAttorney(codes, codeProviders);
+
             SetLogger(null, "Step-Checkpermission 5", flagApplicationResponse.ToString(), "CHECK-06.2");
             foreach (var code in codes.ToList())
-            {
-                SetLogger(null, "Step code", "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
+            {                
+                SetLogger(null, "Step code", "NIT Mandato: " + codeMandato + "NIT RADIAN: " + code + " NIT NOMINA: " + nitNomina, "CHECK-07");
                 var trimAuthCode = authCode.Trim();
                 var newAuthCode = trimAuthCode.Substring(0, trimAuthCode.Length - 1);
                 GlobalAuthorization authEntity = null;
+                RadianTestSetResult objRadianTestSetResult = null;
 
                 if (string.IsNullOrEmpty(trimAuthCode))
                     result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"NIT de la empresa no encontrado en el certificado." });
@@ -490,15 +535,25 @@ namespace Gosocket.Dian.Functions.Batch
                         SetLogger(null, "Step code", "tengo set pruebas ni nit de nomina --- RADIAN", "CHECK-09");
 
                         //Consulta exista testSetID registros RADIAN RadianTestSetResult
-                        List<RadianTestSetResult> lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);                       
-                        RadianTestSetResult objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
+                        if (!string.IsNullOrWhiteSpace(codeMandato))
+                        {
+                            lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(codeMandato);
+                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase) 
+                            && Convert.ToInt32(t.ContributorTypeId) == (int)RadianContributorType.TechnologyProvider);
+                            messageMandato = true;
+                        }
+                        else
+                        {
+                            lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
+                            objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
+                        }
+                        
                         var softwareId = softwareIds.Last();
 
                         //Validaciones exista testSetID GlobalTestSetOthersDocumentsResult
                         SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
                         List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-
 
                         if (objGlobalTestSetResult != null)
                         {
@@ -544,19 +599,19 @@ namespace Gosocket.Dian.Functions.Batch
 
                         }
                         else if (objGlobalTestSetOthersDocumentResult != null)
-                        {                            
+                        {
                             //Validaciones GlobalTestSetOthersDocumentsResult documento de Nomina
                             SetLogger(null, "Step code", "Estoy verificando nomina", "CHECK-10.2");
-                          
+
                             SetLogger(null, "Step code", "Estoy verificando nomina idSoftware " + softwareIdNomina, "CHECK-10.2.1");
-                            
+
                             GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
                             if (objGlobalTestSetOthersDocumentResult != null &&
                                 (objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.InProcess ||
                                 objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Accepted ||
                                 objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.Rejected))
                                 testSetOthersDocumentsResultEntity = objGlobalTestSetOthersDocumentResult;
-                               
+
                             SetLogger(testSetOthersDocumentsResultEntity, "Step code", "comprueba validaciones Nomina", "CHECK-10.2.3");
 
                             if (testSetOthersDocumentsResultEntity == null)
@@ -569,13 +624,13 @@ namespace Gosocket.Dian.Functions.Batch
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"Set de prueba con identificador {testSetId} se encuentra {EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}." });
 
                             SetLogger(result, "Step code", "Finaliza validaciones Nomina", "CHECK-10.2.4");
-                            
+
                         }
-                        else if(objRadianTestSetResult != null)
+                        else if (objRadianTestSetResult != null)
                         {
                             SetLogger(null, "Step code", "Estoy verificando RADIAN", "CHECK-10.4");
                             // Validations to RADIAN  
-                         
+
                             RadianTestSetResult radianTestSetResultEntity = null;
                             if (objRadianTestSetResult != null &&
                                 (objRadianTestSetResult.Status == (int)TestSetStatus.InProcess ||
@@ -594,16 +649,23 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else
                         {
-                            SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
-                            result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
+                            if (messageMandato)
+                            {
+                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.5");
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });
+                            }
+                            else
+                            {
+                                SetLogger(result, "Step code", "No existe TestSetID registrado", "CHECK-10.6");
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });
+                            }                           
                         }
                     }
                 }
             }
 
             return result;
-        }
-
+        }       
 
         private static async Task ProcessBatchFileResults(IEnumerable<GlobalBatchFileResult> batchFileResults)
         {

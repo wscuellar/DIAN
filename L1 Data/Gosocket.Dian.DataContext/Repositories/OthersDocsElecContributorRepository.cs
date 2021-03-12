@@ -70,7 +70,7 @@ namespace Gosocket.Dian.DataContext.Repositories
 
                 context.SaveChanges();
 
-                return ContributorInstance != null ? othersDocsElecContributor.Id : othersDocsElecContributor.Id;
+                return othersDocsElecContributor.Id;
             }
         }
 

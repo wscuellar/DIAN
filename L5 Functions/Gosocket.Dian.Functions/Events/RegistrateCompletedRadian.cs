@@ -286,7 +286,7 @@ namespace Gosocket.Dian.Functions.Events
             var arrayTasks = new List<Task>();
 
             List<GlobalDocReferenceAttorney> documentsAttorney = TableManagerGlobalDocReferenceAttorney.FindAll<GlobalDocReferenceAttorney>(trackIdAttorney).ToList();
-            if (documentsAttorney != null || documentsAttorney.Count > 0)
+            if (documentsAttorney != null)
             {
                 foreach (var documentAttorney in documentsAttorney)
                 {
@@ -343,7 +343,7 @@ namespace Gosocket.Dian.Functions.Events
             StringBuilder valueStockAmountSenderList = new StringBuilder();
             
             List<GlobalDocHolderExchange> documentsHolderExchange = TableManagerGlobalDocHolderExchange.FindpartitionKey<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey.ToLower()).ToList();
-            if (documentsHolderExchange != null || documentsHolderExchange.Count > 0)
+            if (documentsHolderExchange != null && documentsHolderExchange.Count > 0)
             {
                 foreach (var documentHolderExchange in documentsHolderExchange)
                 {

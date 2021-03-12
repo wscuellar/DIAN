@@ -1,6 +1,7 @@
 using Gosocket.Dian.Application.Cosmos;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
+using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Common;
 using Gosocket.Dian.Functions.Utils;
 using Gosocket.Dian.Infrastructure;
