@@ -915,7 +915,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string eventCode = party.ResponseCode;
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
-            var receiverCode = nitModel.ReceiverCode;
+            string receiverCode = nitModel.ReceiverCode;
+            string receiverNameCude = xmlParserCude.Fields["ReceiverName"].ToString();
+            string receiverNameCufe = nitModel.ReceiverName;
             string errorMessageParty = "Evento ValidateParty referenciado correctamente";
 
             //Endoso en Blanco
@@ -1436,6 +1438,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
                 //Valor Informe 3 dias pago
                 case (int)EventStatus.ValInfoPago:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
                     if (party.SenderParty != receiverCode)
                     {
                         var valid = ValidateBuyThreeDay(party.TrackId, party.SenderParty, nitModel.DocumentTypeId, (int)EventStatus.ValInfoPago);
@@ -1455,32 +1467,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
-                    else
+                   
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != nitModel.ReceiverCode)
                     {
-                        // Valida receptor documento AR coincida con DIAN
-                        if (party.ReceiverParty != nitModel.ReceiverCode)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "AAG01",
-                                ErrorMessage = "No fue informado los datos del Adquirente/Deudor/aceptante",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = errorMessageParty,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = "No fue informado el número de identificación.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
+                    // Valida nombre receptor documento AR coincida con DIAN
+                    if (receiverNameCude != receiverNameCufe)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = "No fue informado los datos del Adquirente/Deudor/aceptante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                 
+                    
                     break;
             }
             foreach (var r in responses)
