@@ -648,6 +648,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
             var softwareId = nitModel.SoftwareId;
 
+            var issuerPartyCode = nitModel.IssuerPartyID;
+            var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeID;
+
             var receiverCode = nitModel.ReceiverCode;
             var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
             if (receiverCodeSchemeNameValue == "31")
@@ -684,11 +687,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Endoso Electronico
+            //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Mandato
             if (nitModel.ResponseCode == "043")
-            {
-                var issuerPartyCode = nitModel.IssuerPartyID;
-                var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeID;
+            {               
                 if (string.IsNullOrEmpty(IssuerPartyCodeDigit) || IssuerPartyCodeDigit == "undefined") IssuerPartyCodeDigit = "11";
                 if (ValidateDigitCode(issuerPartyCode, int.Parse(IssuerPartyCodeDigit)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -764,7 +765,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
-            // Software provider RADIAN
+            //Software provider RADIAN
             if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268")
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
@@ -783,6 +784,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 habilitadoRadian = true;
                             break;
                     }
+                }
+
+                //Valida evento mandato - sender mismo provider mismo mandatrario
+                if(String.Equals(senderCode,senderCodeProvider) && String.Equals(senderCode,issuerPartyCode))
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "LGC64",
+                        ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
             }
             else
@@ -1804,6 +1818,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     switch (docReferenceAttorney.Actor)
                                     {
+                                        case "FE":
+                                            if (!globalRadianOperation.ElectronicInvoicer)
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC65"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC65"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            break;
                                         case "PT":
                                             if (!globalRadianOperation.TecnologicalSupplier)
                                             {
@@ -2347,7 +2375,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 switch (senderId)
                 {
                     case "Mandante-FE":
-
                         if (descriptionSender != "Mandante Facturador Electrónico")
                         {
                             validate = false;
@@ -2360,8 +2387,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
-
                         break;
                     case "Mandante-LT":
                         if (descriptionSender != "Mandante Legitimo Tenedor")
@@ -2412,6 +2437,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida descripcion Mandatario 
             switch (factorTemp)
             {
+                case "M-FE":
+                    modoOperacion = "FE";
+                    if (description != "Mandatario Facturador Electrónico")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorMessage = "No fue informado el literal “Mandatario Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
                 case "M-SN-e":
                     modoOperacion = "SNE";
                     if (description != "Mandatario Sistema de Negociación Electrónica")
@@ -2472,13 +2512,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAH62b",
-                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
             else
             {
-                if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor && !globalRadianOperation.NegotiationSystem)
+                if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor 
+                    && !globalRadianOperation.NegotiationSystem && !globalRadianOperation.ElectronicInvoicer)
                 {
                     validate = false;
                     responses.Add(new ValidateListResponse
@@ -2486,7 +2527,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "AAH62b",
-                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -2644,19 +2685,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         else
                             codeExist = false;
-                    }
-                    else
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+                    }                   
                 }
 
                 if (!codeExist)

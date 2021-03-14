@@ -146,10 +146,10 @@
     "ErrorCode_LGC37": "LGC37",
     "ErrorMessage_LGC37": "No se puede generar un Registro para inscripción posterior si previamente no se ha registrado un evento de endoso en propiedad (037).",
     "ErrorCode_LGC58": "LGC58",
-    "ErrorMessage_LGC58": "Cantidad de CUFES referenciados supera el limite de 20 registros"
-
-
-
+    "ErrorMessage_LGC58": "Cantidad de CUFES referenciados supera el limite de 20 registros",
+    "ErrorCode_LGC65": "LGC65",
+    "ErrorMessage_LGC65": "Mandatario Facturador Electrónico no se encuentra Habilitado",
+    "ErrorCode_AAH65": "AAH65"
 
 
     // Test UAT INDRA
