@@ -299,7 +299,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             RadianOperationModeTestSet softwareTypeEnum = Domain.Common.EnumHelper.GetValueFromDescription<RadianOperationModeTestSet>(softwareType);
             string key = ((int)softwareTypeEnum).ToString();
-            RadianTestSet testSet = _radianAprovedService.GetTestResult(key);
+            RadianTestSet testSet = _radianAprovedService.GetTestSet(key);
             List<EventCountersViewModel> events = new List<EventCountersViewModel>();
             if (testSet != null)
             {

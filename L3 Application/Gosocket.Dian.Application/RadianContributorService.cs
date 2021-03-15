@@ -83,12 +83,9 @@ namespace Gosocket.Dian.Application
             if (!indirectElectronicBiller && GetSoftwareOwn(contributor.Id) == null)
                 return new ResponseMessage(TextResources.ParticipantWithoutSoftware, TextResources.alertType);
 
-            //if (radianOperationMode == Domain.Common.RadianOperationMode.Direct)
-            {
-                bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id);
-                if (otherActiveProcess)
-                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType);
-            }
+            bool otherActiveProcess = _radianContributorRepository.GetParticipantWithActiveProcess(contributor.Id);
+            if (otherActiveProcess)
+                return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType);
 
             string cancelEvent = RadianState.Cancelado.GetDescription();
             int radianType = (int)radianContributorType;
@@ -197,7 +194,7 @@ namespace Gosocket.Dian.Application
                  foreach (var item in testSet)
                  {
                      string[] parts = item.RowKey.Split('|');
-                     item.OperationModeName = string.IsNullOrEmpty(item.OperationModeName) ?  softwareTypeName : item.OperationModeName;
+                     item.OperationModeName = string.IsNullOrEmpty(item.OperationModeName) ? softwareTypeName : item.OperationModeName;
                      item.SoftwareId = parts[1];
                  }
                  List<string> userIds = _contributorService.GetUserContributors(c.Contributor.Id).Select(u => u.UserId).ToList();

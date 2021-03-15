@@ -106,13 +106,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +139,10 @@
     <ProjectReference Include="..\L2 Domain\Gosocket.Dian.Domain\Gosocket.Dian.Domain.csproj">
       <Project>{FBA40283-71DF-4B48-8E64-663468E6E0C6}</Project>
       <Name>Gosocket.Dian.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\L3 Application\Gosocket.Dian.Application\Gosocket.Dian.Application.csproj">
+      <Project>{319E3A78-ED5C-463A-A323-FE1037F38AEA}</Project>
+      <Name>Gosocket.Dian.Application</Name>
     </ProjectReference>
     <ProjectReference Include="..\L4 Presentation\Web\Gosocket.Dian.Web\Gosocket.Dian.Web.csproj">
       <Project>{A9E54CF2-ED1D-4844-B21C-10CFBF8EDB40}</Project>
