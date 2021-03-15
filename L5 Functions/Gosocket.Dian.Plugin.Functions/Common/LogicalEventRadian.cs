@@ -2154,7 +2154,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateEndosoTrusted"), out bool ValidateEndosoTrusted);
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -2165,7 +2165,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = "AAI05",
                         ErrorMessage = "El valor no es informado",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2179,7 +2179,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = "AAI07a",
                         ErrorMessage = "El valor no es informado para el evento: Endoso en Propiedad",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2193,7 +2193,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = "AAI09",
                         ErrorMessage = "No fue informado la tasa de descuento para el evento: Endoso en Propiedad",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2212,7 +2212,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2244,7 +2244,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2257,7 +2257,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds

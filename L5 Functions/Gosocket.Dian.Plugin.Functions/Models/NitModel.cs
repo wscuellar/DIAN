@@ -8,6 +8,7 @@
         public string SenderCodeDigit { get; set; }
         public string ProviderCode { get; set; }
         public string ProviderCodeDigit { get; set; }
+        public string ReceiverName { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverCodeDigit { get; set; }
         public string ReceiverCodeSchemaValue { get; set; }
