@@ -529,7 +529,7 @@ namespace Gosocket.Dian.Functions.Batch
                 { "AppResReceiverCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
                 { "AppResSenderCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']" },
                 { "AppResProviderIdXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='DianExtensions']/*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']" },
-                { "AppResEventCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
+                { "AppResEventCodeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse'][1]/*[local-name()='Response']/*[local-name()='ResponseCode']" },
                 { "AppResDocumentTypeXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
                 { "AppResNumberXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
                 { "AppResSeriesXpath", "//*[local-name()='ApplicationResponse']/*[local-name()='ID']"},
@@ -574,7 +574,7 @@ namespace Gosocket.Dian.Functions.Batch
 
             //Evento Mandato el provider es el mandatario
             if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
-                return IssuerAttorney;
+                return senderCode;
 
             //Otros eventos se evalua el sender es diferente al provider para consultar existe un mandato
             if (senderCode != IssuerAttorney)

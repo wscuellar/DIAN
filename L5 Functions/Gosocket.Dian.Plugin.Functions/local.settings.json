@@ -117,7 +117,7 @@
     "ErrorCode_AAF32": "AAF32",
     "ErrorMessage_AAF32": "No fue informado",
     "ErrorCode_AAH62b": "AAH62b",
-    "ErrorMessage_AAH62b": "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+    "ErrorMessage_AAH62b": "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
     "ErrorCode_AAH84": "AAH84",
     "ErrorMessage_AAH84": "Debe ser informado el contrato de mandato en base64",
     "ErrorCode_LGC61": "LGC61",
