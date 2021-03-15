@@ -177,6 +177,9 @@ namespace Gosocket.Dian.Functions.Events
             //Descripcion Mandatario 
             switch (factorTemp)
             {
+                case "M-FE":
+                    modoOperacion = "FE";
+                    break;
                 case "M-SN-e":
                     modoOperacion = "SNE";
                     break;
@@ -206,9 +209,13 @@ namespace Gosocket.Dian.Functions.Events
                     attorneyModel.cufe = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                     code = cufeListDocumentResponse.Item(j).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
                     j++;
-                }                    
-                else                
+                }
+                else
+                {
                     attorneyModel.cufe = "01";
+                    code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                }              
+                   
 
                 //Valida Mandato si es Ilimitado o Limitado
                 if (customizationID == "432" || customizationID == "434")

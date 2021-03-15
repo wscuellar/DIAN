@@ -16,6 +16,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,18 +38,17 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
+
 
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
-
-        //Table
-        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
         [FunctionName("UpdateTestSetResult")]
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-
+            var testSetId = string.Empty;
             try
             {               
                 //Obtengo informacion de la cola e insertamos el registro del tracking de envios
@@ -56,6 +56,16 @@ namespace Gosocket.Dian.Functions.Activation
                 GlobalTestSetTracking globalTestSetTracking = JsonConvert.DeserializeObject<GlobalTestSetTracking>(eventGridEvent.Data.ToString());
                 await globalTestSetTrackingTableManager.InsertOrUpdateAsync(globalTestSetTracking);
 
+                var start = DateTime.UtcNow;
+                var startUpdateTest = new GlobalLogger(globalTestSetTracking.TestSetId, "1 Start startUpdateTest")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Start startUpdateTest"
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(startUpdateTest);
+
+
+                testSetId = globalTestSetTracking.TestSetId;
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
                 GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentTestId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
@@ -65,9 +75,27 @@ namespace Gosocket.Dian.Functions.Activation
                 SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
                 SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, "UPDATE-01");
 
+                start = DateTime.UtcNow;
+                var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "validateTestSet"
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(validateTestSet);
+
+
                 //Si existe el set de pruebas se Valida RADIAN
                 if (radianTesSetResult != null && setResultOther == null)
                 {
+
+                    start = DateTime.UtcNow;
+                    var validateRadian = new GlobalLogger(globalTestSetTracking.TestSetId, "3 radianTesSetResult")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "validateRadian"
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateRadian);
+
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", "UPDATE-02");
 
@@ -405,6 +433,14 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 else if (setResultOther != null) //Other Document
                 {
+                    start = DateTime.UtcNow;
+                    var validateOtherDoc = new GlobalLogger(globalTestSetTracking.TestSetId, "4 setResultOther")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "setResultOther"
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateOtherDoc);
+
                     SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL", "UPDATE-03");
                     // traigo los datos de RadianTestSetResult
 
@@ -543,6 +579,13 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 else // Factura Electronica
                 {
+                    start = DateTime.UtcNow;
+                    var validateFE = new GlobalLogger(globalTestSetTracking.TestSetId, "5 FacturaElectronica")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "Factura Electronica"
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateFE);
 
                     var testSetResults = globalTestSetResultTableManager.FindByPartition<GlobalTestSetResult>(globalTestSetTracking.SenderCode);
 
@@ -648,12 +691,19 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                         }
                     }
-                }
+                }              
             }
             catch (Exception ex)
             {
-                SetLogger(null, "Error-General", ex.Message, "Error-UPT");
-                SetLogger(null, "Error-General", ex.StackTrace, "Error-UPT-Trace");
+                var start = DateTime.UtcNow;
+                var endUpdateTest = new GlobalLogger(testSetId, "7 End endUpdateTest")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Step endUpdateTest Exception =>  " + ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(endUpdateTest);
+                
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
             }
