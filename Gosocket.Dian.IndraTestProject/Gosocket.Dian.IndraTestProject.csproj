@@ -108,6 +108,7 @@
   <ItemGroup>
     <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
+    <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
