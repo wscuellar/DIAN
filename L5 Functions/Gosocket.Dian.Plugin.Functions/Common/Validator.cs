@@ -786,7 +786,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                //Valida evento mandato - sender mismo provider mismo mandatrario
+                //Valida evento mandato - sender mismo provider mismo mandatario
                 if(String.Equals(senderCode,senderCodeProvider) && String.Equals(senderCode,issuerPartyCode))
                 {
                     responses.Add(new ValidateListResponse
