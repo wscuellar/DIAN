@@ -16,12 +16,10 @@ namespace Gosocket.Dian.Web.Controllers
     public class RadianContributorFileTypeController : Controller
     {
         private readonly IRadianContributorFileTypeService _radianContributorFileTypeService;
-        private readonly IRadianContributorService _radianContributorService;
 
-        public RadianContributorFileTypeController(IRadianContributorFileTypeService radianContributorFileTypeService, IRadianContributorService radianContributorService)
+        public RadianContributorFileTypeController(IRadianContributorFileTypeService radianContributorFileTypeService)
         {
             _radianContributorFileTypeService = radianContributorFileTypeService;
-            _radianContributorService = radianContributorService;
         }
 
 
@@ -40,42 +38,40 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
         }
 
-        private RadianContributorFileTypeViewModel GenerateNewRadianContributorFileTypeViewModel()
+        private RadianContributorFileTypeViewModel GenerateNewRadianContributorFileTypeViewModel(List<RadianContributorType> lst)
         {
-            var newModel = new RadianContributorFileTypeViewModel();
-            newModel.RadianContributorTypes = new SelectList(_radianContributorFileTypeService.ContributorTypeList(), "Id", "Name");
-            newModel.SelectedRadianContributorTypeId = _radianContributorFileTypeService.ContributorTypeList().First().Id.ToString();
+            RadianContributorFileTypeViewModel newModel = new RadianContributorFileTypeViewModel();
+            newModel.RadianContributorTypes = new SelectList(lst, "Id", "Name");
+            newModel.SelectedRadianContributorTypeId = lst.First().Id.ToString();
             return newModel;
         }
 
         public ActionResult List()
         {
-            var model = new RadianContributorFileTypeTableViewModel();
-            var fileTypes = _radianContributorFileTypeService.FileTypeList();
+            RadianContributorFileTypeTableViewModel model = new RadianContributorFileTypeTableViewModel();
+            List<RadianContributorFileType> fileTypes = _radianContributorFileTypeService.FileTypeList();
+            List<RadianContributorType> fileTypeList = _radianContributorFileTypeService.ContributorTypeList();
 
             model.RadianContributorFileTypes = RadianContributorFileTypeToViewModel(fileTypes);
-            model.RadianContributorTypes = new SelectList(_radianContributorFileTypeService.ContributorTypeList(), "Id", "Name");
-
+            model.RadianContributorTypes = new SelectList(fileTypeList, "Id", "Name");
             model.SearchFinished = true;
-            model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel();
-            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
+            model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel(fileTypeList);
 
+            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
             return View(model);
         }
 
         [HttpPost]
         public ActionResult List(RadianContributorFileTypeTableViewModel model)
         {
+            List<RadianContributorFileType> fileTypesByContributorType = _radianContributorFileTypeService.Filter(model.Name, model.SelectedRadianContributorTypeId);
+            List<RadianContributorType> fileTypeList = _radianContributorFileTypeService.ContributorTypeList();
 
-            List<RadianContributorFileType> fileTypes;
-            int selectedType = (model.SelectedRadianContributorTypeId == null) ? 0 : int.Parse(model.SelectedRadianContributorTypeId);
-
-            fileTypes = _radianContributorFileTypeService.Filter(model.Name, model.SelectedRadianContributorTypeId);
-
-            model.RadianContributorFileTypes = RadianContributorFileTypeToViewModel(fileTypes);
-            model.RadianContributorTypes = new SelectList(_radianContributorFileTypeService.ContributorTypeList(), "Id", "Name");
+            model.RadianContributorFileTypes = RadianContributorFileTypeToViewModel(fileTypesByContributorType);
+            model.RadianContributorTypes = new SelectList(fileTypeList, "Id", "Name");
             model.SearchFinished = true;
-            model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel();
+            model.RadianContributorFileTypeViewModel = GenerateNewRadianContributorFileTypeViewModel(fileTypeList);
+
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
             return View(model);
         }
@@ -83,27 +79,21 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Add(RadianContributorFileTypeViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var fileType = new RadianContributorFileType
-                {
-                    Mandatory = model.Mandatory,
-                    Name = model.Name,
-                    CreatedBy = User.Identity.Name,
-                    Timestamp = DateTime.Now,
-                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-                };
-
-                _ = _radianContributorFileTypeService.Update(fileType);
-
-                ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
-                return RedirectToAction("List");
-            }
-            else
-            {
+            if (!ModelState.IsValid)
                 return RedirectToAction("List", model);
-            }
 
+            RadianContributorFileType fileType = new RadianContributorFileType
+            {
+                Mandatory = model.Mandatory,
+                Name = model.Name,
+                CreatedBy = User != null ? User.Identity.Name : "",
+                Timestamp = DateTime.Now,
+                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+            };
+            _ = _radianContributorFileTypeService.Update(fileType);
+
+            ViewBag.CurrentPage = Navigation.NavigationEnum.ContributorFileType;
+            return RedirectToAction("List");
         }
 
         public PartialViewResult GetEditRadianContributorFileTypePartialView(int id)
@@ -139,26 +129,23 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Edit(RadianContributorFileTypeViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var fileType = new RadianContributorFileType
-                {
-                    Id = model.Id,
-                    Mandatory = model.Mandatory,
-                    Name = model.Name,
-                    CreatedBy = User.Identity.Name,
-                    Updated = DateTime.Now,
-                    RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
-                    RadianContributorType = model.RadianContributorType
-                };
-                _ = _radianContributorFileTypeService.Update(fileType);
-                ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
-                return RedirectToAction("List");
-            }
-            else
-            {
+            if (!ModelState.IsValid)
                 return RedirectToAction("List", model);
-            }
+
+            RadianContributorFileType fileType = new RadianContributorFileType
+            {
+                Id = model.Id,
+                Mandatory = model.Mandatory,
+                Name = model.Name,
+                CreatedBy = User != null ? User.Identity.Name : "",
+                Updated = DateTime.Now,
+                RadianContributorTypeId = int.Parse(model.SelectedRadianContributorTypeId),
+                RadianContributorType = model.RadianContributorType
+            };
+            _ = _radianContributorFileTypeService.Update(fileType);
+
+            ViewBag.CurrentPage = Navigation.NavigationEnum.RadianContributorFileType;
+            return RedirectToAction("List");
         }
 
         public PartialViewResult GetDeleteRadianContributorFileTypePartialView(int id)
@@ -179,12 +166,12 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public ActionResult Delete(RadianContributorFileTypeViewModel model)
         {
-            var fileType = new RadianContributorFileType
+            RadianContributorFileType fileType = new RadianContributorFileType
             {
                 Id = model.Id,
                 Mandatory = model.Mandatory,
                 Name = model.Name,
-                CreatedBy = User.Identity.Name,
+                CreatedBy = User != null ? User.Identity.Name : "",
                 Updated = DateTime.Now,
                 Deleted = true,
             };

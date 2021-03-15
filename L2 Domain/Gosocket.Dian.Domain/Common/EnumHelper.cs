@@ -227,7 +227,7 @@ namespace Gosocket.Dian.Domain.Common
         None = 000,
         [Description("Acuse de recibo de Factura Electrónica de Venta")]
         Received = 030,
-        [Description("Rechazo de la factura electrónica")]
+        [Description("Reclamo de la Factura Electrónica de Venta")]
         Rejected = 031,
         [Description("Recibo del bien y/o prestación del servicio")]
         Receipt = 032,

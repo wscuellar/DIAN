@@ -345,12 +345,8 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RadianController.cs" />
-    <Compile Include="Controllers\RadianEnablingInvoiceDirectController.cs" />
-    <Compile Include="Controllers\RadianEnablingInvoiceIndirectController.cs" />
     <Compile Include="Controllers\RadianApprovedController.cs" />
-    <Compile Include="Controllers\RadianTechnologyProviderController.cs" />
     <Compile Include="Controllers\RadianTestSetController.cs" />
-    <Compile Include="Controllers\RadianTradingSystemController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="Controllers\SupportController.cs" />
     <Compile Include="Controllers\TestSetController.cs" />
