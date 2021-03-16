@@ -117,7 +117,7 @@
     "ErrorCode_AAF32": "AAF32",
     "ErrorMessage_AAF32": "No fue informado",
     "ErrorCode_AAH62b": "AAH62b",
-    "ErrorMessage_AAH62b": "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+    "ErrorMessage_AAH62b": "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
     "ErrorCode_AAH84": "AAH84",
     "ErrorMessage_AAH84": "Debe ser informado el contrato de mandato en base64",
     "ErrorCode_LGC61": "LGC61",
@@ -134,7 +134,7 @@
     "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta",
     "ErrorCode_LGC22": "LGC22",
     "ErrorMessage_LGC22": "No se puede registrar esté evento si previamente se registro uno de los siguientes eventos: Endoso en garantía, Endoso en procuración, Limitación de circulación.",
-    "ValidateEndosoTrusted": "false",
+    "ValidateManadatory": "false",
     "ErrorCode_AAL03": "AAL03",
     "ErrorMessage_AAL03": "No fue informado la descripción",
     "ErrorCode_AAL07": "AAL07",
@@ -144,9 +144,12 @@
     "ErrorCode_AAL04": "AAL04",
     "ErrorMessage_AAL04": "No fue informado el grupo",
     "ErrorCode_LGC37": "LGC37",
-    "ErrorMessage_LGC37": "No se puede generar un Registro para inscripción posterior si previamente no se ha registrado un evento de endoso en propiedad (037)."
-
-
+    "ErrorMessage_LGC37": "No se puede generar un Registro para inscripción posterior si previamente no se ha registrado un evento de endoso en propiedad (037).",
+    "ErrorCode_LGC58": "LGC58",
+    "ErrorMessage_LGC58": "Cantidad de CUFES referenciados supera el limite de 20 registros",
+    "ErrorCode_LGC65": "LGC65",
+    "ErrorMessage_LGC65": "Mandatario Facturador Electrónico no se encuentra Habilitado",
+    "ErrorCode_AAH65": "AAH65"
 
 
     // Test UAT INDRA

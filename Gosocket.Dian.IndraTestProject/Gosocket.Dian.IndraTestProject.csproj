@@ -64,6 +64,7 @@
       <HintPath>..\packages\Moq.4.15.2\lib\net45\Moq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -106,11 +107,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\OthersDocumentsControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
-    <Compile Include="Controllers\OthersElectronicDocumentsControllerTests.cs" />
+    <Compile Include="Controllers\QueryAssociatedEventsControllerTests.cs" />
     <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
+    <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
+    <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

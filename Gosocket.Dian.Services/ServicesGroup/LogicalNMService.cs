@@ -863,16 +863,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return dianResponse;
             }
 
-
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsedNomina>();
             DocumentParsedNomina.SetValues(ref documentParsed);
-            var parser = new GlobalLogger(string.Empty, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+            var trackId = documentParsed.CUNE;
+            var parser = new GlobalLogger(trackId, Properties.Settings.Default.Param_Parser) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // Parser
 
             // ZONE 3
             //Validar campos mandatorios basicos para el trabajo del WS
             if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
-            var trackId = documentParsed.CUNE;
+            
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
 
@@ -889,17 +889,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", "") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
+                    var globalTimeValidation = new GlobalLogger(trackId, $"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Uoload };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
                 return dianResponse;
             }
+            var upload = new GlobalLogger(trackId, Properties.Settings.Default.Param_Uoload) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // upload xml
 
             // send to validate document sync
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
             var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
-            var validate = new GlobalLogger(trackId, Properties.Settings.Default.Param_Validate6) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+            var validate = new GlobalLogger(trackId, Properties.Settings.Default.Param_ValidateDocumentUrl) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
             // send to validate document sync
 
             if (validations.Count == 0)
@@ -910,7 +911,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                 if (globalEnd >= 10)
                 {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", trackId + " - " + trackId) { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_Validate };
+                    var globalTimeValidation = new GlobalLogger(trackId, $"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}") { Message = globalEnd.ToString(CultureInfo.InvariantCulture), Action = Properties.Settings.Default.Param_ValidateDocumentUrl };
                     TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
                 }
                 return dianResponse;
@@ -994,6 +995,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 {
                     TableManagerGlobalLogger.InsertOrUpdateAsync(unzip),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(parser),
+                    TableManagerGlobalLogger.InsertOrUpdateAsync(upload),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(validate),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(application),
                     TableManagerGlobalLogger.InsertOrUpdateAsync(zone1),
@@ -1032,6 +1034,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         dianResponse.StatusCode = processRegistrateComplete.Code;
                         dianResponse.StatusDescription = processRegistrateComplete.Message;
                     }
+
+                    var register = new GlobalLogger(trackId, Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl) { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture) };
+                    arrayTasks.Add(TableManagerGlobalLogger.InsertOrUpdateAsync(register));
                 }
 
                 Task.WhenAll(arrayTasks);

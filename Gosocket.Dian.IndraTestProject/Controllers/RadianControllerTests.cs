@@ -35,7 +35,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(result);
 
             //act
-           var viewResult=  _current.Index() as ViewResult;
+            ViewResult viewResult =  _current.Index() as ViewResult;
 
             //assert
             Assert.AreEqual(viewResult.ViewData["ContributorId"], "1");
@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(result);
 
             //act
-            var viewResult = _current.ElectronicInvoiceView() as ViewResult;
+            ViewResult viewResult = _current.ElectronicInvoiceView() as ViewResult;
 
             //assert
             Assert.AreEqual(viewResult.ViewData["ContributorId"], "1"); 

@@ -648,6 +648,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var senderCodeProviderDigit = nitModel.ProviderCodeDigit;
             var softwareId = nitModel.SoftwareId;
 
+            var issuerPartyCode = nitModel.IssuerPartyID;
+            var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeID;
+
             var receiverCode = nitModel.ReceiverCode;
             var receiverCodeSchemeNameValue = nitModel.ReceiverCodeSchemaValue;
             if (receiverCodeSchemeNameValue == "31")
@@ -684,11 +687,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Endoso Electronico
+            //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Mandato
             if (nitModel.ResponseCode == "043")
-            {
-                var issuerPartyCode = nitModel.IssuerPartyID;
-                var IssuerPartyCodeDigit = nitModel.IssuerPartySchemeID;
+            {               
                 if (string.IsNullOrEmpty(IssuerPartyCodeDigit) || IssuerPartyCodeDigit == "undefined") IssuerPartyCodeDigit = "11";
                 if (ValidateDigitCode(issuerPartyCode, int.Parse(IssuerPartyCodeDigit)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -764,7 +765,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
-            // Software provider RADIAN
+            //Software provider RADIAN
             if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268")
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
@@ -783,6 +784,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 habilitadoRadian = true;
                             break;
                     }
+                }
+
+                //Valida evento mandato - sender mismo provider mismo mandatario
+                if(String.Equals(senderCode,senderCodeProvider) && String.Equals(senderCode,issuerPartyCode))
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "LGC64",
+                        ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
             }
             else
@@ -915,7 +929,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string eventCode = party.ResponseCode;
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
-            var receiverCode = nitModel.ReceiverCode;
+            string receiverCode = nitModel.ReceiverCode;
+            string receiverNameCude = xmlParserCude.Fields["ReceiverName"].ToString();
+            string receiverNameCufe = nitModel.ReceiverName;
             string errorMessageParty = "Evento ValidateParty referenciado correctamente";
 
             //Endoso en Blanco
@@ -1436,6 +1452,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
                 //Valor Informe 3 dias pago
                 case (int)EventStatus.ValInfoPago:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
                     if (party.SenderParty != receiverCode)
                     {
                         var valid = ValidateBuyThreeDay(party.TrackId, party.SenderParty, nitModel.DocumentTypeId, (int)EventStatus.ValInfoPago);
@@ -1455,32 +1481,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
-                    else
+                   
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != nitModel.ReceiverCode)
                     {
-                        // Valida receptor documento AR coincida con DIAN
-                        if (party.ReceiverParty != nitModel.ReceiverCode)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "AAG01",
-                                ErrorMessage = "No fue informado los datos del Adquirente/Deudor/aceptante",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = errorMessageParty,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = "No fue informado el número de identificación.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
+                    // Valida nombre receptor documento AR coincida con DIAN
+                    if (receiverNameCude != receiverNameCufe)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = "No fue informado los datos del Adquirente/Deudor/aceptante",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                 
+                    
                     break;
             }
             foreach (var r in responses)
@@ -1556,7 +1582,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateEndosoTrusted"), out bool ValidateEndosoTrusted);
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -1567,7 +1593,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1586,7 +1612,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1618,7 +1644,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1631,7 +1657,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateEndosoTrusted,
+                        Mandatory = ValidateManadatory,
                         ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -1783,7 +1809,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "AAH62b",
-                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                     break;
@@ -1792,6 +1818,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     switch (docReferenceAttorney.Actor)
                                     {
+                                        case "FE":
+                                            if (!globalRadianOperation.ElectronicInvoicer)
+                                            {
+                                                validError = true;
+                                                responses.Add(new ValidateListResponse
+                                                {
+                                                    IsValid = false,
+                                                    Mandatory = true,
+                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC65"),
+                                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC65"),
+                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                });
+                                            }
+                                            break;
                                         case "PT":
                                             if (!globalRadianOperation.TecnologicalSupplier)
                                             {
@@ -2273,6 +2313,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
 
+            bool sendTestSet = false;
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
@@ -2335,7 +2376,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 switch (senderId)
                 {
                     case "Mandante-FE":
-
                         if (descriptionSender != "Mandante Facturador Electrónico")
                         {
                             validate = false;
@@ -2348,8 +2388,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
-
                         break;
                     case "Mandante-LT":
                         if (descriptionSender != "Mandante Legitimo Tenedor")
@@ -2400,6 +2438,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida descripcion Mandatario 
             switch (factorTemp)
             {
+                case "M-FE":
+                    modoOperacion = "FE";
+                    if (description != "Mandatario Facturador Electrónico")
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorMessage = "No fue informado el literal “Mandatario Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    break;
                 case "M-SN-e":
                     modoOperacion = "SNE";
                     if (description != "Mandatario Sistema de Negociación Electrónica")
@@ -2447,26 +2500,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
+            //Obtiene informacion del CUDE
+            var documentMetaCUFE = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMetaCUFE != null)
+                sendTestSet = documentMetaCUFE.SendTestSet;
+
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                 issuerPartyCode, false, softwareId);
 
-            //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
-            if (globalRadianOperation == null || (issuerPartyCode != providerCode))
+            //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID  
+            if (!sendTestSet)
             {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH62b",
-                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-            else
-            {
-                if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor && !globalRadianOperation.NegotiationSystem)
+                if (globalRadianOperation == null)
                 {
                     validate = false;
                     responses.Add(new ValidateListResponse
@@ -2474,10 +2520,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "AAH62b",
-                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+                else
+                {
+                    if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor
+                        && !globalRadianOperation.NegotiationSystem && !globalRadianOperation.ElectronicInvoicer)
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH62b",
+                            ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
+          
+            if(issuerPartyCode != providerCode)
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH62b",
+                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             //Valida existe Contrato de mandatos entre las partes
@@ -2632,19 +2707,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         else
                             codeExist = false;
-                    }
-                    else
-                    {
-                        validate = false;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+                    }                   
                 }
 
                 if (!codeExist)
@@ -4091,6 +4154,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime? signingTimeAvailability = null)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
             int businessDays = 0;
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
@@ -4162,7 +4226,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                          ? new ValidateListResponse
                          {
                              IsValid = false,
-                             Mandatory = true,
+                             Mandatory = ValidateManadatory,
                              ErrorCode = "DC24z",
                              ErrorMessage =
                                 "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación " +
@@ -4186,7 +4250,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ? new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "DC24c",
                             ErrorMessage = "No se puede generar el evento pasado los 3 días hábiles de la fecha de generación " +
                             "del evento Recibo del bien y prestación del servicio.",
@@ -4215,7 +4279,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         : new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "DC24e",
                             ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación" +
                             " del evento Recibo del bien y prestación del servicio.",
@@ -4231,7 +4295,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "LGC55",
                             ErrorMessage = "No se puede registrar el evento ya que la fecha de firma es superior " +
                                 "a la fecha de vencimiento de la factura electrónica de venta ",
@@ -4273,7 +4337,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
 
                                     IsValid = false,
-                                    Mandatory = true,
+                                    Mandatory = ValidateManadatory,
                                     ErrorCode = "LGC56",
                                     ErrorMessage = "No se puede registrar el evento ya que la fecha de vencimiento de la factura electrónica de venta  " +
                                     "es superior a 3 días de la fecha de firma del evento ",
