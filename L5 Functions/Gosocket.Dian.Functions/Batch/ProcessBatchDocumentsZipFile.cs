@@ -554,7 +554,7 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders, IEnumerable<string> eventCodes, IEnumerable<string> responseListIds)
+        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders, IEnumerable<string> eventCodes, IEnumerable<string> responseListIds, string testSetId)
         {
             string senderCode = string.Empty;
             string IssuerAttorney = string.Empty;
@@ -572,29 +572,18 @@ namespace Gosocket.Dian.Functions.Batch
 
             SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
 
+            //Se busca el set de pruebas procesado para el testsetid en curso
+            RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+
             //Evento Mandato el provider es el mandatario
             if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
-                return senderCode;
-
-            //Otros eventos se evalua el sender es diferente al provider para consultar existe un mandato
-            if (senderCode != IssuerAttorney)
             {
-                var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentSenderCodeIssueAttorney<GlobalDocReferenceAttorney>(IssuerAttorney, senderCode);
-
-                //Existe Mandato Abierto
-                if (docsReferenceAttorney != null && docsReferenceAttorney.Count > 0)
-                {
-                    foreach (var itemDocsReferenceAttorney in docsReferenceAttorney)
-                    {                        
-                        if (itemDocsReferenceAttorney.ResponseCodeListID == "3" && itemDocsReferenceAttorney.Active)
-                        {
-                            SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato " + itemDocsReferenceAttorney.IssuerAttorney, "ATT-2");
-                            return itemDocsReferenceAttorney.SenderCode;
-                        }                           
-                    }
-                }
+                if (radianTesSetResult != null && radianTesSetResult.PartitionKey == IssuerAttorney) 
+                    return IssuerAttorney;
+                else
+                    return senderCode;
             }
-
+               
             SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato return null", "ATT-3");
             return null;
         }
@@ -626,7 +615,7 @@ namespace Gosocket.Dian.Functions.Batch
             //Aplica para eventos AR 
             string codeMandato = string.Empty;
             if (flagApplicationResponse)
-                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds);           
+                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim());           
 
             foreach (var code in codes.ToList())
             {
