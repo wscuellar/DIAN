@@ -586,7 +586,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
-            string ReceiverCancelacion = String.Empty;
+            string receiverCancelacion = String.Empty;
+            string issuerAttorney = string.Empty;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -597,7 +598,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     party.TrackId = documentMeta.DocumentReferencedKey;
-                    ReceiverCancelacion = documentMeta.ReceiverCode;
+                    receiverCancelacion = documentMeta.ReceiverCode;
                 }
             }
 
@@ -615,7 +616,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
-
+                     
+          
             // ...
             List<string> issuerAttorneyList = null;
             var eventCode = int.Parse(party.ResponseCode);
@@ -635,6 +637,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                         else issuerAttorneyList.Add(item.IssuerAttorney);
                     });
+                }
+            }
+
+            if (eventCode == (int)EventStatus.TerminacionMandato)
+            {
+                var attorney = documentAttorneyTableManager.FindByPartition<GlobalDocReferenceAttorney>(party.TrackId).ToList();
+             
+                if (attorney != null && attorney.Count > 0)
+                {
+                    foreach (var item in attorney)
+                    {
+                        issuerAttorney = item.IssuerAttorney;
+                    }
                 }
             }
 
@@ -675,9 +690,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (valid)
             {
                 //Enodsatario Anulacion endoso
-                nitModel.ReceiverCode = ReceiverCancelacion != "" ? ReceiverCancelacion : nitModel.ReceiverCode;
+                nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
-                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList));
+                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList, issuerAttorney));
             }
             return validateResponses;
         }
