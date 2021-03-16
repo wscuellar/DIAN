@@ -107,21 +107,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\OthersDocumentsControllerTest.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsControllerTests.cs" />
-    <Compile Include="Controllers\ProfileFreeBillerControllerTest.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsControllerTests.cs" />
     <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
-    <Compile Include="Controllers\OthersDocumentsControllerTest.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\RadianContributorServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -157,6 +157,7 @@
       <Name>Gosocket.Dian.Web</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
