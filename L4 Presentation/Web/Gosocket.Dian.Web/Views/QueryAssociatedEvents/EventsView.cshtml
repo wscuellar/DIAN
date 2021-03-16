@@ -246,12 +246,6 @@
                             <span>NIT: @Model.Endoso.SenderCode</span>
                             <span>ENDOSANTE: @Model.Endoso.SenderName</span>
 
-                            <div class="row">
-                                <div class="second-section-align">
-                                    <h5><strong>TIPO DE ENDOSO </strong></h5>
-                                    <span>@Model.Endoso.EndosoType</span>
-                                </div>
-                            </div>
                         }
 
                         @if (Model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoPropiedad)
@@ -265,7 +259,7 @@
                             <div class="row">
                                 <div class="second-section-align">
                                     <h5><strong>TIPO DE ENDOSO </strong></h5>
-                                    <span>Endoso en propiedad</span>
+                                    <span>@Model.Endoso.EndosoType</span>
                                 </div>
                             </div>
                         }
