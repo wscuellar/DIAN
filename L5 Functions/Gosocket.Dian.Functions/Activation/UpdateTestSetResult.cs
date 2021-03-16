@@ -345,7 +345,7 @@ namespace Gosocket.Dian.Functions.Activation
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
 
                     }
-                    SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status);
+                    SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status, "AR_011");
 
                     // Actualizo el registro del set de pruebas del cliente
                     await radianTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
