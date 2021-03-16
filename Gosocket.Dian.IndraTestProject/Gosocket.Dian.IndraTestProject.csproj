@@ -107,6 +107,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsControllerTests.cs" />
     <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
