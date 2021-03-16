@@ -34,9 +34,14 @@ namespace Gosocket.Dian.IndraTestProject.Controllers
         [TestMethod]
         public void Index_Result_Test()
         {
+            //arrange
             _ = _radianTestSetService.Setup(t => t.GetAllTestSet()).Returns(new List<RadianTestSet>());
             _ = _radianTestSetService.Setup(t => t.GetOperationMode(It.IsAny<int>())).Returns(new RadianOperationMode() { Name = "OperationModename" });
+
+            //act
             var viewResult = _currentController.Index() as ViewResult;
+
+            //assert
             Assert.IsInstanceOfType(viewResult.Model, typeof(RadianTestSetTableViewModel));
             Assert.AreEqual(Navigation.NavigationEnum.RadianSetPruebas.ToString(), viewResult.ViewData["CurrentPage"].ToString());
         }
@@ -44,8 +49,13 @@ namespace Gosocket.Dian.IndraTestProject.Controllers
         [TestMethod]
         public void Add_Result_Test()
         {
+            //arrange
             _radianTestSetService.Setup(t => t.OperationModeList(Domain.Common.RadianOperationMode.None)).Returns(GetTestRadianOperationMode());
+
+            //act
             var viewResult = _currentController.Add() as ViewResult;
+
+            //assert
             Assert.IsInstanceOfType(viewResult.Model, typeof(RadianTestSetViewModel));
             Assert.AreEqual(Navigation.NavigationEnum.RadianSetPruebas.ToString(), viewResult.ViewData["CurrentPage"].ToString());
             Assert.IsTrue(((RadianTestSetViewModel)viewResult.Model).OperationModes.Count == 2);
@@ -87,12 +97,11 @@ namespace Gosocket.Dian.IndraTestProject.Controllers
             }
 
             _currentController.ControllerContext = GetControllerContext().Object;
+
             //act
             switch (input)
             {
                 case 3:
-                    result = _currentController.Add(model) as RedirectToRouteResult;
-                    break;
                 case 4:
                     result = _currentController.Add(model) as RedirectToRouteResult;
                     break;
@@ -114,8 +123,6 @@ namespace Gosocket.Dian.IndraTestProject.Controllers
                     Assert.IsInstanceOfType(viewResult.Model, typeof(RadianTestSetViewModel));
                     break;
                 case 3:
-                    Assert.AreEqual("Index", result.RouteValues["Action"]);
-                    break;
                 case 4:
                     Assert.AreEqual("Index", result.RouteValues["Action"]);
                     break;

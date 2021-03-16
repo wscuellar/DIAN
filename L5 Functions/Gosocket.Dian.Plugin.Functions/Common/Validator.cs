@@ -1809,7 +1809,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         IsValid = false,
                                         Mandatory = true,
                                         ErrorCode = "AAH62b",
-                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE).",
+                                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                     break;
@@ -2313,6 +2313,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
 
+            bool sendTestSet = false;
             string modoOperacion = string.Empty;
             string softwareId = xmlParser.Fields["SoftwareId"].ToString();
 
@@ -2499,27 +2500,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
             }
 
+            //Obtiene informacion del CUDE
+            var documentMetaCUFE = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMetaCUFE != null)
+                sendTestSet = documentMetaCUFE.SendTestSet;
+
             //Valida se encuetre habilitado Modo Operacion RadianOperation
             var globalRadianOperation = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
                 issuerPartyCode, false, softwareId);
 
-            //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID          
-            if (globalRadianOperation == null || (issuerPartyCode != providerCode))
+            //Validacion habilitado Modo Operacion RadianOperation y providerID igual a  IssuerParty / PowerOfAttorney / ID  
+            if (!sendTestSet)
             {
-                validate = false;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH62b",
-                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-            else
-            {
-                if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor 
-                    && !globalRadianOperation.NegotiationSystem && !globalRadianOperation.ElectronicInvoicer)
+                if (globalRadianOperation == null)
                 {
                     validate = false;
                     responses.Add(new ValidateListResponse
@@ -2531,6 +2524,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
+                else
+                {
+                    if (!globalRadianOperation.TecnologicalSupplier && !globalRadianOperation.Factor
+                        && !globalRadianOperation.NegotiationSystem && !globalRadianOperation.ElectronicInvoicer)
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH62b",
+                            ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
+          
+            if(issuerPartyCode != providerCode)
+            {
+                validate = false;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH62b",
+                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             //Valida existe Contrato de mandatos entre las partes
