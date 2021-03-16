@@ -124,9 +124,14 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static void SetEndoso(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            if (model.EventStatus == EventStatus.EndosoGarantia
-                || model.EventStatus == EventStatus.EndosoProcuracion)
-                model.Endoso = new EndosoViewModel(eventItem, invoice);
+            model.Endoso = new EndosoViewModel(eventItem, invoice);
+            if(model.EventStatus == EventStatus.EndosoPropiedad)
+            {
+                if (eventItem.CustomizationID == "371")
+                    model.Endoso.EndosoType = "Con responsabilidad";
+                if (eventItem.CustomizationID == "372")
+                    model.Endoso.EndosoType = "Sin responsabilidad";
+            }
         }
 
         private void SetMandate(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
