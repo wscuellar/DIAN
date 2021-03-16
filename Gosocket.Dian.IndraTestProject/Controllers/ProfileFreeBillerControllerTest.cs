@@ -1,19 +1,11 @@
-﻿using Gosocket.Dian.Application.FreeBiller;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Controllers;
-using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.FreeBiller;
-using Gosocket.Dian.Web.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using System.Collections.Generic;
-using System.Security.Principal;
-using System.Web;
-using System.Web.Http;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.IndraTestProject.Controllers
