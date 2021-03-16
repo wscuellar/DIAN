@@ -9,6 +9,7 @@ using Gosocket.Dian.Domain.Entity;
 using System;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Sql;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
@@ -339,13 +340,239 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         }
 
         [TestMethod]
-        public void SetupOperationModeTest()
+        [DataRow(1)]
+        [DataRow(2)]
+        [DataRow(3)]
+        public void SetupOperationModeTest(int input)
         {
             //arrange
+            int id = 0;
+            switch (input)
+            {
+                case 1:
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns((OtherDocsElectData)null);
+                    break;
+                case 2:
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.Transmitter });
+                    _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns((Domain.Contributor)null);
+                    break;
+                case 3:
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.Transmitter });
+                    _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Domain.Contributor() { ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
+                    _othersDocsElecContributorService.Setup(t => t.GetTechnologicalProviders(It.IsAny<int>(),It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(new List<Domain.Contributor>() { new Domain.Contributor() });
+                    _othersDocsElecContributorService.Setup(t => t.List2(It.IsAny<int>())).Returns(new PagedResult<OtherDocsElectData>() { Results = new List<OtherDocsElectData>() { new OtherDocsElectData() { StateSoftware ="1"} } });
+                    break;
+            }
 
             //act
+            RedirectToRouteResult redirectToAction = null;
+            ViewResult viewResult = null;
+            switch (input)
+            {
+                case 1:
+                    redirectToAction = _current.SetupOperationMode(id) as RedirectToRouteResult;
+                    break;
+                case 2:
+                case 3:
+                    viewResult = _current.SetupOperationMode(id) as ViewResult;
+                    break;
+            }
 
             //assert
+            switch (input)
+            {
+                case 1:
+                    Assert.AreEqual("Index", redirectToAction.RouteValues["action"]);
+                    break;
+                case 2:
+                    Assert.AreEqual(false, (bool)viewResult.ViewData["ValidateRequest"]);
+                    break;
+                case 3:
+                    Assert.AreEqual(id, (int)viewResult.ViewData["Id"]);
+                    break;
+            }
+        }
+
+
+        [TestMethod]
+        [DataRow(1,DisplayName ="Without test set")]
+        [DataRow(2, DisplayName = "OperationFailOtherInProcess")]
+        [DataRow(3, DisplayName = "OtherDocEleSuccesModeOperation")]
+        public void SetupOperationModePostTest(int input)
+        {
+            //arrange
+            OtherDocElecSetupOperationModeViewModel model = new OtherDocElecSetupOperationModeViewModel() { OperationModeId = 1 };
+            switch(input)
+            {
+                case 1:
+                    _othersDocsElecContributorService.Setup(t => t.GetTestResult(model.OperationModeId, model.ElectronicDocId)).Returns((GlobalTestSetOthersDocuments)null);
+                    break;
+                case 2:
+                    _othersDocsElecContributorService.Setup(t => t.GetTestResult(model.OperationModeId, model.ElectronicDocId)).Returns(new GlobalTestSetOthersDocuments());
+                    _othersDocsElecContributorService.Setup(t => t.ValidateSoftwareActive(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(true);
+                    break;
+                case 3:
+                    _othersDocsElecContributorService.Setup(t => t.GetTestResult(model.OperationModeId, model.ElectronicDocId)).Returns(new GlobalTestSetOthersDocuments());
+                    _othersDocsElecContributorService.Setup(t => t.ValidateSoftwareActive(0, model.ContributorTypeId, model.OperationModeId, 1)).Returns(false);
+                    _othersDocsElecContributorService.Setup(t => t.CreateContributor(It.IsAny<int>(), OtherDocElecState.Registrado, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(new Domain.Sql.OtherDocElecContributor());
+                    _othersElectronicDocumentsService.Setup(t => t.AddOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>(), It.IsAny<OtherDocElecSoftware>(), true, true)).Returns(new ResponseMessage());
+                    _othersElectronicDocumentsService.Setup(t => t.ChangeParticipantStatus(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+                    break;
+            }
+
+            //act
+            JsonResult jsonResult = _current.SetupOperationModePost(model);
+            ResponseMessage responseMessage = jsonResult.Data as ResponseMessage;
+
+            //assert
+            switch(input)
+            {
+                case 1:
+                    Assert.AreEqual(TextResources.ModeElectroniDocWithoutTestSet, responseMessage.Message);
+                    break;
+                case 2:
+                    Assert.AreEqual(TextResources.OperationFailOtherInProcess, responseMessage.Message);
+                    break;
+                case 3:
+                    Assert.AreEqual(TextResources.OtherDocEleSuccesModeOperation, responseMessage.Message);
+                    break;
+
+            }
+
+        }
+
+        [TestMethod]
+        [DataRow(1, DisplayName ="Operation Hab")]
+        [DataRow(2, DisplayName = "Delete operation")]
+        public void DeleteOperationModeTest(int input)
+        {
+            //arrange
+            int id = 0;
+            switch(input)
+            {
+                case 1:
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Habilitado });
+                    break;
+                case 2:
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.Transmitter });
+                    _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Domain.Contributor() { ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
+                    _othersDocsElecSoftwareService.Setup(t => t.Get(It.IsAny<Guid>())).Returns(new OtherDocElecSoftware());
+                    _testSetOthersDocumentsResultService.Setup(t => t.GetTestSetResult(It.IsAny<string>(), It.IsAny<string>())).Returns(new GlobalTestSetOthersDocumentsResult());
+                    _testSetOthersDocumentsResultService.Setup(t => t.InsertTestSetResult(It.IsAny<GlobalTestSetOthersDocumentsResult>())).Returns(true);
+                    _globalOtherDocElecOperationService.Setup(t => t.GetOperation(It.IsAny<string>(), It.IsAny<Guid>())).Returns(new GlobalOtherDocElecOperation());
+                    _globalOtherDocElecOperationService.Setup(t => t.Update(It.IsAny<GlobalOtherDocElecOperation>())).Returns(true);
+                    _othersElectronicDocumentsService.Setup(t => t.OperationDelete(id)).Returns(new ResponseMessage());
+                    break;
+            }
+            
+            //act
+            JsonResult jsonResult = _current.DeleteOperationMode(id);
+
+            //assert
+            switch(input)
+            {
+                case 1:
+                    string message = jsonResult.Data.GetType().GetProperty("message").GetValue(jsonResult.Data).ToString();
+                    Assert.AreEqual("Modo de operación se encuentra en estado 'Habilitado', no se permite eliminar.", message);
+                    break;
+                case 2:
+                    string code = jsonResult.Data.GetType().GetProperty("code").GetValue(jsonResult.Data).ToString();
+                    Assert.AreEqual("200", code);
+                    break;
+            }
+
+        }
+
+        [TestMethod]
+        [DataRow(1, DisplayName = "SuccessFull")]
+        [DataRow(2, DisplayName = "Failed")]
+        public void RestartSetTestResultTest(int input)
+        {
+            //arrange
+            GlobalTestSetOthersDocumentsResult model = new GlobalTestSetOthersDocumentsResult();
+            Guid docElecSoftwareId = Guid.NewGuid();
+
+            switch(input)
+            {
+                case 1:
+                    _testSetOthersDocumentsResultService.Setup(t => t.InsertTestSetResult(model)).Returns(true);
+                    _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId)).Returns(new OtherDocElecContributorOperations());
+                    _othersElectronicDocumentsService.Setup(t => t.UpdateOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>())).Returns(true);
+                    break;
+                case 2:
+                    _testSetOthersDocumentsResultService.Setup(t => t.InsertTestSetResult(model)).Returns(false);
+                    break;
+            }
+            
+
+            //act
+            JsonResult jsonResult = _current.RestartSetTestResult(model, docElecSoftwareId);
+            ResponseMessage message = jsonResult.Data as ResponseMessage;
+
+            //assert
+            switch(input)
+            {
+                case 1:
+                    Assert.AreEqual("Contadores reiniciados correctamente", message.Message);
+                    break;
+                case 2:
+                    Assert.AreEqual("¡Error en la actualización!", message.Message);
+                    break;
+            }
+        }
+
+        [TestMethod]
+        public void GetSoftwaresByContributorIdTest()
+        {
+            //arrange
+            int id = 0;
+            int electronicDocumentId = 1;
+            _othersDocsElecSoftwareService.Setup(t => t.GetSoftwaresByProviderTechnologicalServices(id, electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OtherDocElecState.Habilitado.GetDescription())).Returns(new List<OtherDocElecSoftware>() { new OtherDocElecSoftware() });
+
+            //act
+            JsonResult jsonResult = _current.GetSoftwaresByContributorId(id, electronicDocumentId);
+            List<SoftwareViewModel> lst = jsonResult.Data.GetType().GetProperty("res").GetValue(jsonResult.Data) as List<SoftwareViewModel>;
+
+            //assert
+            Assert.IsNotNull(lst);
+
+        }
+
+        [TestMethod]
+        [DataRow(1)]
+        [DataRow(2)]
+        public void GetDataBySoftwareId(int input)
+        {
+            //arrange
+            Guid SoftwareId = Guid.NewGuid();
+            switch(input)
+            {
+                case 1:
+                    _othersDocsElecSoftwareService.Setup(t => t.GetBySoftwareId(SoftwareId)).Returns(new OtherDocElecSoftware());
+                    break;
+                case 2:
+                    _othersDocsElecSoftwareService.Setup(t => t.GetBySoftwareId(SoftwareId)).Returns((OtherDocElecSoftware) null);
+                    break;
+            }
+            
+
+            //act
+            JsonResult jsonResult = _current.GetDataBySoftwareId(SoftwareId);
+
+            //assert
+            switch (input)
+            {
+                case 1:
+                    Assert.IsNotNull(jsonResult.Data);
+                    break;
+                case 2:
+                    Assert.IsNull(jsonResult.Data);
+                    break;
+            }
 
         }
 
