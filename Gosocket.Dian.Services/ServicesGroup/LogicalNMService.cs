@@ -871,7 +871,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // ZONE 3
             //Validar campos mandatorios basicos para el trabajo del WS
-            if (!DianServicesUtils.ValidateParserNomina(documentParsed, ref dianResponse)) return dianResponse;
+            if (!DianServicesUtils.ValidateParserNomina(documentParsed, xmlParser, ref dianResponse)) return dianResponse;
             
             var SerieAndNumber = documentParsed.SerieAndNumber;
             // ZONE 3
