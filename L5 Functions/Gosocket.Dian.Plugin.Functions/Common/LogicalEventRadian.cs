@@ -1223,8 +1223,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC25"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -1634,7 +1634,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             string eventCanelLimitacion = string.Empty;
 
-            var listCancelElectronicEvent = documentMeta.Where(t => t.CancelElectronicEvent == cancelElectronicEvent && t.SenderCode == SenderCode).ToList();
+            var listCancelElectronicEvent = documentMeta.Where(t => t.CancelElectronicEvent == cancelElectronicEvent).ToList();
             if (listCancelElectronicEvent != null)
             {
                 foreach (var itemListCancelElectronicEvent in listCancelElectronicEvent)
