@@ -107,7 +107,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\OthersDocumentsControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsControllerTests.cs" />
     <Compile Include="Controllers\ProfileFreeBillerControllerTest.cs" />

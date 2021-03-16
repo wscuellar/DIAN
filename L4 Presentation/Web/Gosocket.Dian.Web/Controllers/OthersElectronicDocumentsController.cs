@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = new ElectronicDocumentService().GetElectronicDocuments().Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments()?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             ViewBag.ContributorId = User.ContributorId();
 
             return View();
@@ -61,7 +61,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult AddOrUpdate(ValidacionOtherDocsElecViewModel dataentity)
         {
-            List<ElectronicDocument> listED = new ElectronicDocumentService().GetElectronicDocuments();
+            List<ElectronicDocument> listED = _electronicDocumentService.GetElectronicDocuments();
             List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
             
@@ -157,7 +157,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware, Name = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
                 // get contributor name...
-                var contributor = this._contributorService.GetContributorById(User.ContributorId(), model.ContributorIdType);
+                var contributor = _contributorService.GetContributorById(User.ContributorId(), model.ContributorIdType);
                 model.ContributorName = contributor?.Name;
                 model.SoftwareId = Guid.NewGuid().ToString();
             }
