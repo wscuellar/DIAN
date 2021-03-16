@@ -29,6 +29,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string ParserError { get; set; }
         public string SigningTime { get; set; }
         public bool Novelty { get; set; }
+        public string SequenceConsecutive { get; set; }
 
 
         public XmlParseNomina()
@@ -104,8 +105,8 @@ namespace Gosocket.Dian.Services.Utils.Common
                     {
                         globalDocPayrolls.CodigoTrabajador = xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText;
                         globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
-                        var tempConsecutivo = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
-                        globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(tempConsecutivo) ? double.Parse(tempConsecutivo) : 0);
+                        this.SequenceConsecutive = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
+                        globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(this.SequenceConsecutive) ? double.Parse(this.SequenceConsecutive) : 0);
                         globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
                     }
                     XmlNodeList xLugarGeneracionXML = xmlDocument.GetElementsByTagName("LugarGeneracionXML");

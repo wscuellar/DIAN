@@ -678,7 +678,7 @@ namespace Gosocket.Dian.Services.Utils
             return isValid;
         }
 
-        public static bool ValidateParserNomina(DocumentParsedNomina documentParsed, ref DianResponse dianResponse)
+        public static bool ValidateParserNomina(DocumentParsedNomina documentParsed, XmlParseNomina xmlParser, ref DianResponse dianResponse)
         {
             string codeMessage = string.Empty;
             bool isValid = true;
@@ -725,6 +725,14 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
+            if($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
+            {
+                stringBuilder.AppendLine($"{codeMessage}012: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
             if (!isValid)
             {
                 dianResponse.StatusCode = "66";
@@ -732,6 +740,8 @@ namespace Gosocket.Dian.Services.Utils
                 dianResponse.StatusDescription = Properties.Settings.Default.Msg_Error_FieldMandatori;
                 dianResponse.StatusMessage = "Validación contiene errores en campos mandatorios.";
             }
+
+            
 
             return isValid;
         }
