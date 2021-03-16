@@ -51,6 +51,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private readonly TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private readonly TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
 
         readonly XmlDocument _xmlDocument;
@@ -587,6 +588,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalContributor softwareProvider = null;
             GlobalRadianOperations softwareProviderRadian = null;
             bool habilitadoRadian = false;
+            string testSetId = string.Empty;
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -786,17 +788,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                //Valida evento mandato - sender mismo provider mismo mandatario
-                if(String.Equals(senderCode,senderCodeProvider) && String.Equals(senderCode,issuerPartyCode))
+                if (documentMeta.SendTestSet)
                 {
-                    responses.Add(new ValidateListResponse
+                    testSetId = documentMeta.TestSetId;
+                    //Se busca el set de pruebas procesado para el testsetid en curso
+                    RadianTestSetResult radianTesSetResult = TableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+                    
+                    if(radianTesSetResult != null && Convert.ToInt32(radianTesSetResult.ContributorTypeId) != (int)RadianContributorType.ElectronicInvoice)
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "LGC64",
-                        ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        //Valida evento mandato - sender mismo provider mismo mandatario
+                        if (String.Equals(senderCode, senderCodeProvider) && String.Equals(senderCode, issuerPartyCode))
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC64",
+                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }                  
+                }
+                else
+                {
+                    //Valida evento mandato - sender mismo provider mismo mandatario
+                    if (String.Equals(senderCode, senderCodeProvider) && String.Equals(senderCode, issuerPartyCode))
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
             }
             else
