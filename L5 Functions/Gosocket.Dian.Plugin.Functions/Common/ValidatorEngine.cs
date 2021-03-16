@@ -588,6 +588,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             XmlParser xmlParserCude = null;
             string receiverCancelacion = String.Empty;
             string issuerAttorney = string.Empty;
+            string senderAttorney = string.Empty;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -649,6 +650,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     foreach (var item in attorney)
                     {
                         issuerAttorney = item.IssuerAttorney;
+                        senderAttorney = item.SenderCode;
                     }
                 }
             }
@@ -692,7 +694,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Enodsatario Anulacion endoso
                 nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
-                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList, issuerAttorney));
+                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList, issuerAttorney, senderAttorney));
             }
             return validateResponses;
         }

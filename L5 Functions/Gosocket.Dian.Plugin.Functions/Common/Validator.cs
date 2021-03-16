@@ -947,7 +947,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null, string issuerAttorney = null)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -1342,7 +1342,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Revocación es información del mandante
                     if (party.CustomizationID == "441")
                     {
-                        if (party.SenderParty != senderCode)
+                        if (party.SenderParty != senderAttorney)
                         {
                             responses.Add(new ValidateListResponse
                             {
