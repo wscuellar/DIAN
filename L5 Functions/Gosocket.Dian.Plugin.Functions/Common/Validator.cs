@@ -2046,6 +2046,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validateReference = false;
             bool validateSigningTime = false;
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
+            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
 
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
             string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
@@ -4166,7 +4167,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
-                    Mandatory = true,
+                    Mandatory = ValidateManadatory,
                     ErrorCode = "DC24",
                     ErrorMessage = "Error en el valor de la fecha y hora de firma. " +
                         $"NO corresponde al formato y/o el valor reportado es superior a la fecha del sistema.",
