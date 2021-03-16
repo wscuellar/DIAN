@@ -64,7 +64,6 @@ namespace Gosocket.Dian.Application.Tests
         [DataRow(4, DisplayName = "Datos actualizados")]
         public void AddOtherDocElecContributorOperationTest(int input)
         {
-
             //arrange
             ResponseMessage result;
             OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations();
@@ -97,44 +96,86 @@ namespace Gosocket.Dian.Application.Tests
                     //Assert
                     Assert.IsNotNull(result);
                     Assert.AreEqual(result.Message, TextResources.OperationFailOtherInProcess);
-                    break; 
+                    break;
                 case 3:
-                    ////arrange
-                    //_ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(3));
-                    //_ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
-                    //_ = _contributorService.Setup(x => x.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Contributor() { Name = "NameContributor" });
+                    //arrange
+                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted))
+                    .Returns(new OtherDocElecContributorOperations());
+                    //act
+                    result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, false);
 
-                    ////act
-                    //resultRedirect = _current.AddOrUpdate(dataentity);
-
-                    ////assert
-                    //Assert.IsNotNull(resultRedirect);
-                    //Assert.IsInstanceOfType(((ViewResult)resultRedirect).Model, typeof(OthersElectronicDocumentsViewModel));
-                    //Assert.IsTrue(condition: ((SelectList)((ViewResult)resultRedirect).ViewData["OperationModes"]).Any());
-                    //Assert.IsTrue(((OthersElectronicDocumentsViewModel)((ViewResult)resultRedirect).Model).ContributorName.Equals("NameContributor"));
+                    //Assert
+                    Assert.IsNotNull(result);
+                    Assert.AreEqual(result.Message, TextResources.ExistingSoftware);
                     break;
                 case 4:
-                    //dataentity.OperationModeId = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider;
-                    //_ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(4));
-                    //_ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
-                    //_ = _othersDocsElecContributorService.Setup(x => x.GetTechnologicalProviders(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(new List<Contributor> { new Contributor() { Id = 1001, Name = "NameContributor" } });
+                    //arrange
+                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted))
+                    .Returns((OtherDocElecContributorOperations)null);
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.CreateSoftware(new OtherDocElecSoftware())).Returns(new OtherDocElecSoftware());
 
-                    ////act
-                    //resultRedirect = _current.AddOrUpdate(dataentity);
-                    //var viewResult = (ViewResult)resultRedirect;
-                    ////assert
-                    //Assert.IsNotNull(resultRedirect);
-                    //Assert.IsInstanceOfType(viewResult.Model, typeof(OthersElectronicDocumentsViewModel));
-                    //Assert.IsTrue(condition: ((SelectList)viewResult.ViewData["OperationModes"]).Any());
-                    //Assert.IsTrue(condition: ((SelectList)viewResult.ViewData["ListTechnoProviders"]).Any());
+                    _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
+                    _globalOtherDocElecOperationService.Insert(operation, existingOperation.Software)
+                        _ = _testSetOthersDocumentsResultService.InsertTestSetResult(setResult);
+
+                    //act
+                    result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, false);
+                    //Assert
+                    Assert.IsNotNull(result);
+                    Assert.AreEqual(result.Message, TextResources.SuccessSoftware);
                     break;
             }
         }
 
-        [TestMethod()]
-        public void ChangeParticipantStatusTest()
+        [TestMethod]
+        [DataRow(1, DisplayName = "Sin contributors")]
+        [DataRow(2, DisplayName = "Con contributors")]
+        public void ChangeParticipantStatusTest(int input)
         {
-            Assert.Fail();
+            //arrange 
+            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations();
+            OtherDocElecSoftware software = new OtherDocElecSoftware();
+
+            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId))
+                .Returns(new OtherDocElecContributor() { OtherDocElecOperationModeId = 1, ElectronicDocumentId = 1, State = OtherDocElecState.Cancelado.GetDescription() });
+
+            bool resultbool; string actualState = string.Empty; int contributorId = 0;
+            switch (input)
+            {
+                case 1:
+                    //arrange
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.List(t => t.Id == contributorId && t.State == actualState, 0, 0).Results).Returns((List<OtherDocElecContributor>)null);
+                    //act
+                    resultbool = _current.ChangeParticipantStatus(1, string.Empty, 1, string.Empty, string.Empty);
+
+                    //Assert
+                    Assert.IsNotNull(resultbool);
+                    Assert.IsTrue(!resultbool);
+                    break;
+                case 2:
+                    //arrange
+                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
+                                                                    && !t.Deleted))
+                         .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 7 } });
+
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.AddOrUpdate(new OtherDocElecContributor())).Returns(1);
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.List(It.IsAny<int>())).Returns(new List<OtherDocElecSoftware> { new OtherDocElecSoftware() { Id = Guid.NewGuid() } });
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.DeleteSoftware(It.IsAny<Guid>())).Returns(Guid.NewGuid());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.SoftwareId == software.Id && !t.Deleted))
+                        .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 1 } });
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Update(new OtherDocElecContributorOperations())).Returns(true);
+                    //act
+                    resultbool = _current.ChangeParticipantStatus(1, string.Empty, 1, string.Empty, string.Empty);
+                    //Assert
+                    Assert.IsNotNull(resultbool);
+                    Assert.IsTrue(resultbool);
+                    break;
+            }
         }
 
         [TestMethod()]
