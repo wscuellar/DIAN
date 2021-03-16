@@ -14,6 +14,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Sql;
 using System.Linq.Expressions;
+using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Application.Tests
 {
@@ -66,9 +67,10 @@ namespace Gosocket.Dian.Application.Tests
 
             //arrange
             ResponseMessage result;
-            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations() { OtherDocElecContributorId = 1 };
+            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations();
+            OtherDocElecSoftware software = new OtherDocElecSoftware();
 
-            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(_ => true))
+            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId))
                 .Returns(new OtherDocElecContributor() { OtherDocElecOperationModeId = 1, ElectronicDocumentId = 1 });
 
             switch (input)
@@ -77,24 +79,25 @@ namespace Gosocket.Dian.Application.Tests
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns((GlobalTestSetOthersDocuments)null);
                     //act
-                    result = _current.AddOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>(), It.IsAny<OtherDocElecSoftware>(), It.IsAny<bool>(), It.IsAny<bool>());
+                    result = _current.AddOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>(), It.IsAny<OtherDocElecSoftware>(), true, true);
                     //Assert
                     Assert.IsNotNull(result);
                     Assert.AreEqual(result.Message, TextResources.ModeElectroniDocWithoutTestSet);
                     break;
                 case 2:
-                    ////arrange
-                    //_ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(2));
-
-                    ////act 
-                    //resultRedirect = _current.AddOrUpdate(dataentity);
-
-                    ////assert
-                    //Assert.IsNotNull(resultRedirect);
-                    //Assert.AreEqual("AddParticipants", ((RedirectToRouteResult)resultRedirect).RouteValues["Action"]);
-                    //Assert.AreEqual(dataentity.ElectronicDocumentId.ToString(), ((RedirectToRouteResult)resultRedirect).RouteValues["electronicDocumentId"].ToString());
-
-                    break;
+                    //arrange
+                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
+                                                                    && !t.Deleted))
+                         .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 7 } });
+                    //act
+                    result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, true);
+                    //Assert
+                    Assert.IsNotNull(result);
+                    Assert.AreEqual(result.Message, TextResources.OperationFailOtherInProcess);
+                    break; 
                 case 3:
                     ////arrange
                     //_ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(3));
