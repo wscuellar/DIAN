@@ -186,7 +186,7 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public RadianTestSet GetTestResult(string softwareType)
+        public RadianTestSet GetTestSet(string softwareType)
         {
             return _radianTestSetService.GetTestSet(softwareType, softwareType);
         }

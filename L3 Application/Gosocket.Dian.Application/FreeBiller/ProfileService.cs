@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Gosocket.Dian.DataContext;
+﻿using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
+using Gosocket.Dian.Interfaces.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application.FreeBiller
 {
-    public class ProfileService 
+    public class ProfileService : IProfileService
     {
         readonly SqlDBContext sqlDBContext;
 
@@ -19,7 +20,7 @@ namespace Gosocket.Dian.Application.FreeBiller
         /// Obtiene todos los perfiles para el Facturador Gratuito.
         /// </summary>
         /// <returns>List<Profile></returns>
-        public List<Profile> GetAll() 
+        public List<Profile> GetAll()
         {
             return sqlDBContext.Profile.ToList();
         }
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Application.FreeBiller
         /// Obtiene todas las opciones del menú para el facturador gratuito.
         /// </summary>
         /// <returns>List<MenuOptions></returns>
-        public List<MenuOptions> GetMenuOptions() 
+        public List<MenuOptions> GetMenuOptions()
         {
             return sqlDBContext.MenuOptions.ToList();
         }
@@ -50,7 +51,7 @@ namespace Gosocket.Dian.Application.FreeBiller
         /// </summary>
         /// <param name="menuOptionsByProfiles">Lista con los Id de MenuOption y el perfil.</param>
         /// <returns>bool. Indicando si el proceso de guardao fue exitoso o no.</returns>
-        public bool SaveOptionsMenuByProfile(List<MenuOptionsByProfiles> menuOptionsByProfiles) 
+        public bool SaveOptionsMenuByProfile(List<MenuOptionsByProfiles> menuOptionsByProfiles)
         {
 
             foreach (MenuOptionsByProfiles newMenu in menuOptionsByProfiles)
@@ -68,7 +69,7 @@ namespace Gosocket.Dian.Application.FreeBiller
 
         public List<MenuOptionsByProfiles> GetMenuOptionsByProfile(int profileId)
         {
-            return sqlDBContext.MenuOptionsByProfiles.Where(t=> t.ProfileId == profileId).ToList();
+            return sqlDBContext.MenuOptionsByProfiles.Where(t => t.ProfileId == profileId).ToList();
         }
 
 

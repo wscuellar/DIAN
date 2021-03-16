@@ -8,13 +8,14 @@ using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class QueryAssociatedEventsController : Controller
     {
+        #region Fields and Constructor
+
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IContributorService _contributorService;
 
@@ -24,7 +25,10 @@ namespace Gosocket.Dian.Web.Controllers
             _contributorService = contributorService;
         }
 
-        // GET: QueryAssociatedEvents
+        #endregion
+
+        #region Views
+
         public ActionResult Index()
         {
             return View();
@@ -39,12 +43,15 @@ namespace Gosocket.Dian.Web.Controllers
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
 
             model.CUDE = id;
+
             SetTitles(eventItem, model);
 
             GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(cufe);
 
             SetMandate(model, eventItem, invoice);
+
             SetEndoso(model, eventItem, invoice);
+
             model.RequestType = TextResources.Event_RequestType;
 
             GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem);
@@ -56,10 +63,15 @@ namespace Gosocket.Dian.Web.Controllers
             SetEventAssociated(model, eventItem);
 
             Response.Headers["InjectingPartialView"] = "true";
+
             return PartialView(model);
-        }
+
+        } 
+
+        #endregion
 
         #region Private Methods
+
         private void SetTitles(GlobalDocValidatorDocumentMeta eventItem, SummaryEventsViewModel model)
         {
             model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
@@ -84,7 +96,6 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
-                //incluir los mandatos
             }
         }
 
@@ -113,9 +124,14 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static void SetEndoso(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
-            if (model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoGarantia
-                || model.EventStatus == Gosocket.Dian.Domain.Common.EventStatus.EndosoProcuracion)
-                model.Endoso = new EndosoViewModel(eventItem, invoice);
+            model.Endoso = new EndosoViewModel(eventItem, invoice);
+            if(model.EventStatus == EventStatus.EndosoPropiedad)
+            {
+                if (eventItem.CustomizationID == "371")
+                    model.Endoso.EndosoType = "Con responsabilidad";
+                if (eventItem.CustomizationID == "372")
+                    model.Endoso.EndosoType = "Sin responsabilidad";
+            }
         }
 
         private void SetMandate(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
@@ -132,6 +148,8 @@ namespace Gosocket.Dian.Web.Controllers
                     model.Mandate.ContractDate = referenceAttorneys.FirstOrDefault().EffectiveDate;
             }
         }
+
         #endregion
+
     }
 }

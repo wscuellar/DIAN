@@ -128,12 +128,6 @@
     <Compile Include="Controllers\FreeBiller\CreateUserTest.cs" />
     <Compile Include="Controllers\FreeBiller\FakeRepository.cs" />
     <Compile Include="Controllers\FreeBiller\TestModelHelper.cs" />
-    <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
-    <Compile Include="Controllers\RadianControllerTests.cs" />
-    <Compile Include="Controllers\RadianEnablingInvoiceDirectControllerTests.cs" />
-    <Compile Include="Controllers\RadianEnablingInvoiceIndirectControllerTests.cs" />
-    <Compile Include="Controllers\RadianTechnologyProviderControllerTests.cs" />
-    <Compile Include="Controllers\RadianTradingSystemControllerTests.cs" />
     <Compile Include="Functions\Commons\AllTest.cs" />
     <Compile Include="Functions\Plugins\AllTest.cs" />
     <Compile Include="Functions\Validator\AllTest.cs" />

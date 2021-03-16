@@ -42,10 +42,10 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(RegistrationDataViewModel registrationData)
         {
             RadianAdmin radianAdmin = _radianAprovedService.ContributorSummary(registrationData.ContributorId, (int)registrationData.RadianContributorType);
-            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
             if (radianAdmin.Contributor.RadianState == "Cancelado")
                 return RedirectToAction("Index", "Radian");
-            
+
+            List<RadianContributorFileType> listFileType = _radianAprovedService.ContributorFileTypeList((int)registrationData.RadianContributorType);
             RadianApprovedViewModel model = new RadianApprovedViewModel()
             {
                 Contributor = radianAdmin.Contributor,
@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             model.CustomerTotalCount = customers.RowCount;
 
-            var data = _radianAprovedService.FileHistoryFilter(radianAdmin.Contributor.RadianContributorId, string.Empty, string.Empty, string.Empty, 1, 10);
+            PagedResult<RadianContributorFileHistory> data = _radianAprovedService.FileHistoryFilter(radianAdmin.Contributor.RadianContributorId, string.Empty, string.Empty, string.Empty, 1, 10);
             FileHistoryListViewModel resultH = new FileHistoryListViewModel()
             {
                 Page = 1,
@@ -97,34 +97,28 @@ namespace Gosocket.Dian.Web.Controllers
             model.FileHistories = resultH;
             model.FileHistoriesRowCount = data.RowCount;
 
-            if ((int)registrationData.RadianOperationMode == 2)
-            {
-                if (model.RadianState == "Habilitado")
-                    return View(model);
-                else
-                {
-                    Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
-                    List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList(registrationData.RadianOperationMode);
-                    RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
-                    RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
-                    {
-                        Contributor = radianAdmin.Contributor,
-                        OperationModeList = operationModeList,
-                        OperationModes = new SelectList(operationModeList, "Id", "Name"),
-                        RadianContributorOperations = radianContributorOperations,
-                        SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl")
-                    };
-                    if (software != null)
-                    {
-                        radianApprovedOperationModeViewModel.Software = software;
-                        radianApprovedOperationModeViewModel.CreatedBy = software.CreatedBy;
-                        radianApprovedOperationModeViewModel.SoftwareId = software.Id;
-                    }
-                    return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
-                }
-            }
-            else
+            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct || 
+                model.RadianState == RadianState.Habilitado.GetDescription())
                 return View(model);
+
+            Software software = _radianAprovedService.SoftwareByContributor(registrationData.ContributorId);
+            List<Domain.RadianOperationMode> operationModeList = _radianTestSetService.OperationModeList(registrationData.RadianOperationMode);
+            RadianContributorOperationWithSoftware radianContributorOperations = _radianAprovedService.ListRadianContributorOperations(radianAdmin.Contributor.RadianContributorId);
+            RadianApprovedOperationModeViewModel radianApprovedOperationModeViewModel = new RadianApprovedOperationModeViewModel()
+            {
+                Contributor = radianAdmin.Contributor,
+                OperationModeList = operationModeList,
+                OperationModes = new SelectList(operationModeList, "Id", "Name"),
+                RadianContributorOperations = radianContributorOperations,
+                SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl")
+            };
+            if (software != null)
+            {
+                radianApprovedOperationModeViewModel.Software = software;
+                radianApprovedOperationModeViewModel.CreatedBy = software.CreatedBy;
+                radianApprovedOperationModeViewModel.SoftwareId = software.Id;
+            }
+            return View("GetFactorOperationMode", radianApprovedOperationModeViewModel);
         }
 
         [HttpPost]
@@ -133,7 +127,7 @@ namespace Gosocket.Dian.Web.Controllers
             RadianTestSet testSet = null;
             if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct)
             {
-                testSet = _radianAprovedService.GetTestResult(((int)RadianOperationModeTestSet.OwnSoftware).ToString());
+                testSet = _radianAprovedService.GetTestSet(((int)RadianOperationModeTestSet.OwnSoftware).ToString());
                 if (testSet == null)
                     return Json(new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
             }
@@ -362,7 +356,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
         {
-             RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
+            RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
@@ -388,11 +382,11 @@ namespace Gosocket.Dian.Web.Controllers
             };
 
 
-            RadianTestSet testSet = _radianAprovedService.GetTestResult(data.SoftwareType.ToString());
+            RadianTestSet testSet = _radianAprovedService.GetTestSet(data.SoftwareType.ToString());
             ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
             if (response.Code != 500 && participant.RadianState != RadianState.Habilitado.GetDescription())
                 _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
-            
+
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
