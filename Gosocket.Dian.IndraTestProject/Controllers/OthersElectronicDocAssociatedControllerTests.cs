@@ -1,7 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Gosocket.Dian.Web.Controllers;
+using System;
 using System.Collections.Generic;
 using Moq;
 using Gosocket.Dian.Interfaces;
+using Moq;
 using Gosocket.Dian.Interfaces.Services;
 using System.Web.Mvc;
 using Gosocket.Dian.Domain.Common;
@@ -24,6 +27,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
         private readonly Mock<IGlobalOtherDocElecOperationService> _globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
 
+        private readonly Mock<IContributorService> contributorService = new Mock<IContributorService>();
+        private readonly Mock<IOthersDocsElecContributorService> othersDocsElecContributorService = new Mock<IOthersDocsElecContributorService>();
+        private readonly Mock<IOthersElectronicDocumentsService> othersElectronicDocumentsService = new Mock<IOthersElectronicDocumentsService>();
+        private readonly Mock<ITestSetOthersDocumentsResultService> testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
+        private readonly Mock<IOthersDocsElecSoftwareService> othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
+        private readonly Mock<IGlobalOtherDocElecOperationService> globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -84,7 +93,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 case 4:
                     viewResult = _current.Index(id) as ViewResult;
                     break;
-
             }
 
             //assert
@@ -176,13 +184,13 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 string message = jsonResult.Data.GetType().GetProperty("message").GetValue(jsonResult.Data).ToString();
                 Assert.AreEqual("Datos enviados correctamente.", message);
             }
-                
+
             if (input == 2)
             {
                 ResponseMessage responseMessage = jsonResult.Data as ResponseMessage;
                 Assert.AreEqual("El registro no pudo ser actualizado", responseMessage.Message);
             }
-                
+
         }
 
         [TestMethod]
@@ -193,12 +201,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void GetSetTestResultTest(int input)
         {
             //arrange
-            int id=0;
+            int id = 0;
             switch (input)
             {
                 case 1:
                     _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns((OtherDocsElectData) null);
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns((OtherDocsElectData)null);
                     break;
                 case 2:
                     _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
@@ -214,7 +222,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     break;
                 case 4:
                     _othersElectronicDocumentsService.Setup(t => t.GetOtherDocElecContributorOperationById(id)).Returns(new Domain.Sql.OtherDocElecContributorOperations() { OperationStatusId = (int)OtherDocElecState.Test });
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OperationModeId = 1 , ElectronicDocId=1});
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OperationModeId = 1, ElectronicDocId = 1 });
                     _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Domain.Contributor() { ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
                     _othersDocsElecSoftwareService.Setup(t => t.Get(It.IsAny<Guid>())).Returns(new Domain.Sql.OtherDocElecSoftware());
                     _othersDocsElecContributorService.Setup(t => t.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
@@ -241,12 +249,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     JsonResult jsonResult = _current.GetSetTestResult(id) as JsonResult;
                     responseMessage = jsonResult.Data as ResponseMessage;
                     break;
-                
+
             }
-            
+
 
             //assert
-            switch(input)
+            switch (input)
             {
                 case 1:
                     Assert.AreEqual("Index", redirectToAction.RouteValues["action"]);
@@ -327,7 +335,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         {
             //arrange
             int ContributorId = 1, page = 1, pagesize = 1;
-            string code= string.Empty ;
+            string code = string.Empty;
             OtherDocElecState State = OtherDocElecState.Registrado;
             _othersElectronicDocumentsService.Setup(t => t.CustormerList(It.IsAny<int>(), code, State, page, pagesize)).Returns(new PagedResult<OtherDocElecCustomerList>() { Results = new List<OtherDocElecCustomerList>() { new OtherDocElecCustomerList() } });
 
