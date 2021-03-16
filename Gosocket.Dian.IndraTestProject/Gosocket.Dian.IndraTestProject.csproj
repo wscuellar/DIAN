@@ -110,11 +110,13 @@
     <Compile Include="Controllers\OthersDocumentsControllerTest.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsControllerTests.cs" />
+    <Compile Include="Controllers\ProfileFreeBillerControllerTest.cs" />
     <Compile Include="Controllers\QueryAssociatedEventsControllerTests.cs" />
     <Compile Include="Controllers\RadianApprovedControllerTests.cs" />
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
+    <Compile Include="Services\OthersElectronicDocumentsServiceTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
