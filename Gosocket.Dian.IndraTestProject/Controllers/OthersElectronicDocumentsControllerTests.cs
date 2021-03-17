@@ -1,22 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Gosocket.Dian.Web.Controllers;
+﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Web.Models;
+using Gosocket.Dian.Web.Utils;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Application;
-using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Web.Models;
-using Gosocket.Dian.Domain.Sql;
-using Gosocket.Dian.Web.Utils;
 using System.Web.Mvc;
-using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Common.Resources;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {

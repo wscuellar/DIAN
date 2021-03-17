@@ -1,20 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Gosocket.Dian.Application;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
-using Moq;
 using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Interfaces.Managers;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Common.Resources;
-using Gosocket.Dian.Domain.Sql;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
-using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Application.Tests
 {
@@ -30,7 +25,6 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
         private readonly Mock<IOthersDocsElecContributorRepository> _othersDocsElecContributorRepository = new Mock<IOthersDocsElecContributorRepository>();
         private readonly Mock<IOthersDocsElecContributorOperationRepository> _othersDocsElecContributorOperationRepository = new Mock<IOthersDocsElecContributorOperationRepository>();
-
 
         [TestInitialize]
         public void TestInitialize()
@@ -69,8 +63,8 @@ namespace Gosocket.Dian.Application.Tests
             OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations();
             OtherDocElecSoftware software = new OtherDocElecSoftware();
 
-            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId))
-                .Returns(new OtherDocElecContributor() { OtherDocElecOperationModeId = 1, ElectronicDocumentId = 1 });
+            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributor, bool>>>()))
+                .Returns(new OtherDocElecContributor() { OtherDocElecOperationModeId = 1, ElectronicDocumentId = 1, Contributor = new Domain.Contributor() { Id = 77, Code = "77" } });
 
             switch (input)
             {
@@ -86,10 +80,7 @@ namespace Gosocket.Dian.Application.Tests
                 case 2:
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
-                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
-                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
-                                                                    && !t.Deleted))
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
                          .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 7 } });
                     //act
                     result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, true);
@@ -100,8 +91,7 @@ namespace Gosocket.Dian.Application.Tests
                 case 3:
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted))
-                    .Returns(new OtherDocElecContributorOperations());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>())).Returns(new OtherDocElecContributorOperations());
                     //act
                     result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, false);
 
@@ -109,23 +99,26 @@ namespace Gosocket.Dian.Application.Tests
                     Assert.IsNotNull(result);
                     Assert.AreEqual(result.Message, TextResources.ExistingSoftware);
                     break;
-                case 4:
+                /*case 4:
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted))
-                    .Returns((OtherDocElecContributorOperations)null);
-                    _ = _othersDocsElecSoftwareService.Setup(x => x.CreateSoftware(new OtherDocElecSoftware())).Returns(new OtherDocElecSoftware());
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>())).Returns((OtherDocElecContributorOperations)null);
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.CreateSoftware(It.IsAny<OtherDocElecSoftware>())).Returns(new OtherDocElecSoftware());
 
-                    _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
-                    _globalOtherDocElecOperationService.Insert(operation, existingOperation.Software)
-                        _ = _testSetOthersDocumentsResultService.InsertTestSetResult(setResult);
-
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Add(ContributorOperation)).Returns(1);
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                        .Returns(new OtherDocElecContributorOperations() { SoftwareId = Guid.NewGuid(), Software = new OtherDocElecSoftware(), SoftwareType = 7 });
+                    // se asigna el nuevo set de pruebas...
+                    //ApplyTestSet
+                    _ = _globalOtherDocElecOperationService.Setup(x => x.GetOperation(It.IsAny<string>(), It.IsAny<Guid>())).Returns((GlobalOtherDocElecOperation)null);
+                    _ = _globalOtherDocElecOperationService.Setup(x => x.Insert(It.IsAny<GlobalOtherDocElecOperation>(), It.IsAny<OtherDocElecSoftware>())).Returns(true);
+                    _ = _testSetOthersDocumentsResultService.Setup(x => x.InsertTestSetResult(It.IsAny<GlobalTestSetOthersDocumentsResult>())).Returns(false);
                     //act
                     result = _current.AddOtherDocElecContributorOperation(ContributorOperation, software, true, false);
                     //Assert
                     Assert.IsNotNull(result);
                     Assert.AreEqual(result.Message, TextResources.SuccessSoftware);
-                    break;
+                    break;*/
             }
         }
 
@@ -134,19 +127,13 @@ namespace Gosocket.Dian.Application.Tests
         [DataRow(2, DisplayName = "Con contributors")]
         public void ChangeParticipantStatusTest(int input)
         {
-            //arrange 
-            OtherDocElecContributorOperations ContributorOperation = new OtherDocElecContributorOperations();
-            OtherDocElecSoftware software = new OtherDocElecSoftware();
-
-            _ = _othersDocsElecContributorRepository.Setup(x => x.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId))
-                .Returns(new OtherDocElecContributor() { OtherDocElecOperationModeId = 1, ElectronicDocumentId = 1, State = OtherDocElecState.Cancelado.GetDescription() });
-
-            bool resultbool; string actualState = string.Empty; int contributorId = 0;
+            bool resultbool;
             switch (input)
             {
                 case 1:
                     //arrange
-                    _ = _othersDocsElecContributorRepository.Setup(x => x.List(t => t.Id == contributorId && t.State == actualState, 0, 0).Results).Returns((List<OtherDocElecContributor>)null);
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.List(It.IsAny<Expression<Func<OtherDocElecContributor, bool>>>(), 0, 0))
+                        .Returns(new PagedResult<OtherDocElecContributor>() { Results = new List<OtherDocElecContributor>() });
                     //act
                     resultbool = _current.ChangeParticipantStatus(1, string.Empty, 1, string.Empty, string.Empty);
 
@@ -156,21 +143,18 @@ namespace Gosocket.Dian.Application.Tests
                     break;
                 case 2:
                     //arrange
-                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns(new GlobalTestSetOthersDocuments());
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
-                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
-                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
-                                                                    && !t.Deleted))
-                         .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 7 } });
-
-                    _ = _othersDocsElecContributorRepository.Setup(x => x.AddOrUpdate(new OtherDocElecContributor())).Returns(1);
-                    _ = _othersDocsElecSoftwareService.Setup(x => x.List(It.IsAny<int>())).Returns(new List<OtherDocElecSoftware> { new OtherDocElecSoftware() { Id = Guid.NewGuid() } });
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.List(It.IsAny<Expression<Func<OtherDocElecContributor, bool>>>(), 0, 0))
+                        .Returns(new PagedResult<OtherDocElecContributor>() { Results = new List<OtherDocElecContributor>() { new OtherDocElecContributor() { OtherDocElecContributorTypeId = 1 } } });
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.AddOrUpdate(It.IsAny<OtherDocElecContributor>())).Returns(7);
+                    //CancelParticipant
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.List(It.IsAny<int>())).Returns(new List<OtherDocElecSoftware>() { new OtherDocElecSoftware() { Id = Guid.NewGuid() } });
                     _ = _othersDocsElecSoftwareService.Setup(x => x.DeleteSoftware(It.IsAny<Guid>())).Returns(Guid.NewGuid());
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(t => t.SoftwareId == software.Id && !t.Deleted))
-                        .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 1 } });
-                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Update(new OtherDocElecContributorOperations())).Returns(true);
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.List(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                        .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 7007 } });
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Update(It.IsAny<OtherDocElecContributorOperations>())).Returns(true);
+
                     //act
-                    resultbool = _current.ChangeParticipantStatus(1, string.Empty, 1, string.Empty, string.Empty);
+                    resultbool = _current.ChangeParticipantStatus(1, OtherDocElecState.Test.GetDescription(), 1, string.Empty, string.Empty);
                     //Assert
                     Assert.IsNotNull(resultbool);
                     Assert.IsTrue(resultbool);
@@ -179,51 +163,153 @@ namespace Gosocket.Dian.Application.Tests
         }
 
         [TestMethod()]
-        public void ChangeContributorStepTest()
+        [DataRow(1, DisplayName = "Sin Contributors")]
+        [DataRow(2, DisplayName = "Con Contributors")]
+        public void ChangeContributorStepTest(int input)
         {
-            Assert.Fail();
+            bool Result;
+
+            switch (input)
+            {
+                case 1:
+                    //arrange
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributor, bool>>>()))
+                        .Returns((OtherDocElecContributor)null);
+                    //act
+                    Result = _current.ChangeContributorStep(1, 1);
+                    //Assert
+                    Assert.IsNotNull(Result);
+                    Assert.IsTrue(!Result);
+                    break;
+                case 2:
+                    //arrange
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributor, bool>>>()))
+                        .Returns(new OtherDocElecContributor());
+                    _ = _othersDocsElecContributorRepository.Setup(x => x.AddOrUpdate(It.IsAny<OtherDocElecContributor>())).Returns(7);
+                    //act
+                    Result = _current.ChangeContributorStep(1, 1);
+                    //Assert
+                    Assert.IsNotNull(Result);
+                    Assert.IsTrue(Result);
+                    break;
+            }
         }
 
         [TestMethod()]
         public void CustormerListTest()
         {
-            Assert.Fail();
+            //arrange
+            _ = _othersDocsElecContributorRepository.Setup(x => x.CustomerList(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+            .Returns(new PagedResult<OtherDocElecCustomerList>() { PageSize = 702 });
+            //act
+            var Result = _current.CustormerList(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<OtherDocElecState>(), It.IsAny<int>(), It.IsAny<int>());
+            //Assert
+            Assert.IsNotNull(Result);
+            Assert.IsInstanceOfType(Result, typeof(PagedResult<OtherDocElecCustomerList>));
         }
 
         [TestMethod()]
-        public void OperationDeleteTest()
+        [DataRow(1, DisplayName = "Sin contributors")]
+        [DataRow(2, DisplayName = "Con contributors")]
+        public void OperationDeleteTest(int input)
         {
-            Assert.Fail();
+            ResponseMessage Result;
+            //arrange
+            _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                .Returns(new OtherDocElecContributorOperations() { Id = 703, SoftwareId = Guid.NewGuid() });
+            switch (input)
+            {
+                case 1:
+                    //arrange
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(new OtherDocElecSoftware() { OtherDocElecSoftwareStatusId = 2 });
+                    //act
+                    Result = _current.OperationDelete(1);
+                    //Assert
+                    Assert.IsNotNull(Result);
+                    Assert.IsTrue(Result.Message.Equals("El software encuentra en estado aceptado."));
+                    break;
+                case 2:
+                    //arrange
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.Get(It.IsAny<Guid>())).Returns(new OtherDocElecSoftware() { OtherDocElecSoftwareStatusId = 1 });
+                    _ = _othersDocsElecContributorOperationRepository.Setup(x => x.Delete(It.IsAny<int>())).Returns(new ResponseMessage() { Message = "Ok OperationDeleteTest" });
+                    _ = _othersDocsElecSoftwareService.Setup(x => x.DeleteSoftware(It.IsAny<Guid>())).Returns(Guid.NewGuid());
+                    //act
+                    Result = _current.OperationDelete(1);
+                    //Assert
+                    Assert.IsNotNull(Result);
+                    Assert.IsTrue(Result.Message.Equals("Ok OperationDeleteTest"));
+                    break;
+            }
         }
 
         [TestMethod()]
         public void GetOtherDocElecContributorOperationBySoftwareIdTest()
         {
-            Assert.Fail();
+            //arrange 
+            _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                .Returns(new OtherDocElecContributorOperations() { Id = 704 });
+            //act
+            var Result = _current.GetOtherDocElecContributorOperationBySoftwareId(It.IsAny<Guid>());
+
+            //assert
+            Assert.IsNotNull(Result);
+            Assert.IsInstanceOfType(Result, typeof(OtherDocElecContributorOperations));
         }
 
         [TestMethod()]
         public void UpdateOtherDocElecContributorOperationTest()
         {
-            Assert.Fail();
+            //arrange 
+            _othersDocsElecContributorOperationRepository.Setup(x => x.Update(It.IsAny<OtherDocElecContributorOperations>()))
+                .Returns(true);
+            //act
+            var Result = _current.UpdateOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>());
+
+            //assert
+            Assert.IsNotNull(Result);
+            Assert.IsTrue(Result);
         }
 
         [TestMethod()]
         public void GetOtherDocElecContributorOperationByIdTest()
         {
-            Assert.Fail();
+            //arrange 
+            _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                .Returns(new OtherDocElecContributorOperations() { Id = 705 });
+            //act
+            var Result = _current.GetOtherDocElecContributorOperationById(It.IsAny<int>());
+
+            //assert
+            Assert.IsNotNull(Result);
+            Assert.IsInstanceOfType(Result, typeof(OtherDocElecContributorOperations));
         }
 
         [TestMethod()]
         public void GetOtherDocElecContributorOperationByDocEleContributorIdTest()
         {
-            Assert.Fail();
+            //arrange 
+            _othersDocsElecContributorOperationRepository.Setup(x => x.Get(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                .Returns(new OtherDocElecContributorOperations() { Id = 706 });
+            //act
+            var Result = _current.GetOtherDocElecContributorOperationByDocEleContributorId(It.IsAny<int>());
+
+            //assert
+            Assert.IsNotNull(Result);
+            Assert.IsInstanceOfType(Result, typeof(OtherDocElecContributorOperations));
         }
 
         [TestMethod()]
         public void GetOtherDocElecContributorOperationsListByDocElecContributorIdTest()
         {
-            Assert.Fail();
+            //arrange 
+            _othersDocsElecContributorOperationRepository.Setup(x => x.List(It.IsAny<Expression<Func<OtherDocElecContributorOperations, bool>>>()))
+                .Returns(new List<OtherDocElecContributorOperations> { new OtherDocElecContributorOperations() { Id = 707 } });
+            //act
+            var Result = _current.GetOtherDocElecContributorOperationsListByDocElecContributorId(It.IsAny<int>());
+
+            //assert
+            Assert.IsNotNull(Result);
+            Assert.IsInstanceOfType(Result, typeof(List<OtherDocElecContributorOperations>));
         }
     }
 }
