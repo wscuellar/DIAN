@@ -184,9 +184,7 @@ namespace Gosocket.Dian.Application
 
             return cleanDictionary;
         }
-
-
-
+         
         private List<GlobalDocValidatorDocumentMeta> removeEvents(List<GlobalDocValidatorDocumentMeta> events, EventStatus conditionalStatus, List<string> removeData)
         {
             if (events.Count > 0 && events.Last().EventCode == $"0{(int)conditionalStatus }")
