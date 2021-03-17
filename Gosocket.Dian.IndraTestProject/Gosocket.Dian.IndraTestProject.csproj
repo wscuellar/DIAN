@@ -116,6 +116,8 @@
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
+    <Compile Include="Services\RadianTestSetResultServiceTests.cs" />
+    <Compile Include="Services\RadianContributorFileTypeServiceTests.cs" />
     <Compile Include="Services\OthersDocsElecSoftwareServiceTests.cs" />
     <Compile Include="Services\RadianTestSetServiceTests.cs" />
     <Compile Include="Services\OthersElectronicDocumentsServiceTests.cs" />
