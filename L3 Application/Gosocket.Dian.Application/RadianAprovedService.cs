@@ -88,9 +88,9 @@ namespace Gosocket.Dian.Application
                 .GetContributorOperations(contributorId);
 
             if (contributorOperations == null)
-                return default;
+                return new Software();
 
-            return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? default;
+            return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? new Software();
         }
 
         public List<RadianContributorFileType> ContributorFileTypeList(int typeId)

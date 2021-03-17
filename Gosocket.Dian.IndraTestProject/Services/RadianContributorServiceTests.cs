@@ -1,10 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Gosocket.Dian.Application;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
@@ -15,7 +11,6 @@ using System.Linq.Expressions;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Common.Resources;
-using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Application.Tests
