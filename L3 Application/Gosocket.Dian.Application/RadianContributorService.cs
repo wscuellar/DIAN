@@ -60,6 +60,7 @@ namespace Gosocket.Dian.Application
         {
             NameValueCollection collection = new NameValueCollection();
             Domain.Contributor contributor = _contributorService.Get(contributorId);
+            if (contributor == null) return collection;
             List<RadianContributor> radianContributors = _radianContributorRepository.List(t => t.ContributorId == contributor.Id && t.RadianState != "Cancelado").Results;
             if (radianContributors.Any())
                 foreach (var radianContributor in radianContributors)
@@ -68,7 +69,6 @@ namespace Gosocket.Dian.Application
                     collection.Add(key + "_RadianContributorTypeId", radianContributor.RadianContributorTypeId.ToString());
                     collection.Add(key + "_RadianOperationModeId", radianContributor.RadianOperationModeId.ToString());
                 }
-            if (contributor == null) return collection;
             collection.Add("ContributorId", contributor.Id.ToString());
             collection.Add("ContributorTypeId", contributor.ContributorTypeId.ToString());
             collection.Add("Active", contributor.Status.ToString());

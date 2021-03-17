@@ -10,6 +10,7 @@ using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
+using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models.FreeBiller;
 using Newtonsoft.Json;
 
@@ -22,7 +23,11 @@ namespace Gosocket.Dian.Web.Controllers
         /// Servicio para obtener los perfiles de Facturador gratuito.
         /// Tabla: ProfilesFreeBiller.
         /// </summary>
-        private readonly ProfileService profileService = new ProfileService();
+        private readonly IProfileService _profileService;
+
+        public ProfileFreeBillerController(IProfileService profileService) {
+            _profileService = profileService;
+        }
 
         private List<MenuOptionsModel> staticMenuOptions { get; set; }
 
@@ -36,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult CreateProfile()
         {
             ProfileFreeBillerModel model = new ProfileFreeBillerModel();
-            model.MenuOptionsByProfile = profileService.GetOptionsByProfile(0);
+            model.MenuOptionsByProfile = _profileService.GetOptionsByProfile(0);
             string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
             return View(model);
         }
@@ -54,7 +59,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(errors.ToString(), TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            Profile newProfile = profileService.CreateNewProfile(
+            Profile newProfile = _profileService.CreateNewProfile(
                 new Profile
                 {
                     Name = model.Name,
@@ -63,7 +68,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             List<string> verificationMenuIds = this.VerificationFatherIds(model.ValuesSelected);
             List<MenuOptionsByProfiles> menuOptions = this.GenerateMenuOptionsForInsert(newProfile.Id, verificationMenuIds);
-            bool changes = profileService.SaveOptionsMenuByProfile(menuOptions);
+            bool changes = _profileService.SaveOptionsMenuByProfile(menuOptions);
             ResponseMessage response = new ResponseMessage();
             if (changes)
             {

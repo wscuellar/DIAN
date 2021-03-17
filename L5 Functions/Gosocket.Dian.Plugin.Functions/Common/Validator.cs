@@ -51,6 +51,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private readonly TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private readonly TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
 
         readonly XmlDocument _xmlDocument;
@@ -587,6 +588,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalContributor softwareProvider = null;
             GlobalRadianOperations softwareProviderRadian = null;
             bool habilitadoRadian = false;
+            string testSetId = string.Empty;
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -786,17 +788,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                //Valida evento mandato - sender mismo provider mismo mandatario
-                if(String.Equals(senderCode,senderCodeProvider) && String.Equals(senderCode,issuerPartyCode))
+                if (documentMeta.SendTestSet)
                 {
-                    responses.Add(new ValidateListResponse
+                    testSetId = documentMeta.TestSetId;
+                    //Se busca el set de pruebas procesado para el testsetid en curso
+                    RadianTestSetResult radianTesSetResult = TableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+                    
+                    if(radianTesSetResult != null && Convert.ToInt32(radianTesSetResult.ContributorTypeId) != (int)RadianContributorType.ElectronicInvoice)
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "LGC64",
-                        ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                        //Valida evento mandato - sender mismo provider mismo mandatario
+                        if (String.Equals(senderCode, senderCodeProvider) && String.Equals(senderCode, issuerPartyCode))
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC64",
+                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }                  
+                }
+                else
+                {
+                    //Valida evento mandato - sender mismo provider mismo mandatario
+                    if (String.Equals(senderCode, senderCodeProvider) && String.Equals(senderCode, issuerPartyCode))
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                 }
             }
             else
@@ -920,7 +947,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -1315,7 +1342,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Revocación es información del mandante
                     if (party.CustomizationID == "441")
                     {
-                        if (party.SenderParty != senderCode)
+                        if (party.SenderParty != senderAttorney)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1364,8 +1391,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Renuncia
                     else if (party.CustomizationID == "442")
                     {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
                         //Renuncia es información del mandatario
-                        if (party.SenderParty != senderCode)
+                        if (party.SenderParty != issuerAttorney)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1376,7 +1412,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-                        else if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                       
+                        if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1386,18 +1423,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = "No fue informado el literal '800197268'",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
-                        else
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = true,
-                                Mandatory = true,
-                                ErrorCode = "100",
-                                ErrorMessage = errorMessageParty,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
+                        }                                                 
+                        
                     }
                     return responses;
 
@@ -4921,7 +4948,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (eventCode == "044")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No coincide con la Mandante o Mandatario del mandato";
+                response.errorMessage = "No coincide con el Mandante o Mandatario del mandato";
             }
             else if (eventCode == "045")
             {
