@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void IndexTest()
         {
             var result = _current.Index();
-            Assert.IsNotNull(result);
+            Assert.IsNotNull(result); 
         }
 
         [TestMethod()]
