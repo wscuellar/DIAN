@@ -581,7 +581,7 @@ h4.text-thin {
 
     #steps-approved .steps li.done::after {
         content: "";
-        width: 108px;
+        width: 140%;
         height: 130px;
         background: transparent;
         position: absolute;
@@ -912,21 +912,21 @@ span.state-file {
     margin: 11px;
 }
 
-span.state-file.status-1 {
-    background-image: url(../../images/Svg/Loaded.svg);
-}
+    span.state-file.status-1 {
+        background-image: url(../../images/Svg/Loaded.svg);
+    }
 
-span.state-file.status-2 {
-    background-image: url(../../images/aproved.png);
-}
+    span.state-file.status-2 {
+        background-image: url(../../images/aproved.png);
+    }
 
-span.state-file.status-3 {
-    background-image: url(../../images/reject.png);
-}
+    span.state-file.status-3 {
+        background-image: url(../../images/reject.png);
+    }
 
-span.state-file.status-4 {
-    background-image: url(../../images/observations.png);
-}
+    span.state-file.status-4 {
+        background-image: url(../../images/observations.png);
+    }
 
 span.state-file-rejected.status-4 {
     background-image: url(../../images/observations.png);
@@ -1592,10 +1592,10 @@ button.selectpicker {
     text-align: center;
 }
 
-.icon-alert .fa-exclamation-circle {
-    margin: 20px auto;
-    width: 44px;
-}
+    .icon-alert .fa-exclamation-circle {
+        margin: 20px auto;
+        width: 44px;
+    }
 
 .adm-radian-view {
     padding: 25px 12px 20px !important;
@@ -1662,11 +1662,11 @@ button.selectpicker {
     padding-left: 17px;
 }
 
-#table-history td:nth-child(2) {
-    text-align: center;
-    padding-left: 18px;
-    color: initial
-}
+    #table-history td:nth-child(2) {
+        text-align: center;
+        padding-left: 18px;
+        color: initial
+    }
 
 .edit-state-td {
     padding: 0px;
@@ -1689,11 +1689,11 @@ button.selectpicker {
     padding-left: 25px;
 }
 
-.show-details.disabled a:hover{
+.show-details.disabled a:hover {
     text-decoration: none;
 }
 
-.show-details.disabled a{
+.show-details.disabled a {
     cursor: not-allowed;
 }
 
@@ -1736,19 +1736,19 @@ input:checked + .slider {
     border: 1px solid #348441;
 }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 30px;
-            transform: translateX(-90%);
-            transition: .4s;
-            top: -2px;
-            border: solid 3px #348441;
-            left: 12px;
-        }
+    .slider:before {
+        position: absolute;
+        content: "";
+        width: 16px;
+        height: 16px;
+        background: white;
+        border-radius: 30px;
+        transform: translateX(-90%);
+        transition: .4s;
+        top: -2px;
+        border: solid 3px #348441;
+        left: 12px;
+    }
 
 input:checked + .slider:before {
     border: white;
@@ -1782,7 +1782,7 @@ input:checked + .slider {
 
 /* ############# bootstrap toogle ################# */
 
-.documents-table tr td{
+.documents-table tr td {
     padding-top: 0px;
     padding-bottom: 0px;
 }
@@ -1790,6 +1790,7 @@ input:checked + .slider {
 .documents-freebiller {
     padding: 20px;
 }
+
 .buttons-freebiller {
     padding: 20px;
 }
@@ -1803,7 +1804,7 @@ input:checked + .slider {
     margin-left: 40px;
 }
 
-.view-details-user a{
+.view-details-user a {
     color: #348441;
     text-decoration: underline;
 }
@@ -1817,7 +1818,7 @@ input:checked + .slider {
     padding-top: 4px;
 }
 
-.d-flex{
+.d-flex {
     display: flex;
 }
 
@@ -1856,13 +1857,13 @@ input:checked + .slider {
     cursor: pointer;
 }
 
-.add-profile a{
-    color: white;
-    position: relative;
-    margin: auto;
-    top: 7px;
-    left: 1px;
-}
+    .add-profile a {
+        color: white;
+        position: relative;
+        margin: auto;
+        top: 7px;
+        left: 1px;
+    }
 
 .cancel-confirmation .modal-dialog .media-body {
     padding: 25px 20% 0px 20%;
@@ -1873,9 +1874,10 @@ input:checked + .slider {
     opacity: 0.5;
     text-decoration: none !important;
 }
-.isActive-False a {
-    text-decoration: none;
-}
+
+    .isActive-False a {
+        text-decoration: none;
+    }
 
 
 .titleMenu {
@@ -1890,9 +1892,10 @@ input:checked + .slider {
     color: #2C323C;
 }
 
-.div-add-profile{
+.div-add-profile {
     margin: 31px 0px 11px 0;
 }
+
 .fa-plus-circle:before {
     margin-right: 6px;
 }
@@ -1917,28 +1920,28 @@ ul#list {
         margin-bottom: 5px;
     }
 
-ul#list li a {
-    color: #9AB4B0;
-    text-decoration: none;
-    margin-right: 5px;
-    font-size: 19px;
-    background: white;
-    width: 16px;
-    height: 15px;
-    border-radius: 50%;
-    display: inline-flex;
-    transform: matrix(0.71, 0.64, -0.78, 0.71, 0, 0);
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    top: 2px;
-    left: -2px;
-    position: relative;
-}
+        ul#list li a {
+            color: #9AB4B0;
+            text-decoration: none;
+            margin-right: 5px;
+            font-size: 19px;
+            background: white;
+            width: 16px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-flex;
+            transform: matrix(0.71, 0.64, -0.78, 0.71, 0, 0);
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            top: 2px;
+            left: -2px;
+            position: relative;
+        }
 
-ul#list li a:hover {
-    color: red;
-}
+            ul#list li a:hover {
+                color: red;
+            }
 
 
 #TypeDocIdHidden {
@@ -1951,7 +1954,7 @@ ul#list li a:hover {
     text-align: center !important;
 }
 
-#table-history tbody tr td:first-child{
+#table-history tbody tr td:first-child {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -1959,22 +1962,22 @@ ul#list li a:hover {
     width: 200px;
 }
 
-#forgot-pasword-form{
+#forgot-pasword-form {
     margin-top: 20px;
 }
 
-#forgot-pasword-form .input-group {
-    margin: auto;
-}
+    #forgot-pasword-form .input-group {
+        margin: auto;
+    }
 
-#forgot-pasword-form .form-group {
-    margin-bottom: 35px;
-}
+    #forgot-pasword-form .form-group {
+        margin-bottom: 35px;
+    }
 
-#forgot-pasword-form .row {
-    width: 75%;
-    margin: auto;
-}
+    #forgot-pasword-form .row {
+        width: 75%;
+        margin: auto;
+    }
 
 .forgot-password .modal-dialog {
     width: 500px;
@@ -1983,6 +1986,7 @@ ul#list li a:hover {
 .bhoechie-tab-menu {
     padding: 0px !important;
 }
+
 .subtitle-modal {
     width: 80%;
     margin: auto;
