@@ -825,7 +825,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (providerCode == "800197268")
                 {
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAB19b") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
+                    stringBuilder.AppendLine(txtRegla + "AAB19b" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAB19b"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -833,7 +833,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrWhiteSpace(UBLVersionID) || !UBLVersionID.Equals("UBL 2.1"))
                 {
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD01") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
+                    stringBuilder.AppendLine(txtRegla + "AAD01" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD01"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -841,7 +841,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(eventCode))
                 {
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH03") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(txtRegla + "AAH03" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -852,7 +852,7 @@ namespace Gosocket.Dian.Services.Utils
                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
                    || eventCode == "045" || eventCode == "046"))
                 {
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAH03") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
+                    stringBuilder.AppendLine(txtRegla + "AAH03" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -866,14 +866,14 @@ namespace Gosocket.Dian.Services.Utils
                     {
                         if (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34 && flagEvento)
                         {
-                            stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD05") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
+                            stringBuilder.AppendLine(txtRegla + "AAD05" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
                         }
                         if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
                         {
-                            stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD05a") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
+                            stringBuilder.AppendLine(txtRegla + "AAD05a" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());
                             stringBuilder.Clear();
                             isValid = false;
@@ -911,7 +911,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentCude))
                 {
-                    stringBuilder.AppendLine(txtRegla + ConfigurationManager.GetValue("ErrorCode_AAD06") + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
+                    stringBuilder.AppendLine(txtRegla + "AAD06" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD06"));
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

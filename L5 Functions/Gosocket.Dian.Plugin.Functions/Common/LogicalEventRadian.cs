@@ -53,7 +53,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC50"),
+                                        ErrorCode = "LGC50",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC50"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -73,7 +73,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC51"),
+                        ErrorCode = "LGC51",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC51"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC51"),
+                    ErrorCode = "LGC51",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC51"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -126,7 +126,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC43"),
+                    ErrorCode = "LGC43",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC43"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -160,7 +160,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC43"),
+                        ErrorCode = "LGC43",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC43"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -198,7 +198,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC45"),
+                                    ErrorCode ="LGC45",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC45"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
@@ -225,7 +225,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC44"),
+                            ErrorCode = "LGC44",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC44"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -266,7 +266,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC41"),
+                    ErrorCode = "LGC41",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC41"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -284,7 +284,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC42"),
+                            ErrorCode = "LGC42",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC42"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -326,8 +326,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC34"),
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC34"),
+                    ErrorCode = "LGC34",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC34"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -360,7 +360,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC34"),
+                        ErrorCode = "LGC34",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC34"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -386,7 +386,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC33"),
+                    ErrorCode = "LGC33",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC33"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -420,7 +420,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC33"),
+                        ErrorCode = "LGC33",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC33"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -488,7 +488,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC46"),
+                            ErrorCode = "LGC46",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC46"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -500,7 +500,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC46"),
+                        ErrorCode = "LGC46",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC46"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -558,7 +558,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC47"),
+                            ErrorCode = "LGC47",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC47"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -570,7 +570,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC47"),
+                        ErrorCode = "LGC47",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC47"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -594,7 +594,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC48"),
+                                ErrorCode = "LGC48",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC48"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -634,7 +634,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC49"),
+                                                ErrorCode = "LGC49",
                                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC49"),
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
@@ -709,7 +709,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string senderCode = string.Empty;
             bool validFor = true;
-            string errorCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorCode_LGC27") : ConfigurationManager.GetValue("ErrorCode_LGC30");
+            string errorCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? "LGC27" : "LGC30";
             string messageCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorMessage_LGC27") : ConfigurationManager.GetValue("ErrorMessage_LGC30");
 
             responses.Add(new ValidateListResponse
@@ -869,7 +869,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorMessage_LGC30"),
+                        ErrorCode = "LGC30",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC30"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -882,7 +882,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC30"),
+                    ErrorCode = "LGC30",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC30"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -902,8 +902,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC32"),
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC32"),
+                            ErrorCode = "LGC32",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC32"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         break;
@@ -931,8 +931,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC31"),
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC31"),
+                                ErrorCode = "LGC31",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC31"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                             break;
@@ -1022,7 +1022,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC27"),
+                        ErrorCode = "LGC27",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC27"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1035,7 +1035,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC27"),
+                    ErrorCode = "LGC27",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC27"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1055,7 +1055,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC29"),
+                            ErrorCode = "LGC29",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC29"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1083,7 +1083,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC28"),
+                                ErrorCode = "LGC28",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC28"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -1157,7 +1157,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
+                        ErrorCode = "LGC24",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1170,7 +1170,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC24"),
+                    ErrorCode = "LGC24",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC24"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1190,7 +1190,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC26"),
+                            ErrorCode = "LGC26",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC26"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1219,7 +1219,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC25"),
+                                ErrorCode = "LGC25",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC25"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -1293,7 +1293,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         {
                                             IsValid = false,
                                             Mandatory = true,
-                                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC39"),
+                                            ErrorCode = "LGC39",
                                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
@@ -1317,7 +1317,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC40"),
+                                        ErrorCode = "LGC40",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC40"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1338,7 +1338,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC38"),
+                        ErrorCode = "LGC38",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC38"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1350,7 +1350,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC38"),
+                    ErrorCode = "LGC38",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC38"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1406,7 +1406,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC20"),
+                                ErrorCode = "LGC20",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC20"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -1448,7 +1448,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC37"),
+                        ErrorCode = "LGC37",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC37"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1483,7 +1483,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC37"),
+                            ErrorCode = "LGC37",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC37"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1535,7 +1535,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             {
                                                 IsValid = false,
                                                 Mandatory = true,
-                                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC22"),
+                                                ErrorCode = "LGC22",
                                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC22"),
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
@@ -1556,7 +1556,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                            ErrorCode = "LGC21",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1568,7 +1568,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                        ErrorCode = "LGC21",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1606,7 +1606,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = false,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC57"),
+                        ErrorCode = "LGC57",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC57"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1618,7 +1618,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC57"),
+                    ErrorCode = "LGC57",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC57"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1666,7 +1666,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC14"),
+                    ErrorCode = "LGC14",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC14"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1702,7 +1702,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC04"),
+                                        ErrorCode = "LGC04",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC04"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1724,7 +1724,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC05"),
+                                        ErrorCode = "LGC05",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC05"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1745,7 +1745,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC14"),
+                        ErrorCode = "LGC14",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC14"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1770,7 +1770,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                    ErrorCode = "LGC13",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1804,7 +1804,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC13"),
+                        ErrorCode = "LGC13",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1819,7 +1819,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC12"),
+                    ErrorCode = "LGC12",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC12"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1855,7 +1855,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC04"),
+                                        ErrorCode = "LGC04",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC04"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1877,7 +1877,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC07"),
+                                        ErrorCode = "LGC07",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC07"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -1898,7 +1898,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC12"),
+                        ErrorCode = "LGC12",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC12"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1923,7 +1923,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC09"),
+                    ErrorCode = "LGC09",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1957,7 +1957,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC09"),
+                        ErrorCode = "LGC09",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1982,7 +1982,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC03"),
+                    ErrorCode = "LGC03",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC03"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -2019,7 +2019,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC02"),
+                                        ErrorCode = "LGC02",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC02"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2041,7 +2041,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     {
                                         IsValid = false,
                                         Mandatory = true,
-                                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC02"),
+                                        ErrorCode = "LGC02",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC02"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
@@ -2063,7 +2063,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC03"),
+                        ErrorCode = "LGC03",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC03"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2105,7 +2105,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAH32c",
-                    ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH32c"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2131,7 +2131,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAH32c",
-                    ErrorMessage = $"{(string)null} El valor reportado no es igual a la sumatoria del elemento SenderParty:CorporateStockAmount - IssuerParty:PartyLegalEntity:CorporateStockAmount",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH32c"),                    
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2166,7 +2166,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = ValidateManadatory,
                         ErrorCode = "AAI05",
-                        ErrorMessage = "El valor no es informado",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                     return responses;
@@ -2180,7 +2180,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = ValidateManadatory,
                         ErrorCode = "AAI07a",
-                        ErrorMessage = "El valor no es informado para el evento: Endoso en Propiedad",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                     return responses;
@@ -2194,7 +2194,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = ValidateManadatory,
                         ErrorCode = "AAI09",
-                        ErrorMessage = "No fue informado la tasa de descuento para el evento: Endoso en Propiedad",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                     return responses;
@@ -2212,7 +2212,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
+                        ErrorCode = "AAI07b",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2244,7 +2244,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
+                        ErrorCode = "AAF19",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2257,7 +2257,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
+                        ErrorCode = "AAG20",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2291,7 +2291,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                            ErrorCode = "AAH07",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2305,7 +2305,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAD11a_040"),
+                            ErrorCode = "AAD11a",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD11a_040"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2348,7 +2348,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19c"),
+                        ErrorCode = "AAF19c",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19c"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2363,7 +2363,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19b"),
+                    ErrorCode = "AAF19b",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19b"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
