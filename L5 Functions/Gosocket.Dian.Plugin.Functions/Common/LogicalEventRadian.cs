@@ -935,8 +935,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorCode_LGC31"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
-                        }
-                        break;
+                            break;
+                        }                      
                     }
                 }
             }
@@ -1087,8 +1087,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC28"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -1297,8 +1297,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC39"),
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
-                                    }
-                                    break;
+                                        break;
+                                    }                                    
                                 }
                             }
                         }
@@ -1435,9 +1435,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, existDocumentEndosos.DocumentKey, senderCode);
                             if (!string.IsNullOrWhiteSpace(validCancelElectronicEvent)) validateExistEndoso = true;
-
+                            break;
                         }
-                        break;
                     }
                 }
 
@@ -1540,8 +1539,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC22"),
                                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                             });
+                                            break;
                                         }
-                                        break;
                                     }
                                 }
                             }

@@ -123,6 +123,7 @@
     <Compile Include="Services\RadianContributorFileTypeServiceTests.cs" />
     <Compile Include="Services\OthersDocsElecSoftwareServiceTests.cs" />
     <Compile Include="Services\RadianTestSetServiceTests.cs" />
+    <Compile Include="Services\RadianAprovedServiceTests.cs" />
     <Compile Include="Services\OthersElectronicDocumentsServiceTests.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
