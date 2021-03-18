@@ -3,7 +3,6 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
