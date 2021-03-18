@@ -116,6 +116,7 @@
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
+    <Compile Include="Services\OthersDocsElecContributorServiceTests.cs" />
     <Compile Include="Services\RadianCallSoftwareServiceTests.cs" />
     <Compile Include="Services\RadianLoggerServiceTests.cs" />
     <Compile Include="Services\RadianTestSetAppliedServiceTests.cs" />
@@ -152,6 +153,10 @@
     <ProjectReference Include="..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{ab742b49-c0de-4363-ac4a-c436ffffb5b1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
+      <Project>{72e3852a-75d8-4007-93a5-8ee16bdfb5d7}</Project>
+      <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
       <Project>{cbaa925a-695b-41b2-90b9-5c061a9cc30e}</Project>
