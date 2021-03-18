@@ -483,7 +483,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValTol = objCune?.ValTol.ToString("F2");
 
             var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
-                ? ConfigurationManager.GetValue("ErrorCode_NIE024") : ConfigurationManager.GetValue("ErrorCode_NIAE024");
+                ? "NIE024" : "NIAE024";
 
             string key = string.Empty;
 
@@ -708,10 +708,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
                         if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
-                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH71", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAH71", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     }
-                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH71"), ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAH71", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
                 }
             }
 
@@ -804,7 +804,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "LGC64",
-                                ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -820,7 +820,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "LGC64",
-                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1078,7 +1078,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e" : "AAG04",
-                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ? "No fue informado los datos de la DIAN" : "No fue informado el literal '800197268'",
+                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ? ConfigurationManager.GetValue("ErrorMessage_AAG01e") : ConfigurationManager.GetValue("ErrorMessage_AAG04"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1127,7 +1127,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "LGC64",
-                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1140,7 +1140,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG01",
-                            ErrorMessage = "No fue informado los datos de la DIAN",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1189,7 +1189,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG01",
-                            ErrorMessage = "No fue informado los datos de la DIAN",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1281,7 +1281,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG04a",
-                            ErrorMessage = "El destinatario no coincide con el documento del endosatario",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04a"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1318,7 +1318,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "LGC64",
-                            ErrorMessage = "Este evento no puede ser transmitido por el emisor informado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1331,7 +1331,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG04",
-                            ErrorMessage = "No fue informado el literal '800197268'",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1372,7 +1372,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal '800197268'",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -1420,7 +1420,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAG04",
-                                ErrorMessage = "No fue informado el literal '800197268'",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }                                                 
@@ -1460,7 +1460,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG01",
-                            ErrorMessage = "No fue informado los datos del Tenedor Legitimo o Autoridad Competente",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -1508,7 +1508,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                     }
-                   
+
                     // Valida receptor documento AR coincida con DIAN
                     if (party.ReceiverParty != nitModel.ReceiverCode)
                     {
@@ -1517,11 +1517,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG04",
-                            ErrorMessage = "No fue informado el número de identificación.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_046"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    // Valida nombre receptor documento AR coincida con DIAN
+
+                    // Valida nombre receptor documento Adquirente/Deudor/aceptante"
                     if (receiverNameCude != receiverNameCufe)
                     {
                         responses.Add(new ValidateListResponse
@@ -1529,7 +1530,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAG01",
-                            ErrorMessage = "No fue informado los datos del Adquirente/Deudor/aceptante",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01_046"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }                 
@@ -1571,7 +1572,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19c"),
+                        ErrorCode = "AAF19c",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19c"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1586,7 +1587,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19b"),
+                    ErrorCode = "AAF19b",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19b"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -1621,7 +1622,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
+                        ErrorCode = "AAI07b",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1640,7 +1641,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAI07b") + "-(N): ",
+                        ErrorCode = "AAI07b",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1672,7 +1673,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF19") + "-(N): ",
+                        ErrorCode = "AAF19",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1685,7 +1686,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = ValidateManadatory,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAG20") + "-(N): ",
+                        ErrorCode = "AAG20",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -1719,7 +1720,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                            ErrorCode = "AAH07",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1733,7 +1734,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAD11a_040"),
+                            ErrorCode = "AAD11a",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD11a_040"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1789,7 +1790,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC36"),
+                            ErrorCode = "LGC36",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC36"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1806,7 +1807,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC36"),
+                            ErrorCode = "LGC36",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC36"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -1853,7 +1854,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC65"),
+                                                    ErrorCode = "LGC65",
                                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC65"),
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -1867,7 +1868,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC59"),
+                                                    ErrorCode = "LGC59",
                                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC59"),
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -1881,7 +1882,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC60"),
+                                                    ErrorCode = "LGC60",
                                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC60"),
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -1895,7 +1896,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                 {
                                                     IsValid = false,
                                                     Mandatory = true,
-                                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC61"),
+                                                    ErrorCode = "LGC61",
                                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC61"),
                                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                 });
@@ -1964,7 +1965,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC35"),
+                                    ErrorCode = "LGC35",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
@@ -2011,7 +2012,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC51"),
+                                    ErrorCode = "LGC51",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC51"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 };
@@ -2023,7 +2024,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC51"),
+                                ErrorCode = "LGC51",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC51"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             };
@@ -2041,7 +2042,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF03"),
+                                ErrorCode = "AAF03",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF03"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             };
@@ -2095,7 +2096,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC58"),
+                    ErrorCode = "LGC58",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC58"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -2107,7 +2108,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL04"),
+                    ErrorCode = "AAL04",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL04"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -2119,7 +2120,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL04"),
+                    ErrorCode = "AAL04",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL04"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -2143,7 +2144,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL05"),
+                            ErrorCode = "AAL05",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL05"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2170,7 +2171,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                            ErrorCode = "AAL07",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2223,7 +2224,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                ErrorCode = "AAL07",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2254,7 +2255,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL07"),
+                                ErrorCode = "AAL07",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL07"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2295,7 +2296,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = itemSingInTIme.IsValid,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24r"),
+                            ErrorCode = "DC24r",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24r"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2388,7 +2389,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF32"),
+                        ErrorCode = "AAF32",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF32"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2411,7 +2412,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorCode = "AAF35",
                                 ErrorMessage = "No fue informado el literal “Mandante Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2425,7 +2426,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorCode = "AAF35",
                                 ErrorMessage = "No fue informado el literal “Mandante Legitimo Tenedor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2439,7 +2440,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorCode = "AAF35",
                                 ErrorMessage = "No fue informado el literal “Mandante Aval” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2453,7 +2454,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAF35"),
+                                ErrorCode = "AAF35",
                                 ErrorMessage = "No fue informado el literal “Mandante Adquirente/Deudor” de acuerdo con el campo “Descripcion” de la lista 13.2.5 Tipo de Mandante",
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2475,7 +2476,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorCode = "AAH65",
                             ErrorMessage = "No fue informado el literal “Mandatario Facturador Electrónico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2490,7 +2491,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorCode = "AAH65",
                             ErrorMessage = "No fue informado el literal “Mandatario Sistema de Negociación Electrónica” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2505,7 +2506,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorCode = "AAH65",
                             ErrorMessage = "No fue informado el literal “Mandatario Factor” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2520,7 +2521,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH65"),
+                            ErrorCode = "AAH65",
                             ErrorMessage = "No fue informado el literal “Mandatario Proveedor Tecnológico” de acuerdo con el campo “Descripcion” de la lista 13.2.8 Tipo de Mandatario",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2548,7 +2549,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "AAH62b",
-                        ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH62b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -2563,7 +2564,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAH62b",
-                            ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH62b"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -2578,7 +2579,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAH62b",
-                    ErrorMessage = "El número de documento no corresponde a un participante habilitado en la plataforma RADIAN (PT/Factor/SNE/FE).",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH62b"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2593,7 +2594,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                        ErrorCode = "AAH84",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2613,7 +2614,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                            ErrorCode = "AAH84",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2630,7 +2631,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH84"),
+                                ErrorCode = "AAH84",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH84"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -2682,7 +2683,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
+                            ErrorCode = "AAL02",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -2708,7 +2709,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                    ErrorCode = "AAL03",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
@@ -2727,7 +2728,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                                    ErrorCode = "AAL03",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
@@ -2745,7 +2746,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL02"),
+                        ErrorCode = "AAL02",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -2758,7 +2759,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAL03"),
+                            ErrorCode = "AAL03",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL03"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3527,7 +3528,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageTypeId = (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
-            string errorCodeReglaUUID = ConfigurationManager.GetValue("ErrorCode_AAH07");
+            string errorCodeReglaUUID = "AAH07";
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -3563,7 +3564,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                        ErrorCode = "AAH07",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
@@ -3577,7 +3578,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH06"),
+                            ErrorCode = "AAH06",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_043"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3590,7 +3591,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH09"),
+                            ErrorCode = "AAH09",
                             ErrorMessage = "No corresponde al literal '96'",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3624,7 +3625,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH06"),
+                            ErrorCode = "AAH06",
                             ErrorMessage = message,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3636,7 +3637,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH09"),
+                            ErrorCode = "AAH09",
                             ErrorMessage = messageTypeId,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -3653,7 +3654,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH26b"),
+                                ErrorCode = "AAH26b",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH26b"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -3665,7 +3666,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH25b"),
+                                ErrorCode = "AAH25b",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH25b"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -4036,7 +4037,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC01"),
+                                ErrorCode = "LGC01",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -4168,7 +4169,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_LGC21"),
+                    ErrorCode = "LGC21",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -4196,9 +4197,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateManadatory,
                     ErrorCode = "DC24",
-                    ErrorMessage = "Error en el valor de la fecha y hora de firma. " +
-                        $"NO corresponde al formato y/o el valor reportado es superior a la fecha del sistema.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24"),
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
 
@@ -4209,12 +4209,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (data.EventCode == "043")
             {
                 errorCodeRef = "DC24r";
-                errorMesaageRef = "No se puede generar el evento mandato antes de la fecha de generación del documento referenciado";
+                errorMesaageRef = ConfigurationManager.GetValue("ErrorMessage_DC24r");
             }
             else if (data.EventCode != "030" && data.EventCode != "032")
             {
                 errorCodeRef = "DC24q";
-                errorMesaageRef = "No se puede generar el evento Cancelación del endoso electrónico antes de la fecha de generación del documento referenciado.";
+                errorMesaageRef = ConfigurationManager.GetValue("ErrorMessage_DC24q");
             }
 
             switch (int.Parse(data.EventCode))
@@ -4256,9 +4256,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                              IsValid = false,
                              Mandatory = ValidateManadatory,
                              ErrorCode = "DC24z",
-                             ErrorMessage =
-                                "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación " +
-                                "del evento Recibo del bien y prestación del servicio.",
+                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24z"),
                              ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                          }
                         : new ValidateListResponse
@@ -4280,8 +4278,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = ValidateManadatory,
                             ErrorCode = "DC24c",
-                            ErrorMessage = "No se puede generar el evento pasado los 3 días hábiles de la fecha de generación " +
-                            "del evento Recibo del bien y prestación del servicio.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24c"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
                         : new ValidateListResponse
@@ -4309,8 +4306,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = ValidateManadatory,
                             ErrorCode = "DC24e",
-                            ErrorMessage = "No se puede generar el evento antes de los 3 días hábiles de la fecha de generación" +
-                            " del evento Recibo del bien y prestación del servicio.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24e"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     break;
@@ -4325,8 +4321,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = ValidateManadatory,
                             ErrorCode = "LGC55",
-                            ErrorMessage = "No se puede registrar el evento ya que la fecha de firma es superior " +
-                                "a la fecha de vencimiento de la factura electrónica de venta ",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC55"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4354,8 +4349,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     IsValid = false,
                                     Mandatory = true,
                                     ErrorCode = "LGC54",
-                                    ErrorMessage = "No se puede registrar el evento ya que la fecha de firma es inferior a 3 días " +
-                                    "de la fecha de vencimiento de la factura electrónica de venta ",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC54"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
@@ -4367,8 +4361,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     IsValid = false,
                                     Mandatory = ValidateManadatory,
                                     ErrorCode = "LGC56",
-                                    ErrorMessage = "No se puede registrar el evento ya que la fecha de vencimiento de la factura electrónica de venta  " +
-                                    "es superior a 3 días de la fecha de firma del evento ",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC56"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
@@ -4380,7 +4373,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAH59",
-                                ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -4402,9 +4395,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "DC24h",
-                            ErrorMessage =
-                                "No se puede generar el evento inscripción en el RADIAN de la factura electrónica de venta " +
-                                "como título valor que circula en el territorio nacional antes de la fecha de generación del documento referenciado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24h"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
 
@@ -4426,7 +4417,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "AAH59",
-                            ErrorMessage = "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4461,7 +4452,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "DC24t",
-                            ErrorMessage = "No se puede generar el evento limitación de circulación antes de la fecha de generación del documento referenciado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24t"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4481,7 +4472,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "DC24t",
-                            ErrorMessage = "No se puede generar el evento limitación de circulación antes de la fecha de generación del documento referenciado.",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24t"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
@@ -4502,7 +4493,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = false,
                            Mandatory = true,
-                           ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24g"),
+                           ErrorCode = "DC24g",
                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24g"),
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
@@ -4513,7 +4504,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_DC24g"),
+                            ErrorCode = "DC24g",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24g"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -4534,9 +4525,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                            IsValid = false,
                            Mandatory = true,
                            ErrorCode = "DC24x",
-                           ErrorMessage =
-                               "No se puede generar el evento Pago de la factura electrónica de venta " +
-                               "como título valor antes de la fecha de generación del documento referenciado.",
+                           ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24x"),
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        });
 
@@ -4562,7 +4551,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH59") + "",
+                            ErrorCode = "AAH59",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -4590,23 +4579,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if ((int)EventStatus.EndosoPropiedad == Convert.ToInt32(data.EventCode))
                     {
                         errorCode = "DC24j";
-                        errorMessage = "No se puede generar el evento endoso en propiedad antes de la fecha de generación del documento referenciado.";
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24j");
                         errorCodeAvailability = "DC24k";
-                        errorMessageAvailability = "No se puede generar el evento endoso en propiedad antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
+                        errorMessageAvailability = ConfigurationManager.GetValue("ErrorMessage_DC24k");
                     }
                     else if ((int)EventStatus.EndosoGarantia == Convert.ToInt32(data.EventCode))
                     {
                         errorCode = "DC24l";
-                        errorMessage = "No se puede generar el evento endoso en garantía antes de la fecha de generación del documento referenciado.";
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24l");
                         errorCodeAvailability = "DC24m";
-                        errorMessageAvailability = "No se puede generar el evento endoso en garantía antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
+                        errorMessageAvailability = ConfigurationManager.GetValue("ErrorMessage_DC24m");
                     }
                     else
                     {
                         errorCode = "DC24o";
-                        errorMessage = "No se puede generar el evento endoso en procuración antes de la fecha de generación del documento referenciado.";
+                        errorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24o");
                         errorCodeAvailability = "DC24p";
-                        errorMessageAvailability = "No se puede generar el evento endoso en procuración antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional";
+                        errorMessageAvailability = ConfigurationManager.GetValue("ErrorMessage_DC24p");
                     }
 
                     if (signingTimeEndoso.Date < signingTimeFEV.Date)
@@ -4659,8 +4648,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "DC24s",
-                                ErrorMessage = "No se puede generar el evento terminación de mandato antes de la " +
-                                "fecha de generación del documento referenciado.",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24s"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -4687,8 +4675,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = true,
                                 Mandatory = true,
                                 ErrorCode = "DC24s",
-                                ErrorMessage = "No se puede generar el evento terminación de mandato antes de la " +
-                                "fecha de generación del documento referenciado.",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24s"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -4757,7 +4744,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = "LGC63",
-                            ErrorMessage = $"{(string)null}La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC63"),                            
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                         return responses;
@@ -4797,7 +4784,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAD05b") + "",
+                    ErrorCode = "AAD05b",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD05b"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -4877,13 +4864,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorMessageMandato = string.Empty
             };
 
-            response.errorCodeNote = ConfigurationManager.GetValue("ErrorCode_AAD11");
+            response.errorCodeNote = "AAD11";
             response.errorMessageNote = ConfigurationManager.GetValue("ErrorMessage_AAD11");
-            response.errorMessageFETV = "Nombre o Razón social no esta autorizado para generar esté evento";
-            response.errorMessageReceiverFETV = "El adquiriente no esta autorizado para recibir esté evento";
+            response.errorMessageFETV = ConfigurationManager.GetValue("ErrorMessage_AAF01a");
+            response.errorMessageReceiverFETV = ConfigurationManager.GetValue("ErrorMessage_AAG01a");
             response.errorMessageEndoso = ConfigurationManager.GetValue("ErrorMessage_LGC32");
             response.errorCodeMandato = "LGC36";
-            response.errorMessageMandato = "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente.";
+            response.errorMessageMandato = ConfigurationManager.GetValue("ErrorMessage_LGC36");
 
             //SenderPArty
             if (eventCode == "030") response.errorCodeFETV = "AAF01a";
@@ -4899,61 +4886,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //SigningTime
             if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a";
-            if (eventCode == "030") response.errorMessageigningTimeAcuse = "No se puede generar el evento acuse de recibo de la factura electrónica de venta " +
-                    "antes de la fecha de generación del documento referenciado. ";
+            if (eventCode == "030") response.errorMessageigningTimeAcuse = ConfigurationManager.GetValue("ErrorMessage_DC24a");
 
             if (eventCode == "032") response.errorCodeSigningTimeRecibo = "DC24b";
-            if (eventCode == "032") response.errorMessageigningTimeRecibo = "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación " +
-                    "del evento acuse de recibo de la factura electrónica de venta. ";
+            if (eventCode == "032") response.errorMessageigningTimeRecibo = ConfigurationManager.GetValue("ErrorMessage_DC24b");
 
             //Endoso
-            if (eventCode == "037") response.errorCodeEndoso = ConfigurationManager.GetValue("ErrorCode_LGC26");
-            if (eventCode == "038") response.errorCodeEndoso = ConfigurationManager.GetValue("ErrorCode_LGC29");
-            if (eventCode == "039") response.errorCodeEndoso = ConfigurationManager.GetValue("ErrorCode_LGC32");
+            if (eventCode == "037") response.errorCodeEndoso = "LGC26";
+            if (eventCode == "038") response.errorCodeEndoso = "LGC29";
+            if (eventCode == "039") response.errorCodeEndoso = "LGC32";
 
             else if (eventCode == "036")
             {
-                response.errorCodeB = "AAF01b";
-                response.errorMessageB = "No corresponde a la información del Tenedor Legítimo";
                 response.errorCode = "AAF01a";
-                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01a_036");
+                response.errorCodeB = "AAF01b";
+                response.errorMessageB = ConfigurationManager.GetValue("ErrorMessage_AAF01b_036");              
             }
             else if (eventCode == "035")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No fue informado el avalista";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_035");
                 response.errorCodeNoteA = "AAD11a";
-                response.errorMessageNoteA = "No se informo la nota cuando el evento fue generado por un mandato.";
+                response.errorMessageNoteA = ConfigurationManager.GetValue("ErrorMessage_AAD11a");
             }
             else if (eventCode == "037")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_037");
             }
             else if (eventCode == "040" || eventCode == "039" || eventCode == "038")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo en su disponibización";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_038");
             }
             else if (eventCode == "041")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No fue referenciado la información del Juez o Juzgado";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_041");
             }
             else if (eventCode == "043")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No es informado el grupo del Mandante";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01");
             }
             else if (eventCode == "044")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No coincide con el Mandante o Mandatario del mandato";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_044");
             }
             else if (eventCode == "045")
             {
                 response.errorCode = "AAF01";
-                response.errorMessage = "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_045");
             }
             return response;
         }
