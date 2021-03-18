@@ -187,7 +187,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
                     foreach (var itemReferenceAttorney in responses)
                     {
-                        if (itemReferenceAttorney.ErrorCode == ConfigurationManager.GetValue("ErrorCode_AAH07"))
+                        if (itemReferenceAttorney.ErrorCode == "AAH07")
                             validEventReference = false;
                     }
                     validateResponses.AddRange(responses);
@@ -216,8 +216,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
                     foreach (var itemResponsesTacita in responses)
                     {
-                        if (itemResponsesTacita.ErrorCode == ConfigurationManager.GetValue("ErrorCode_LGC14")
-                            || itemResponsesTacita.ErrorCode == ConfigurationManager.GetValue("ErrorCode_LGC05"))
+                        if (itemResponsesTacita.ErrorCode == "LGC14"
+                            || itemResponsesTacita.ErrorCode == "LGC05")
                             validEventTacita = false;
                     }
                     validateResponses.AddRange(responses);
@@ -239,7 +239,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = ConfigurationManager.GetValue("ErrorCode_AAH07"),
+                    ErrorCode = "AAH07",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -717,7 +717,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.IsValid = false;                
                 response.Mandatory = true;
                 response.ErrorCode = "LGC62";
-                response.ErrorMessage = $"La factura referenciada no es de tipo crédito, PaymentMeansID=2";
+                response.ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62");                
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;
