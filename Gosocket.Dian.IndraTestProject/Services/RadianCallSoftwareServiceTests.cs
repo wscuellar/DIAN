@@ -6,19 +6,13 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gosocket.Dian.Interfaces.Repositories;
-using Moq;
 using System.Linq.Expressions;
-using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Application.Tests
 {
     [TestClass()]
     public class RadianCallSoftwareServiceTests
-    {
-        private readonly Mock<IRadianSoftwareRepository> _RadianSoftwareRepository = new Mock<IRadianSoftwareRepository>();
+    { 
         private RadianCallSoftwareService _current;
         private readonly Mock<SoftwareService> _softwareService = new Mock<SoftwareService>();
 
