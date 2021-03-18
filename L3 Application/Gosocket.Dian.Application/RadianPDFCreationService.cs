@@ -91,8 +91,8 @@ namespace Gosocket.Dian.Application
                 #region hilo3
                 storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
                 GlobalDataDocument cosmosDocument = DocumentInfoFromCosmos(documentMeta).Result;
-                List<Event> eventsCosmos = cosmosDocument.Events;
-                events = ListEvents(eventsCosmos, storageEvents); 
+                List<Event> eventsCosmos = cosmosDocument != null ? cosmosDocument.Events : new List<Event>() ;
+                events = ListEvents(eventsCosmos, storageEvents);
                 #endregion
 
             });
