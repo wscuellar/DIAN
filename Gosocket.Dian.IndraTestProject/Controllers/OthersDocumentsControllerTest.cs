@@ -1,6 +1,5 @@
 ﻿using Gosocket.Dian.Web.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.IndraTestProject.Controllers

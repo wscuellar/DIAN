@@ -411,12 +411,10 @@ namespace Gosocket.Dian.Application
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianFileHistory)
         {
             radianFileHistory.Timestamp = DateTime.Now;
-            string idHistoryRegister = string.Empty;
-
             radianFileHistory.Id = Guid.NewGuid();
-            idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianFileHistory).ToString();
-
-            if (!string.IsNullOrEmpty(idHistoryRegister))
+            Guid idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianFileHistory);
+            
+            if (idHistoryRegister != Guid.Empty)
             {
                 return new ResponseMessage($"Información registrada id: {idHistoryRegister}", "Guardado");
             }
@@ -514,6 +512,7 @@ namespace Gosocket.Dian.Application
             var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
             return fileManager.GetBytes("radiancontributor-files", fileNameURL, out contentType);
         }
+
         #endregion
 
     }

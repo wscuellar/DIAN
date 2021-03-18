@@ -1,29 +1,24 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Gosocket.Dian.Web.Controllers;
+﻿using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Web.Models;
+using Gosocket.Dian.Web.Utils;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Application;
-using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Web.Models;
-using Gosocket.Dian.Domain.Sql;
-using Gosocket.Dian.Web.Utils;
 using System.Web.Mvc;
-using Gosocket.Dian.Domain.Common;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Common.Resources;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
     [TestClass()]
     public class OthersElectronicDocumentsControllerTests
     {
-
         private OthersElectronicDocumentsController _current;
 
         private readonly Mock<IOthersElectronicDocumentsService> _othersElectronicDocumentsService = new Mock<IOthersElectronicDocumentsService>();
@@ -56,7 +51,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             Assert.AreEqual(Navigation.NavigationEnum.OthersEletronicDocuments.ToString(), viewResult.ViewData["CurrentPage"].ToString());
             Assert.IsTrue(((List<AutoListModel>)viewResult.ViewData["ListElectronicDocuments"]).Count == 3);
         }
-
 
         [TestMethod]
         [DataRow(1, DisplayName = "Return Index OthersElectronicDocAssociated")]
@@ -138,7 +132,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     break;
             }
         }
-
 
         [TestMethod]
         [DataRow(1, DisplayName = "Return Index OthersElectronicDocAssociated")]
@@ -258,7 +251,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     break;
             }
         }
- 
+
         [TestMethod()]
         public void GetSoftwaresByContributorIdTest()
         {
@@ -313,7 +306,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         {
             //arrange
             _ = _othersDocsElecContributorService.Setup(x => x.CancelRegister(It.IsAny<int>(), It.IsAny<string>()))
-                .Returns(new ResponseMessage() { Message= "CancelRegisterTest" });
+                .Returns(new ResponseMessage() { Message = "CancelRegisterTest" });
             //act
             JsonResult viewResult = _current.CancelRegister(1, "Descr");
 
@@ -322,8 +315,138 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             Assert.IsTrue(((ResponseMessage)viewResult.Data).Message == "CancelRegisterTest");
         }
 
+        [TestMethod]
+        [DataRow(1, DisplayName = "Entrada Accion == SeleccionElectronicDocument")]
+        [DataRow(2, DisplayName = "Entrada Accion == SeleccionParticipante TechnologyProvider")]
+        [DataRow(3, DisplayName = "Entrada Accion == SeleccionParticipante No TechnologyProvider")]
+        [DataRow(4, DisplayName = "Entrada Accion == SeleccionOperationMode --> Lista.Any()=True Sin test")]
+        [DataRow(5, DisplayName = "Entrada Accion == SeleccionOperationMode --> Lista.Any()=False")]
+        [DataRow(6, DisplayName = "Entrada Accion == CancelRegister")]
+        [DataRow(7, DisplayName = "Entrada Accion == '' Fallido")]
 
-        #region Private
+        public void ValidationTest(int input)
+        {
+            JsonResult _jsonResult;
+            ValidacionOtherDocsElecViewModel ValidacionOtherDocs = new ValidacionOtherDocsElecViewModel()
+            {
+                OperationModeId = Domain.Common.OtherDocElecOperationMode.OwnSoftware,
+                ContributorIdType = Domain.Common.OtherDocElecContributorType.Transmitter,
+                ElectronicDocumentId = 1,
+            };
+
+            switch (input)
+            {
+                case 1:
+                    #region  case 1:
+                    //arrange
+                    ValidacionOtherDocs.Accion = "SeleccionElectronicDocument";
+                    //act
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Contains("¿Desea iniciar el proceso de habilitación para ?"));
+                    #endregion
+                    break;
+                case 2:
+                    #region  case 2:
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "SeleccionParticipante";
+                    ValidacionOtherDocs.ContributorIdType = Domain.Common.OtherDocElecContributorType.TechnologyProvider;
+                    _ = _contributorService.Setup(x => x.Get(It.IsAny<int>())).Returns(new Contributor() { Name = "NameContributor", ContributorTypeId = (int)Domain.Common.ContributorType.Biller });
+
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+
+                    //assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Equals(TextResources.TechnologProviderDisabled));
+
+                    #endregion 
+                    break;
+                case 3:
+                    #region  case 3:
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "SeleccionParticipante";
+                    ValidacionOtherDocs.ContributorIdType = Domain.Common.OtherDocElecContributorType.Transmitter;
+                    _ = _contributorService.Setup(x => x.Get(It.IsAny<int>())).Returns(new Contributor() { Name = "NameContributor", ContributorTypeId = (int)Domain.Common.ContributorType.Biller });
+
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+
+                    //assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Contains("¿Desea iniciar el proceso como para  de otros documentos electrónicos?"));
+
+                    #endregion
+                    break;
+                case 4:
+                    #region  case 4:
+
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "SeleccionOperationMode";
+                    _ = _othersDocsElecContributorService.Setup(x => x.ValidateExistenciaContribuitor(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                        .Returns(new List<OtherDocElecContributor> { new OtherDocElecContributor() { ElectronicDocumentId = 2 } });
+                    _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns((GlobalTestSetOthersDocuments)null);
+
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+
+                    //assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Equals(TextResources.ModeElectroniDocWithoutTestSet));
+
+                    #endregion
+
+                    break;
+                case 5:
+                    #region  case 5:
+
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "SeleccionOperationMode";
+                    _ = _othersDocsElecContributorService.Setup(x => x.ValidateExistenciaContribuitor(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
+                        .Returns(new List<OtherDocElecContributor>());
+     
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+
+                    //assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Equals("¿Desea habilitar la trasmisión de \"Otros Documentos Electrónicos\" en el sistema como  de otros documentos electrónicos?"));
+
+                    #endregion  
+
+                    break;
+                case 6:
+                    #region  case 6:
+
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "CancelRegister";
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+                    //Assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Contains("¿Desea habilitar la trasmisión de \"Otros Documentos Electrónicos\" en el sistema como  de otros documentos electrónicos?"));
+                    #endregion 
+
+                    break;
+                case 7:
+                    #region  case 7:
+
+                    //arrange 
+                    ValidacionOtherDocs.Accion = "";
+                    //act 
+                    _jsonResult = _current.Validation(ValidacionOtherDocs);
+                    //Assert
+                    Assert.IsNotNull(_jsonResult);
+                    Assert.IsTrue(((ResponseMessage)_jsonResult.Data).Message.Contains("No se logro realizar la validación del participante a Registrar!!!"));
+                    #endregion 
+
+                    break;
+            }
+        }
+
+        #region ---Private---
+
         private List<ElectronicDocument> GetDocumentos()
         {
             List<ElectronicDocument> Lista = new List<ElectronicDocument>
@@ -403,6 +526,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
 
             return List;
         }
+
         #endregion
     }
 }

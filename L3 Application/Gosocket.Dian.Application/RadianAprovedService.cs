@@ -88,9 +88,9 @@ namespace Gosocket.Dian.Application
                 .GetContributorOperations(contributorId);
 
             if (contributorOperations == null)
-                return default;
+                return new Software();
 
-            return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? default;
+            return contributorOperations.FirstOrDefault(t => !t.Deleted && t.OperationModeId == (int)Domain.Common.OperationMode.Own && t.Software != null && t.Software.Status)?.Software ?? new Software();
         }
 
         public List<RadianContributorFileType> ContributorFileTypeList(int typeId)
@@ -155,15 +155,10 @@ namespace Gosocket.Dian.Application
         public ResponseMessage AddFileHistory(RadianContributorFileHistory radianContributorFileHistory)
         {
             radianContributorFileHistory.Timestamp = DateTime.Now;
-            string idHistoryRegister = string.Empty;
-
             radianContributorFileHistory.Id = Guid.NewGuid();
-            idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory).ToString();
-
-            if (!string.IsNullOrEmpty(idHistoryRegister))
-            {
+            Guid idHistoryRegister = _radianContributorFileHistoryRepository.AddRegisterHistory(radianContributorFileHistory);
+            if (idHistoryRegister != Guid.Empty)
                 return new ResponseMessage($"Información registrada id: {idHistoryRegister}", "Guardado");
-            }
 
             return new ResponseMessage($"El registro no pudo ser guardado", "Nulo");
         }
@@ -248,7 +243,7 @@ namespace Gosocket.Dian.Application
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
-                string key = radianContributor.RadianContributorTypeId.ToString()    + "|" + radianContributorOperation.SoftwareId;
+                string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
                 string sType = radianContributor.RadianOperationModeId == 1 ? "1" : operation.SoftwareType.ToString();
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
@@ -361,14 +356,9 @@ namespace Gosocket.Dian.Application
 
         public List<RadianContributor> AutoCompleteProvider(int contributorId, int contributorTypeId, RadianOperationModeTestSet softwareType, string term)
         {
-            List<RadianContributor> participants;
-            if (softwareType == RadianOperationModeTestSet.OwnSoftware)
-                participants = _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results;
-            else
-            {
-                participants = _radianContributorRepository.ActiveParticipantsWithSoftware((int)softwareType);
-
-            }
+            List<RadianContributor> participants = (softwareType == RadianOperationModeTestSet.OwnSoftware) ?
+                             _radianContributorRepository.List(t => t.ContributorId == contributorId && t.RadianContributorTypeId == contributorTypeId && t.Contributor.BusinessName.Contains(term)).Results :
+                             _radianContributorRepository.ActiveParticipantsWithSoftware((int)softwareType);
 
             return participants.Distinct().ToList();
         }
