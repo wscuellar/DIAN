@@ -191,10 +191,13 @@
                     if (model.CustomizationID.Equals("452"))
                         model.Title = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
                     break;
-                case EventStatus.AnulacionLimitacionCirculacion:
-                    model.Title = EnumHelper.GetDescription(EventStatus.AnulacionLimitacionCirculacion);
-                    break;
                 case EventStatus.NegotiatedInvoice:
+                    if (model.CustomizationID.Equals("411"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MedidaCautelarEmbargo);
+                    if (model.CustomizationID.Equals("412"))
+                        model.Title = EnumHelper.GetDescription(SubEventStatus.MedidaCautelarMandamiento);
+                    break;
+                case EventStatus.AnulacionLimitacionCirculacion:
                     if (model.CustomizationID.Equals("421"))
                         model.Title = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
                     if (model.CustomizationID.Equals("422"))
@@ -644,7 +647,7 @@
                 { "SenderDocumentType","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme'][1]/*[local-name()='CompanyID']/@schemeName" },
                 { "Note","//*[local-name()='ApplicationResponse']/*[local-name()='Note']" },
                 { "SignedBy","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Signature']/*[local-name()='Object']/*[local-name()='QualifyingProperties']/*[local-name()='SignedProperties']/*[local-name()='SignedSignatureProperties']/*[local-name()='SignerRole']/*[local-name()='ClaimedRoles']/*[local-name()='ClaimedRole']" },
-                { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
+                { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
                 { "EventTotalValueAval","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value'])[1]" },
                 { "EventTotalValueEndoso","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'])[1]" },
                 { "EventTotalValueLimitation","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value'])[1]" },
