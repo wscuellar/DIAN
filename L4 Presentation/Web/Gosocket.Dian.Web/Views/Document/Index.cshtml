@@ -213,14 +213,14 @@
             });
 
             $('.document-row').click('onClick', function () {
-                showLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
-                if (!$(this).hasClass('not-redirect')) {
-                    var id = $(this).context.getAttribute('data-id');
-                    var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                var id = $(this).context.getAttribute('data-id');
+                var partitionKey = $(this).context.getAttribute('data-partitionKey');
+                var documentType = $(this).context.getAttribute('data-type');
+                if (documentType != "101" && documentType != "12") //ignora documento exportacion 
+                {
+                    showLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
                     window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
                 }
-                else
-                    $(this).removeClass('not-redirect')
             });
 
             $(".download-document").click(function(){

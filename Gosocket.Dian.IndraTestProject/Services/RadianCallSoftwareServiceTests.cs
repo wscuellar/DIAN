@@ -37,16 +37,6 @@ namespace Gosocket.Dian.Application.Tests
             Assert.IsInstanceOfType(Result, typeof(RadianSoftware));
             Assert.IsTrue(Result.Id.Equals(guidPrueba));
         }
-         
-        [TestMethod()]
-        public void GetSoftwaresTest()
-        {
-            _ = _softwareService.Setup(x => x.GetSoftwares(It.IsAny<int>()));
-            var Result = _current.GetSoftwares(It.IsAny<int>());
-
-            Assert.IsNotNull(Result);
-            Assert.IsInstanceOfType(Result, typeof(List<Software>));
-        }
 
         [TestMethod()]
         public void ListTest()
