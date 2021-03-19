@@ -12,6 +12,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace Gosocket.Dian.Functions.Events
     {
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
         [FunctionName("ApplicationResponseProcess")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -53,8 +55,16 @@ namespace Gosocket.Dian.Functions.Events
             var trackId = data.TrackId;
             var responseCode = data.ResponseCode;
             var trackIdCude = data.TrackIdCude;
+            var start = DateTime.UtcNow;
 
-            if(!StringUtils.HasOnlyNumbers(responseCode))
+            var startBatch = new GlobalLogger(trackIdCude, "1 Start ApplicationResponseProcess")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = "Start ApplicationResponseProcess: trackIdCude " + trackIdCude + " responseCode " + responseCode + " trackId " + trackId + " listId " + data.ListId
+            };
+            await TableManagerGlobalLogger.InsertOrUpdateAsync(startBatch);
+
+            if (!StringUtils.HasOnlyNumbers(responseCode))
                 return new EventResponse { Code = ((int)EventValidationMessage.InvalidResponseCode).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.InvalidResponseCode) };
 
             string[] eventCodesImplemented =
@@ -183,10 +193,14 @@ namespace Gosocket.Dian.Functions.Events
                     return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
 
                 // Validate event
-                var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
-                if (!eventValidation.Item1)
-                    return eventValidation.Item2;
-                else if (globalDataDocument.Events.Count == 0)
+                if (string.IsNullOrWhiteSpace(documentMetaCUDE.TestSetId))
+                {
+                    var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
+                    if (!eventValidation.Item1)
+                        return eventValidation.Item2;
+                }
+                
+                if (globalDataDocument.Events.Count == 0)
                 {
                     globalDataDocument.Events = new List<Event>()
                     {
@@ -195,13 +209,21 @@ namespace Gosocket.Dian.Functions.Events
                 }
                 else
                     globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
-
+                
+               
                 // upsert document in cosmos
                 var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
                 if (result == null)
                     return new EventResponse { Code = ((int)EventValidationMessage.Error).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Error) };
 
             }
+
+            var finishtBatch = new GlobalLogger(trackIdCude, "1 Finish ApplicationResponseProcess")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = "Finish ApplicationResponseProcess"
+            };
+            await TableManagerGlobalLogger.InsertOrUpdateAsync(finishtBatch);
 
             var response = new EventResponse { Code = ((int)EventValidationMessage.Success).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success) };
             return response;
@@ -222,7 +244,8 @@ namespace Gosocket.Dian.Functions.Events
                 SenderName = globalDataDocumentCude.SenderName,
                 ReceiverCode = globalDataDocumentCude.ReceiverCode,
                 ReceiverName = globalDataDocumentCude.ReceiverName,
-                CancelElectronicEvent = globalDataDocumentCude.CancelElectronicEvent
+                CancelElectronicEvent = globalDataDocumentCude.CancelElectronicEvent,
+                SendTestSet = globalDataDocumentCude.TestSetId
             };
         }
 

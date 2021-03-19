@@ -1181,7 +1181,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         return dianResponse;
                     }
 
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { TrackId = documentParsed.DocumentKey, documentParsed.ResponseCode, trackIdCude, listId });
+
+                    trackId = documentParsed.DocumentKey;
+                    var responseCode = documentParsed.ResponseCode;
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { trackId, responseCode, trackIdCude, listId });
                     
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
                     {
