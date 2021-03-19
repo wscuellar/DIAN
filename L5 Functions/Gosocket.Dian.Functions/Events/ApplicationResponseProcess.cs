@@ -193,10 +193,14 @@ namespace Gosocket.Dian.Functions.Events
                     return new EventResponse { Code = ((int)EventValidationMessage.NotFound).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.NotFound) };
 
                 // Validate event
-                var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
-                if (!eventValidation.Item1)
-                    return eventValidation.Item2;
-                else if (globalDataDocument.Events.Count == 0)
+                if (string.IsNullOrWhiteSpace(documentMetaCUDE.TestSetId))
+                {
+                    var eventValidation = Validator.ValidateEvent(globalDataDocument, responseCode);
+                    if (!eventValidation.Item1)
+                        return eventValidation.Item2;
+                }
+                
+                if (globalDataDocument.Events.Count == 0)
                 {
                     globalDataDocument.Events = new List<Event>()
                     {
@@ -205,7 +209,8 @@ namespace Gosocket.Dian.Functions.Events
                 }
                 else
                     globalDataDocument.Events.Add(InstanceEventObject(documentMetaCUDE, responseCode));
-
+                
+               
                 // upsert document in cosmos
                 var result = CosmosDBService.Instance(documentMeta.EmissionDate).UpdateDocument(globalDataDocument);
                 if (result == null)
