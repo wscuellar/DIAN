@@ -244,7 +244,8 @@ namespace Gosocket.Dian.Functions.Events
                 SenderName = globalDataDocumentCude.SenderName,
                 ReceiverCode = globalDataDocumentCude.ReceiverCode,
                 ReceiverName = globalDataDocumentCude.ReceiverName,
-                CancelElectronicEvent = globalDataDocumentCude.CancelElectronicEvent
+                CancelElectronicEvent = globalDataDocumentCude.CancelElectronicEvent,
+                SendTestSet = globalDataDocumentCude.TestSetId
             };
         }
 
