@@ -52,7 +52,12 @@ namespace Gosocket.Dian.Functions.Batch
             string softwareIdNomina = string.Empty;
             XmlParseNomina xmlParser = null;
             GlobalBatchFileStatus batchFileStatus = null;
-           
+            var eventCodeRadian = string.Empty;
+            var trackIdReferenceRadian = string.Empty;
+            var trackIdCude = string.Empty;
+            var listId = string.Empty;
+
+
             try
             {                
                 var data = string.Empty;
@@ -103,6 +108,10 @@ namespace Gosocket.Dian.Functions.Batch
                 var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
+                eventCodeRadian = xpathResponse.XpathsValues["AppResEventCodeXpath"];
+                trackIdReferenceRadian = xpathResponse.XpathsValues["AppResDocumentReferenceKeyXpath"];
+                listId = string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResListIDXpath"]) ? "1" : xpathResponse.XpathsValues["AppResListIDXpath"];
+                trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
 
                 var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
 
@@ -110,7 +119,7 @@ namespace Gosocket.Dian.Functions.Batch
                 var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
                 {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                    Action = "validando consulta " + flagApplicationResponse
+                    Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian + " trackIdCude " + trackIdCude + " listId " + listId
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
 
@@ -394,7 +403,7 @@ namespace Gosocket.Dian.Functions.Batch
                         {                           
                             if (validateDocumentUrl)
                             {
-                                SetLogger(null, "Step prueba nomina", " Ingresa cargue de documento RADIAN ", "PROC-05");
+                                SetLogger(null, "Step prueba AR", " Ingresa cargue de documento RADIAN ", "PROC-05");
                                 try
                                 {
                                     byte[] xmlBytesEvent = null;
@@ -412,7 +421,33 @@ namespace Gosocket.Dian.Functions.Batch
                                     appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
                                     log.Error($"Error al generar registro complemento de datos en RADIAN con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
                                 }
-                                SetLogger(null, "Step prueba nomina", " Salida cargue de documento RADIAN ", "PROC-05.1");
+                                SetLogger(null, "Step prueba AR", " Salida cargue de documento RADIAN ", "PROC-05.1");
+
+                                try
+                                {
+                                    SetLogger(null, "Step prueba AR", " inicio ApplicationResponseProcessUrl trackIdReferenceRadian " + trackIdReferenceRadian +
+                                        " eventCodeRadian " + eventCodeRadian + " trackIdCude " + trackIdCude + " listId " + listId, "PROC-05.2");
+                                    byte[] xmlBytesEvent = null;
+                                    trackId = trackIdReferenceRadian;
+                                    var responseCode = eventCodeRadian;
+                                                                        
+                                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), new { trackId, responseCode, trackIdCude, listId });
+                                    if (processEventResponse.Code == "100" || processEventResponse.Code == "201")
+                                    {
+                                        xmlBytesEvent = Encoding.ASCII.GetBytes(processEventResponse.XmlBytesBase64);
+                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
+                                    }
+                                    else
+                                        appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                }
+                                catch (Exception ex)
+                                {
+                                    SetLogger(null, "Step prueba AR", " Exception " + ex.Message, "PROC-05.3");
+                                    appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = null, Success = false });
+                                    log.Error($"Error al generar registro complemento de datos en Cosmos con trackId: {trackId} Message: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                }
+                                SetLogger(null, "Step prueba AR", " Salida cargue de documento Cosmos ", "PROC-05.4");
+
                             }                            
                         }                       
 
