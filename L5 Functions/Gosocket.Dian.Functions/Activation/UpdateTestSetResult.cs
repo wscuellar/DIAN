@@ -391,7 +391,8 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwarePassword = software.SoftwarePassword,
                                     pin = software.Pin,
                                     url = software.Url,
-                                    softwareName = software.Name
+                                    softwareName = software.Name,
+                                    testSetId = globalTestSetTracking.TestSetId
                                 };
 
                                 //Enviamos la habilitacion para el usuario
@@ -763,6 +764,9 @@ namespace Gosocket.Dian.Functions.Activation
 
             [JsonProperty(PropertyName = "trace")]
             public string Trace { get; set; }
+
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }            
         }
 
     }

@@ -112,7 +112,9 @@ namespace Gosocket.Dian.Functions.Radian
                         SoftwareName = data.SoftwareName,
                         SoftwareId = data.SoftwareId,
                         SoftwareType = data.SoftwareType,
-                        Url = data.Url
+                        Url = data.Url,
+                        RadianTestSetObj = results
+
                     };
                     //Se envia para la creacion en prod.
                     await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
@@ -185,6 +187,9 @@ namespace Gosocket.Dian.Functions.Radian
             [JsonProperty(PropertyName = "url")]
             public string Url { get; set; }
 
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }
+
         }
 
         class RadianaActivateContributorRequestObject
@@ -223,6 +228,9 @@ namespace Gosocket.Dian.Functions.Radian
 
             [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "radianTestSetObj")]
+            public RadianTestSetResult RadianTestSetObj { get; set; }
         }
 
 

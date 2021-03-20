@@ -101,10 +101,7 @@ namespace Gosocket.Dian.Functions.Others
 
                     //Se habilita el contribuyente en la table Storage
                     globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
-
-                    //Obtiene informacion GlobalTestSetOthersDocumentsResult Hab
-                    GlobalTestSetOthersDocumentsResult retrieveGlobalTestSetOthersDocumentsResult = globalTestSetOthersDocumentsResult.FindOthersDocumentsResult<GlobalTestSetOthersDocumentsResult>(data.Code, results.SoftwareId);
-
+                  
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
@@ -123,7 +120,7 @@ namespace Gosocket.Dian.Functions.Others
                         ElectronicDocumentId = otherDocElecContributor.ElectronicDocumentId,
                         SoftwareProvider = data.SoftwareId,
                         ProviderId = results.ProviderId,
-                        TestSetOthersDocumentsResultObj = retrieveGlobalTestSetOthersDocumentsResult
+                        TestSetOthersDocumentsResultObj = results
                     };
 
                     //Se envia para la creacion en prod.
@@ -222,6 +219,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "url")]
             public string Url { get; set; }
+
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }
         }
 
         class OtherDocumentActivateContributorRequestObject
