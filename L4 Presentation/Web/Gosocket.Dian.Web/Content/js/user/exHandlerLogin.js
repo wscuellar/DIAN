@@ -4,13 +4,14 @@ function OnBeginAjax(response) {
 }
 
 function OnSuccessAjax(response) {
+    debugger
     if (response.Code == 200) {
         window.location.href = response.Message;
-    } else {
+    } else { 
         hideLoading("#panel-forma");
         var confirmMessage = response.Message;
-        var closeEvent = () => {}
-        var buttons = AlertExec();
+        var closeEvent = () => { }
+        var buttons = response.Message.indexOf('Captcha') > 0 ? AlertExecLogin() : AlertExec();
         showConfirmation(confirmMessage, buttons, null, closeEvent);
     }
 }
