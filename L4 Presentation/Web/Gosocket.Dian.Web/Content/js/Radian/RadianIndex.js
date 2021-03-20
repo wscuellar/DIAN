@@ -156,7 +156,7 @@ function AlertExecLogin(operation) {
             className: "btn-radian-default",
             callback: function () {
                 operation != null && operation();
-                window.location.reload();
+                location.reload();
                 operationClick = false;
             }
         }
