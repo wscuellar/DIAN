@@ -23,7 +23,10 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly TableManager globalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
         private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();
+        
+
 
         [FunctionName("SendToActivateOtherDocumentContributor")]
 
@@ -99,6 +102,9 @@ namespace Gosocket.Dian.Functions.Others
                     //Se habilita el contribuyente en la table Storage
                     globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
 
+                    //Obtiene informacion GlobalTestSetOthersDocumentsResult Hab
+                    GlobalTestSetOthersDocumentsResult retrieveGlobalTestSetOthersDocumentsResult = globalTestSetOthersDocumentsResult.FindOthersDocumentsResult<GlobalTestSetOthersDocumentsResult>(data.Code, results.SoftwareId);
+
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
@@ -116,7 +122,8 @@ namespace Gosocket.Dian.Functions.Others
                         Url = data.Url,
                         ElectronicDocumentId = otherDocElecContributor.ElectronicDocumentId,
                         SoftwareProvider = data.SoftwareId,
-                        ProviderId = results.ProviderId
+                        ProviderId = results.ProviderId,
+                        TestSetOthersDocumentsResultObj = retrieveGlobalTestSetOthersDocumentsResult
                     };
 
                     //Se envia para la creacion en prod.
@@ -262,6 +269,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "providerId")]
             public int ProviderId { get; set; }
+
+            [JsonProperty(PropertyName = "testSetOthersDocumentsResult")]
+            public GlobalTestSetOthersDocumentsResult TestSetOthersDocumentsResultObj { get; set; }
         }
     }
 }
