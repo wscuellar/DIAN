@@ -168,13 +168,13 @@
                     break;
                 case EventStatus.Mandato:
                     if(model.CustomizationID.Equals("431"))
-                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                        model.Title = EnumHelper.GetDescription(model.SchemeID =="1" ? SubEventStatus.MandatoGenerarlIlimitadoEspecial  :SubEventStatus.MandatoGenerarlLimitado  );
                     if (model.CustomizationID.Equals("432"))
-                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlLimitado);
+                        model.Title = EnumHelper.GetDescription(model.SchemeID == "1" ? SubEventStatus.MandatoGenerarlLimitadoEspecial: SubEventStatus.MandatoGenerarlLimitado);
                     if (model.CustomizationID.Equals("433"))
-                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempo);
+                        model.Title = EnumHelper.GetDescription(model.SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoEspecial :SubEventStatus.MandatoGenerarlTiempo);
                     if (model.CustomizationID.Equals("434"))
-                        model.Title = EnumHelper.GetDescription(SubEventStatus.MandatoGenerarlTiempoIlimitado);
+                        model.Title = EnumHelper.GetDescription(model.SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoIlimitadoEspecial: SubEventStatus.MandatoGenerarlTiempoIlimitado);
                     break;
                 case EventStatus.TerminacionMandato:
                     if (model.CustomizationID.Equals("441"))
@@ -392,7 +392,7 @@
 
             if (model.EventCode == "036" || model.CustomizationID == "372" || model.EventCode == "038" || model.EventCode == "045")
             {
-                htmlInvoice += "<div id='ExpirationDate' class='text-subtitle text-gray'>Fecha de Vencimiento: <a class='text-data'>{ExpirationDate}</a></div>";
+                htmlInvoice += "<div id='ExpirationDate' class='text-subtitle text-gray'>Fecha de Vencimiento: <a class='text-data'>{EventFinishDate}</a></div>";
             }
             htmlInvoice += "</td>";
             template.Replace("{invoiceReference}", htmlInvoice);
@@ -448,7 +448,7 @@
             template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
             if (model.EventCode == "045")
             {
-                template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? "Sin limitación" : "Con limitación");
+                template = template.Replace("{ResponseCodeListID}",model.Title);
             }
             else
             {
@@ -655,9 +655,11 @@
                 { "EventTotalValuePago","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']" },
                 { "InvoiceNumber","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']" },
                 { "CustomizationID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']" },
+                { "SchemeID","//*[local-name()='ApplicationResponse']/*[local-name()='CustomizationID']/@schemeID" },
                 { "ResponseCodeListID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID" },
                 { "CertificateNumber", "(//*[local-name()='X509SerialNumber'])[1]" },
                 { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" },
+                { "listID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID']" },
                 { "CudeReference", "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']" }
             };
             return requestObj;
@@ -718,6 +720,8 @@
             model.EventTotalValuePago = dataValues.XpathsValues["EventTotalValuePago"] != null ? dataValues.XpathsValues["EventTotalValuePago"] : string.Empty;
             model.InvoiceNumber = dataValues.XpathsValues["InvoiceNumber"] != null ? dataValues.XpathsValues["InvoiceNumber"] : string.Empty;
             model.CustomizationID = dataValues.XpathsValues["CustomizationID"] != null ? dataValues.XpathsValues["CustomizationID"] : string.Empty;
+            model.SchemeID = dataValues.XpathsValues["SchemeID"] != null ? dataValues.XpathsValues["SchemeID"] : string.Empty;
+            
             model.ResponseCodeListID = dataValues.XpathsValues["ResponseCodeListID"] != null ? dataValues.XpathsValues["ResponseCodeListID"] : string.Empty;
             model.EntityName = dataValues.XpathsValues["EntityName"] != null ? dataValues.XpathsValues["EntityName"] : string.Empty;
             model.CertificateNumber = dataValues.XpathsValues["CertificateNumber"] != null ? dataValues.XpathsValues["CertificateNumber"] : string.Empty;
