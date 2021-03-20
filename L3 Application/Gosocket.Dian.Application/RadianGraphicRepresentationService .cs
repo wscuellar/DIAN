@@ -104,8 +104,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-            //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
             ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
             
             model = MappingXpathValues(model, fieldValues);
@@ -323,7 +323,7 @@
 
             string htmlEvent = "";
             htmlEvent += "<td>";
-            htmlEvent += "<div id='EventNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{OperationDetails}</a></div> ";
+            htmlEvent += "<div id='EventNumber' class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventNumber}</a></div> ";
 
             if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "043" || model.EventCode == "045")
             {
@@ -647,7 +647,8 @@
                 { "SenderDocumentType","//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme'][1]/*[local-name()='CompanyID']/@schemeName" },
                 { "Note","//*[local-name()='ApplicationResponse']/*[local-name()='Note']" },
                 { "SignedBy","//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Signature']/*[local-name()='Object']/*[local-name()='QualifyingProperties']/*[local-name()='SignedProperties']/*[local-name()='SignedSignatureProperties']/*[local-name()='SignerRole']/*[local-name()='ClaimedRoles']/*[local-name()='ClaimedRole']" },
-                { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
+                { "EventNumber","//*[local-name()='ApplicationResponse']/*[local-name()='ID']" },
+                { "EventCode","//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']" },
                 { "EventTotalValueAval","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionAvalar']/*[local-name()='Value'])[1]" },
                 { "EventTotalValueEndoso","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionNegociacion']/*[local-name()='Value'])[1]" },
                 { "EventTotalValueLimitation","(//*[local-name()='ApplicationResponse']/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='CustomTagGeneral']/*[local-name()='InformacionMedidaCautelar']/*[local-name()='Value'])[1]" },
