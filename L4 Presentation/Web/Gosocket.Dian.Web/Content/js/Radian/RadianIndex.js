@@ -157,6 +157,7 @@ function AlertExecLogin(operation) {
             callback: function () {
                 operation != null && operation();
                 location.reload();
+                window.location.href = window.location.href;
                 operationClick = false;
             }
         }
