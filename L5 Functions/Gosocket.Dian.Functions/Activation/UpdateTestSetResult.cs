@@ -1,14 +1,9 @@
 using Gosocket.Dian.Application;
-using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
-using Gosocket.Dian.Functions.Others;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Interfaces.Repositories;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -37,7 +32,6 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private static readonly TableManager tableGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
 
