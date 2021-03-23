@@ -269,8 +269,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(documentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
                 XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
-                int[] arrayAllowanceCharge = new int[allowanceChargeListResponse.Count];
+                XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");
+               
                 int tempID = 0;
+                //Consecutivo regla DSBC02
+                for (int i = 0; i < deliveryTermsListResponse.Count; i++)
+                {
+                    var xmlID = Convert.ToInt32(deliveryTermsListResponse.Item(i).SelectNodes("//*[local-name()='DeliveryTerms']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+
+                    if (i == 0)
+                        tempID = xmlID;
+                    else
+                    {
+                        if (!int.Equals(xmlID, tempID + 1))
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "DSBC02",
+                                ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                        else
+                            tempID = Convert.ToInt32(xmlID);
+                    }
+                }
+
+
+                //Consecutivo regla DSAQ02
                 for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
                     var xmlID = Convert.ToInt32(allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
@@ -946,8 +975,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-        #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null)
+        #region Validate SenderCode and ReceiverCode        
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude,
+            List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null,
+            string partyLegalEntityName = null, string partyLegalEntityCompanyID = null, string availabilityCustomizationId = null)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -1245,6 +1276,64 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = errorMessageParty,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+
+                    // EndosoPropiedad
+                    if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
+                        && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
+                    {
+                        if (partyLegalEntityName != nitModel.IssuerPartyName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG03",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG03_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (partyLegalEntityCompanyID != nitModel.IssuerPartyCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        var receiverNameEndoso = xmlParserCude.Fields["ReceiverName"].ToString();
+                        var receiverCodeEndoso = xmlParserCude.Fields["ReceiverCode"].ToString();
+                        var receiverPartyLegalEntityCompanyID = xmlParserCude.Fields["ReceiverPartyLegalEntityCompanyID"].ToString();
+                        var receiverPartyLegalEntityName = xmlParserCude.Fields["ReceiverPartyLegalEntityName"].ToString();
+
+                        if (receiverNameEndoso != receiverPartyLegalEntityName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG13",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG13"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (receiverCodeEndoso != receiverPartyLegalEntityCompanyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG14",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG14"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
 
                     return responses;
@@ -3309,6 +3398,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                isValid = true;
+                var sheldHolderTaxLevelCodeItems = xpathValues["PartyTaxSchemeTaxLevelCodes"].Split(';');
+                foreach (var item in sheldHolderTaxLevelCodeItems)
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        var sheldHolderTaxLevelCodes = item.Split(';');
+                        foreach (var code in sheldHolderTaxLevelCodes)
+                            if (!typeListvalues.Contains(code))
+                            {
+                                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "DSAJ62", ErrorMessage = "Responsabilidad informada por participantes no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                                isValid = false;
+                                break;
+                            }
+                    }
+                if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "DSAJ62", ErrorMessage = "Responsabilidad informada por participantes válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else
             {
@@ -4924,20 +5030,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "037") response.errorCodeEndoso = "LGC26";
             if (eventCode == "038") response.errorCodeEndoso = "LGC29";
             if (eventCode == "039") response.errorCodeEndoso = "LGC32";
-
-            else if (eventCode == "036")
-            {
-                response.errorCode = "AAF01a";
-                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01a_036");
-                response.errorCodeB = "AAF01b";
-                response.errorMessageB = ConfigurationManager.GetValue("ErrorMessage_AAF01b_036");              
-            }
+           
             else if (eventCode == "035")
             {
                 response.errorCode = "AAF01";
                 response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_035");
                 response.errorCodeNoteA = "AAD11a";
                 response.errorMessageNoteA = ConfigurationManager.GetValue("ErrorMessage_AAD11a");
+            }
+            else if (eventCode == "036")
+            {
+                response.errorCode = "AAF01a";
+                response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01a_036");
+                response.errorCodeB = "AAF01b";
+                response.errorMessageB = ConfigurationManager.GetValue("ErrorMessage_AAF01b_036");
             }
             else if (eventCode == "037")
             {
