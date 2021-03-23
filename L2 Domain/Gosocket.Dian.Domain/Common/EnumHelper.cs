@@ -811,9 +811,9 @@ namespace Gosocket.Dian.Domain.Common
         CancelacionEndosoProcuracion = 402,
         [Description("Tacha de endosos por endoso en retorno")]
         TachaEndosoRetorno= 403,
-        [Description("Auto que decreta medida cautelar por embargo")]
+        [Description("Limitación para circulación de la FEV TV - Auto que decreta medida cautelar por embargo")]
         MedidaCautelarEmbargo = 411,
-        [Description("Auto que decreta medida cautelar por mandamiento de pago")]
+        [Description("Limitación para circulación de la FEV TV - Auto que decreta medida cautelar por mandamiento de pago")]
         MedidaCautelarMandamiento = 412,        
         [Description("Terminación de limitación por sentencia")]
         TerminacionSentencia = 421,
