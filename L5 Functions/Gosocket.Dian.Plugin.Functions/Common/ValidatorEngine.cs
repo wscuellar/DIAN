@@ -589,6 +589,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string receiverCancelacion = String.Empty;
             string issuerAttorney = string.Empty;
             string senderAttorney = string.Empty;
+            string trackIdAvailability = null;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -640,6 +641,40 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
+            else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96",
+                    "0" + (int)EventStatus.SolicitudDisponibilizacion);
+                if (documentMeta != null || documentMeta.Count > 0)
+                {
+                    // se filtra por CustomizationID y se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
+                    documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
+                    // ...
+                    foreach (var itemDocumentMeta in documentMeta)
+                    {
+                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                        if (documentValidator != null)
+                        {
+                            trackIdAvailability = itemDocumentMeta.PartitionKey;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
+            if ((Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(trackIdAvailability)))
+            {
+                var availabilityXmlBytes = await GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                partyLegalEntityName = availabilityXmlParser.Fields["PartyLegalEntityName"].ToString();
+                partyLegalEntityCompanyID = availabilityXmlParser.Fields["PartyLegalEntityCompanyID"].ToString();
+                availabilityCustomizationId = availabilityXmlParser.Fields["CustomizationId"].ToString();
+            }
+
 
             if (eventCode == (int)EventStatus.TerminacionMandato)
             {
@@ -694,7 +729,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Enodsatario Anulacion endoso
                 nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
-                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList, issuerAttorney, senderAttorney));
+                validateResponses.AddRange(validator.ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList,
+                    issuerAttorney, senderAttorney, partyLegalEntityName, partyLegalEntityCompanyID, availabilityCustomizationId));
             }
             return validateResponses;
         }
@@ -867,7 +903,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     { "ReceiverTaxLevelCodes", "/sig:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode"},
                     { "DeliveryTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" },
                     { "SheldHolderTaxLevelCodes", "/sig:Invoice/cac:Delivery/cac:DeliveryParty/cac:PartyTaxScheme/cbc:TaxLevelCode" },
-                    { "InvoiceTypeCode","/sig:Invoice/cbc:InvoiceTypeCode" }
+                    { "InvoiceTypeCode","/sig:Invoice/cbc:InvoiceTypeCode" },
+                    { "PartyTaxSchemeTaxLevelCodes", "/sig:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cac:ShareholderParty/cac:Party/cac:PartyTaxScheme/cbc:TaxLevelCode" },
             };
             return dictionary;
         }
