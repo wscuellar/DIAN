@@ -3303,12 +3303,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 foreach (var code in deliveryTaxLevelCodes)
                     if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
                     {
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                         isValid = false;
                         break;
                     }
                 if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else
             {
