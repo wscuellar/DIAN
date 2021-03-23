@@ -4,14 +4,13 @@ function OnBeginAjax(response) {
 }
 
 function OnSuccessAjax(response) {
-    debugger
     if (response.Code == 200) {
         window.location.href = response.Message;
-    } else { 
+    } else {
         hideLoading("#panel-forma");
         var confirmMessage = response.Message;
         var closeEvent = () => { }
-        var buttons = response.Message.indexOf('Captcha') > 0 ? AlertExecLogin() : AlertExec();
+        var buttons = AlertExecLoggin2();
         showConfirmation(confirmMessage, buttons, null, closeEvent);
     }
 }
@@ -20,4 +19,23 @@ function OnFailureAjax(response) {
     var confirmMessage = response.responseJSON.message;
     var buttons = AlertExec();
     showConfirmation(confirmMessage, buttons);
+}
+
+
+function AlertExecLoggin2() {
+    return {
+        del: {
+            label: "Aceptar",
+            className: "btn-radian-default",
+            callback: function () {
+                if (location.href.indexOf('tlogin=1') == -1) {
+                    window.location.href = window.location.href + "?tlogin=1";
+                }
+                else {
+                    window.location.reload();
+                }                   
+                operationClick = false;
+            }
+        }
+    }
 }

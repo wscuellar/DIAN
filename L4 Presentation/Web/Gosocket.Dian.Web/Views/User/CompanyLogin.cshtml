@@ -46,14 +46,14 @@
                 </a>
 
                 <!-- company -->
-                <a href="#" class="list-group-item text-center active cCompany">
+                <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center active">
                     <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
                 </a>
 
                 <!-- external user -->
                 @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
-                </a>*@
+                        <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
+                    </a>*@
 
                 <!-- person -->
                 <a href="@Url.Action("PersonLogin", "User")" class="list-group-item text-center">
@@ -70,7 +70,7 @@
                 </a>
             </div>
         </div>
-        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab cardsLogin"  style="display: none">
 
             <div class="container-fluid" id="panel-form-login">
                 <center><a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a></center>
@@ -128,33 +128,43 @@
 
         $(document).ready(function () {
             var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
-
-            $(".pxLogin").hide();
-
-            $('.cCompany').click(function () {
-                $("#panel-form-login").show();
+            $(".cardsLogin").show();
+            if (location.href.indexOf('tlogin=1') > 0) {
+                showLoading("#panel-forma", "Validando datos", "Por favor esperar");
                 $(".pxLogin").hide();
-            });
-
-            $('#legalRepresentative').click(function () {
                 $("#panel-form-login").hide();
                 $(".companyLogin").show();
-                cleanFields();
-            });
+                hideLoading("#panel-forma");
+            }
+            else {
 
-            $('#authorizedUser').click(function () {
-                $("#panel-form-login").hide();
-                $(".userExLogin").show();
-                cleanFields();
-            });
+                    $(".pxLogin").hide();
 
-            $('.certificate-login-link').click(function () {
-                window.location = '@ConfigurationManager.GetValue("CertificateLoginUrl")';
-            });
+                    $('.cCompany').click(function () {
+                        $("#panel-form-login").show();
+                        $(".pxLogin").hide();
+                    });
 
-            $('.list-group-item').click(function () {
-                cleanFields();
-            });
+                    $('#legalRepresentative').click(function () {
+                        $("#panel-form-login").hide();
+                        $(".companyLogin").show();
+                        cleanFields();
+                    });
+
+                    $('#authorizedUser').click(function () {
+                        $("#panel-form-login").hide();
+                        $(".userExLogin").show();
+                        cleanFields();
+                    });
+
+                    $('.certificate-login-link').click(function () {
+                        window.location = '@ConfigurationManager.GetValue("CertificateLoginUrl")';
+                    });
+
+                    $('.list-group-item').click(function () {
+                        cleanFields();
+                    });
+            }
 
             var cleanFields = function () {
                 $('.field-validation-error').html('');

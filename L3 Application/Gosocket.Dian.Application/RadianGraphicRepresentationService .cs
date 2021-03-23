@@ -104,8 +104,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
             ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
             
             model = MappingXpathValues(model, fieldValues);
@@ -138,7 +138,6 @@
                         model.Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
                     break;
                 case EventStatus.EndosoGarantia:
-                    model.Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
                     model.RequestType = eventItem.EventCode;
                     break;
@@ -385,7 +384,7 @@
 
             string htmlInvoice = "";
             htmlInvoice += "<td>";
-            htmlInvoice += "<div class='text-subtitle text-gray'> Número de Factura: <a class='text-data'>{InvoiceNumber}</a></div> ";
+            htmlInvoice += "<div class='text-subtitle text-gray'> Número de Factura: <a class='text-data'></a></div> ";
             htmlInvoice += "<div class='text-subtitle text-gray'> CUFE: <a class='text-data cufe'>{CUFE}</a></div>";
             htmlInvoice += "</td>";
             htmlInvoice += "<td>";
@@ -404,7 +403,7 @@
             if (model.EventCode == "040" || model.EventCode == "042" || model.EventCode == "044") {
                 string htmlReference = "";
                 htmlReference += "<td>";
-                htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventCode}</a></div>";
+                htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{InvoiceNumber}</a></div>";
                 htmlReference += "<div id='CUDE' class='text-subtitle text-gray'>CUDE: <a class='text-data cude'>{CUDEReference}</a></div>";
                 htmlReference += "</td>";
                 htmlReference += "<td>";
