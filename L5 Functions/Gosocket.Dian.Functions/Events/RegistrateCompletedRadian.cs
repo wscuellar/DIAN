@@ -26,6 +26,7 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -87,6 +88,14 @@ namespace Gosocket.Dian.Functions.Events
 
                     //Inserta registros AR en GlobalDocRegisterProviderAR
                     InsertGlobalDocRegisterProviderAR(documentRegisterAR);
+
+                    //Obtiene informacion de GlobalDocAssociate
+                    GlobalDocAssociate validatorDocumentAssociate = TableManagerGlobalDocAssociate.Find<GlobalDocAssociate>(documentMeta.DocumentReferencedKey, trackIdCude);
+                    if(validatorDocumentAssociate != null)
+                    {
+                        validatorDocumentAssociate.Active = true;
+                        InsertGlobalDocAssociate(validatorDocumentAssociate);
+                    }
 
                     //Actualiza registro Mandato asociado a la Factura, terminacion de mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
@@ -277,6 +286,13 @@ namespace Gosocket.Dian.Functions.Events
         }
         #endregion
 
+        #region InsertGlobalDocAssociate
+        private static void InsertGlobalDocAssociate(GlobalDocAssociate documentAssociate)
+        {
+            var arrayTasks = new List<Task>();
+            arrayTasks.Add(TableManagerGlobalDocAssociate.InsertOrUpdateAsync(documentAssociate));
+        }
+        #endregion
 
         #region InsertGlobalDocRegisterProviderAR
         private static void InsertGlobalDocRegisterProviderAR(GlobalDocRegisterProviderAR documentRegisterAR)
