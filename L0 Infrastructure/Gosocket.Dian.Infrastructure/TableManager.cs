@@ -594,6 +594,7 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
         public List<T> FindpartitionKey<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
@@ -602,6 +603,7 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
         public List<T> FindDocumentReferenceAttorneyFaculitity<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
