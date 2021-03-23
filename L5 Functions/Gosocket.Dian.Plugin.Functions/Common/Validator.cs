@@ -3296,6 +3296,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (isValid && receiverTaxLevelCodes.Any())
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAK26", ErrorMessage = "Responsabilidad informada para receptor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
+
+                //delivery tax level code validation
+                isValid = true;
+                var deliveryTaxLevelCodes = xpathValues["DeliveryTaxLevelCodes"].Split(';');
+                foreach (var code in deliveryTaxLevelCodes)
+                    if (!string.IsNullOrEmpty(code) && !typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && deliveryTaxLevelCodes.Any(d => !string.IsNullOrEmpty(d)))
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else
             {
