@@ -19,14 +19,6 @@
             AssociatedEvents = new List<AssociatedEventsModel>();
         }
 
-        public EventDataModel(GlobalDocValidatorDocumentMeta eventItem)
-        {
-            Validations = new List<AssociatedValidationsModel>();
-            References = new List<AssociatedReferenceModel>();
-            AssociatedEvents = new List<AssociatedEventsModel>();
-
-
-        }
 
         public string Title { get; set; }
         public string CUDE { get; set; }

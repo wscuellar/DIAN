@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System.Collections.Generic;
 
 namespace Gosocket.Dian.Domain.Entity
 {
@@ -15,4 +16,38 @@ namespace Gosocket.Dian.Domain.Entity
         public string Identifier { get; set; }
 
     }
+
+    public class EventDocument
+    {
+        public EventDocument()
+        {
+            Notifications = new List<GlobalDocValidatorTracking>();
+        }
+        /// <summary>
+        /// Identificador de la factura
+        /// </summary>
+        public string Cufe { get; set; }
+        /// <summary>
+        /// Si tiene validaciones o no (true/false)
+        /// </summary>
+        public bool IsNotifications { get; set; }
+        /// <summary>
+        /// Eventos asociado a la factura
+        /// </summary>
+        public GlobalDocAssociate Associate { get; set; }
+        /// <summary>
+        /// Informacion general del evento
+        /// </summary>
+        public GlobalDocValidatorDocumentMeta Event { get; set; }
+        /// <summary>
+        /// Informacion resumen de la validacion
+        /// </summary>
+        public GlobalDocValidatorDocument Document { get; set; }
+        /// <summary>
+        /// Validaciones
+        /// </summary>
+        public List<GlobalDocValidatorTracking> Notifications { get; set; }
+
+    }
+
 }

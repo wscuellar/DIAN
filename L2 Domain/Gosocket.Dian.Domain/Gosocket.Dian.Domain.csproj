@@ -183,7 +183,6 @@
     <Compile Include="Entity\GlobalDocReferenceAttorney.cs" />
     <Compile Include="Entity\GlobalDocRegisterProviderAR.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocument.cs" />
-    <Compile Include="Entity\GlobalDataDocument.cs" />
     <Compile Include="Entity\GlobalDocumentType.cs" />
     <Compile Include="Entity\GlobalDocValidatorCategory.cs" />
     <Compile Include="Entity\GlobalDocValidatorDocumentMeta.cs" />
