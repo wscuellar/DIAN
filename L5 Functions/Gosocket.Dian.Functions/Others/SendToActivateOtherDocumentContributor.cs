@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
 using Gosocket.Dian.Domain;
-
+using System.Globalization;
 
 namespace Gosocket.Dian.Functions.Others
 {
@@ -22,8 +22,8 @@ namespace Gosocket.Dian.Functions.Others
     {        
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly ContributorService contributorService = new ContributorService();
-        private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetOthersDocumentsResult");
-        private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();
+        private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetOthersDocumentsResult");      
+        private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();       
 
         [FunctionName("SendToActivateOtherDocumentContributor")]
 
@@ -41,6 +41,14 @@ namespace Gosocket.Dian.Functions.Others
                     throw new Exception("Request body is empty.");
                 SetLogger(data, "Step STA-1.1", "Data", "SEND-00");
 
+                var start = DateTime.UtcNow;
+                var startSendToActivateOtherDocument = new GlobalLogger(data.TestSetId, "1 Start SendToActivateOtherDocument")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Start SendToActivateOtherDocument"
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
+
                 //Se obtiene participante otros documentos habilitacion
                 OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
@@ -49,6 +57,15 @@ namespace Gosocket.Dian.Functions.Others
 
                 try
                 {
+                    start = DateTime.UtcNow;
+                    var startSendContributorId = new GlobalLogger(data.TestSetId, "2 sendContributorId")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "startSendContributorId ContributorId: " + data.ContributorId
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendContributorId);
+
+
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
                     SetLogger(null, "Step STA-2", " -- Validaciones OK-- ", "SEND-02");
@@ -89,6 +106,17 @@ namespace Gosocket.Dian.Functions.Others
                                             + data.SoftwareType
                                             , "SEND-10");
 
+                    start = DateTime.UtcNow;
+                    var startOtehrDocElecContributor = new GlobalLogger(data.TestSetId, "3 startOtehrDocElecContributor")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "startOtehrDocElecContributor ContributorId:" + otherDocElecContributor.ContributorId +
+                        " OtherDocElecContributorTypeId: " + otherDocElecContributor.OtherDocElecContributorTypeId +
+                        " SoftwareId: " + data.SoftwareId +
+                        " SoftwareType: " + data.SoftwareType
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
+
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledOtherDocElecContributor(
                       otherDocElecContributor.ContributorId,
@@ -98,7 +126,7 @@ namespace Gosocket.Dian.Functions.Others
 
                     //Se habilita el contribuyente en la table Storage
                     globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
-
+                  
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
@@ -116,7 +144,8 @@ namespace Gosocket.Dian.Functions.Others
                         Url = data.Url,
                         ElectronicDocumentId = otherDocElecContributor.ElectronicDocumentId,
                         SoftwareProvider = data.SoftwareId,
-                        ProviderId = results.ProviderId
+                        ProviderId = results.ProviderId,
+                        TestSetOthersDocumentsResultObj = results
                     };
 
                     //Se envia para la creacion en prod.
@@ -124,6 +153,13 @@ namespace Gosocket.Dian.Functions.Others
 
                     SetLogger(activateOtherDocumentContributorRequestObject, "Step STA-7", " -- SendToActivateOtherDocumentContributorToProduction -- ", "SEND-11");
 
+                    start = DateTime.UtcNow;
+                    var finishSendContributorId = new GlobalLogger(data.TestSetId, "4 finishSendContributorId")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "finish SendToActivateOtherDocument"
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
 
                 }
                 catch (Exception ex)
@@ -215,6 +251,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "url")]
             public string Url { get; set; }
+
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }
         }
 
         class OtherDocumentActivateContributorRequestObject
@@ -262,6 +301,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "providerId")]
             public int ProviderId { get; set; }
+
+            [JsonProperty(PropertyName = "testSetOthersDocumentsResult")]
+            public GlobalTestSetOthersDocumentsResult TestSetOthersDocumentsResultObj { get; set; }
         }
     }
 }

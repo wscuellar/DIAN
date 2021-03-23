@@ -785,6 +785,18 @@ namespace Gosocket.Dian.Domain.Common
         MandatoGenerarlTiempo = 433,
         [Description("Mandato General de la FEV TV por documento Limitado por tiempo Ilimitado")]
         MandatoGenerarlTiempoIlimitado = 434,
+
+
+        [Description("Mandato Especial de la FEV TV por documento General por tiempo limitado")]
+        MandatoGenerarlLimitadoEspecial = 4131,
+        [Description("Mandato Especial  de la FEV TV por documento General por tiempo Ilimitado")]
+        MandatoGenerarlIlimitadoEspecial = 4321,
+        [Description("Mandato Especial de la FEV TV por documento Limitado por tiempo limitado")]
+        MandatoGenerarlTiempoEspecial = 4331,
+        [Description("Mandato  Especial de la FEV TV por documento Limitado por tiempo Ilimitado")]
+        MandatoGenerarlTiempoIlimitadoEspecial = 4341,
+
+
         [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación General")]
         PrimeraSolicitudDisponibilizacion = 361,
         [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación Directa Previa")]
@@ -799,9 +811,9 @@ namespace Gosocket.Dian.Domain.Common
         CancelacionEndosoProcuracion = 402,
         [Description("Tacha de endosos por endoso en retorno")]
         TachaEndosoRetorno= 403,
-        [Description("Auto que decreta medida cautelar por embargo")]
+        [Description("Limitación para circulación de la FEV TV - Auto que decreta medida cautelar por embargo")]
         MedidaCautelarEmbargo = 411,
-        [Description("Auto que decreta medida cautelar por mandamiento de pago")]
+        [Description("Limitación para circulación de la FEV TV - Auto que decreta medida cautelar por mandamiento de pago")]
         MedidaCautelarMandamiento = 412,        
         [Description("Terminación de limitación por sentencia")]
         TerminacionSentencia = 421,

@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
+        private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
 
         // Set queue name
         private const string queueName = "activate-radian-operation-input";
@@ -187,6 +188,11 @@ namespace Gosocket.Dian.Functions.Radian
                     if (IsProduction)
                         GlobalRadianOperationsTableManager.InsertOrUpdateAsync(globalRadianOperations).Wait();
 
+                    //Se inserta en RadianTestSetResult
+                    if (IsProduction)
+                        TableManagerRadianTestSetResult.InsertOrUpdateAsync(requestObject.RadianTestSetObj).Wait();
+
+
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ");
 
 
@@ -254,6 +260,9 @@ namespace Gosocket.Dian.Functions.Radian
 
             [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "radianTestSetObj")]
+            public RadianTestSetResult RadianTestSetObj { get; set; }
         }
 
         /// <summary>

@@ -94,6 +94,7 @@
         public string CUDEReference { get; set; }
         public string EventCodeReference { get; set; }
         public string DescriptionReference { get; set; }
+        public string SchemeID { get; set; }
     }
 
     public class AssociatedValidationsModel

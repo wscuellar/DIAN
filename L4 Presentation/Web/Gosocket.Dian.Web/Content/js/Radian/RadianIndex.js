@@ -149,6 +149,21 @@ function AlertExec(operation) {
     }
 }
 
+function AlertExecLogin(operation) {
+    return {
+        del: {
+            label: "Aceptar",
+            className: "btn-radian-default",
+            callback: function () {
+                operation != null && operation();
+                location.reload();
+                window.location.href = window.location.href;
+                operationClick = false;
+            }
+        }
+    }
+}
+
 
 function ajaxFunction(url,metod,data,actionError,actionSuccess) {
     $.ajax({
