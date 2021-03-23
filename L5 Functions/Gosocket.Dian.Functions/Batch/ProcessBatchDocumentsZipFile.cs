@@ -26,8 +26,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly string blobContainer = "global";
         private static readonly string blobContainerFolder = "batchValidator";
         private static readonly FileManager fileManager = new FileManager();
-        private static readonly TableManager tableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
-        private static readonly TableManager tableManagerGlobalBatchFileFailed = new TableManager("GlobalBatchFileFailed");
+        private static readonly TableManager tableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");       
         private static readonly TableManager tableManagerbatchFileResult = new TableManager("GlobalBatchFileResult");
         private static readonly TableManager tableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
         private static readonly TableManager tableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
@@ -35,8 +34,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
-        private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
+        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");    
 
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
