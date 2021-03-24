@@ -114,14 +114,19 @@ namespace Gosocket.Dian.Application
                     Title = "Aval de la FEV TV";
                     break;
                 case EventStatus.Mandato:
-                    if (CustomizationID.Equals("431"))
-                        Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlIlimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
-                    if (CustomizationID.Equals("432"))
-                        Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlLimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
-                    if (CustomizationID.Equals("433"))
-                        Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoEspecial : SubEventStatus.MandatoGenerarlTiempo);
-                    if (CustomizationID.Equals("434"))
-                        Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoIlimitadoEspecial : SubEventStatus.MandatoGenerarlTiempoIlimitado);
+                    if (!string.IsNullOrEmpty(SchemeID))
+                    {
+                        if (CustomizationID.Equals("431"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlIlimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
+                        if (CustomizationID.Equals("432"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlLimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
+                        if (CustomizationID.Equals("433"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoEspecial : SubEventStatus.MandatoGenerarlTiempo);
+                        if (CustomizationID.Equals("434"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoIlimitadoEspecial : SubEventStatus.MandatoGenerarlTiempoIlimitado);
+                    }
+                    else
+                        Title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), EventCode));
                     break;
                 case EventStatus.TerminacionMandato:
                     if (CustomizationID.Equals("441"))
@@ -231,7 +236,7 @@ namespace Gosocket.Dian.Application
                 allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
                 allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
-            } 
+            }
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
             var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ToList();
 
@@ -281,7 +286,7 @@ namespace Gosocket.Dian.Application
 
             return cleanDictionary;
         }
-         
+
         private List<GlobalDocValidatorDocumentMeta> removeEvents(List<GlobalDocValidatorDocumentMeta> events, EventStatus conditionalStatus, List<string> removeData)
         {
             if (events.Count > 0 && events.Last().EventCode == $"0{(int)conditionalStatus }")
