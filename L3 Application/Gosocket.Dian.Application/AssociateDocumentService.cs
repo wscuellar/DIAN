@@ -122,19 +122,21 @@ namespace Gosocket.Dian.Application
             //Mandatos (DocumentReferencesAttorney)
             Task operation4 = Task.Run(() =>
             {
-                //Documentos
+                //Lista la referencias de mandato
                 List<GlobalDocReferenceAttorney> attorneys = new List<GlobalDocReferenceAttorney>();
                 for (int i = 0; i < associations.Count; i++)
                 {
                     attorneys.AddRange(GlobalDocReferenceAttorneyTableManager.FindByPartition<GlobalDocReferenceAttorney>(associations[i].RowKey));
                 }
 
+                //Organiza los cufes para la busqueda
                 var attorneyCudes = attorneys.Select(t => new
                 {
                     OriginalCude = t.PartitionKey,
                     CancelAttorneyCude = t.DocReferencedEndAthorney ?? string.Empty
                 }).ToList();
 
+                //Obtiene los eventos de la documentMeta
                 for (int i = 0; i < attorneyCudes.Count; i++)
                 {
                     meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyCudes[i].OriginalCude, attorneyCudes[i].OriginalCude));
@@ -148,6 +150,7 @@ namespace Gosocket.Dian.Application
             arrayTasks.Add(operation2);
             arrayTasks.Add(operation3);
             arrayTasks.Add(operation4);
+
             Task.WhenAll(arrayTasks).Wait();
 
             return invoice;
