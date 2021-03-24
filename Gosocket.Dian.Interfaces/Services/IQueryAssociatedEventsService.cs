@@ -8,8 +8,8 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IQueryAssociatedEventsService
     {
         List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments);
-        GlobalDocValidatorDocumentMeta DocumentValidation(string reference);
-        string EventTitle(EventStatus eventStatus, string customizationId, string eventCode);
+        GlobalDocValidatorDocumentMeta DocumentValidation(string reference); 
+        string EventTitle (EventStatus eventStatus, string customizationId, string eventCode, string SchemeID);
         Domain.Entity.GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem);
         Domain.Entity.GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId);
         Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "");

@@ -46,18 +46,22 @@ namespace Gosocket.Dian.Application
                 List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();
                 List<GlobalDocValidatorDocument> documents = new List<GlobalDocValidatorDocument>();
                 List<GlobalDocValidatorTracking> notifications = new List<GlobalDocValidatorTracking>();
+                List<GlobalDocReferenceAttorney> attorneys = new List<GlobalDocReferenceAttorney>();
 
-                GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, documents, notifications, cufe);
+                GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, documents, notifications, attorneys, cufe);
 
                 //Unifica la data
                 var eventDoc = from associate in events
                                join docMeta in meta on associate.RowKey equals docMeta.PartitionKey
                                join document in documents on docMeta.Identifier equals document.PartitionKey
+                               join attorney in attorneys on docMeta.PartitionKey equals attorney.PartitionKey into left
+                               from item in left.DefaultIfEmpty()
                                select new EventDocument()
                                {
                                    Cufe = cufe,
                                    Associate = associate,
                                    Event = docMeta,
+                                   Attorney = item,
                                    Document = document,
                                    IsNotifications = notifications.Any(t => t.PartitionKey == document.DocumentKey),
                                    Notifications = notifications.Where(t => t.PartitionKey == document.DocumentKey).ToList()
@@ -79,7 +83,7 @@ namespace Gosocket.Dian.Application
         }
 
 
-        private GlobalDocValidatorDocumentMeta OperationProcess(List<GlobalDocAssociate> associations, List<GlobalDocValidatorDocumentMeta> meta, List<GlobalDocValidatorDocument> documents, List<GlobalDocValidatorTracking> notifications, string cufe)
+        private GlobalDocValidatorDocumentMeta OperationProcess(List<GlobalDocAssociate> associations, List<GlobalDocValidatorDocumentMeta> meta, List<GlobalDocValidatorDocument> documents, List<GlobalDocValidatorTracking> notifications, List<GlobalDocReferenceAttorney> attorneys, string cufe)
         {
             List<Task> arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta invoice = new GlobalDocValidatorDocumentMeta();
@@ -90,7 +94,7 @@ namespace Gosocket.Dian.Application
                 invoice = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cufe, cufe);
             });
 
-            //Consulta documentos en la meta
+            //Consulta documentos en la meta para los eventos
             Task operation2 = Task.Run(() =>
             {
                 for (int i = 0; i < associations.Count; i++)
@@ -123,7 +127,6 @@ namespace Gosocket.Dian.Application
             Task operation4 = Task.Run(() =>
             {
                 //Lista la referencias de mandato
-                List<GlobalDocReferenceAttorney> attorneys = new List<GlobalDocReferenceAttorney>();
                 for (int i = 0; i < associations.Count; i++)
                 {
                     attorneys.AddRange(GlobalDocReferenceAttorneyTableManager.FindByPartition<GlobalDocReferenceAttorney>(associations[i].RowKey));

@@ -643,6 +643,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.Events = new List<EventsViewModel>();
             List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
+            GlobalDocReferenceAttorney attorney; 
+            string eventcodetext = string.Empty;
             if (eventsByInvoice.Any())
             {
                 foreach (var eventItem in eventsByInvoice)
@@ -653,8 +655,20 @@ namespace Gosocket.Dian.Web.Controllers
 
                         if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
+                            attorney = new GlobalDocReferenceAttorney();
+                            eventcodetext = string.Empty;
+                            if (eventItem.EventCode == "043")
+                            {
+                                attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
+                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                eventItem.CustomizationID, eventItem.EventCode, attorney?.SchemeID);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            }
+                            else
+                            {
+                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                eventItem.CustomizationID, eventItem.EventCode, string.Empty);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            }
 
-                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
                             model.Events.Add(new EventsViewModel()
                             {
                                 DocumentKey = eventItem.DocumentKey,
@@ -670,7 +684,6 @@ namespace Gosocket.Dian.Web.Controllers
                             if (eventItem.EventCode == "043")
                             {
                                 //Se busca en la GlobalDocReferenceAttorney 
-                                GlobalDocReferenceAttorney attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
                                 //En el campo DocReferencedEndAttorney si tiene valor 
                                 if (attorney != null && !string.IsNullOrEmpty(attorney.DocReferencedEndAthorney))
                                 {
@@ -678,7 +691,8 @@ namespace Gosocket.Dian.Web.Controllers
                                     GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
                                     if (eventEndMandate != null)
                                     {
-                                        eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
+                                        eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode.ToString()),
+                                             eventEndMandate.CustomizationID, eventEndMandate.EventCode, attorney.SchemeID);//  EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
                                         model.Events.Add(new EventsViewModel()
                                         {
                                             DocumentKey = eventEndMandate.DocumentKey,
@@ -692,6 +706,7 @@ namespace Gosocket.Dian.Web.Controllers
                                         });
                                     }
                                 }
+
                             }
 
                         }
@@ -1049,7 +1064,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             eveOrder = removeEvents(eveOrder, EventStatus.InvoiceOfferedForNegotiation, new List<string>() { $"0{(int)EventStatus.EndosoProcuracion}", $"0{ (int)EventStatus.EndosoGarantia}" });
             eveOrder = removeEvents(eveOrder, EventStatus.AnulacionLimitacionCirculacion, new List<string>() { $"0{(int)EventStatus.NegotiatedInvoice}" });
-             
+
 
             foreach (var documentMeta in eveOrder)
             {
