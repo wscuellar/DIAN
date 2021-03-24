@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Application.Common;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.Common;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -53,6 +54,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
+        private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -4259,47 +4261,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufe.RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
-            GlobalDocValidatorDocument document = null;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();          
 
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId);
-            int count = 0;
-            //Validación de la Sección prerrequisitos Solicitud Disponibilizacion Task 719
-            foreach (var documentIdentifier in documentMeta)
+            responses.Add(new ValidateListResponse
             {
-                document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier);
-                if (document != null)
-                {
-                    foreach (var eventCode in documentMeta)
-                    {
-                        switch (eventCode.EventCode)
-                        {
-                            case "030":
-                            case "032":
-                            case "033":
-                            case "034":
-                                if (eventCode.Identifier == document.PartitionKey)
-                                {
-                                    count++;
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-            if (count >= 3)
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = true,
-                    Mandatory = true,
-                    ErrorCode = "100",
-                    ErrorMessage = "Evento EventApproveCufe referenciado correctamente",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-            else
-            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento EventApproveCufe referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+            List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+            if (invoiceWrapper.Any() && !invoiceWrapper[0].Invoice.IsInvoiceTV)
+            {               
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
@@ -4308,7 +4283,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
+
+                return responses;
             }
+                   
             return responses;
         }
         #endregion

@@ -644,12 +644,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
             else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
-            {
-                List<EventDocument> eventDocument = new List<EventDocument>();
+            {               
                 string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
-                eventDocument = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower()).Where(x => x.Event.EventCode == eventDisponibiliza).ToList();
-                if(eventDocument.Any())
-                    trackIdAvailability = eventDocument.FirstOrDefault().Event.PartitionKey;                
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
+                                           
+                if(InvoiceWrapper.Any())
+                    trackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventDisponibiliza).Event.PartitionKey;   
                 else
                 {
                     var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96",

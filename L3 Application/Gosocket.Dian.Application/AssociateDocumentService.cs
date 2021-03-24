@@ -25,21 +25,17 @@ namespace Gosocket.Dian.Application
             return "Ok";
         }
 
-
-
-        public List<EventDocument> GetEventsByTrackId(string trackId)
+        public List<InvoiceWrapper> GetEventsByTrackId(string trackId)
         {
             //Traemos las asociaciones de la factura = Eventos
             List<GlobalDocAssociate> associateDocumentList = TableManagerGlobalDocAssociate.FindpartitionKey<GlobalDocAssociate>(trackId.ToLower()).ToList();
             if (!associateDocumentList.Any())
-                return new List<EventDocument>();
+                return new List<InvoiceWrapper>();
 
             //Organiza grupos por factura
             var groups = associateDocumentList.Where(t => t.Active && !string.IsNullOrEmpty(t.Identifier)).GroupBy(t => t.PartitionKey);
-            List<EventDocument> responses = groups.Aggregate(new List<EventDocument>(), (list, source) =>
-            {
-                List<Task> arrayTasks = new List<Task>();
-
+            List<InvoiceWrapper> responses = groups.Aggregate(new List<InvoiceWrapper>(), (list, source) =>
+            {              
                 //obtenemos el cufe
                 string cufe = source.Key;
                 List<GlobalDocAssociate> events = source.ToList();
@@ -48,10 +44,11 @@ namespace Gosocket.Dian.Application
                 List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();
                 List<GlobalDocValidatorDocument> documents = new List<GlobalDocValidatorDocument>();
                 List<GlobalDocValidatorTracking> notifications = new List<GlobalDocValidatorTracking>();
-                OperationProcess(arrayTasks, events, meta, documents, notifications);
+
+                GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, documents, notifications, cufe);
 
                 //Unifica la data
-                list.AddRange(from associate in events
+                var eventDoc = from associate in events
                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey
                               join document in documents on docMeta.Identifier equals document.PartitionKey
                               select new EventDocument()
@@ -62,29 +59,46 @@ namespace Gosocket.Dian.Application
                                   Document = document,
                                   IsNotifications = notifications.Any(t => t.PartitionKey == document.DocumentKey),
                                   Notifications = notifications.Where(t => t.PartitionKey == document.DocumentKey).ToList()
-                              });
+                              };
 
+                InvoiceWrapper invoiceWrapper = new InvoiceWrapper()
+                {
+                    Cufe = cufe,
+                    Invoice = invoice,
+                    Events = eventDoc.OrderByDescending(t => t.Event.SigningTimeStamp).ToList()
+                };
 
+                list.Add(invoiceWrapper);
+                
                 return list;
             });
 
-            return responses.OrderByDescending(x => x.Event.SigningTimeStamp).ToList();
+            return responses;
         }
 
 
-        private void OperationProcess(List<Task> arrayTasks, List<GlobalDocAssociate> events, List<GlobalDocValidatorDocumentMeta> meta, List<GlobalDocValidatorDocument> documents, List<GlobalDocValidatorTracking> notifications)
+        private GlobalDocValidatorDocumentMeta OperationProcess(List<GlobalDocAssociate> events, List<GlobalDocValidatorDocumentMeta> meta, List<GlobalDocValidatorDocument> documents, List<GlobalDocValidatorTracking> notifications, string cufe)
         {
-            //Consulta documentos en la meta
+            List<Task> arrayTasks = new List<Task>();
+            GlobalDocValidatorDocumentMeta invoice = new GlobalDocValidatorDocumentMeta();
+
+            //Consulta documentos en la meta Factura
             Task operation1 = Task.Run(() =>
+            {               
+                 invoice = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cufe, cufe);               
+            });
+
+            //Consulta documentos en la meta
+            Task operation2 = Task.Run(() =>
             {
                 for (int i = 0; i < events.Count; i++)
                 {
                     meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(events[i].RowKey, events[i].RowKey));
                 }
             });
-
+            
             //Trae las notificaciones por los eventos
-            Task operation2 = Task.Run(() =>
+            Task operation3 = Task.Run(() =>
             {
                 //Documentos
                 for (int i = 0; i < events.Count; i++)
@@ -105,7 +119,10 @@ namespace Gosocket.Dian.Application
 
             arrayTasks.Add(operation1);
             arrayTasks.Add(operation2);
+            arrayTasks.Add(operation3);
             Task.WhenAll(arrayTasks).Wait();
+
+            return invoice;
         }
 
     }

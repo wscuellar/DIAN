@@ -50,4 +50,12 @@ namespace Gosocket.Dian.Domain.Entity
 
     }
 
+
+    public class InvoiceWrapper
+    {
+        public string Cufe { get; set; }
+        public GlobalDocValidatorDocumentMeta Invoice { get; set; }
+        public List<EventDocument> Events { get; set; }
+    }
+
 }

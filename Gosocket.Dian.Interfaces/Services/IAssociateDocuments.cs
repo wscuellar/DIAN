@@ -7,7 +7,7 @@ namespace Gosocket.Dian.Interfaces.Services
 {
     public interface IAssociateDocuments
     {
-        List<EventDocument> GetEventsByTrackId(string trackId);
+        List<InvoiceWrapper> GetEventsByTrackId(string trackId);
 
     }
 }
