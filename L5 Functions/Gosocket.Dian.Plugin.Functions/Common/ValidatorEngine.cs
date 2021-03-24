@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Plugin.Functions.Cufe;
@@ -26,7 +27,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
-
+        private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
+       
         #endregion
 
         public ValidatorEngine() { }
@@ -643,20 +645,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96",
-                    "0" + (int)EventStatus.SolicitudDisponibilizacion);
-                if (documentMeta != null || documentMeta.Count > 0)
+                List<EventDocument> eventDocument = new List<EventDocument>();
+                string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
+                eventDocument = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower()).Where(x => x.Event.EventCode == eventDisponibiliza).ToList();
+                if(eventDocument.Any())
+                    trackIdAvailability = eventDocument.FirstOrDefault().Event.PartitionKey;                
+                else
                 {
-                    // se filtra por CustomizationID y se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
-                    documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
-                    // ...
-                    foreach (var itemDocumentMeta in documentMeta)
+                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96",
+                   "0" + (int)EventStatus.SolicitudDisponibilizacion);
+                    if (documentMeta != null || documentMeta.Count > 0)
                     {
-                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                        if (documentValidator != null)
+                        // se filtra por CustomizationID y se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
+                        documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
+                        // ...
+                        foreach (var itemDocumentMeta in documentMeta)
                         {
-                            trackIdAvailability = itemDocumentMeta.PartitionKey;
-                            break;
+                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                            if (documentValidator != null)
+                            {
+                                trackIdAvailability = itemDocumentMeta.PartitionKey;
+                                break;
+                            }
                         }
                     }
                 }

@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Application
                 return list;
             });
 
-            return responses;
+            return responses.OrderByDescending(x => x.Event.SigningTimeStamp).ToList();
         }
 
 
