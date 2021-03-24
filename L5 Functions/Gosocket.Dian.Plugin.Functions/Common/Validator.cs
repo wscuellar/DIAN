@@ -1243,6 +1243,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.EndosoPropiedad:
                 case (int)EventStatus.EndosoGarantia:
                 case (int)EventStatus.EndosoProcuracion:
+
+                    var receiverNameEndoso = xmlParserCude.Fields["ReceiverName"].ToString();
+                    var receiverCodeEndoso = xmlParserCude.Fields["ReceiverCode"].ToString();
+
                     if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
                     {
                         if (party.SenderParty != senderCode)
@@ -1284,7 +1288,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
                         && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
                     {
-                        if (partyLegalEntityName != nitModel.IssuerPartyName)
+                        if (partyLegalEntityName != receiverNameEndoso)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1296,7 +1300,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
 
-                        if (partyLegalEntityCompanyID != nitModel.IssuerPartyCode)
+                        if (partyLegalEntityCompanyID != receiverCodeEndoso)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -1307,9 +1311,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
-                        var receiverNameEndoso = xmlParserCude.Fields["ReceiverName"].ToString();
-                        var receiverCodeEndoso = xmlParserCude.Fields["ReceiverCode"].ToString();
+                       
                         var receiverPartyLegalEntityCompanyID = xmlParserCude.Fields["ReceiverPartyLegalEntityCompanyID"].ToString();
                         var receiverPartyLegalEntityName = xmlParserCude.Fields["ReceiverPartyLegalEntityName"].ToString();
 
