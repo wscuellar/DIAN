@@ -654,7 +654,9 @@ namespace Gosocket.Dian.Web.Controllers
                         if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
                         {
 
-                            string eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                            string eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                eventItem.CustomizationID, eventItem.EventCode, "");// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+
                             model.Events.Add(new EventsViewModel()
                             {
                                 DocumentKey = eventItem.DocumentKey,
@@ -678,7 +680,8 @@ namespace Gosocket.Dian.Web.Controllers
                                     GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
                                     if (eventEndMandate != null)
                                     {
-                                        eventcodetext = EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
+                                        eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                             eventItem.CustomizationID, eventItem.EventCode, attorney.);//  EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
                                         model.Events.Add(new EventsViewModel()
                                         {
                                             DocumentKey = eventEndMandate.DocumentKey,
@@ -1049,7 +1052,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             eveOrder = removeEvents(eveOrder, EventStatus.InvoiceOfferedForNegotiation, new List<string>() { $"0{(int)EventStatus.EndosoProcuracion}", $"0{ (int)EventStatus.EndosoGarantia}" });
             eveOrder = removeEvents(eveOrder, EventStatus.AnulacionLimitacionCirculacion, new List<string>() { $"0{(int)EventStatus.NegotiatedInvoice}" });
-             
+
 
             foreach (var documentMeta in eveOrder)
             {

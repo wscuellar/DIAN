@@ -113,7 +113,20 @@
             model = MappingXpathValues(model, fieldValues);
 
             // Set Titles
-            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode, model.SchemeID);
+
+            switch (model.EventStatus)
+            {
+                case EventStatus.EndosoGarantia:
+                case EventStatus.EndosoPropiedad:
+                case EventStatus.EndosoProcuracion:
+                case EventStatus.InvoiceOfferedForNegotiation:
+                    model.RequestType = eventItem.EventCode;
+                    break;
+                default:
+                    model.ReceiverType = string.Empty;
+                    break;
+            }
 
             switch (model.EventStatus)
             {
@@ -210,8 +223,9 @@
                     break;
             }
 
+            var resulRM = _queryAssociatedEventsService.EventTitle2(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode, model.SchemeID, model.SchemeID);
 
-            if(!string.IsNullOrEmpty(model.CUDEReference))
+            if (!string.IsNullOrEmpty(model.CUDEReference))
             {
                 GlobalDocValidatorDocumentMeta reference = _queryAssociatedEventsService.DocumentValidation(model.CUDEReference);
                 if(reference != null &&  reference.EventCode != null)

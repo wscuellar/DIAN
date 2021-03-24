@@ -74,7 +74,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private void SetTitles(GlobalDocValidatorDocumentMeta eventItem, SummaryEventsViewModel model)
         {
-            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode,"");
             model.ValidationTitle = TextResources.Event_ValidationTitle;
             model.ReferenceTitle = TextResources.Event_ReferenceTitle;
         }
