@@ -661,7 +661,7 @@ namespace Gosocket.Dian.Web.Controllers
                             {
                                 attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
                                 eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
-                                eventItem.CustomizationID, eventItem.EventCode, attorney.SchemeID);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
+                                eventItem.CustomizationID, eventItem.EventCode, attorney?.SchemeID);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
                             }
                             else
                             {

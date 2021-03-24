@@ -102,19 +102,19 @@ namespace Gosocket.Dian.Application.Tests
                     //act
                     statusData = EventStatus.Received;
 
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type,null);
                     Assert.IsNotNull(result);
                     break;
                 case "032":
                     //act
                     statusData = EventStatus.Receipt;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result);
                     break;
                 case "033":
                     statusData = EventStatus.Accepted;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     Assert.IsNotNull(result);
                     break;
                 case "036":
@@ -122,35 +122,35 @@ namespace Gosocket.Dian.Application.Tests
                     //act
                     CustomizationID = "361";
                     statusData = EventStatus.SolicitudDisponibilizacion;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result, $"Fallo en documento {type} con custom {CustomizationID}");
 
                     //act
                     CustomizationID = "362";
                     statusData = EventStatus.SolicitudDisponibilizacion;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result, $"Fallo en documento {type} con custom {CustomizationID}");
 
                     //act
                     CustomizationID = "364";
                     statusData = EventStatus.SolicitudDisponibilizacion;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result, $"Fallo en documento {type} con custom {CustomizationID}");
 
                     //act
                     CustomizationID = "363";
                     statusData = EventStatus.SolicitudDisponibilizacion;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result, $"Fallo en documento {type} con custom {CustomizationID}");
                     break;
                 default:
                     //act
                     statusData = EventStatus.Received;
-                    result = _current.EventTitle(statusData, CustomizationID, type);
+                    result = _current.EventTitle(statusData, CustomizationID, type, null);
                     //assert
                     Assert.IsNotNull(result);
                     break;

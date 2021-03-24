@@ -51,7 +51,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             controllercontext.Setup(frm => frm.HttpContext.Response.Headers).Returns(headerCollection);
             _current.ControllerContext = controllercontext.Object;
             _queryAssociatedEventsService.Setup(t => t.DocumentValidation(id)).Returns(new GlobalDocValidatorDocumentMeta() { EventCode = eventCode, DocumentReferencedKey = "invoice", SenderCode= "111" });
-            _queryAssociatedEventsService.Setup(t => t.EventTitle(It.IsAny<EventStatus>(), It.IsAny<string>(), It.IsAny<string>())).Returns("test");
+            _queryAssociatedEventsService.Setup(t => t.EventTitle(It.IsAny<EventStatus>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns("test");
             _queryAssociatedEventsService.Setup(t => t.DocumentValidation(cufe)).Returns(new GlobalDocValidatorDocumentMeta());
             _queryAssociatedEventsService.Setup(t => t.EventVerification(It.IsAny<GlobalDocValidatorDocumentMeta>())).Returns(new Domain.Entity.GlobalDocValidatorDocument() { ValidationStatus = validationStatus });
             _queryAssociatedEventsService.Setup(t => t.DocumentValidation("invoice")).Returns(new GlobalDocValidatorDocumentMeta());
