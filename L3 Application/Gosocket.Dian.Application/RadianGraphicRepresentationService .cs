@@ -68,6 +68,8 @@
             // Replace QrLabel
             template = template.Replace("{QrCode}", ImgHtml);
 
+
+            //template.Replace("Firmado por: supplier", $"Firmado por: {model.SenderBusinessName}");
             // Mapping Events
 
             byte[] report = RadianPdfCreationService.GetPdfBytes(template.ToString(), "Representacion grafica");
@@ -439,8 +441,8 @@
             template = template.Replace("{RegistrationDate}", model.DateOfIssue);
             template = template.Replace("{EventStartDate}", model.EventStartDate);
             template = template.Replace("{EventFinishDate}", model.EventFinishDate);
-            template = template.Replace("{Notes}", model.Note);
-            template = template.Replace("{SignedBy}", model.SignedBy);
+            template = template.Replace("{Notes}", model.Note.Replace("|","</br>"));
+            template = template.Replace("{SignedBy}", model.SenderBusinessName);
             template = template.Replace("{EventTotalValueAval}", model.EventTotalValueAval);
             template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
