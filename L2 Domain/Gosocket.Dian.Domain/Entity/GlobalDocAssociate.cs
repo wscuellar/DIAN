@@ -40,6 +40,10 @@ namespace Gosocket.Dian.Domain.Entity
         /// </summary>
         public GlobalDocValidatorDocumentMeta Event { get; set; }
         /// <summary>
+        /// Asociacion de referencia al mandato.
+        /// </summary>
+        public GlobalDocReferenceAttorney Attorney { get; set; }
+        /// <summary>
         /// Informacion resumen de la validacion
         /// </summary>
         public GlobalDocValidatorDocument Document { get; set; }
