@@ -18,10 +18,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class DianPAServices : IDisposable
     {
-        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
-        private TableManager TableManagerDianProcessResult = new TableManager("DianProcessResult");
-        private TableManager TableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
+        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");      
         private TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
         private TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
         private TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
@@ -33,7 +32,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
 
         private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
-        //private TableManager TableManagerDianOfeControl = new TableManager("DianOfeControl");
         private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
@@ -659,6 +657,78 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return responses;
         }
 
+        private GlobalDocValidatorDocumentMeta OperationProcess(List<GlobalDocAssociate> associations, List<GlobalDocValidatorDocumentMeta> meta, string cufe)
+        {
+            List<Task> arrayTasks = new List<Task>();
+            GlobalDocValidatorDocumentMeta invoice = new GlobalDocValidatorDocumentMeta();
+
+            //Consulta documentos en la meta Factura
+            Task operation1 = Task.Run(() =>
+            {
+                invoice = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(cufe, cufe);
+            });
+
+            //Consulta documentos en la meta
+            Task operation2 = Task.Run(() =>
+            {
+                for (int i = 0; i < associations.Count; i++)
+                {
+                    meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(associations[i].RowKey, associations[i].RowKey));
+                }
+            });
+
+            arrayTasks.Add(operation1);
+            arrayTasks.Add(operation2);
+
+            Task.WhenAll(arrayTasks).Wait();
+
+            return invoice;
+        }
+
+        private List<InvoiceWrapper> GetEventsByTrackId(string trackId)
+        {
+            //Traemos las asociaciones de la factura = Eventos
+            List<GlobalDocAssociate> associateDocumentList = TableManagerGlobalDocAssociate.FindpartitionKey<GlobalDocAssociate>(trackId.ToLower()).ToList();
+            if (!associateDocumentList.Any())
+                return new List<InvoiceWrapper>();
+
+            //Organiza grupos por factura
+            var groups = associateDocumentList.Where(t => t.Active && !string.IsNullOrEmpty(t.Identifier)).GroupBy(t => t.PartitionKey);
+            List<InvoiceWrapper> responses = groups.Aggregate(new List<InvoiceWrapper>(), (list, source) =>
+            {
+                //obtenemos el cufe
+                string cufe = source.Key;
+                List<GlobalDocAssociate> events = source.ToList();
+
+                //calcula items del proceso
+                List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();               
+                GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, cufe);
+
+                //Unifica la data
+                var eventDoc = from associate in events
+                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey                               
+                               select new EventDocument()
+                               {
+                                   Cufe = cufe,
+                                   Associate = associate,
+                                   Event = docMeta,                                  
+                               };
+
+                InvoiceWrapper invoiceWrapper = new InvoiceWrapper()
+                {
+                    Cufe = cufe,
+                    Invoice = invoice,
+                    Events = eventDoc.OrderByDescending(t => t.Event.SigningTimeStamp).ToList()
+                };
+
+                list.Add(invoiceWrapper);
+
+                return list;
+            });
+
+            return responses;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -707,8 +777,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     Task secondLocalRun = Task.Run(() =>
                     {
+                        //Servicio
+                        List<InvoiceWrapper> InvoiceWrapper = GetEventsByTrackId(trackId.ToLower());
+
                         // se consultan los eventos asociados al trackId.
-                        events = TableManagerGlobalDocValidatorDocumentMeta.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId, "96");
+                        events = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList()
+                            : TableManagerGlobalDocValidatorDocumentMeta.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), "96");
+                  
                         if (events != null && events.Count > 0)
                         {
                             events = events.OrderBy(x => x.SigningTimeStamp).ToList();
