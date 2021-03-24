@@ -110,6 +110,7 @@ namespace Gosocket.Dian.Web.Models
         public string SenderCode { get; internal set; }
         public string SenderName { get; internal set; }
         public string MandateType { get; internal set; }
+        public string SchemeID { get; internal set; }
     }
 
     public class AssociatedEventsViewModel

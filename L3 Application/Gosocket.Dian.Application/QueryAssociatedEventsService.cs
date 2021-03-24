@@ -61,6 +61,108 @@ namespace Gosocket.Dian.Application
             return _radianGlobalDocValidationDocumentMeta.GetAssociatedDocuments(documentKey, code);
         }
 
+        public string EventTitle(EventStatus eventStatus, string CustomizationID, string EventCode, string SchemeID)
+        {
+            string Title = string.Empty;
+
+            switch (eventStatus)
+            {
+                case EventStatus.Received:
+                    Title = EnumHelper.GetDescription(EventStatus.Received);
+                    break;
+                case EventStatus.Receipt:
+                    Title = EnumHelper.GetDescription(EventStatus.Receipt);
+                    break;
+                case EventStatus.AceptacionTacita:
+                    Title = EnumHelper.GetDescription(EventStatus.AceptacionTacita);
+                    break;
+                case EventStatus.Accepted:
+                    Title = EnumHelper.GetDescription(EventStatus.Accepted);
+                    break;
+                case EventStatus.SolicitudDisponibilizacion:
+                    if (CustomizationID.Equals("361"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.PrimeraSolicitudDisponibilizacion);
+                    if (CustomizationID.Equals("362"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionDirecta);
+                    if (CustomizationID.Equals("363"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosterior);
+                    if (CustomizationID.Equals("364"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.SolicitudDisponibilizacionPosteriorDirecta);
+                    break;
+                case EventStatus.EndosoGarantia:
+                    Title = EnumHelper.GetDescription(EventStatus.EndosoGarantia);
+                    break;
+                case EventStatus.EndosoPropiedad:
+                    if (CustomizationID.Equals("371"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.ConResponsabilidad);
+                    else
+                        Title = EnumHelper.GetDescription(SubEventStatus.SinResponsabilidad);
+                    break;
+                case EventStatus.EndosoProcuracion:
+                    Title = EnumHelper.GetDescription(EventStatus.EndosoProcuracion);
+                    break;
+                case EventStatus.InvoiceOfferedForNegotiation:
+                    Title = eventStatus.GetDescription();
+                    if (CustomizationID.Equals("401"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.CancelacionEndoso);
+                    if (CustomizationID.Equals("402"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.CancelacionEndosoProcuracion);
+                    if (CustomizationID.Equals("403"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.TachaEndosoRetorno);
+                    break;
+                case EventStatus.Avales:
+                    Title = "Aval de la FEV TV";
+                    break;
+                case EventStatus.Mandato:
+                    if (!string.IsNullOrEmpty(SchemeID))
+                    {
+                        if (CustomizationID.Equals("431"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlIlimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
+                        if (CustomizationID.Equals("432"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlLimitadoEspecial : SubEventStatus.MandatoGenerarlLimitado);
+                        if (CustomizationID.Equals("433"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoEspecial : SubEventStatus.MandatoGenerarlTiempo);
+                        if (CustomizationID.Equals("434"))
+                            Title = EnumHelper.GetDescription(SchemeID == "1" ? SubEventStatus.MandatoGenerarlTiempoIlimitadoEspecial : SubEventStatus.MandatoGenerarlTiempoIlimitado);
+                    }
+                    else
+                        Title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), EventCode));
+                    break;
+                case EventStatus.TerminacionMandato:
+                    if (CustomizationID.Equals("441"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.TerminacionRevocatoria);
+                    if (CustomizationID.Equals("442"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.TerminacionRenuncia);
+                    break;
+                case EventStatus.ValInfoPago:
+                    Title = EnumHelper.GetDescription(EventStatus.ValInfoPago);
+                    break;
+                case EventStatus.NotificacionPagoTotalParcial:
+                    if (CustomizationID.Equals("451"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.PagoParcial);
+                    if (CustomizationID.Equals("452"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.PagoTotal);
+                    break;
+                case EventStatus.NegotiatedInvoice:
+                    if (CustomizationID.Equals("411"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.MedidaCautelarEmbargo);
+                    if (CustomizationID.Equals("412"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.MedidaCautelarMandamiento);
+                    break;
+                case EventStatus.AnulacionLimitacionCirculacion:
+                    if (CustomizationID.Equals("421"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
+                    if (CustomizationID.Equals("422"))
+                        Title = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada);
+                    break;
+                default:
+                    Title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), EventCode));
+                    break;
+            }
+            return Title;
+        }
+
+        /*
         public string EventTitle(EventStatus eventStatus, string customizationId, string eventCode)
         {
             string title = string.Empty;
@@ -89,7 +191,7 @@ namespace Gosocket.Dian.Application
 
             return title;
         }
-
+        */
         public bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent)
         {
             //otherEvent.Identifier
@@ -134,7 +236,7 @@ namespace Gosocket.Dian.Application
                 allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
                 allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
-            } 
+            }
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
             var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ToList();
 
@@ -184,7 +286,7 @@ namespace Gosocket.Dian.Application
 
             return cleanDictionary;
         }
-         
+
         private List<GlobalDocValidatorDocumentMeta> removeEvents(List<GlobalDocValidatorDocumentMeta> events, EventStatus conditionalStatus, List<string> removeData)
         {
             if (events.Count > 0 && events.Last().EventCode == $"0{(int)conditionalStatus }")
