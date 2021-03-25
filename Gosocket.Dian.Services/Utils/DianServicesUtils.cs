@@ -936,7 +936,16 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
             }
-
+            else if (docTypeCode == "101")
+            {
+                if (string.IsNullOrEmpty(documentKey))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}D06: Valor del CUDI no está calculado correctamente.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+            }
             else
             {
                 if (string.IsNullOrEmpty(documentKey))
