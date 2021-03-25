@@ -111,7 +111,7 @@ namespace Gosocket.Dian.Application
                         Title = EnumHelper.GetDescription(SubEventStatus.TachaEndosoRetorno);
                     break;
                 case EventStatus.Avales:
-                    Title = "Aval de la FEV TV";
+                    Title = "Aval";
                     break;
                 case EventStatus.Mandato:
                     if (!string.IsNullOrEmpty(SchemeID))
