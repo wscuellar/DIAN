@@ -87,6 +87,7 @@
         public string EventCodeReference { get; set; }
         public string DescriptionReference { get; set; }
         public string SchemeID { get; set; }
+        public string EventNumberReference { get; set; }
     }
 
     public class AssociatedValidationsModel
@@ -121,6 +122,7 @@
         public string CUFE { get; set; }
         public string Number { get; set; }
         public double TotalAmount { get; set; }
+        public string SerieAndNumber { get; set; }
     }
 
 

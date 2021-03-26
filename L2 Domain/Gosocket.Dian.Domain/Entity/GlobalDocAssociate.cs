@@ -14,6 +14,8 @@ namespace Gosocket.Dian.Domain.Entity
 
         public bool Active { get; set; }
         public string Identifier { get; set; }
+        public string EventCode { get; set; }
+        public string CustomizationID { get; set; }
 
     }
 
