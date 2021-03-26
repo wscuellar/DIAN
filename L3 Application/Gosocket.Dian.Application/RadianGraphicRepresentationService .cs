@@ -366,7 +366,7 @@
             template = template.Replace("{EventStartDate}", model.EventStartDate);
             template = template.Replace("{EventFinishDate}", model.EventFinishDate);
             template = template.Replace("{Notes}", model.Note.Replace("|", "</br>"));
-            template = template.Replace("{SignedBy}", model.SenderBusinessName);
+            template = template.Replace("{SignedBy}", model.SignedBy);
             template = template.Replace("{EventTotalValueAval}", model.EventTotalValueAval);
             template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
             template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
