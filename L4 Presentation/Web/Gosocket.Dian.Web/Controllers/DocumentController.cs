@@ -55,6 +55,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
+        private readonly IAssociateDocuments _associateDocuments;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
@@ -95,7 +96,8 @@ namespace Gosocket.Dian.Web.Controllers
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
                                   IRadianSupportDocument radianSupportDocument, FileManager fileManager,
-                                  IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService)
+                                  IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService,
+                                  IAssociateDocuments associateDocuments)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -104,6 +106,7 @@ namespace Gosocket.Dian.Web.Controllers
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
+            _associateDocuments = associateDocuments;
         }
 
         #endregion
@@ -547,8 +550,14 @@ namespace Gosocket.Dian.Web.Controllers
         private async Task<DocValidatorModel> ReturnDocValidatorModelByCufe(string trackId, GlobalDataDocument globalDataDocument = null)
         {
             List<DocValidatorTrackingModel> validations = GetValidatedRules(trackId);
+            GlobalDocValidatorDocumentMeta globalDocValidatorDocumentMeta;
 
-            GlobalDocValidatorDocumentMeta globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            List<InvoiceWrapper> invoiceData = _associateDocuments.GetEventsByTrackId(trackId);
+            if (invoiceData.Any())
+                globalDocValidatorDocumentMeta = invoiceData.First().Invoice;
+            else
+                globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+
             string emissionDateNumber = globalDocValidatorDocumentMeta.EmissionDate.ToString("yyyyMMdd");
             string partitionKey = $"co|{emissionDateNumber.Substring(6, 2)}|{globalDocValidatorDocumentMeta.DocumentKey.Substring(0, 2)}";
 
@@ -558,6 +567,8 @@ namespace Gosocket.Dian.Web.Controllers
                 globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocumentMeta.DocumentKey, partitionKey, date);
 
             DocumentViewModel document = new DocumentViewModel();
+
+            #region --- Mapear globalDataDocument ---
 
             if (globalDataDocument != null)
             {
@@ -633,18 +644,46 @@ namespace Gosocket.Dian.Web.Controllers
                 }).ToList();
             }
 
+            #endregion
+
             var model = new DocValidatorModel
             {
                 Document = document,
                 Validations = validations
             };
 
-
-
             model.Events = new List<EventsViewModel>();
-            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-            GlobalDocReferenceAttorney attorney; 
+            GlobalDocReferenceAttorney attorney;
             string eventcodetext = string.Empty;
+            if (invoiceData.Any())
+            {
+                var invoice = invoiceData.First();
+
+                foreach (var eventItem in invoice.Events)
+                {
+                    EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.Event.EventCode.ToString());
+                    eventcodetext = _queryAssociatedEventsService.EventTitle(eventStatus, eventItem.Event.CustomizationID, eventItem.Event.EventCode,
+                       eventItem.Event.EventCode == "043" ? eventItem.Attorney?.SchemeID : string.Empty);
+
+                    model.Events.Add(new EventsViewModel()
+                    {
+                        DocumentKey = eventItem.Event.DocumentKey,
+                        EventCode = eventItem.Event.EventCode,
+                        Description = eventcodetext,
+                        EventDate = eventItem.Event.SigningTimeStamp,
+                        SenderCode = eventItem.Event.SenderCode,
+                        Sender = eventItem.Event.SenderName,
+                        ReceiverCode = eventItem.Event.ReceiverCode,
+                        Receiver = eventItem.Event.ReceiverName
+                    });
+                }
+
+                model.Events = model.Events.Distinct().OrderBy(t => t.EventDate).ToList();
+                return model;
+            }
+
+            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
+
             if (eventsByInvoice.Any())
             {
                 foreach (var eventItem in eventsByInvoice)
@@ -658,16 +697,10 @@ namespace Gosocket.Dian.Web.Controllers
                             attorney = new GlobalDocReferenceAttorney();
                             eventcodetext = string.Empty;
                             if (eventItem.EventCode == "043")
-                            {
                                 attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
-                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
-                                eventItem.CustomizationID, eventItem.EventCode, attorney?.SchemeID);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                            }
-                            else
-                            {
-                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
-                                eventItem.CustomizationID, eventItem.EventCode, string.Empty);// EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode)));
-                            }
+
+                            eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                            eventItem.CustomizationID, eventItem.EventCode, eventItem.EventCode == "043" ? attorney?.SchemeID : string.Empty);
 
                             model.Events.Add(new EventsViewModel()
                             {
@@ -683,30 +716,9 @@ namespace Gosocket.Dian.Web.Controllers
                             //Adiciono el evento de finalizacion de mandato.
                             if (eventItem.EventCode == "043")
                             {
-                                //Se busca en la GlobalDocReferenceAttorney 
-                                //En el campo DocReferencedEndAttorney si tiene valor 
-                                if (attorney != null && !string.IsNullOrEmpty(attorney.DocReferencedEndAthorney))
-                                {
-                                    //Se busca en la GlobalDocValidatorDocumentMeta y se saca el evento de terminacion.
-                                    GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(attorney.DocReferencedEndAthorney, attorney.DocReferencedEndAthorney);
-                                    if (eventEndMandate != null)
-                                    {
-                                        eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode.ToString()),
-                                             eventEndMandate.CustomizationID, eventEndMandate.EventCode, attorney.SchemeID);//  EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode)));
-                                        model.Events.Add(new EventsViewModel()
-                                        {
-                                            DocumentKey = eventEndMandate.DocumentKey,
-                                            EventCode = eventEndMandate.EventCode,
-                                            Description = eventcodetext,
-                                            EventDate = eventEndMandate.SigningTimeStamp,
-                                            SenderCode = eventEndMandate.SenderCode,
-                                            Sender = eventEndMandate.SenderName,
-                                            ReceiverCode = eventEndMandate.ReceiverCode,
-                                            Receiver = eventEndMandate.ReceiverName
-                                        });
-                                    }
-                                }
-
+                                EventsViewModel _event = FillEventsAttorney(attorney);
+                                if (_event != null)
+                                    model.Events.Add(_event);
                             }
 
                         }
@@ -715,10 +727,38 @@ namespace Gosocket.Dian.Web.Controllers
                 }
                 model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
-
             return model;
         }
 
+        private EventsViewModel FillEventsAttorney(GlobalDocReferenceAttorney Attorney)
+        {
+            EventsViewModel _event = null;
+            //Se busca en la GlobalDocReferenceAttorney 
+            //En el campo DocReferencedEndAttorney si tiene valor 
+
+            if (Attorney != null && !string.IsNullOrEmpty(Attorney.DocReferencedEndAthorney))
+            {
+                //Se busca en la GlobalDocValidatorDocumentMeta y se saca el evento de terminacion.
+                GlobalDocValidatorDocumentMeta eventEndMandate = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(Attorney.DocReferencedEndAthorney, Attorney.DocReferencedEndAthorney);
+                if (eventEndMandate != null)
+                {
+                    var eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventEndMandate.EventCode.ToString()),
+                          eventEndMandate.CustomizationID, eventEndMandate.EventCode, Attorney.SchemeID);
+                    _event = new EventsViewModel()
+                    {
+                        DocumentKey = eventEndMandate.DocumentKey,
+                        EventCode = eventEndMandate.EventCode,
+                        Description = eventcodetext,
+                        EventDate = eventEndMandate.SigningTimeStamp,
+                        SenderCode = eventEndMandate.SenderCode,
+                        Sender = eventEndMandate.SenderName,
+                        ReceiverCode = eventEndMandate.ReceiverCode,
+                        Receiver = eventEndMandate.ReceiverName
+                    };
+                }
+            }
+            return _event;
+        }
         private DocValidatorModel ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
         {
             var model = new DocValidatorModel();

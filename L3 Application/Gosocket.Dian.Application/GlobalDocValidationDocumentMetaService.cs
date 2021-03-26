@@ -2,6 +2,7 @@
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -24,8 +25,11 @@ namespace Gosocket.Dian.Application
 
         public List<GlobalDocValidatorDocumentMeta> GetAssociatedDocuments(string documentKey, string eventCode)
         {
+            //return documentMetaTableManager
+            //    .FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(documentKey, eventCode);
+
             return documentMetaTableManager
-                .FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(documentKey, eventCode);
+                .FindpartitionKey<GlobalDocValidatorDocumentMeta>(documentKey).Where(x=>x.EventCode== eventCode).ToList();
         }
 
         //FindDocumentReferenced_TypeId
