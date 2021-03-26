@@ -399,10 +399,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             string errorMessarge = string.Empty;
             string key = string.Empty;
-            var errorCode = "FAD06";
-            var prop = "CUFE";
+            var errorCode = "FAD06";            
+            var prop = "CUFE";            
 
-            string[] codesWithCUDE = { "03", "05", "91", "92", "96" };
+            string[] codesWithCUDE = { "03", "05", "91", "92", "96", "101" };
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
             if (documentMeta.DocumentTypeId == "05")
@@ -413,6 +413,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCode = "DAD06";
             else if (documentMeta.DocumentTypeId == "96")
                 errorCode = "AAD06";
+            else if (documentMeta.DocumentTypeId == "101")
+            {
+                errorCode = "DIAD06";
+                prop = "CUDI";
+            }
+                
 
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
@@ -471,6 +477,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
             var documentKey = cufeModel.DocumentKey;
+
+            if(cufeModel.DocumentTypeId == "101")
+            {
+                data = $"{number}{emissionDate}{emissionHour}{amount}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
+                documentKey = cufeModel.DocumentKey;
+            }
 
             // Only for AR
             if (cufeModel.DocumentTypeId == "96")
