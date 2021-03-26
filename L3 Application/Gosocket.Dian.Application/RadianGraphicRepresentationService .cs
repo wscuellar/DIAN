@@ -107,8 +107,8 @@
             Dictionary<string, string> xpathRequest = new Dictionary<string, string>();
             xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
 
-            string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-            //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+            //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+            string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
             ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
             model = MappingXpathValues(model, fieldValues);
@@ -134,6 +134,7 @@
                 if (reference != null && reference.EventCode != null)
                 {
                     model.EventCodeReference = reference.EventCode;
+                    model.EventNumberReference = reference.Number;
                     GlobalDocReferenceAttorney attorney = null;
                     if (reference.EventCode == "043")
                         attorney = _queryAssociatedEventsService.ReferenceAttorneys(model.CUDEReference, reference.DocumentReferencedKey,string.Empty, string.Empty).FirstOrDefault();
@@ -162,7 +163,8 @@
                     ReceiverName = referenceMeta.ReceiverName,
                     Number = referenceMeta.Number,
                     CUFE = referenceMeta.DocumentKey,
-                    TotalAmount = referenceMeta.TotalAmount
+                    TotalAmount = referenceMeta.TotalAmount,
+                    SerieAndNumber = referenceMeta.SerieAndNumber
                 });
             }
 
@@ -329,7 +331,7 @@
             {
                 string htmlReference = "";
                 htmlReference += "<td>";
-                htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{InvoiceNumber}</a></div>";
+                htmlReference += "<div class='text-subtitle text-gray'> Número del Evento: <a class='text-data'>{EventNumberReference}</a></div>";
                 htmlReference += "<div id='CUDE' class='text-subtitle text-gray'>CUDE: <a class='text-data cude'>{CUDEReference}</a></div>";
                 htmlReference += "</td>";
                 htmlReference += "<td>";
@@ -379,7 +381,7 @@
             {
                 template = template.Replace("{ResponseCodeListID}", model.ResponseCodeListID == "1" ? EnumHelper.GetDescription(EndodoSubEventStatus.Completo) : EnumHelper.GetDescription(EndodoSubEventStatus.EnBlanco));
             }
-            template = template.Replace("{EventCode}", model.EventCodeReference);
+            template = template.Replace("{EventNumberReference}", model.EventNumberReference);
             template = template.Replace("{CUDEReference}", model.CUDEReference);
             template = template.Replace("{DescriptionReference}", model.DescriptionReference);
 
@@ -395,7 +397,7 @@
 
             // Mapping reference invoice data section
 
-            template = template.Replace("{InvoiceNumber}", model.InvoiceNumber);
+            template = template.Replace("{InvoiceNumber}", model.References[0].SerieAndNumber);
             template = template.Replace("{TotalValue}", $"{model.References[0].TotalAmount}");
             template = template.Replace("{PaymentWay}", string.Empty);
             template = template.Replace("{PaymentMethod}", string.Empty);
