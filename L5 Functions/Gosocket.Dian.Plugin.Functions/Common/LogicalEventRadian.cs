@@ -703,7 +703,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateExistPropertyEndorsement     
-        private List<ValidateListResponse> ValidateExistPropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
+        private List<ValidateListResponse> ValidateExistEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -721,8 +721,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            //Consulta existe endoso en propiedad
-            var documentMeta = documentMetaList.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoPropiedad).OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
+            //Consulta existe endoso
+            var documentMeta = documentMetaList.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoPropiedad 
+            || Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoProcuracion
+            || Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoGarantia).OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
             if (documentMeta != null)
             {
                 var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier, documentMeta.PartitionKey);
@@ -757,10 +759,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (validFor)
                     {
                         //Valida existe disponibilizacion posterior
+                        DateTime dateEndorsement = documentMeta.SigningTimeStamp;
                         var listDisponibilizacion = documentMetaList.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
                         && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.GeneralSubsequentRegistration ||
                                 Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment) && t.SenderCode == senderCode
-                            ).FirstOrDefault();
+                           && t.SigningTimeStamp > dateEndorsement ).FirstOrDefault();
                         if (listDisponibilizacion == null)
                         {
                             responses.Add(new ValidateListResponse
@@ -813,7 +816,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
 
             //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
-            var responseExistPropertyEndorsement = ValidateExistPropertyEndorsement(documentMeta, xmlParserCude, nitModel);
+            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel);
             if (responseExistPropertyEndorsement != null)
             {
                 foreach (var item in responseExistPropertyEndorsement)
@@ -967,7 +970,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
 
             //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
-            var responseExistPropertyEndorsement = ValidateExistPropertyEndorsement(documentMeta, xmlParserCude, nitModel);
+            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel);
             if (responseExistPropertyEndorsement != null)
             {
                 foreach (var item in responseExistPropertyEndorsement)

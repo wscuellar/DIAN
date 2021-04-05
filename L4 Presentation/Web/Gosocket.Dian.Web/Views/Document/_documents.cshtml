@@ -69,7 +69,7 @@
                         }
                         else
                         {
-                            if (document.Status != 2)
+                            if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
                             {
                                 <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
                             }
@@ -80,41 +80,41 @@
                         }
 
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                         <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                         <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                         @document.Serie
                     </td>
-                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         @document.SerieAndNumber
                     </td>
-                    <td class="text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         <div class="iffyTip hideText2">@document.DocumentTypeName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         @document.SenderCode
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         <div class="iffyTip hideText2">@document.SenderName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         @document.ReceiverCode
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         <div class="iffyTip hideText2">@document.ReceiverName</div>
                     </td>
-                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         @document.StatusName
                     </td>
-                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         <i class="fa fa-circle radian-status-circle"></i>
                         @document.RadianStatusName
                     </td>
-                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey">
+                    <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey"  data-type="@document.DocumentTypeId">
                         @document.TotalAmount.ToString("C0")
                     </td>
                 </tr>

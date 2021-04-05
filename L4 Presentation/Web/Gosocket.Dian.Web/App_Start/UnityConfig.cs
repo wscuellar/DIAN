@@ -1,10 +1,11 @@
 using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Application.Managers;
 using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
-using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Interfaces.Services; 
 using System.Web.Mvc;
 using Unity;
 using Unity.Mvc5;
@@ -40,6 +41,7 @@ namespace Gosocket.Dian.Web
 
             container.RegisterType<IContributorService, ContributorService>();
             container.RegisterType<IRadianContributorService, RadianContributorService>();
+            container.RegisterType<IProfileService, ProfileService>();
             container.RegisterType<IRadianTestSetService, RadianTestSetService>();
             container.RegisterType<IRadianContributorFileTypeService, RadianContributorFileTypeService>();
             container.RegisterType<IRadianApprovedService, RadianAprovedService>();

@@ -42,7 +42,8 @@
     "SendToActivateOtherDocumentContributorUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/SendToActivateOtherDocumentContributor?code=HE9pcqc2Cev4moXFTeHQv1G5zdd7ckvFkUql5vzgSR9XNbJeLPZAbg==",
     "RegistrateCompletedRadianUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/RegistrateCompletedRadian?code=fidb6tCni9OEkLaCaAETAauIgWmow8jQm2bnWab1ZMPKn5WKb6gRzg==",
     "IsProduction": "true",
-    "RegistrateCompletedPayrollUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/RegistrateCompletedPayroll?code=LG2hTOQeYSjiATrshC6/hu4LZa354YXma/G2VqwC4ly3vVCGu3MKsw=="
+    "RegistrateCompletedPayrollUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/RegistrateCompletedPayroll?code=LG2hTOQeYSjiATrshC6/hu4LZa354YXma/G2VqwC4ly3vVCGu3MKsw==",
+    "ApplicationResponseProcessUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/ApplicationResponseProcess?code=ocMBoXmOlNNffsNts7H4M4VMJiqoiAk3QBKhkRpkzIGWpEiQQ3SiQQ=="
 
 
     //"Environment": "Hab",

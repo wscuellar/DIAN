@@ -50,6 +50,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Data.Edm, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm.5.8.2\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.OData.5.8.2\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.2.1.1\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
     </Reference>
@@ -79,6 +87,9 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Spatial">
+      <HintPath>..\packages\System.Spatial.5.8.2\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -116,6 +127,10 @@
     <Compile Include="Controllers\RadianContributorFileTypeControllerTests.cs" />
     <Compile Include="Controllers\RadianControllerTests.cs" />
     <Compile Include="Controllers\RadianTestSetControllerTest.cs" />
+    <Compile Include="Services\OthersDocsElecContributorServiceTests.cs" />
+    <Compile Include="Services\RadianPdfCreationServiceTests.cs" />
+    <Compile Include="Services\RadianCallSoftwareServiceTests.cs" />
+    <Compile Include="Services\RadianLoggerServiceTests.cs" />
     <Compile Include="Services\RadianTestSetAppliedServiceTests.cs" />
     <Compile Include="Services\RadianTestSetResultServiceTests.cs" />
     <Compile Include="Services\RadianContributorFileTypeServiceTests.cs" />
@@ -149,6 +164,10 @@
     <ProjectReference Include="..\Gosocket.Dian.Interfaces\Gosocket.Dian.Interfaces.csproj">
       <Project>{ab742b49-c0de-4363-ac4a-c436ffffb5b1}</Project>
       <Name>Gosocket.Dian.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\L0 Infrastructure\Gosocket.Dian.Infrastructure\Gosocket.Dian.Infrastructure.csproj">
+      <Project>{72e3852a-75d8-4007-93a5-8ee16bdfb5d7}</Project>
+      <Name>Gosocket.Dian.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\L1 Data\Gosocket.Dian.DataContext\Gosocket.Dian.DataContext.csproj">
       <Project>{cbaa925a-695b-41b2-90b9-5c061a9cc30e}</Project>
