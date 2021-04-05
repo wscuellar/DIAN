@@ -719,6 +719,12 @@ namespace Gosocket.Dian.Web.Services
                 var authCode = GetAuthCode();
                 var email = GetAuthEmail();
 
+                if(string.IsNullOrWhiteSpace(contributorCode))
+                {
+                    Log($"{authCode} {email} GetDocIdentifierWithEvents", (int)InsightsLogType.Error, "ContributorCode no enviado.");
+                    return new DocIdentifierWithEventsResponse { StatusCode = "89", Success = false, Message = "ContributorCode no enviado.", CsvBase64Bytes = null };
+                }
+
                 DianPAServices customerDianPa = new DianPAServices();
                 {
                     var start = DateTime.UtcNow;
