@@ -27,6 +27,7 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
         private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
+        private static readonly TableManager TableManagerGlobalDocQueryRegisteredInvoice = new TableManager("GlobalDocQueryRegisteredInvoice");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -65,6 +66,7 @@ namespace Gosocket.Dian.Functions.Events
                 
                 if (documentMeta != null)
                 {
+                  
                     //Registra Mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
                     {
@@ -96,6 +98,16 @@ namespace Gosocket.Dian.Functions.Events
                         validatorDocumentAssociate.Active = true;
                         InsertGlobalDocAssociate(validatorDocumentAssociate);
                     }
+
+                    //Inserta registro GlobalDocQueryRegisteredInvoice
+                    //Obtiene XML Invoice CUFE
+                    var xmlBytesCufe = await Utils.Utils.GetXmlFromStorageAsync(documentMeta.DocumentReferencedKey);
+                    var xmlParserCufe = new XmlParser(xmlBytesCufe);
+                    if (!xmlParserCufe.Parser())
+                        throw new Exception(xmlParserCufe.ParserError);
+
+                    InsertDocQueryRegisteredInvoice(documentMeta, xmlParserCufe);
+
 
                     //Actualiza registro Mandato asociado a la Factura, terminacion de mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
@@ -286,6 +298,35 @@ namespace Gosocket.Dian.Functions.Events
                 };
                 arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney));
             }
+        }
+        #endregion
+
+        #region insert GlobalDocQueryRegisteredInvoice    
+        private static void InsertDocQueryRegisteredInvoice(GlobalDocValidatorDocumentMeta documentMeta, XmlParser xmlParserCufe)
+        {
+            var arrayTasks = new List<Task>();
+            var failedList = new List<string>();          
+
+            string trackIdCufe = documentMeta.DocumentReferencedKey;
+            string startDate = DateTime.UtcNow.AddHours(-5).ToString("yyyyMMdd");     //"20210321"
+            string accountingSupplierParty = string.Empty;
+            string accountingCustomerParty = string.Empty;
+            string techProviderCode = documentMeta.TechProviderCode;
+           
+            accountingSupplierParty = xmlParserCufe.Fields["SenderCode"].ToString();
+            accountingCustomerParty = xmlParserCufe.Fields["ReceiverCode"].ToString();
+
+            failedList.Add(startDate + "|" + accountingSupplierParty);
+            failedList.Add(startDate + "|" + accountingCustomerParty);
+            failedList.Add(startDate + "|" + techProviderCode);          
+            
+            foreach (var item in failedList)
+            {
+                GlobalDocQueryRegisteredInvoice docQueryRegisteredInvoice = new GlobalDocQueryRegisteredInvoice(item, trackIdCufe)
+                {                    
+                };
+                arrayTasks.Add(TableManagerGlobalDocQueryRegisteredInvoice.InsertOrUpdateAsync(docQueryRegisteredInvoice));
+            }                      
         }
         #endregion
 
