@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
         private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
-        private static readonly TableManager TableManagerGlobalDocQueryRegisteredInvoice = new TableManager("GlobalDocQueryRegisteredInvoice");
+        private static readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -322,10 +322,10 @@ namespace Gosocket.Dian.Functions.Events
             
             foreach (var item in failedList)
             {
-                GlobalDocQueryRegisteredInvoice docQueryRegisteredInvoice = new GlobalDocQueryRegisteredInvoice(item, trackIdCufe)
+                GlobalDocumentWithEventRegistered docQueryRegisteredInvoice = new GlobalDocumentWithEventRegistered(item, trackIdCufe)
                 {                    
                 };
-                arrayTasks.Add(TableManagerGlobalDocQueryRegisteredInvoice.InsertOrUpdateAsync(docQueryRegisteredInvoice));
+                arrayTasks.Add(TableManagerGlobalDocumentWithEventRegistered.InsertOrUpdateAsync(docQueryRegisteredInvoice));
             }                      
         }
         #endregion
