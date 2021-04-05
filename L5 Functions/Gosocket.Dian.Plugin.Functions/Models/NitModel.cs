@@ -40,6 +40,7 @@
         public string SoftwareId { get; set; }
         public string AgentPartyPersonSchemeID { get; set; }
         public string AgentPartyPersonSchemeName { get; set; }
-
+        public string ReceiverPartyLegalEntityName { get; set; }
+        public string ReceiverPartyLegalEntityCompanyID { get; set; }
     }
 }

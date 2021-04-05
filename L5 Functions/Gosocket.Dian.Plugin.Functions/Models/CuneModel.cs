@@ -24,6 +24,6 @@
 
         public string TipAmb { get; set; }
         public string DocumentType { get; set; }
-
+        public string TipoXML { get; set; }
     }
 }

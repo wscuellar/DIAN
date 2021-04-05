@@ -15,13 +15,18 @@ namespace Gosocket.Dian.Domain.Entity
 
         }
 
+        public string CUNENov { get; set; }
+        public int? TipoNota { get; set; }
+
         //Periodo
         public DateTime? FechaIngreso { get; set; }
+        public DateTime? FechaRetiro { get; set; }
         public DateTime? FechaPagoInicio { get; set; }
         public DateTime? FechaPagoFin { get; set; }
         public string TiempoLaborado { get; set; }
         public DateTime? FechaLiquidacion { get; set; }
         public DateTime? FechaGen { get; set; }
+        public string FechasPagos { get; set; }
 
         //NumeroSecuenciaXML
         public string CodigoTrabajador { get; set; }
@@ -36,6 +41,11 @@ namespace Gosocket.Dian.Domain.Entity
         public string Idioma { get; set; }
 
         //ProveedorXml
+        public string Prov_RazonSocial { get; set; }
+        public string Prov_PrimerApellido { get; set; }
+        public string Prov_SegundoApellido { get; set; }
+        public string Prov_PrimerNombre { get; set; }
+        public string Prov_OtrosNombres { get; set; }
         public string NIT { get; set; }
         public string DV { get; set; }
         public string SoftwareID { get; set; }
@@ -53,8 +63,8 @@ namespace Gosocket.Dian.Domain.Entity
         public string PeriodoNomina { get; set; }
         public string TRM { get; set; }
         public string TipoMoneda { get; set; }
-        public string TipoNomina { get; set; }
         public string Version { get; set; }
+        public string TipoXML { get; set; }
 
         //Notas
         public string Notas { get; set; }
@@ -66,6 +76,10 @@ namespace Gosocket.Dian.Domain.Entity
 
         //Empleador
         public string Emp_RazonSocial { get; set; }
+        public string Emp_PrimerApellido { get; set; }
+        public string Emp_SegundoApellido { get; set; }
+        public string Emp_PrimerNombre { get; set; }
+        public string Emp_OtrosNombres { get; set; }
         public string Emp_NIT { get; set; }
         public string Emp_DV { get; set; }
         public string Emp_Pais { get; set; }
@@ -154,12 +168,10 @@ namespace Gosocket.Dian.Domain.Entity
         //Deducciones
         //Salud
         public string s_Porcentaje { get; set; }
-        public string s_ValorBase { get; set; }
         public string s_Deduccion { get; set; }
 
         //FondoPension
         public string FP_Porcentaje { get; set; }
-        public string FP_ValorBase { get; set; }
         public string FP_Deduccion { get; set; }
 
         //Retefuente

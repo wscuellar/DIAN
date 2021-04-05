@@ -34,7 +34,6 @@ namespace Gosocket.Dian.Functions.Payroll
             if (string.IsNullOrEmpty(data.TrackId))
                 return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
 
-            var trackIdCude = data.TrackId;
             var response = new EventResponse
             {
                 Code = ((int)EventValidationMessage.Success).ToString(),
@@ -43,7 +42,7 @@ namespace Gosocket.Dian.Functions.Payroll
 
             try
             {
-                var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(trackIdCude);
+                var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(data.TrackId);
                 var xmlParser = new XmlParseNomina(xmlBytes);
                 if (!xmlParser.Parser())
                     throw new Exception(xmlParser.ParserError);
@@ -57,17 +56,23 @@ namespace Gosocket.Dian.Functions.Payroll
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
+                var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
+
                 // Nómina Individual de Ajuste...
-                if (Convert.ToInt32(documentParsed.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+                if ((documentTypeId == (int)DocumentType.IndividualPayroll && xmlParser.Novelty)
+                    || documentTypeId == (int)DocumentType.IndividualPayrollAdjustments)
                 {
-                    var trackId = documentParsed.CUNE;
-                    var trackIdPred = documentParsed.CUNEPred;
-                    var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
-                    
+                    var trackIdCuneNovOrCunePred = (documentTypeId == (int)DocumentType.IndividualPayroll) ? xmlParser.globalDocPayrolls.CUNENov : xmlParser.globalDocPayrolls.CUNEPred;
+                    var trackIdCune = xmlParser.globalDocPayrolls.CUNE;
+
+                    var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdCuneNovOrCunePred, trackIdCune);
+                    docGlobalPayrollHistoric.DocumentTypeId = documentParsed.DocumentTypeId;
+                    if (documentTypeId == (int)DocumentType.IndividualPayrollAdjustments && xmlParser.HasRemoveNode) docGlobalPayrollHistoric.Deleted = true;
+
                     arrayTasks.Add(TableManagerGlobalDocPayrollHistoric.InsertOrUpdateAsync(docGlobalPayrollHistoric));
                     // se actualiza en la Meta el DocumentReferenceKey con el ID del último ajuste...
-                    var documentMetaAdjustment = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdPred, trackIdPred);
-                    documentMetaAdjustment.DocumentReferencedKey = trackId;
+                    var documentMetaAdjustment = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCuneNovOrCunePred, trackIdCuneNovOrCunePred);
+                    documentMetaAdjustment.DocumentReferencedKey = trackIdCune;
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMetaAdjustment));
                 }
                 // ...

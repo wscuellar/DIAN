@@ -825,4 +825,11 @@ namespace Gosocket.Dian.Domain.Common
         EnBlanco = 2
     }
 
+    public enum IndividualPayrollAdjustmentNoteType
+    {
+        [Description("Reemplazar")]
+        Replace = 1,
+        [Description("Eliminar")]
+        Remove = 2
+    }
 }

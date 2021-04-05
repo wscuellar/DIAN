@@ -8,5 +8,8 @@ namespace Gosocket.Dian.Domain.Entity
 
         public GlobalDocPayrollHistoric(string pk, string rk) : base(pk, rk)
         { }
+
+        public string DocumentTypeId { get; set; }
+        public bool Deleted { get; set; }
     }
 }

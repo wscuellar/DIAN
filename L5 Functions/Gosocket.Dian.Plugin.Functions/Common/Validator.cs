@@ -516,8 +516,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var DocEmp = objCune.DocEmp;
             var SoftwarePin = key;
             var TipAmb = objCune.TipAmb;
+            var tipoXml = objCune.TipoXML;
 
-            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{SoftwarePin}{TipAmb}";
+            if (string.IsNullOrWhiteSpace(DocEmp)) DocEmp = "0";
+
+            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{tipoXml}{SoftwarePin}{TipAmb}";
 
             var hash = numberSha384.EncryptSHA384();
 
@@ -569,10 +572,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {
-                responses.AddRange(this.CheckIndividualPayrollInSameMonth(model.EmpleadorNIT,
-                                    xmlParser.globalDocPayrolls.NumeroDocumento,
-                                    xmlParser.Novelty,
-                                    xmlParser.globalDocPayrolls.FechaPagoInicio.Value));
+                responses.AddRange(this.CheckIndividualPayrollInSameMonth(xmlParser));
             }
 
             return responses;
@@ -947,7 +947,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate SenderCode and ReceiverCode
-        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null)
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude, 
+            List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null,
+            string partyLegalEntityName = null, string partyLegalEntityCompanyID = null, string availabilityCustomizationId = null)
         {
             DateTime startDate = DateTime.UtcNow;
             party.TrackId = party.TrackId.ToLower();
@@ -1245,6 +1247,64 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = errorMessageParty,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+
+                    // EndosoPropiedad
+                    if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
+                        && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
+                    {
+                        if (partyLegalEntityName != nitModel.IssuerPartyName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG03",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG03_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (partyLegalEntityCompanyID != nitModel.IssuerPartyCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        var receiverNameEndoso = xmlParserCude.Fields["ReceiverName"].ToString();
+                        var receiverCodeEndoso = xmlParserCude.Fields["ReceiverCode"].ToString();
+                        var receiverPartyLegalEntityCompanyID = xmlParserCude.Fields["ReceiverPartyLegalEntityCompanyID"].ToString();
+                        var receiverPartyLegalEntityName = xmlParserCude.Fields["ReceiverPartyLegalEntityName"].ToString();
+
+                        if (receiverNameEndoso != receiverPartyLegalEntityName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG13",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG13"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (receiverCodeEndoso != receiverPartyLegalEntityCompanyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG14",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG14"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
 
                     return responses;
@@ -4946,44 +5006,148 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Reemplazado Predecesor
 
-        public List<ValidateListResponse> ValidateReplacePredecesor(string trackId)
+        //public List<ValidateListResponse> ValidateReplacePredecesor(string trackId, string companyId, string employeeId)
+        //{
+        //    DateTime startDate = DateTime.UtcNow;
+        //    List<ValidateListResponse> responses = new List<ValidateListResponse>();
+        //    var item = new ValidateListResponse
+        //    {
+        //        IsValid = false,
+        //        Mandatory = true,
+        //        ErrorCode = "NIAE191a",
+        //        ErrorMessage = "Documento a Reemplazar no se encuentra recibido en la Base de Datos."
+        //    };
+
+        //    var adjustment = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+        //    if (adjustment == null)
+        //    {
+        //        item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+        //        responses.Add(item);
+        //        return responses;
+        //    }
+
+        //    var individualPayroll = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(adjustment.DocumentReferencedKey, adjustment.DocumentReferencedKey);
+        //    if (individualPayroll == null)
+        //    {
+        //        item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+        //        responses.Add(item);
+        //        return responses;
+        //    }
+
+        //    // Control de cambios v9.3: Se valida que el Predecesor corresponda al mismo Empleador y Empleado.
+        //    if(companyId != individualPayroll.SenderCode || employeeId != individualPayroll.ReceiverCode)
+        //    {
+        //        item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+        //        responses.Add(item);
+        //        return responses;
+        //    }
+
+        //    var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
+        //    if (document != null)
+        //    {
+        //        item.IsValid = true;
+        //        item.ErrorCode = "100";
+        //        item.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";
+        //    }
+
+        //    item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+        //    responses.Add(item);
+        //    return responses;
+        //}
+
+        public List<ValidateListResponse> ValidateReplacePredecesor(string trackId, XmlParseNomina xmlParser)
         {
+            var companyId = xmlParser.globalDocPayrolls.Emp_NIT;
+            var employeeId = xmlParser.globalDocPayrolls.NumeroDocumento;
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var item = new ValidateListResponse
+
+            int? noteType = xmlParser.globalDocPayrolls.TipoNota;
+            var noteTypeResponseError = new ValidateListResponse
             {
                 IsValid = false,
                 Mandatory = true,
-                ErrorCode = "NIAE191a",
+                ErrorCode = "NIAE214",
+                ErrorMessage = "Se debe colocar el Codigo correspondiente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            };
+
+            // validar tipo de Nota...
+            if ((!noteType.HasValue)
+                || (noteType.HasValue 
+                    && noteType.Value != (int)IndividualPayrollAdjustmentNoteType.Replace 
+                    && noteType.Value != (int)IndividualPayrollAdjustmentNoteType.Remove))
+            {
+                responses.Add(noteTypeResponseError);
+                return responses;
+            }
+
+            // Solo se debe informar uno de los nodos, nos pueden estar al mismo tiempo 'Reemplazar' y 'Eliminar'.
+            if (noteType.HasValue 
+                && ((noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Replace && xmlParser.HasRemoveNode)
+                        || (noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Remove && xmlParser.HasReplaceNode)))
+            {
+                responses.Add(noteTypeResponseError);
+                return responses;
+            }
+
+            var errorCode = (noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Replace) ? "NIAE191a" : "NIAE216a";
+
+            // Replace
+            var itemResponse = new ValidateListResponse
+            {
+                IsValid = false,
+                Mandatory = true,
+                ErrorCode = errorCode,
                 ErrorMessage = "Documento a Reemplazar no se encuentra recibido en la Base de Datos."
             };
 
             var adjustment = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
             if (adjustment == null)
             {
-                item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                responses.Add(item);
+                itemResponse.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                responses.Add(itemResponse);
                 return responses;
             }
 
             var individualPayroll = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(adjustment.DocumentReferencedKey, adjustment.DocumentReferencedKey);
             if (individualPayroll == null)
             {
-                item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-                responses.Add(item);
+                itemResponse.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                responses.Add(itemResponse);
                 return responses;
+            }
+
+            // Control de cambios v9.3: Se valida que el Predecesor corresponda al mismo Empleador y Empleado.
+            if(noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Replace)
+            {
+                if (companyId != individualPayroll.SenderCode || employeeId != individualPayroll.ReceiverCode)
+                {
+                    itemResponse.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    responses.Add(itemResponse);
+                    return responses;
+                }
+            }
+            else
+            {
+                if (companyId != individualPayroll.SenderCode)
+                {
+                    itemResponse.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+                    responses.Add(itemResponse);
+                    return responses;
+                }
             }
 
             var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
             if (document != null)
             {
-                item.IsValid = true;
-                item.ErrorCode = "100";
-                item.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";
+                itemResponse.IsValid = true;
+                itemResponse.ErrorCode = "100";
+                itemResponse.ErrorMessage = "Evento ValidateReplacePredecesor referenciado correctamente";
             }
 
-            item.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-            responses.Add(item);
+            itemResponse.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            responses.Add(itemResponse);
             return responses;
         }
 
@@ -5023,8 +5187,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return responses;
         }
 
-        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, DateTime startPaymentDate)
+        //private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, DateTime startPaymentDate)
+        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(XmlParseNomina xmlParser)
         {
+            var companyId = xmlParser.globalDocPayrolls.Emp_NIT;
+            var employeeId = xmlParser.globalDocPayrolls.NumeroDocumento;
+            var novelty = xmlParser.Novelty;
+            
             DateTime startDate = DateTime.UtcNow;
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -5060,6 +5229,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses; // no existe para el mes actual
             }
 
+            var startPaymentDate = xmlParser.globalDocPayrolls.FechaPagoInicio.Value;
+
             // Se valida contra la FechaPagoInicio...
             var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.FechaPagoInicio.Value.Year == startPaymentDate.Year
                 && x.FechaPagoInicio.Value.Month == startPaymentDate.Month);
@@ -5084,20 +5255,72 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses; // no existe para el mes actual
             }
 
-            //Novedad XML False
-            if (payrollCurrentMonth != null && !novelty)
+            ////Novedad XML False
+            //if (payrollCurrentMonth != null && !novelty)
+            //{
+            //    responses.Clear();
+            //    responses.Add(new ValidateListResponse
+            //    {
+            //        IsValid = false,
+            //        Mandatory = true,
+            //        ErrorCode = "NIE199",
+            //        ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
+            //        " durante el Mes indicado en el documento que posean como 'True' este elemento.",
+            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            //    });
+            //    return responses;
+            //}
+
+            // Control de cambios v9.3: Se valida que el CUNENov exista y corresponda al mismo Empleador y Empleado.
+            if (novelty)
             {
-                responses.Clear();
-                responses.Add(new ValidateListResponse
+                var errorCode = "NIE204a";
+                var errorMessage = "Documento a Realizar la Novedad contractual no se encuentra recibido en la Base de Datos";
+                var cune = xmlParser.globalDocPayrolls.CUNENov;
+
+                var individualPayroll = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
+                if (individualPayroll == null)
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "NIE199",
-                    ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
-                    " durante el Mes indicado en el documento que posean como 'True' este elemento.",
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-                return responses;
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = errorCode,
+                        ErrorMessage = errorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+
+                if (companyId != individualPayroll.SenderCode || employeeId != individualPayroll.ReceiverCode)
+                {
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = errorCode,
+                        ErrorMessage = errorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
+
+                var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(individualPayroll.Identifier, individualPayroll.Identifier);
+                if (document == null)
+                {
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = errorCode,
+                        ErrorMessage = errorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                    return responses;
+                }
             }
 
             return responses;

@@ -688,7 +688,7 @@ namespace Gosocket.Dian.Services.Utils
 
             var docTypeCode = documentParsed.DocumentTypeId;
             var cune = documentParsed.CUNE;
-            var cunePred = documentParsed.CUNEPred; 
+            var cunePred = documentParsed.CUNEPred;
 
             switch (docTypeCode)
             {

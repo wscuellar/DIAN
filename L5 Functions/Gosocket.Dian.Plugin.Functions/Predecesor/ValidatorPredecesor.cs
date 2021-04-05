@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Plugin.Functions.Predecesor
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartValidatePredecesor(data.TrackId);
+                var validateResponses = await ValidatorEngine.Instance.StartValidatePredecesor(data.TrackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)
