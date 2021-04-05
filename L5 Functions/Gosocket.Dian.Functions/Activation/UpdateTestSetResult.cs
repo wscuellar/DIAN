@@ -1,14 +1,9 @@
 using Gosocket.Dian.Application;
-using Gosocket.Dian.DataContext.Repositories;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
-using Gosocket.Dian.Functions.Others;
 using Gosocket.Dian.Infrastructure;
-using Gosocket.Dian.Interfaces.Repositories;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
@@ -37,7 +32,6 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private static readonly TableManager tableGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
 
@@ -391,7 +385,8 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwarePassword = software.SoftwarePassword,
                                     pin = software.Pin,
                                     url = software.Url,
-                                    softwareName = software.Name
+                                    softwareName = software.Name,
+                                    testSetId = globalTestSetTracking.TestSetId
                                 };
 
                                 //Enviamos la habilitacion para el usuario
@@ -763,6 +758,9 @@ namespace Gosocket.Dian.Functions.Activation
 
             [JsonProperty(PropertyName = "trace")]
             public string Trace { get; set; }
+
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }            
         }
 
     }

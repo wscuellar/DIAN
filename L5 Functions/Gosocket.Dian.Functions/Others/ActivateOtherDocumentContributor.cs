@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager TableManagerOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private static readonly TableManager TableManagerTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
         // Set queue name
         private const string queueName = "activate-otherdocument-operation-input";
@@ -44,12 +45,12 @@ namespace Gosocket.Dian.Functions.Others
 
                 try
                 {
-                    // Step 1  Validate RadianContributor
+                    // Step 1  Validate OtherDocumentActivateContributor
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                     requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
                     SetLogger(requestObject, "Step OtherDocument-1", "ActivateOtherContributor SoftwareId " + requestObject.SoftwareId, "ACT-01");
 
-                    //Contributorid = RadiancontributoriD
+                    //Contributorid = OtherDocumentActivateContributorID
                     int otherDocContributorId = 0;
                     otherDocElecContributor = contributorService.GetOtherDocElecContributor(requestObject.ContributorId, requestObject.OtherDocContributorTypeId);
                     SetLogger(null, "Step ActOther-1", otherDocElecContributor == null ? "vacio" : "radiancontributor no es null", "ACT-02");
@@ -182,6 +183,10 @@ namespace Gosocket.Dian.Functions.Others
                     if (IsProduction)
                         TableManagerOtherDocElecOperation.InsertOrUpdateAsync(globalOtherDocElecOperation).Wait();
 
+                    //Se inserta en GlobalTestSetOthersDocumentsResult
+                    if (IsProduction)
+                        TableManagerTestSetOthersDocumentsResult.InsertOrUpdateAsync(requestObject.TestSetOthersDocumentsResultObj).Wait();
+
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
 
@@ -280,6 +285,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "providerId")]
             public int ProviderId { get; set; }
+
+            [JsonProperty(PropertyName = "testSetOthersDocumentsResult")]
+            public GlobalTestSetOthersDocumentsResult TestSetOthersDocumentsResultObj { get; set; }
         }
 
     }

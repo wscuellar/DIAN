@@ -458,10 +458,10 @@ namespace Gosocket.Dian.Web.Controllers
             if (!recaptchaValidation.Item1)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage("Captcha invalido", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
             if (!ModelState.IsValid)
-                return View("CompanyLogin", model);
+                return Json(new ResponseMessage("informacion invalida", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             var pk = $"{model.IdentificationType}|{model.UserCode}";
             var rk = $"{model.CompanyCode}";

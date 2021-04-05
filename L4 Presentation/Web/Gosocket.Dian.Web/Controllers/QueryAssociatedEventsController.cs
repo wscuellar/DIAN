@@ -44,8 +44,6 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.CUDE = id;
 
-            SetTitles(eventItem, model);
-
             GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(cufe);
 
             SetMandate(model, eventItem, invoice);
@@ -62,11 +60,13 @@ namespace Gosocket.Dian.Web.Controllers
 
             SetEventAssociated(model, eventItem);
 
+            SetTitles(eventItem, model);
+
             Response.Headers["InjectingPartialView"] = "true";
 
             return PartialView(model);
 
-        } 
+        }
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private void SetTitles(GlobalDocValidatorDocumentMeta eventItem, SummaryEventsViewModel model)
         {
-            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode);
+            model.Title = _queryAssociatedEventsService.EventTitle(model.EventStatus, eventItem.CustomizationID, eventItem.EventCode, model.Mandate?.SchemeID);
             model.ValidationTitle = TextResources.Event_ValidationTitle;
             model.ReferenceTitle = TextResources.Event_ReferenceTitle;
         }
@@ -125,7 +125,7 @@ namespace Gosocket.Dian.Web.Controllers
         private static void SetEndoso(SummaryEventsViewModel model, GlobalDocValidatorDocumentMeta eventItem, GlobalDocValidatorDocumentMeta invoice)
         {
             model.Endoso = new EndosoViewModel(eventItem, invoice);
-            if(model.EventStatus == EventStatus.EndosoPropiedad)
+            if (model.EventStatus == EventStatus.EndosoPropiedad)
             {
                 if (eventItem.CustomizationID == "371")
                     model.Endoso.EndosoType = "Con responsabilidad";
@@ -145,7 +145,11 @@ namespace Gosocket.Dian.Web.Controllers
                 List<GlobalDocReferenceAttorney> referenceAttorneys = _queryAssociatedEventsService.ReferenceAttorneys(eventItem.DocumentKey, eventItem.DocumentReferencedKey, eventItem.ReceiverCode, eventItem.SenderCode);
 
                 if (referenceAttorneys.Any())
-                    model.Mandate.ContractDate = referenceAttorneys.FirstOrDefault().EffectiveDate;
+                {
+                    var Mandate= referenceAttorneys.FirstOrDefault();
+                    model.Mandate.ContractDate = Mandate.EffectiveDate;
+                    model.Mandate.SchemeID = Mandate.SchemeID;
+                }
             }
         }
 

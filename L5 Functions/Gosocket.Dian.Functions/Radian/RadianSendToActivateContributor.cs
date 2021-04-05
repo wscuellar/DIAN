@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,8 +25,6 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
 
-
-
         [FunctionName("SendToActivateRadianOperation")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
         {
@@ -39,7 +38,16 @@ namespace Gosocket.Dian.Functions.Radian
                 RadianActivationRequest data = await req.Content.ReadAsAsync<RadianActivationRequest>();
                 if (data == null)
                     throw new Exception("Request body is empty.");
-                SetLogger(data, "Step STA-1.1", "Data");
+                SetLogger(data, "Step STA-1.1 " + data.TestSetId, "Data");
+
+                var start = DateTime.UtcNow;
+                var startSendToActivateRadian = new GlobalLogger(data.TestSetId, "1 Start SendToActivateRadianOperation")
+                {
+                    Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                    Action = "Start SendToActivateRadianOperation"
+                };
+                await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateRadian);
+
 
                 //Se obtiene el participante radian para habilitacion.
                 RadianContributor radianContributor = contributorService.GetRadian(data.ContributorId, data.ContributorTypeId);
@@ -49,6 +57,14 @@ namespace Gosocket.Dian.Functions.Radian
 
                 try
                 {
+                    start = DateTime.UtcNow;
+                    var startSendContributorId = new GlobalLogger(data.TestSetId, "2 sendContributorId")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "startSendContributorId ContributorId: " + data.ContributorId
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendContributorId);
+
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
                     SetLogger(null, "Step STA-2", " -- Validaciones OK-- ");
@@ -88,6 +104,17 @@ namespace Gosocket.Dian.Functions.Radian
                                             + data.SoftwareType
                                             , "Step STA-6");
 
+                    start = DateTime.UtcNow;
+                    var startRadianContributor = new GlobalLogger(data.TestSetId, "3 startRadianContributor")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "startRadianContributor ContributorId:" + data.ContributorId +
+                        " RadianContributorTypeId: " + radianContributor.RadianContributorTypeId +
+                        " SoftwareId: " + data.SoftwareId +
+                        " SoftwareType: " + data.SoftwareType
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startRadianContributor);
+
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledRadian(
                         radianContributor.ContributorId,
@@ -112,11 +139,21 @@ namespace Gosocket.Dian.Functions.Radian
                         SoftwareName = data.SoftwareName,
                         SoftwareId = data.SoftwareId,
                         SoftwareType = data.SoftwareType,
-                        Url = data.Url
+                        Url = data.Url,
+                        RadianTestSetObj = results
+
                     };
                     //Se envia para la creacion en prod.
                     await SendToActivateRadianContributorToProduction(activateRadianContributorRequestObject);
                     SetLogger(activateRadianContributorRequestObject, "Step STA-7", " -- SendToActivateRadianContributorToProduction -- ", "STA-7");
+
+                    start = DateTime.UtcNow;
+                    var finishSendContributorId = new GlobalLogger(data.TestSetId, "4 finishSendContributorId")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "finish SendToActivateRadianOperation"
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
 
                 }
                 catch (Exception ex)
@@ -185,6 +222,9 @@ namespace Gosocket.Dian.Functions.Radian
             [JsonProperty(PropertyName = "url")]
             public string Url { get; set; }
 
+            [JsonProperty(PropertyName = "testSetId")]
+            public string TestSetId { get; set; }
+
         }
 
         class RadianaActivateContributorRequestObject
@@ -223,6 +263,9 @@ namespace Gosocket.Dian.Functions.Radian
 
             [JsonProperty(PropertyName = "softwarePassword")]
             public string SoftwarePassword { get; set; }
+
+            [JsonProperty(PropertyName = "radianTestSetObj")]
+            public RadianTestSetResult RadianTestSetObj { get; set; }
         }
 
 

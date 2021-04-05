@@ -507,6 +507,24 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public T FindOthersDocumentsResult<T>(string partitionKey, string softwareId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("SoftwareId",
+                    QueryComparisons.Equal,
+                    softwareId),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
         public T FindSoftwareRowKey<T>(string partitionKey, string softwareId) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -576,6 +594,7 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
         public List<T> FindpartitionKey<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
@@ -584,6 +603,7 @@ namespace Gosocket.Dian.Infrastructure
 
             return entities.ToList();
         }
+
         public List<T> FindDocumentReferenceAttorneyFaculitity<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));

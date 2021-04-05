@@ -18,9 +18,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
+        static 
 
         private readonly string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
         #endregion
+
+        #region GetAssociateDocument
+        public List<GlobalDocValidatorDocumentMeta> GetAssociateDocument()
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<GlobalDocValidatorDocumentMeta> responses = new List<GlobalDocValidatorDocumentMeta>();
+
+
+
+
+
+            return responses;
+
+        }
+        #endregion
+
 
         #region ValidatePaymetInfo
         public List<ValidateListResponse> ValidatePaymetInfo(List<GlobalDocValidatorDocumentMeta> documentMeta)

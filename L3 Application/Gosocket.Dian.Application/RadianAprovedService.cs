@@ -215,6 +215,7 @@ namespace Gosocket.Dian.Application
 
             if (isInsert)
             {
+                software.Url = ConfigurationManager.GetValue("WebServiceUrl");
                 RadianSoftware soft = _radianCallSoftwareService.CreateSoftware(software);
                 radianContributorOperation.SoftwareId = soft.Id;
             }

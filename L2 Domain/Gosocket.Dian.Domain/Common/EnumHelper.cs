@@ -225,42 +225,105 @@ namespace Gosocket.Dian.Domain.Common
     {
         [Description("None")]
         None = 000,
-        [Description("Acuse de recibo de Factura Electrónica de Venta")]
+        [Description("Acuse de recibo de la Factura Electrónica de Venta")]
         Received = 030,
         [Description("Reclamo de la Factura Electrónica de Venta")]
         Rejected = 031,
-        [Description("Recibo del bien y/o prestación del servicio")]
+        [Description("Recibo del bien o prestación del servicio")]
         Receipt = 032,
-        [Description("Aceptación expresa")]
+        [Description("Aceptación expresa de la Factura Electrónica de Venta")]
         Accepted = 033,
-        [Description("Aceptación Tácita")]
+        [Description("Aceptación tácita de la Factura Electrónica de Venta")]
         AceptacionTacita = 034,
         [Description("Aval")]
         Avales = 035,
-        [Description("Inscripción de la factura electrónica de venta como título valor - RADIAN")]
+        [Description("Inscripción en el RADIAN de la Factura Electrónica de Venta como Título Valor")]
         SolicitudDisponibilizacion = 036,
-        [Description("Endoso en propiedad")]
+        [Description("Endoso electrónico en propiedad ")]
         EndosoPropiedad = 037,
-        [Description("Endoso en garantía")]
+        [Description("Endoso electrónico en garantía")]
         EndosoGarantia = 038,
-        [Description("Endoso en procuración")]
+        [Description("Endoso electrónico en procuración")]
         EndosoProcuracion = 039,
-        [Description("Cancelación de endoso")]
+        [Description("Cancelación del endoso electrónico")]
         InvoiceOfferedForNegotiation = 040,
-        [Description("Limitaciones a la circulación de la factura electrónica de venta como título")]
+        [Description("Limitación para circulación de la Factura Electrónica de Venta como Título Valor")]
         NegotiatedInvoice = 041,
-        [Description("Terminación de las limitaciones a la circulación de la factura electrónica de venta como título")]
+        [Description("Terminación de la limitación para circulación de la Factura Electrónica de Venta como Título Valor")]
         AnulacionLimitacionCirculacion = 042,
         [Description("Mandato")]
         Mandato = 043,
         [Description("Terminación del mandato")]
         TerminacionMandato = 044,
-        [Description("Pago de la factura electrónica de venta como título valor")]
+        [Description("Pago de la Factura Electrónica de Venta como Título Valor")]
         NotificacionPagoTotalParcial = 045,
-        [Description("Informe para el pago")]
+        [Description("Informe para el pago de la Factura Electrónica de Venta como Título Valor")]
         ValInfoPago = 046
     }
 
+    public enum SubEventStatus
+    {
+        [Description("Endoso electrónico en propiedad con responsabilidad")]
+        ConResponsabilidad = 371,
+        [Description("Endoso electrónico en propiedad sin responsabilidad")]
+        SinResponsabilidad = 372,
+
+        [Description("Mandato general por documento general por tiempo limitado")]
+        MandatoGenerarlLimitado = 431,
+        [Description("Mandato general por documento general por tiempo ilimitado")]
+        MandatoGenerarlIlimitado = 432,
+        [Description("Mandato general por documento limitado por tiempo limitado")]
+        MandatoGenerarlTiempo = 433,
+        [Description("Mandato general por documento limitado por tiempo ilimitado")]
+        MandatoGenerarlTiempoIlimitado = 434,
+
+
+        [Description("Mandato especial por documento general por tiempo limitado")]
+        MandatoGenerarlLimitadoEspecial = 4131,
+        [Description("Mandato especial por documento general por tiempo ilimitado")]
+        MandatoGenerarlIlimitadoEspecial = 4321,
+        [Description("Mandato especial por documento limitado por tiempo limitado")]
+        MandatoGenerarlTiempoEspecial = 4331,
+        [Description("Mandato especial por documento limitado por tiempo ilimitado")]
+        MandatoGenerarlTiempoIlimitadoEspecial = 4341,
+
+
+        [Description("Primera inscripción de la Factura Electrónica de Venta como Título Valor en el RADIAN para negociación general")]
+        PrimeraSolicitudDisponibilizacion = 361,
+        [Description("Primera inscripción de la Factura Electrónica de Venta como Título Valor en el RADIAN para negociación directa previa")]
+        SolicitudDisponibilizacionDirecta = 362,
+        [Description("Inscripción posterior de la Factura Electrónica de Venta como Título Valor en el RADIAN para negociación general")]
+        SolicitudDisponibilizacionPosterior = 363,
+        [Description("Inscripción posterior de la Factura Electrónica de Venta como Título Valor en el RADIAN para negociación directa previa")]
+        SolicitudDisponibilizacionPosteriorDirecta = 364,
+
+        [Description("Cancelación del endoso electrónico en garantía")]
+        CancelacionEndoso = 401,
+        [Description("Cancelación del endoso electrónico en procuración")]
+        CancelacionEndosoProcuracion = 402,
+
+        [Description("Tacha de endosos por endoso en retorno")]
+        TachaEndosoRetorno = 403,
+
+        [Description("Limitación para circulación de la Factura Electrónica de Venta como Título Valor por auto que decreta medida cautelar por embargo")]
+        MedidaCautelarEmbargo = 411,
+        [Description("Limitación para circulación de la Factura Electrónica de Venta como Título Valor por auto que decreta medida cautelar por mandamiento de pago")]
+        MedidaCautelarMandamiento = 412,
+
+        [Description("Terminación de la limitación para circulación de la Factura Electrónica de Venta como Título Valor por sentencia")]
+        TerminacionSentencia = 421,
+        [Description("Terminación de la limitación para circulación de la Factura Electrónica de Venta como Título Valor por terminación anticipada")]
+        TerminacionAnticipada = 422,
+
+        [Description("Terminación del mandato por revocatoria")]
+        TerminacionRevocatoria = 441,
+        [Description("Terminación del mandato por renuncia")]
+        TerminacionRenuncia = 442,
+        [Description("Pago parcial de la Factura Electrónica de Venta como Título Valor")]
+        PagoParcial = 451,
+        [Description("Pago total de la Factura Electrónica de Venta como Título Valor")]
+        PagoTotal = 452
+    }
 
     public enum ExportStatus
     {
@@ -770,52 +833,7 @@ namespace Gosocket.Dian.Domain.Common
         ClearingEntreartners = 97
 
     }
-
-    public enum SubEventStatus
-    {
-        [Description("Endoso electrónico en propiedad con responsabilidad de la FEV")]
-        ConResponsabilidad = 371,
-        [Description("Endoso electrónico en propiedad sin responsabilidad de la FEV")]
-        SinResponsabilidad = 372,
-        [Description("Mandato General de la FEV TV por documento General por tiempo limitado")]
-        MandatoGenerarlLimitado = 431,
-        [Description("Mandato General de la FEV TV por documento General por tiempo Ilimitado")]
-        MandatoGenerarlIlimitado = 432,
-        [Description("Mandato General de la FEV TV por documento Limitado por tiempo limitado")]
-        MandatoGenerarlTiempo = 433,
-        [Description("Mandato General de la FEV TV por documento Limitado por tiempo Ilimitado")]
-        MandatoGenerarlTiempoIlimitado = 434,
-        [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación General")]
-        PrimeraSolicitudDisponibilizacion = 361,
-        [Description("Inscripción en el RADIAN para primera circulación  de la FEV para Negociación Directa Previa")]
-        SolicitudDisponibilizacionDirecta = 362,
-        [Description("Inscripción en el RADIAN para circulación posterior de la FEV para Negociación General")]
-        SolicitudDisponibilizacionPosterior = 363,        
-        [Description("Inscripción en el RADIAN para circulación posterior de la FEV para Negociación Directa Previa")]
-        SolicitudDisponibilizacionPosteriorDirecta = 364,
-        [Description("Cancelación del Endoso en Garantia")]
-        CancelacionEndoso = 401,
-        [Description("Cancelación del Endoso en Procuración")]
-        CancelacionEndosoProcuracion = 402,
-        [Description("Tacha de endosos por endoso en retorno")]
-        TachaEndosoRetorno= 403,
-        [Description("Auto que decreta medida cautelar por embargo")]
-        MedidaCautelarEmbargo = 411,
-        [Description("Auto que decreta medida cautelar por mandamiento de pago")]
-        MedidaCautelarMandamiento = 412,        
-        [Description("Terminación de limitación por sentencia")]
-        TerminacionSentencia = 421,
-        [Description("Terminación de limitación por terminación anticipada")]
-        TerminacionAnticipada = 422,        
-        [Description("Terminación por Revocatoria del mandato de la FEV")]
-        TerminacionRevocatoria = 441,
-        [Description("Terminación por Renuncia del mandato de la FEV")]
-        TerminacionRenuncia = 442,
-        [Description("Pago Parcial de la FEV TV")]
-        PagoParcial = 451,
-        [Description("Pago Total de la FEV TV")]
-        PagoTotal = 452
-    }
+       
 
     public enum EndodoSubEventStatus
     {

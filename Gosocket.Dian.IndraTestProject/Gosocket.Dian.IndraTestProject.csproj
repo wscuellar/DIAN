@@ -118,6 +118,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssociateDocumentServiceTests.cs" />
     <Compile Include="Controllers\OthersDocumentsControllerTest.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedControllerTests.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsControllerTests.cs" />

@@ -26,6 +26,8 @@ namespace Gosocket.Dian.Functions.Events
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
         private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
+        private static readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
         [FunctionName("RegistrateCompletedRadian")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -64,6 +66,7 @@ namespace Gosocket.Dian.Functions.Events
                 
                 if (documentMeta != null)
                 {
+                  
                     //Registra Mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
                     {
@@ -87,6 +90,24 @@ namespace Gosocket.Dian.Functions.Events
 
                     //Inserta registros AR en GlobalDocRegisterProviderAR
                     InsertGlobalDocRegisterProviderAR(documentRegisterAR);
+
+                    //Obtiene informacion de GlobalDocAssociate
+                    GlobalDocAssociate validatorDocumentAssociate = TableManagerGlobalDocAssociate.Find<GlobalDocAssociate>(documentMeta.DocumentReferencedKey, trackIdCude);
+                    if(validatorDocumentAssociate != null)
+                    {
+                        validatorDocumentAssociate.Active = true;
+                        InsertGlobalDocAssociate(validatorDocumentAssociate);
+                    }
+
+                    //Inserta registro GlobalDocQueryRegisteredInvoice
+                    //Obtiene XML Invoice CUFE
+                    var xmlBytesCufe = await Utils.Utils.GetXmlFromStorageAsync(documentMeta.DocumentReferencedKey);
+                    var xmlParserCufe = new XmlParser(xmlBytesCufe);
+                    if (!xmlParserCufe.Parser())
+                        throw new Exception(xmlParserCufe.ParserError);
+
+                    InsertDocQueryRegisteredInvoice(documentMeta, xmlParserCufe);
+
 
                     //Actualiza registro Mandato asociado a la Factura, terminacion de mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
@@ -158,6 +179,7 @@ namespace Gosocket.Dian.Functions.Events
             string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string serieAndNumber = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ID']").Item(0)?.InnerText.ToString();
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
+            string schemeID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.Attributes["schemeID"].Value;            
             string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
             string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
@@ -270,13 +292,51 @@ namespace Gosocket.Dian.Functions.Events
                     SerieAndNumber = serieAndNumber,
                     SenderName = senderName,
                     IssuerAttorneyName = name,
-                    ResponseCodeListID = listID
+                    ResponseCodeListID = listID,
+                    SchemeID = schemeID
+
                 };
                 arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney));
             }
         }
         #endregion
 
+        #region insert GlobalDocQueryRegisteredInvoice    
+        private static void InsertDocQueryRegisteredInvoice(GlobalDocValidatorDocumentMeta documentMeta, XmlParser xmlParserCufe)
+        {
+            var arrayTasks = new List<Task>();
+            var failedList = new List<string>();          
+
+            string trackIdCufe = documentMeta.DocumentReferencedKey;
+            string startDate = DateTime.UtcNow.AddHours(-5).ToString("yyyyMMdd");     //"20210321"
+            string accountingSupplierParty = string.Empty;
+            string accountingCustomerParty = string.Empty;
+            string techProviderCode = documentMeta.TechProviderCode;
+           
+            accountingSupplierParty = xmlParserCufe.Fields["SenderCode"].ToString();
+            accountingCustomerParty = xmlParserCufe.Fields["ReceiverCode"].ToString();
+
+            failedList.Add(startDate + "|" + accountingSupplierParty);
+            failedList.Add(startDate + "|" + accountingCustomerParty);
+            failedList.Add(startDate + "|" + techProviderCode);          
+            
+            foreach (var item in failedList)
+            {
+                GlobalDocumentWithEventRegistered docQueryRegisteredInvoice = new GlobalDocumentWithEventRegistered(item, trackIdCufe)
+                {                    
+                };
+                arrayTasks.Add(TableManagerGlobalDocumentWithEventRegistered.InsertOrUpdateAsync(docQueryRegisteredInvoice));
+            }                      
+        }
+        #endregion
+
+        #region InsertGlobalDocAssociate
+        private static void InsertGlobalDocAssociate(GlobalDocAssociate documentAssociate)
+        {
+            var arrayTasks = new List<Task>();
+            arrayTasks.Add(TableManagerGlobalDocAssociate.InsertOrUpdateAsync(documentAssociate));
+        }
+        #endregion
 
         #region InsertGlobalDocRegisterProviderAR
         private static void InsertGlobalDocRegisterProviderAR(GlobalDocRegisterProviderAR documentRegisterAR)
