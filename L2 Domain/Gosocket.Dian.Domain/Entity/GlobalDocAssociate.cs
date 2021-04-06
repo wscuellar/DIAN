@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System.Collections.Generic;
+using System;
 
 namespace Gosocket.Dian.Domain.Entity
 {
@@ -16,6 +17,10 @@ namespace Gosocket.Dian.Domain.Entity
         public string Identifier { get; set; }
         public string EventCode { get; set; }
         public string CustomizationID { get; set; }
+        public DateTime? SigningTimeStamp { get; set; }
+        public string SerieAndNumber { get; set; }
+        public string TestSetId { get; set; }
+        public bool SendTestSet { get; set; }
 
     }
 

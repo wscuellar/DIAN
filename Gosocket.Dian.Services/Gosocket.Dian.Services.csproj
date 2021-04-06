@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
+    <Compile Include="Models\CufeModel.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
     <Compile Include="Models\ValidatePayroll.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -93,6 +94,7 @@
     <Compile Include="Utils\Cryptography\XmlDsig\SignXmlDocument.cs" />
     <Compile Include="Utils\Cryptography\XmlDsig\ValidXmlDocument.cs" />
     <Compile Include="Utils\DianServicesUtils.cs" />
+    <Compile Include="Utils\DocIdentifierWithEventsResponse.cs" />
     <Compile Include="Utils\EventResponse.cs" />
     <Compile Include="Utils\ExchangeEmailResponse.cs" />
     <Compile Include="Utils\Extensions.cs" />

@@ -707,6 +707,46 @@ namespace Gosocket.Dian.Web.Services
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contributorCode"></param>
+        /// <param name="dateNumber"></param>
+        /// <returns></returns>
+        public DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if(string.IsNullOrWhiteSpace(contributorCode))
+                {
+                    Log($"{authCode} {email} GetDocIdentifierWithEvents", (int)InsightsLogType.Error, "ContributorCode no enviado.");
+                    return new DocIdentifierWithEventsResponse { StatusCode = "89", Success = false, Message = "ContributorCode no enviado.", CsvBase64Bytes = null };
+                }
+
+                DianPAServices customerDianPa = new DianPAServices();
+                {
+                    var start = DateTime.UtcNow;
+                    var result = customerDianPa.GetDocIdentifierWithEvents(authCode, contributorCode, dateNumber);
+
+                    customerDianPa = null;
+                    var end = DateTime.UtcNow.Subtract(start).TotalSeconds;
+                    Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetDocIdentifierWithEvents " + end);
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("GetDocIdentifierWithEvents", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"GetDocIdentifierWithEvents-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetDocIdentifierWithEvents", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DocIdentifierWithEventsResponse { StatusCode = "500", Success = false, Message = "Ha ocurrido un error. Por favor inténtentelo de nuevo.", CsvBase64Bytes = null };
+            }
+        }
+
+        /// <summary>
         /// Check trackId format
         /// </summary>
         /// <param name="trackId"></param>

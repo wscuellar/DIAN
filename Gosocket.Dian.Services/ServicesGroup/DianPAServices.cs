@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static Gosocket.Dian.Logger.Logger;
 
@@ -37,6 +38,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
         private readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
+        private readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
         private FileManager fileManager = new FileManager();
 
@@ -1517,6 +1519,45 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return eventResponse;
         }
 
+        public DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string authCode, string contributorCode, string dateNumber)
+        {
+            var response = new DocIdentifierWithEventsResponse { StatusCode = "0", Success = true, CsvBase64Bytes = null };
+            bool validateAuthorization = Convert.ToBoolean(ConfigurationManager.GetValue("ValidateAuthorizationDocIdentifierWithEvents"));
+            if (validateAuthorization)
+            {
+                // La variable authCode obtienes el NIT que viene dentro del certificado y el contributorCode es el Nit enviado por parametro 
+                var authEntity = GetAuthorization(contributorCode, authCode);
+                if (authEntity == null)
+                {
+                    response.StatusCode = "401";
+                    response.Success = false;
+                    response.Message = $"NIT {authCode} no autorizado para consultar documentos con eventos del Nit { contributorCode }";
+                    return response;
+                }
+            }
+
+            if(string.IsNullOrWhiteSpace(dateNumber)) // Si no llega fecha, se establece la actual...
+            {
+                var now = DateTime.Now;
+                dateNumber = $"{now.Year}{now.Month.ToString().PadLeft(2, char.Parse("0"))}{now.Day.ToString().PadLeft(2, char.Parse("0"))}";
+            }
+
+            var partitionKey = $"{dateNumber}|{contributorCode}"; // Se arma el PartitionKey compuesto (fecha|NIT)
+            var eventsList = TableManagerGlobalDocumentWithEventRegistered.FindAll<GlobalDocumentWithEventRegistered>(partitionKey).ToList();
+            if(eventsList == null || eventsList.Count <= 0)
+            {
+                response.Message = $"No existe información con los criterios de búsqueda recibidos";
+                return response;
+            }
+
+            var cufesList = eventsList.Select(item => new Models.CufeModel { CUFE = item.RowKey }).ToList();
+
+            var csv = StringUtil.ToCSV(cufesList);
+            response.CsvBase64Bytes = Encoding.UTF8.GetBytes(csv);
+
+            return response;
+        }
+
         #region Private methods
         /// <summary>
         /// 
@@ -1587,11 +1628,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 // Check if response has errors
                 if (response.ErrorMessage.Any())
                 {
-                    //
-                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+                    ////
+                    //var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    //if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
-                    //
+                    ////
                     return response;
                 }
             }

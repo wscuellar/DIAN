@@ -3,11 +3,11 @@ using System;
 
 namespace Gosocket.Dian.Domain.Entity
 {
-    public class GlobalDocQueryRegisteredInvoice : TableEntity
+    public class GlobalDocumentWithEventRegistered : TableEntity
     {
-        public GlobalDocQueryRegisteredInvoice() { }
+        public GlobalDocumentWithEventRegistered() { }
 
-        public GlobalDocQueryRegisteredInvoice(string pk, string rk) : base(pk, rk)
+        public GlobalDocumentWithEventRegistered(string pk, string rk) : base(pk, rk)
         {
 
         }
