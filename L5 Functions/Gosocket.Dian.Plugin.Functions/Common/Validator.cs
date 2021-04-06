@@ -1714,8 +1714,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
+            bool validEndoso = false;           
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -2178,8 +2178,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validateID = false;
             bool validateReference = false;
             bool validateSigningTime = false;
-            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
-            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
+            int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));            
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
             string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
@@ -4313,8 +4313,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null,
             DateTime? signingTimeAvailability = null)
         {
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();            
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
+
             int businessDays = 0;
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
