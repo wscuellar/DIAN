@@ -34,6 +34,11 @@ namespace Gosocket.Dian.Application
             if (!associateDocumentList.Any())
                 return new List<InvoiceWrapper>();
 
+            return InvoiceProcess(associateDocumentList);
+        }
+
+        private List<InvoiceWrapper> InvoiceProcess(List<GlobalDocAssociate> associateDocumentList)
+        {
             //Organiza grupos por factura
             var groups = associateDocumentList.Where(t => t.Active && !string.IsNullOrEmpty(t.Identifier)).GroupBy(t => t.PartitionKey);
             List<InvoiceWrapper> responses = groups.Aggregate(new List<InvoiceWrapper>(), (list, source) =>
@@ -82,7 +87,6 @@ namespace Gosocket.Dian.Application
             return responses;
         }
 
-
         private GlobalDocValidatorDocumentMeta OperationProcess(List<GlobalDocAssociate> associations, List<GlobalDocValidatorDocumentMeta> meta, List<GlobalDocValidatorDocument> documents, List<GlobalDocValidatorTracking> notifications, List<GlobalDocReferenceAttorney> attorneys, string cufe)
         {
             List<Task> arrayTasks = new List<Task>();
@@ -99,7 +103,9 @@ namespace Gosocket.Dian.Application
             {
                 for (int i = 0; i < associations.Count; i++)
                 {
-                    meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(associations[i].RowKey, associations[i].RowKey));
+                    GlobalDocValidatorDocumentMeta current = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(associations[i].RowKey, associations[i].RowKey);
+                    if (!string.IsNullOrEmpty(current.EventCode))
+                        meta.Add(current);
                 }
             });
 
@@ -133,7 +139,7 @@ namespace Gosocket.Dian.Application
                 }
 
                 //Organiza los cufes para la busqueda
-                var attorneyCudes = attorneys.Select(t => new
+                var attorneyCudes = attorneys.Where(x => x.DocReferencedEndAthorney != null).Select(t => new
                 {
                     OriginalCude = t.PartitionKey,
                     CancelAttorneyCude = t.DocReferencedEndAthorney ?? string.Empty
@@ -142,7 +148,6 @@ namespace Gosocket.Dian.Application
                 //Obtiene los eventos de la documentMeta
                 for (int i = 0; i < attorneyCudes.Count; i++)
                 {
-                    meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyCudes[i].OriginalCude, attorneyCudes[i].OriginalCude));
                     if (!string.IsNullOrEmpty(attorneyCudes[i].CancelAttorneyCude))
                         meta.Add(TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(attorneyCudes[i].CancelAttorneyCude, attorneyCudes[i].CancelAttorneyCude));
                 }
@@ -158,6 +163,7 @@ namespace Gosocket.Dian.Application
 
             return invoice;
         }
+
 
     }
 }
