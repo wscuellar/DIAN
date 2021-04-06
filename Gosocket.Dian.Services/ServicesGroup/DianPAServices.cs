@@ -1628,11 +1628,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 // Check if response has errors
                 if (response.ErrorMessage.Any())
                 {
-                    //
-                    var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
-                    if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
+                    ////
+                    //var validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(document.DocumentKey);
+                    //if (validations.Any(v => !v.IsValid && v.Mandatory)) return null;
 
-                    //
+                    ////
                     return response;
                 }
             }
