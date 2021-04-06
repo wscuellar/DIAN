@@ -8,6 +8,7 @@ using Gosocket.Dian.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -18,11 +19,13 @@ namespace Gosocket.Dian.Web.Controllers
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IContributorService _contributorService;
+        private readonly IAssociateDocuments _associateDocuments;
 
-        public QueryAssociatedEventsController(IQueryAssociatedEventsService queryAssociatedEventsService, IContributorService contributorService)
+        public QueryAssociatedEventsController(IQueryAssociatedEventsService queryAssociatedEventsService, IContributorService contributorService, IAssociateDocuments associateDocuments)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _contributorService = contributorService;
+            _associateDocuments = associateDocuments;
         }
 
         #endregion
@@ -36,6 +39,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public PartialViewResult EventsView(string id, string cufe)
         {
+            List<Task> arrayTasks = new List<Task>();
             GlobalDocValidatorDocumentMeta eventItem = _queryAssociatedEventsService.DocumentValidation(id);
 
             SummaryEventsViewModel model = new SummaryEventsViewModel(eventItem);
@@ -43,29 +47,43 @@ namespace Gosocket.Dian.Web.Controllers
             model.EventStatus = (EventStatus)Enum.Parse(typeof(EventStatus), eventItem.EventCode);
 
             model.CUDE = id;
-
-            GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(cufe);
-
-            SetMandate(model, eventItem, invoice);
-
-            SetEndoso(model, eventItem, invoice);
-
             model.RequestType = TextResources.Event_RequestType;
+            GlobalDocValidatorDocumentMeta invoice = _queryAssociatedEventsService.DocumentValidation(cufe);
+            Task operation1 = Task.Run(() =>
+            {
+                SetMandate(model, eventItem, invoice);
+                SetTitles(eventItem, model);
+            });
+            Task operation2 = Task.Run(() =>
+            {
+                SetEndoso(model, eventItem, invoice);
+            });
 
-            GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem);
-            SetValidations(model, eventItem, eventVerification);
+            Task operation3 = Task.Run(() =>
+            {
+                GlobalDocValidatorDocument eventVerification = _queryAssociatedEventsService.EventVerification(eventItem);
+                SetValidations(model, eventItem, eventVerification);
+            });
+            Task operation4 = Task.Run(() =>
+            { 
+                GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
+                SetReferences(model, referenceMeta); 
+            });
+            Task operation5 = Task.Run(() =>
+            { 
+                SetEventAssociated(model, eventItem); 
+            });
 
-            GlobalDocValidatorDocumentMeta referenceMeta = _queryAssociatedEventsService.DocumentValidation(eventItem.DocumentReferencedKey);
-            SetReferences(model, referenceMeta);
+            arrayTasks.Add(operation1);
+            arrayTasks.Add(operation2);
+            arrayTasks.Add(operation3);
+            arrayTasks.Add(operation4);
+            arrayTasks.Add(operation5);
 
-            SetEventAssociated(model, eventItem);
-
-            SetTitles(eventItem, model);
+            Task.WhenAll(arrayTasks).Wait();
 
             Response.Headers["InjectingPartialView"] = "true";
-
             return PartialView(model);
-
         }
 
         #endregion
@@ -95,7 +113,6 @@ namespace Gosocket.Dian.Web.Controllers
                             model.AssociatedEvents.Add(new AssociatedEventsViewModel(otherEvent));
                     }
                 }
-
             }
         }
 
@@ -146,7 +163,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (referenceAttorneys.Any())
                 {
-                    var Mandate= referenceAttorneys.FirstOrDefault();
+                    var Mandate = referenceAttorneys.FirstOrDefault();
                     model.Mandate.ContractDate = Mandate.EffectiveDate;
                     model.Mandate.SchemeID = Mandate.SchemeID;
                 }

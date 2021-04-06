@@ -119,5 +119,9 @@ namespace Gosocket.Dian.Web.Services
         [OperationContract]
         [CustomOperation]
         EventResponse GetXmlByDocumentKey(string trackId);
+
+        [OperationContract]
+        [CustomOperation]
+        DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber);
     }
 }

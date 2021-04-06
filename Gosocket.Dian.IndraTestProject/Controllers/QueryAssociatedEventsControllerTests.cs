@@ -14,12 +14,13 @@ namespace Gosocket.Dian.Web.Controllers.Tests
 
         QueryAssociatedEventsController _current;
         private readonly Mock<IQueryAssociatedEventsService> _queryAssociatedEventsService = new Mock<IQueryAssociatedEventsService>();
-        private readonly Mock<IContributorService> _contributorService = new Mock<IContributorService>();
+        private readonly Mock<IContributorService> _contributorService = new Mock<IContributorService>(); 
+        private readonly Mock<IAssociateDocuments> _associateDocuments = new Mock<IAssociateDocuments>();
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _current = new QueryAssociatedEventsController(_queryAssociatedEventsService.Object, _contributorService.Object);
+            _current = new QueryAssociatedEventsController(_queryAssociatedEventsService.Object, _contributorService.Object, _associateDocuments.Object);
         }
         
 
