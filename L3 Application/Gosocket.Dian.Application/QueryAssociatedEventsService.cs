@@ -232,11 +232,9 @@ namespace Gosocket.Dian.Application
             statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
 
             if (documentKey != "")
-            {
                 allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
-                allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
+            allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
-            }
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();
             var events = eventListByTimestamp(allReferencedDocuments).OrderBy(t => t.Timestamp).ToList();
 
