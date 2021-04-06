@@ -98,6 +98,21 @@ namespace Gosocket.Dian.Functions.Events
                         validatorDocumentAssociate.Active = true;
                         InsertGlobalDocAssociate(validatorDocumentAssociate);
                     }
+                    else
+                    {
+                        GlobalDocAssociate associate = new GlobalDocAssociate(documentMeta.DocumentReferencedKey, trackIdCude)
+                        {
+                            Active = true,
+                            Identifier = documentMeta.Identifier,
+                            EventCode = documentMeta.EventCode,
+                            CustomizationID = documentMeta.CustomizationID,
+                            SigningTimeStamp = documentMeta.SigningTimeStamp,
+                            SerieAndNumber = documentMeta.SerieAndNumber,
+                            TestSetId = documentMeta.TestSetId,
+                            SendTestSet = documentMeta.SendTestSet
+                        };
+                        InsertGlobalDocAssociate(associate);
+                    }
 
                     //Inserta registro GlobalDocQueryRegisteredInvoice
                     //Obtiene XML Invoice CUFE
