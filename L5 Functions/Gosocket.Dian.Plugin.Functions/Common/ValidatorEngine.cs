@@ -450,7 +450,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
             string parameterPaymentDueDateFE = null;
             if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
-                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
             {
                 var originalXmlBytes = await GetXmlFromStorageAsync(originalTrackId);
                 var originalXmlParser = new XmlParser(originalXmlBytes);
