@@ -4755,6 +4755,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    // El evento debe incluir la fecha de Vencimiento de la Factura electrónica de Venta 
+                    // (Debe validar el campo EndDate contra el campo  PaymentDueDate de la factura referenciada.)
+                    DateTime endDatePaymentDueDateEndoso = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime paymentDueDateFacturaEndoso = Convert.ToDateTime(paymentDueDateFE).Date;
+
+                    if (endDatePaymentDueDateEndoso != paymentDueDateFacturaEndoso)                   
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = false,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
                     break;
                 case (int)EventStatus.TerminacionMandato:
                     DateTime signingTime = Convert.ToDateTime(data.SigningTime);

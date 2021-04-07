@@ -2172,8 +2172,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
+            bool validEndoso = false;           
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatoryEndoso"), out bool ValidateManadatoryEndoso);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -2184,7 +2184,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI05",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2198,7 +2198,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI07a",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2212,7 +2212,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI09",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2221,17 +2221,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Calculo valor de la negociación
-                int resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+                double resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultNegotiationValue = resultNegotiationValue / 100;
 
                 //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+                if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)                
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAI07b",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2242,41 +2242,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (xmlParserCude.Fields["listID"].ToString() != "2")
             {
                 XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueSender = 0;
+                double totalValueSender = 0;
                 for (int i = 0; i < valueListSender.Count; i++)
                 {
                     string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 }
 
                 XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueReceiver = 0;
+                double totalValueReceiver = 0;
                 for (int i = 0; i < valueListReceiver.Count; i++)
                 {
                     string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 }
 
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+                if (double.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAF19",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
 
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
+                if (double.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAG20",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
