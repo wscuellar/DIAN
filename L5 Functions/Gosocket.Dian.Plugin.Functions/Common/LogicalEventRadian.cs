@@ -2221,11 +2221,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 //Calculo valor de la negociación
-                int resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+                double resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
                 resultNegotiationValue = resultNegotiationValue / 100;
 
                 //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+                if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)                
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
