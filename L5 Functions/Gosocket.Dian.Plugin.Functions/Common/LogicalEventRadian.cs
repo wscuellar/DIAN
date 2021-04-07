@@ -2173,7 +2173,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validEndoso = false;           
-            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatoryEndoso"), out bool ValidateManadatoryEndoso);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -2184,7 +2184,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI05",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2198,7 +2198,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI07a",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2212,7 +2212,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = true,
                         ErrorCode = "AAI09",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2231,7 +2231,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAI07b",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2263,7 +2263,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAF19",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -2276,7 +2276,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = ValidateManadatory,
+                        Mandatory = ValidateManadatoryEndoso,
                         ErrorCode = "AAG20",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
