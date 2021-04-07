@@ -2172,8 +2172,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-            bool.TryParse(ConfigurationManager.GetValue("ValidateManadatory"), out bool ValidateManadatory);
+            bool validEndoso = false;           
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
             //Valida informacion Endoso en propiedad                       
             if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
@@ -2242,22 +2242,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (xmlParserCude.Fields["listID"].ToString() != "2")
             {
                 XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueSender = 0;
+                double totalValueSender = 0;
                 for (int i = 0; i < valueListSender.Count; i++)
                 {
                     string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 }
 
                 XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueReceiver = 0;
+                double totalValueReceiver = 0;
                 for (int i = 0; i < valueListReceiver.Count; i++)
                 {
                     string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                    totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 }
 
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+                if (double.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
@@ -2270,7 +2270,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
 
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
+                if (double.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
