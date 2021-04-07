@@ -1,12 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Gosocket.Dian.Application;
-using System;
+﻿using Gosocket.Dian.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gosocket.Dian.Web.Controllers;
-using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Application.Tests
 {

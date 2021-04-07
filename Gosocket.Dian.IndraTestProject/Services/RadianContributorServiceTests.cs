@@ -7,19 +7,11 @@ using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
-using Moq;
-using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Interfaces.Repositories;
-using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Interfaces.Managers;
 using System.Collections.Specialized;
 using System.Linq.Expressions;
-using Gosocket.Dian.Domain;
-using Gosocket.Dian.Domain.Entity;
-using Gosocket.Dian.Common.Resources;
-using Gosocket.Dian.Domain.Common;
 
 namespace Gosocket.Dian.Application.Tests
 {
