@@ -4,13 +4,12 @@ using Microsoft.WindowsAzure.Storage.Table.Queryable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Infrastructure
 {
-    public class TableManager
+    public class TableManager : ITableManager
     {
         public CloudTable CloudTable { get; set; }
 
@@ -262,7 +261,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
- 
+
         public IEnumerable<T> FindAll<T>(string partitionKey) where T : ITableEntity, new()
         {
             TableContinuationToken token = null;
@@ -1132,13 +1131,13 @@ namespace Gosocket.Dian.Infrastructure
                 TableQuery.GenerateFilterCondition("RowKey",
                     QueryComparisons.Equal,
                     softwareId));
-         
+
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.FirstOrDefault();
         }
 
-        public T FindhByCufeExchange<T> (string partitionKey, bool Active) where T : ITableEntity, new()
+        public T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new()
         {
 
             var query = new TableQuery<T>();
@@ -1294,7 +1293,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
-        public List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State <T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new()
+        public List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
@@ -1339,7 +1338,7 @@ namespace Gosocket.Dian.Infrastructure
         }
 
         public List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>
-            (int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, 
+            (int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType,
             string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -1369,8 +1368,8 @@ namespace Gosocket.Dian.Infrastructure
                 if (prefixCondition == null) prefixCondition = tempPrefixCondition;
                 else prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, tempPrefixCondition);
             }
-                        
-            if(!string.IsNullOrWhiteSpace(employeeDocType))
+
+            if (!string.IsNullOrWhiteSpace(employeeDocType))
             {
                 var tempPrefixCondition = TableQuery.GenerateFilterCondition("TipoDocumento", QueryComparisons.Equal, employeeDocType);
 

@@ -10,8 +10,16 @@ namespace Gosocket.Dian.Application
     public class GlobalRadianOperationService : IGlobalRadianOperationService
     {
 
-        private static readonly TableManager globalSoftware = new TableManager("GlobalSoftware");
-        private static readonly TableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
+        private readonly ITableManager globalSoftware = new TableManager("GlobalSoftware");
+        private readonly ITableManager globalRadianOperations = new TableManager("GlobalRadianOperations");
+
+        public GlobalRadianOperationService() { }
+
+        public GlobalRadianOperationService(ITableManager _globalSoftware, ITableManager _globalRadianOperations) {
+            globalSoftware = _globalSoftware;
+            globalRadianOperations = _globalRadianOperations;
+        }
+
 
         #region GlobalRadianOperation
 
