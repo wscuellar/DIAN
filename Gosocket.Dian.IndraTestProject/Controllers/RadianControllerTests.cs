@@ -30,8 +30,10 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void IndexTest()
         {
             //arrange
-            NameValueCollection result = new NameValueCollection();
-            result.Add("ContributorId", "1");
+            NameValueCollection result = new NameValueCollection
+            {
+                { "ContributorId", "1" }
+            };
             _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(result);
 
             //act
@@ -45,8 +47,10 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public  void ElectronicInvoiceView()
         {
             //arrange
-            NameValueCollection result = new NameValueCollection();
-            result.Add("ContributorId", "1");
+            NameValueCollection result = new NameValueCollection
+            {
+                { "ContributorId", "1" }
+            };
             _radianContributorService.Setup(t => t.Summary(It.IsAny<int>())).Returns(result);
 
             //act

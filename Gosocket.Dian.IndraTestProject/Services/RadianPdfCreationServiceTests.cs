@@ -31,7 +31,6 @@ namespace Gosocket.Dian.Application.Tests
         {
             //arrange
             string eventItemIdentifier= "0d1e4c33eb93711b6dda11f618b66dba78dcbf33d80b2dd4ae787a7806ebd6b6ee1e9cb56fd36e9e479f74834b71e5a4";
-            string webPath = "test/";
             GlobalDocValidatorDocumentMeta documentMeta = new GlobalDocValidatorDocumentMeta()
             {
                 DocumentKey = eventItemIdentifier

@@ -84,8 +84,10 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             //arrange
             int id = 1;
             Mock<ControllerContext> controllercontext = new Mock<ControllerContext>();
-            NameValueCollection headerCollection = new NameValueCollection();
-            headerCollection["InjectingPartialView"] = "true";
+            NameValueCollection headerCollection = new NameValueCollection
+            {
+                ["InjectingPartialView"] = "true"
+            };
             controllercontext.Setup(frm => frm.HttpContext.Response.Headers).Returns(headerCollection);
             _current.ControllerContext = controllercontext.Object;
             _radianContributorFileTypeService.Setup(t => t.Get(id)).Returns(new RadianContributorFileType() { RadianContributorType = new RadianContributorType()});
@@ -144,8 +146,10 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             //arrange
             int id = 1;
             Mock<ControllerContext> controllercontext = new Mock<ControllerContext>();
-            NameValueCollection headerCollection = new NameValueCollection();
-            headerCollection["InjectingPartialView"] = "true";
+            NameValueCollection headerCollection = new NameValueCollection
+            {
+                ["InjectingPartialView"] = "true"
+            };
             controllercontext.Setup(frm => frm.HttpContext.Response.Headers).Returns(headerCollection);
             _current.ControllerContext = controllercontext.Object;
             _radianContributorFileTypeService.Setup(t => t.Get(id)).Returns(new RadianContributorFileType() { RadianContributorType =new RadianContributorType() });

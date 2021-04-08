@@ -223,16 +223,18 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void UploadFilesTest()
         {
             //arrange
-            NameValueCollection form = new NameValueCollection();
-            form["nit"] = "1111111";
-            form["email"] = "test@gmail.com";
-            form["contributorId"] = "1";
-            form["radianContributorType"] = "1";
-            form["radianOperationMode"] = "1";
-            form["filesNumber"] = "1";
-            form["step"] = "3";
-            form["radianState"] = "En pruebas";
-            form["radianContributorTypeiD"] = "1";
+            NameValueCollection form = new NameValueCollection
+            {
+                ["nit"] = "1111111",
+                ["email"] = "test@gmail.com",
+                ["contributorId"] = "1",
+                ["radianContributorType"] = "1",
+                ["radianOperationMode"] = "1",
+                ["filesNumber"] = "1",
+                ["step"] = "3",
+                ["radianState"] = "En pruebas",
+                ["radianContributorTypeiD"] = "1"
+            };
 
             Mock<HttpContextBase> context = new Mock<HttpContextBase>();
             Mock<HttpRequestBase> request = new Mock<HttpRequestBase>();
@@ -275,9 +277,11 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void GetSetTestResultPostTest()
         {
             //arrange
-            NameValueCollection form = new NameValueCollection();
-            form["ContributorId"] = "1";
-            form["Contributor.RadianContributorId"] = "1";
+            NameValueCollection form = new NameValueCollection
+            {
+                ["ContributorId"] = "1",
+                ["Contributor.RadianContributorId"] = "1"
+            };
             Mock<ControllerContext> controllercontext = new Mock<ControllerContext>();
             controllercontext.Setup(frm => frm.HttpContext.Request.Params).Returns(form);
             _current.ControllerContext = controllercontext.Object;
@@ -390,10 +394,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         public void SetTestDetailsTest()
         {
             //arrange
-            NameValueCollection form = new NameValueCollection();
-            form["ContributorId"] = "1";
-            form["Contributor.RadianContributorId"] = "1";
-            form["SoftwareT"] = "1";
+            NameValueCollection form = new NameValueCollection
+            {
+                ["ContributorId"] = "1",
+                ["Contributor.RadianContributorId"] = "1",
+                ["SoftwareT"] = "1"
+            };
             Mock<ControllerContext> controllercontext = new Mock<ControllerContext>();
             controllercontext.Setup(frm => frm.HttpContext.Request.Params).Returns(form);
             _current.ControllerContext = controllercontext.Object;

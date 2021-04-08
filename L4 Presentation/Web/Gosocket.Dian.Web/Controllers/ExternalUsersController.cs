@@ -253,7 +253,15 @@ namespace Gosocket.Dian.Web.Controllers
 
             var uCompany = userService.Get(User.Identity.GetUserId());
 
-            model.Users = this.LoadExternalUsersViewBags(uCompany.Code, model.Page, model.Length);
+            if (uCompany == null)
+            {
+                model.Users = new List<ExternalUserViewModel>();
+                ViewBag.ExternalUsersList = new List<ExternalUserViewModel>();
+                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
+                return View(model);
+            }
+             
+            model.Users = this.LoadExternalUsersViewBags(uCompany?.Code, model.Page, model.Length);
             ViewBag.ExternalUsersList = model.Users;
 
             if (!ModelState.IsValid)
@@ -262,12 +270,6 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (var item in allErrors)
                     ModelState.AddModelError("", item.ErrorMessage);
 
-                return View(model);
-            }
-
-            if (uCompany == null)
-            {
-                ModelState.AddModelError("", "El Usuario no tiene una Empresa Asociada!");
                 return View(model);
             }
 

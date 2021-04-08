@@ -11,12 +11,19 @@ namespace Gosocket.Dian.Application
     public class GlobalOtherDocElecOperationService : IGlobalOtherDocElecOperationService
     {
 
-        private static readonly TableManager globalSoftware = new TableManager("GlobalSoftware");
-        private static readonly TableManager globalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private readonly ITableManager globalSoftware = new TableManager("GlobalSoftware");
+        private readonly ITableManager globalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+
+        public GlobalOtherDocElecOperationService() { }
+
+        public GlobalOtherDocElecOperationService(ITableManager _globalSoftware, ITableManager _globalOtherDocElecOperation) {
+            globalOtherDocElecOperation = _globalOtherDocElecOperation;
+            globalSoftware = _globalSoftware;
+        }
 
         #region GlobalOperation
 
-        public bool Insert(GlobalOtherDocElecOperation item, OtherDocElecSoftware software) 
+        public bool Insert(GlobalOtherDocElecOperation item, OtherDocElecSoftware software)
         {
             GlobalSoftware soft = new GlobalSoftware(software.Id.ToString(), software.Id.ToString())
             {
@@ -24,7 +31,7 @@ namespace Gosocket.Dian.Application
                 Pin = software.Pin,
                 Timestamp = DateTime.Now,
                 StatusId = 1
-            }; 
+            };
             return SoftwareAdd(soft) && globalOtherDocElecOperation.InsertOrUpdate(item);
         }
 
@@ -90,7 +97,7 @@ namespace Gosocket.Dian.Application
         {
             GlobalOtherDocElecOperation operation = globalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId);
             return globalOtherDocElecOperation.Delete(operation);
-        } 
+        }
 
         #endregion
 

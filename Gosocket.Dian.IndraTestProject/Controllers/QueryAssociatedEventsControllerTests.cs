@@ -47,8 +47,10 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             string cufe = "";
             string eventCode = "0" + ((int)eventStatus).ToString();
             Mock<ControllerContext> controllercontext = new Mock<ControllerContext>();
-            NameValueCollection headerCollection = new NameValueCollection();
-            headerCollection["InjectingPartialView"] = "true";
+            NameValueCollection headerCollection = new NameValueCollection
+            {
+                ["InjectingPartialView"] = "true"
+            };
             controllercontext.Setup(frm => frm.HttpContext.Response.Headers).Returns(headerCollection);
             _current.ControllerContext = controllercontext.Object;
             _queryAssociatedEventsService.Setup(t => t.DocumentValidation(id)).Returns(new GlobalDocValidatorDocumentMeta() { EventCode = eventCode, DocumentReferencedKey = "invoice", SenderCode= "111" });

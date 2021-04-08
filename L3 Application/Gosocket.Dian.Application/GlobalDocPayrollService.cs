@@ -7,7 +7,10 @@ namespace Gosocket.Dian.Application
 {
     public class GlobalDocPayrollService : IGlobalDocPayrollService
     {
-        private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private readonly ITableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+
+        public GlobalDocPayrollService() { }
+        public GlobalDocPayrollService(ITableManager _payrollTableManager) { payrollTableManager = _payrollTableManager; }
 
         public GlobalDocPayroll Find(string partitionKey)
         {
