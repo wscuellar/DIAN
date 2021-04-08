@@ -2013,53 +2013,56 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 if (!validError)
                                 {
                                     string[] tempFacultityCode = docReferenceAttorney.FacultityCode.Split(';');
+                                    bool validForAttorneyFacultity = false;
                                     foreach (string codeFacultity in tempFacultityCode)
                                     {
                                         //Valida permisos/facultades firma para el evento emitido
-                                        var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";
-                                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentReferenceAttorneyFaculitity<GlobalAttorneyFacultity>(filter).FirstOrDefault();
-                                        if (attorneyFacultity != null)
+                                        var filter = $"{codeFacultity}-{docReferenceAttorney.Actor}";                                        
+                                        var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentFaculitityEvent<GlobalAttorneyFacultity>(eventCode);
+                                        attorneyFacultity = attorneyFacultity.Where(t => t.PartitionKey == filter).ToList();
+
+                                        if (attorneyFacultity != null && attorneyFacultity.Count > 0)
                                         {
-                                            if ((attorneyFacultity.RowKey == eventCode) || (attorneyFacultity.RowKey == "0") && codeFacultity != "MR91")
+                                            //Valida exista note mandatario
+                                            if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                             {
-                                                //Valida exista note mandatario
-                                                if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                                if (noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
                                                 {
-                                                    if (noteMandato2 == null || !noteMandato2.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
+                                                    validError = true;
+                                                    validForAttorneyFacultity = false;
+                                                    responses.Add(new ValidateListResponse
                                                     {
-                                                        validError = true;
-                                                        responses.Add(new ValidateListResponse
-                                                        {
-                                                            IsValid = false,
-                                                            Mandatory = true,
-                                                            ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                            ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
-                                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                        });
-                                                        break;
-                                                    }
-
+                                                        IsValid = false,
+                                                        Mandatory = true,
+                                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                                    });
+                                                    break;
                                                 }
-
-                                                //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
-                                                if (!validError)
-                                                    return null;
-
                                             }
-                                            else if (codeFacultity != "MR91")
-                                            {
-                                                validError = true;
-                                                responses.Add(new ValidateListResponse
-                                                {
-                                                    IsValid = false,
-                                                    Mandatory = true,
-                                                    ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
-                                                    ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
-                                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                                });
-                                                break;
-                                            }
+
+                                            //Si mandatario tiene permisos/facultades y esta habilitado para emitir documentos
+                                            if (!validError)
+                                                return null;
+                                           
                                         }
+                                        else
+                                            validForAttorneyFacultity = true;
+                                    }
+
+                                    if (validForAttorneyFacultity)
+                                    {                                       
+                                        validError = true;
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCodeMandato,
+                                            ErrorMessage = (Convert.ToInt32(eventCode) >= 30 && Convert.ToInt32(eventCode) <= 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessageMandato,
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                        break;                                        
                                     }
                                 }
                             }
@@ -2087,6 +2090,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             if (validError)
                 return responses;
+
             return null;
         }
         #endregion

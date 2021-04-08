@@ -50,6 +50,7 @@ namespace Gosocket.Dian.Functions.Events
             };
             try
             {
+                string listID = string.Empty;
                 GlobalDocValidatorDocumentMeta documentMeta = null;
                 byte[] xmlBytes = null;
                 List<GlobalDocValidatorTracking> validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
@@ -76,7 +77,12 @@ namespace Gosocket.Dian.Functions.Events
                         if (!xmlParserCude.Parser())
                             throw new Exception(xmlParserCude.ParserError);
                         InsertUpdateMandato(xmlParserCude, trackIdCude, data.AuthCode);
+                        listID = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
                     }
+
+                    //Referencia CUFE mandato abierto
+                    if (listID == "3" && Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
+                        documentMeta.DocumentReferencedKey = "01";
 
                     GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackIdCude, documentMeta.TechProviderCode)
                     {
@@ -115,14 +121,17 @@ namespace Gosocket.Dian.Functions.Events
                     }
 
                     //Inserta registro GlobalDocQueryRegisteredInvoice
-                    //Obtiene XML Invoice CUFE
-                    var xmlBytesCufe = await Utils.Utils.GetXmlFromStorageAsync(documentMeta.DocumentReferencedKey);
-                    var xmlParserCufe = new XmlParser(xmlBytesCufe);
-                    if (!xmlParserCufe.Parser())
-                        throw new Exception(xmlParserCufe.ParserError);
+                    //Obtiene XML Invoice CUFE solo si no es mandadato abierto
+                    if(Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
+                    {
+                        var xmlBytesCufe = await Utils.Utils.GetXmlFromStorageAsync(documentMeta.DocumentReferencedKey);
+                        var xmlParserCufe = new XmlParser(xmlBytesCufe);
+                        if (!xmlParserCufe.Parser())
+                            throw new Exception(xmlParserCufe.ParserError);
 
-                    InsertDocQueryRegisteredInvoice(documentMeta, xmlParserCufe);
+                        InsertDocQueryRegisteredInvoice(documentMeta, xmlParserCufe);
 
+                    }
 
                     //Actualiza registro Mandato asociado a la Factura, terminacion de mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
@@ -284,10 +293,10 @@ namespace Gosocket.Dian.Functions.Events
                     {
                         facultityCode.Append(";" + tempCodeAttorney[0]);
                     }
-                    
-                } 
-                attorneyModel.facultityCode = facultityCode.ToString();
 
+                    attorneyModel.facultityCode = facultityCode.ToString();
+                } 
+               
                 attorney.Add(attorneyModel);
             }
 
