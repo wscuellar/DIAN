@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -14,6 +15,8 @@ namespace Gosocket.Dian.Web.Models
         public List<ReferenceViewModel> References { get; set; }
         public List<EventsViewModel> Events { get; set; }
         public Dictionary<int, string> IconsData { get; set; }
+        public string LegitimateOwner { get; internal set; }
+        public DateTime? DateInscription { get; internal set; }
     }
 
     public class DocValidatorTrackingModel
