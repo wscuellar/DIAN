@@ -249,7 +249,7 @@ namespace Gosocket.Dian.Infrastructure
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("Rowkey",
+                TableQuery.GenerateFilterCondition("RowKey",
                     QueryComparisons.Equal,
                     rowkey),
                 TableOperators.And,

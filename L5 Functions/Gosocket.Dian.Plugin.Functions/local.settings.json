@@ -101,7 +101,7 @@
     "ErrorMessage_LGC21": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser registrada.",
     "ErrorMessage_LGC23": "No puede registrar si previamente se registro primera inscripcion de la factura electrónica de venta",
     "ErrorMessage_LGC22": "No se puede registrar esté evento si previamente se registro uno de los siguientes eventos: Endoso en garantía, Endoso en procuración, Limitación de circulación.",
-    "ValidateManadatory": "false",
+    "ValidateManadatory": "true",
     "ErrorMessage_AAL03": "No fue informado la descripción",
     "ErrorMessage_AAL07": "El CUFE referenciado no pertenece al emisor del mandato",
     "ErrorMessage_AAL05": "El número de documento electrónico referenciado no coinciden con un documento valido",
