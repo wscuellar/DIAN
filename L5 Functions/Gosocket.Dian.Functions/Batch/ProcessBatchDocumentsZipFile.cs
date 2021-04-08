@@ -34,7 +34,9 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");    
+        private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly TableManager tableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
+        private static readonly TableManager tableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
 
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
@@ -758,6 +760,13 @@ namespace Gosocket.Dian.Functions.Batch
                             };
                             var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
 
+                            //Valida software asociado al NIT en GlobalOtherDocElecOperation
+                            bool existOperation = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
+                            if (!existOperation)
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"El NIT {nitNomina} no cuenta con el software con id {softwareIdNomina} asociado al proceso de habilitación Otros documentos" });
+                            }
+
                             GlobalTestSetOthersDocumentsResult testSetOthersDocumentsResultEntity = null;
                             if (objGlobalTestSetOthersDocumentResult != null &&
                                 (objGlobalTestSetOthersDocumentResult.Status == (int)TestSetStatus.InProcess ||
@@ -790,6 +799,13 @@ namespace Gosocket.Dian.Functions.Batch
                                 " Step-code " + code
                             };
                             var insertRadian = TableManagerGlobalLogger.InsertOrUpdateAsync(checkRadian);
+
+                            //Valida software asociado al NIT en GlobalRadianOperation
+                            bool existOperation = tableManagerGlobalRadianOperations.Exist<GlobalRadianOperations>(code, softwareId);
+                            if (!existOperation)
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"El NIT {code} no cuenta con el software con id {softwareId} asociado al proceso de habilitación RADIAN" });
+                            }
 
                             RadianTestSetResult radianTestSetResultEntity = null;
                             if (objRadianTestSetResult != null &&
