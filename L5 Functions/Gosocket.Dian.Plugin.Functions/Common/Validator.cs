@@ -276,54 +276,87 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 int tempID = 0;
                 //Consecutivo regla DSBC02
                 for (int i = 0; i < deliveryTermsListResponse.Count; i++)
-                {
-                    var xmlID = Convert.ToInt32(deliveryTermsListResponse.Item(i).SelectNodes("//*[local-name()='DeliveryTerms']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+                {                    
+                    var xmlID = deliveryTermsListResponse.Item(i).SelectNodes("//*[local-name()='DeliveryTerms']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
 
-                    if (i == 0)
-                        tempID = xmlID;
+                    int number1 = 0;
+                    bool valNumber = int.TryParse(xmlID, out number1);
+                    if (valNumber)
+                    {
+                        if (i == 0)
+                            tempID = number1;
+                        else
+                        {
+                            if (!int.Equals(number1, tempID + 1))
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "DSBC02",
+                                    ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
+                            }
+                            else
+                                tempID = Convert.ToInt32(number1);
+                        }
+                    }
                     else
                     {
-                        if (!int.Equals(xmlID, tempID + 1))
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "DSBC02",
-                                ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            break;
-                        }
-                        else
-                            tempID = Convert.ToInt32(xmlID);
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "DSBC02",
+                            ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
                     }
                 }
-
 
                 //Consecutivo regla DSAQ02
                 for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
-                    var xmlID = Convert.ToInt32(allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim());
+                    var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
 
-                    if (i == 0)
-                        tempID = xmlID;
+                    int number1 = 0;
+                    bool valNumber = int.TryParse(xmlID, out number1);
+                    if (valNumber)
+                    {
+                        if (i == 0)
+                            tempID = number1;
+                        else
+                        {
+                            if (!int.Equals(number1, tempID + 1))
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "DSAQ02",
+                                    ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
+                            }
+                            else
+                                tempID = Convert.ToInt32(number1);
+                        }
+                    }
                     else
                     {
-                        if (!int.Equals(xmlID, tempID + 1))
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "DSAQ02",
-                                ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                            break;
-                        }
-                        else
-                            tempID = Convert.ToInt32(xmlID);
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "DSAQ02",
+                            ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
                     }
                 }
             }
@@ -5040,7 +5073,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a";
             if (eventCode == "030") response.errorMessageigningTimeAcuse = ConfigurationManager.GetValue("ErrorMessage_DC24a");
 
-            if (eventCode == "032") response.errorCodeSigningTimeRecibo = "DC24b";
+            if (eventCode == "032") response.errorCodeSigningTimeRecibo = " ";
             if (eventCode == "032") response.errorMessageigningTimeRecibo = ConfigurationManager.GetValue("ErrorMessage_DC24b");
 
             //Endoso
