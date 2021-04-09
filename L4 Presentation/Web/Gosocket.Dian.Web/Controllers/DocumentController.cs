@@ -148,7 +148,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        
+
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
         {
@@ -1067,7 +1067,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     try
                     {
-                        docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
+                        docView.RadianStatusName = DeterminateRadianStatus(docView.Events, docView.DocumentTypeId);
                     }
                     catch (Exception ex)
                     {
@@ -1106,7 +1106,12 @@ namespace Gosocket.Dian.Web.Controllers
         {
 
             if (events.Count == 0)
-                return RadianDocumentStatus.DontApply.GetDescription();
+            {
+                if (documentTypeId == "01")
+                    return RadianDocumentStatus.ElectronicInvoice.GetDescription();
+                else
+                    return RadianDocumentStatus.DontApply.GetDescription();
+            }
 
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
