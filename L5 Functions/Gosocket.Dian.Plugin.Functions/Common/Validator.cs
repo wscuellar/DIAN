@@ -5073,7 +5073,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == "030") response.errorCodeSigningTimeAcuse = "DC24a";
             if (eventCode == "030") response.errorMessageigningTimeAcuse = ConfigurationManager.GetValue("ErrorMessage_DC24a");
 
-            if (eventCode == "032") response.errorCodeSigningTimeRecibo = " ";
+            if (eventCode == "032") response.errorCodeSigningTimeRecibo = "DC24b";
             if (eventCode == "032") response.errorMessageigningTimeRecibo = ConfigurationManager.GetValue("ErrorMessage_DC24b");
 
             //Endoso
