@@ -612,6 +612,15 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public List<T> FindDocumentFaculitityEvent<T>(string eventCode) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, eventCode));
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+
 
         public T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new()
         {
