@@ -112,7 +112,10 @@
     "ErrorMessage_LGC27": "No se puede registrar este evento si previamente no se ha registrado el evento Inscripción de la factura electrónica de venta como título valor",
     "ErrorMessage_AAF01b_036": "No corresponde a la información del Tenedor Legítimo",
     "ErrorMessage_AAF01a_036": "No corresponde a la información del Emisor/Facturador electrónico",
-    "ErrorMessage_DC24b": "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación del evento acuse de recibo de la factura electrónica de venta."
+    "ErrorMessage_DC24b": "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación del evento acuse de recibo de la factura electrónica de venta.",
+    "ErrorMessage_AAI07b": "El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento para el evento: Endoso en Propiedad",
+    "ErrorMessage_AAF19": "la sumatoria del elemento: cbc:CorporateStockAmount no coincide cn el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value",
+    "ErrorMessage_AAG20": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value"
 
 
     // Test UAT INDRA
