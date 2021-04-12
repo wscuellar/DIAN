@@ -72,7 +72,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{Cune}", this.GetValueFormatToTemplate(model.CUNE));
             template = template.Replace("{PayrollNumber}", this.GetValueFormatToTemplate(model.Numero));
             template = template.Replace("{Country}", this.GetCountryName(model.Pais));
-            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate((model.FechaGen.HasValue) ? model.FechaGen.Value.ToString("yyyy-MM-dd") : string.Empty)); //...
+            template = template.Replace("{GenerationPeriod}", this.GetValueFormatToTemplate((model.FechaGen.HasValue) ? model.FechaGen.Value.ToString("yyyy-MM-dd") : string.Empty)  + this.GetValueFormatToTemplate((model.FechaLiquidacion.HasValue) ? " hasta " + model.FechaLiquidacion.Value.ToString("yyyy-MM-dd") : string.Empty)); //...
             template = template.Replace("{City}", this.GetMunicipalityName(model.MunicipioCiudad));
             template = template.Replace("{Departament}", this.GetDepartmentName(model.DepartamentoEstado));
 
