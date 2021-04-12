@@ -4,16 +4,19 @@
 
     using Gosocket.Dian.Application.Cosmos;
     using Gosocket.Dian.Common.Resources;
+    using Gosocket.Dian.Domain;
     using Gosocket.Dian.Domain.Common;
     using Gosocket.Dian.Domain.Cosmos;
     using Gosocket.Dian.Domain.Domain;
     using Gosocket.Dian.Domain.Entity;
     using Gosocket.Dian.Infrastructure;
+    using Gosocket.Dian.Interfaces;
     using Gosocket.Dian.Interfaces.Services;
     using Gosocket.Dian.Services.Utils.Helpers;
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.Globalization;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -24,20 +27,22 @@
     {
         #region Properties
 
-        private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
-        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly FileManager _fileManager;
         private readonly CosmosDBService _cosmosDBService;
+        private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
+        private readonly IContributorService _contributorService;
 
         #endregion
 
         #region Constructor
 
-        public RadianGraphicRepresentationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
+        public RadianGraphicRepresentationService(IContributorService contributorService, IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
             _cosmosDBService = cosmosDBService;
+            _contributorService = contributorService;
         }
 
         #endregion
@@ -137,7 +142,7 @@
                     model.EventNumberReference = reference.Number;
                     GlobalDocReferenceAttorney attorney = null;
                     if (reference.EventCode == "043")
-                        attorney = _queryAssociatedEventsService.ReferenceAttorneys(model.CUDEReference, reference.DocumentReferencedKey,string.Empty, string.Empty).FirstOrDefault();
+                        attorney = _queryAssociatedEventsService.ReferenceAttorneys(model.CUDEReference, reference.DocumentReferencedKey, string.Empty, string.Empty).FirstOrDefault();
                     model.DescriptionReference = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), reference.EventCode),
                         reference.CustomizationID,
                         reference.EventCode,
@@ -368,11 +373,22 @@
             template = template.Replace("{EventStartDate}", model.EventStartDate);
             template = template.Replace("{EventFinishDate}", model.EventFinishDate);
             template = template.Replace("{Notes}", model.Note.Replace("|", "</br>"));
-            template = template.Replace("{SignedBy}", model.SignedBy);
-            template = template.Replace("{EventTotalValueAval}", model.EventTotalValueAval);
-            template = template.Replace("{EventTotalValueEndoso}", model.EventTotalValueEndoso);
-            template = template.Replace("{EventTotalValueLimitation}", model.EventTotalValueLimitation);
-            template = template.Replace("{EventTotalValuePago}", model.EventTotalValuePago);
+
+            if (model.SignedBy.ToLower() == "supplier")
+                template = template.Replace("{SignedBy}", model.SenderBusinessName);
+
+            if (model.SignedBy.ToLower() == "third party")
+            {
+                Contributor contributor = _contributorService.GetByCode(model.ProviderIdNit);
+                template = template.Replace("{SignedBy}", contributor != null ? contributor.BusinessName : string.Empty);
+            }
+            else
+                template = template.Replace("{SignedBy}", string.Empty);
+
+            template = template.Replace("{EventTotalValueAval}", GetFormatDoubleValue(model.EventTotalValueAval));
+            template = template.Replace("{EventTotalValueEndoso}", GetFormatDoubleValue(model.EventTotalValueEndoso));
+            template = template.Replace("{EventTotalValueLimitation}", GetFormatDoubleValue(model.EventTotalValueLimitation));
+            template = template.Replace("{EventTotalValuePago}", GetFormatDoubleValue(model.EventTotalValuePago));
             if (model.EventCode == "045")
             {
                 template = template.Replace("{ResponseCodeListID}", model.Title);
@@ -398,7 +414,7 @@
             // Mapping reference invoice data section
 
             template = template.Replace("{InvoiceNumber}", model.References[0].SerieAndNumber);
-            template = template.Replace("{TotalValue}", $"{model.References[0].TotalAmount}");
+            template = template.Replace("{TotalValue}", $"{model.References[0].TotalAmount.ToString("C", CultureInfo.CurrentCulture)}");
             template = template.Replace("{PaymentWay}", string.Empty);
             template = template.Replace("{PaymentMethod}", string.Empty);
             template = template.Replace("{PaymentState}", string.Empty);
@@ -588,7 +604,8 @@
                 { "CertificateNumber", "(//*[local-name()='X509SerialNumber'])[1]" },
                 { "EntityName", "(//*[local-name()='X509IssuerName'])[1]" },
                 { "listID", "//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']/@listID']" },
-                { "CudeReference", "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']" }
+                { "CudeReference", "//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']" },
+                { "ProviderIdNit", "//*[local-name()='SoftwareProvider']/*[local-name()='ProviderID']" }
             };
             return requestObj;
         }
@@ -666,12 +683,30 @@
                 model.EmissionDate = string.Format("{0} {1}", model.EmissionDate,
                 dataValues.XpathsValues["GenerationTime"]);
             }
+
+            model.ProviderIdNit = dataValues.XpathsValues["ProviderIdNit"] != null ? dataValues.XpathsValues["ProviderIdNit"] : string.Empty;
             return model;
         }
 
         #endregion
 
         #endregion
+
+
+        private static string GetFormatDoubleValue(string dataValue)
+        {
+            try
+            {
+                double value = double.Parse(dataValue, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.NumberFormatInfo.InvariantInfo);
+                return $"$ { value.ToString("N") }";
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+
+
+        }
 
     }
 }

@@ -367,7 +367,7 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso como para @Participante de otros documentos electrónicos?.
+        ///   Busca una cadena traducida similar a ¿Desea iniciar el proceso como @Participante de otros documentos electrónicos?.
         /// </summary>
         public static string OthersElectronicDocumentsSelectParticipante_Confirm {
             get {

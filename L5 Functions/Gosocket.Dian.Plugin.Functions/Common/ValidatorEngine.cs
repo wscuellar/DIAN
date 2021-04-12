@@ -773,8 +773,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = false,
                                 Mandatory = true,
-                                ErrorCode = "089",
-                                ErrorMessage = "Mandatario no encontrado para el Nit del Endosatario" + endosatario,
+                                ErrorCode = "LGC35",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
