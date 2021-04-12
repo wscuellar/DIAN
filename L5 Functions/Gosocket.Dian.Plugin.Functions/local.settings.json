@@ -116,7 +116,8 @@
     "ErrorMessage_AAI07b": "El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento para el evento: Endoso en Propiedad",
     "ErrorMessage_AAF19": "la sumatoria del elemento: cbc:CorporateStockAmount no coincide cn el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value",
     "ErrorMessage_AAG20": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value",
-    "ErrorMessage_AAF01a": "No corresponde a la información del Emisor/Facturador electrónico"
+    "ErrorMessage_AAF01a": "No corresponde a la información del Emisor/Facturador electrónico",
+    "ErrorMessage_LGC12": "Solo se pueda transmitir el evento (033) Aceptación Expresa de la factura, después de haber transmitido el evento (032) Recibo del bien o prestación del servicio"
 
 
     // Test UAT INDRA

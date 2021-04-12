@@ -218,7 +218,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
                     foreach (var itemResponsesTacita in responses)
                     {
-                        if (itemResponsesTacita.ErrorCode == "LGC14"
+                        if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05")
                             validEventTacita = false;
                     }
