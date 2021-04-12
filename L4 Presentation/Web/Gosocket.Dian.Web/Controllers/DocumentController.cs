@@ -381,7 +381,7 @@ namespace Gosocket.Dian.Web.Controllers
                     link = Url.Action("DownloadPayrollPDF", new { id = payroll.PartitionKey }),
                     NumeroNomina = payroll.Numero,
                     ApellidosNombre = $"{payroll.PrimerApellido} {payroll.SegundoApellido} {payroll.PrimerNombre}",
-                    TipoDocumento = payroll.TipoDocumento,
+                    TipoDocumento = findTypeDocument(payroll.TipoDocumento),
                     NoDocumento = payroll.NumeroDocumento,
                     Salario = payroll.Sueldo,
                     Devengado = payroll.DevengadosTotal,
@@ -1422,6 +1422,31 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         #endregion
+
+        string findTypeDocument(string idTypeDocument)
+        {
+            string findTypeDocument = string.Empty;
+
+            switch (idTypeDocument)
+            {
+                case "13":
+                    return "CC";
+                case "22":
+                    return "CE";
+                case "12":
+                    return "TI";
+                case "41":
+                    return "PS";
+                case "31":
+                    return "NIT";
+                case "91":
+                    return "NIUP";
+
+            }
+
+            return findTypeDocument;
+        }
+
 
         List<DocumentViewPayroll> firstLoadPayroll()
         {
