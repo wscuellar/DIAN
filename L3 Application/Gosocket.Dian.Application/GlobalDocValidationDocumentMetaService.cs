@@ -8,9 +8,17 @@ namespace Gosocket.Dian.Application
 {
     public class GlobalDocValidationDocumentMetaService : IGlobalDocValidationDocumentMetaService
     {
-        private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
-        private readonly TableManager documentTableManager = new TableManager("GlobalDocValidatorDocument");
-        private readonly TableManager ReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+        private readonly ITableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+        private readonly ITableManager documentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly ITableManager ReferenceAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
+
+        public GlobalDocValidationDocumentMetaService() { }
+
+        public GlobalDocValidationDocumentMetaService(ITableManager _documentMetaTableManager, ITableManager _documentTableManager,  ITableManager _ReferenceAttorneyTableManager) {
+            documentMetaTableManager = _documentMetaTableManager;
+            documentTableManager = _documentTableManager;
+            ReferenceAttorneyTableManager = _ReferenceAttorneyTableManager;
+        }
 
         //Se utiliza en invoice, eventitem, referenceMeta
         public GlobalDocValidatorDocumentMeta DocumentValidation(string reference)
@@ -29,7 +37,7 @@ namespace Gosocket.Dian.Application
             //    .FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(documentKey, eventCode);
 
             return documentMetaTableManager
-                .FindpartitionKey<GlobalDocValidatorDocumentMeta>(documentKey).Where(x=>x.EventCode== eventCode).ToList();
+                .FindpartitionKey<GlobalDocValidatorDocumentMeta>(documentKey).Where(x => x.EventCode == eventCode).ToList();
         }
 
         //FindDocumentReferenced_TypeId
@@ -44,7 +52,7 @@ namespace Gosocket.Dian.Application
         {
             return documentMetaTableManager
                 .FindDocumentByReference<GlobalDocValidatorDocumentMeta>(documentReferencedKey);
-        } 
+        }
 
         public GlobalDocValidatorDocument EventValidator(GlobalDocValidatorDocumentMeta eventItem)
         {

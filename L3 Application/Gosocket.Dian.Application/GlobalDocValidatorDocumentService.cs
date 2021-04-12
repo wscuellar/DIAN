@@ -6,7 +6,15 @@ namespace Gosocket.Dian.Application
 {
     public class GlobalDocValidatorDocumentService : IGlobalDocValidatorDocumentService
     {
-        private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private readonly ITableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+
+        public GlobalDocValidatorDocumentService() { }
+
+        public GlobalDocValidatorDocumentService(ITableManager _globalDocValidatorDocumentTableManager)
+        {
+            globalDocValidatorDocumentTableManager = _globalDocValidatorDocumentTableManager;
+        }
+
 
         public GlobalDocValidatorDocument EventVerification(GlobalDocValidatorDocumentMeta eventItem)
         {

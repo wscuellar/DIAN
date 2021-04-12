@@ -101,13 +101,13 @@
 
                         @if (Model.Document.DocumentTypeId == "05")
                         {
-                        <span>CUDE:</span>
+                            <span>CUDE:</span>
                         }
 
                         @if (Model.Document.DocumentTypeId != "05")
                         {
-                        <span>CUFE:</span>
-                        }      
+                            <span>CUFE:</span>
+                        }
                         @Model.Document.DocumentKey<br>
 
                     </span>
@@ -264,11 +264,14 @@
         </div>
         <div class="col-md-4 row-fe-states">
             <span class="cufe-text">
-                Legítimo Tenedor actual: @Model.Document.SenderName
+                Legítimo Tenedor actual: @Model.LegitimateOwner
             </span>
-            <span class="cufe-text">
-                Fecha de autorización para circulación: @string.Format("{0:dd/MM/yyyy}", Model.Document.EmissionDate)
-            </span>
+            @if (Model.DateInscription != null)
+            {
+                <span class="cufe-text">
+                    Fecha de inscripción como título valor: @string.Format("{0:dd/MM/yyyy}", Model.DateInscription.Value)
+                </span>
+            }
         </div>
     </div>
     <div class="row">

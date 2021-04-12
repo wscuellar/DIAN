@@ -333,6 +333,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             EventStatus code;
             string trackIdAvailability = null;
             string originalTrackId = data.TrackId;
+            
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Receipt:
@@ -364,28 +365,78 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 )
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                    "0" + (int)code);
-                if (documentMeta != null)
+                bool existDisponibilizaExpresa = false;
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
                 {
-                    foreach (var itemDocumentMeta in documentMeta)
+                    existDisponibilizaExpresa = true;
+                    data.TrackId = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch).Event.PartitionKey;
+                }                   
+                else
+                {
+                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
+                   "0" + (int)code);
+                    if (documentMeta != null)
                     {
-                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                        if (documentValidator != null)
+                        foreach (var itemDocumentMeta in documentMeta)
                         {
-                            data.TrackId = itemDocumentMeta.PartitionKey;
-                            break;
+                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                            if (documentValidator != null)
+                            {
+                                existDisponibilizaExpresa = true;
+                                data.TrackId = itemDocumentMeta.PartitionKey;
+                                break;
+                            }
                         }
                     }
                 }
-
+               
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
-                else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
                 {
+                    //Servicio GlobalDocAssociate
                     code = EventStatus.AceptacionTacita;
-                    documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                        "0" + (int)code);
-                    if (documentMeta != null)
+                    string eventSearchTacita = "0" + (int)code;
+                    List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                    if (InvoiceWrapperTacita.Any())
+                        data.TrackId = InvoiceWrapperTacita[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearchTacita).Event.PartitionKey;
+                    else
+                    {
+                       var documentMetaTacita = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
+                      "0" + (int)code);
+                        if (documentMetaTacita != null)
+                        {
+                            foreach (var itemDocumentMeta in documentMetaTacita)
+                            {
+                                var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                                if (documentValidator != null)
+                                {
+                                    data.TrackId = itemDocumentMeta.PartitionKey;
+                                    break;
+                                }
+                            }
+                        }
+                    }                  
+                }
+            }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
+            {
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    data.TrackId = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch 
+                    && (x.Event.CustomizationID == "361" || x.Event.CustomizationID == "362" )).Event.PartitionKey;
+                else
+                {
+                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
+                    data.DocumentTypeId, "0" + (int)code, "361", "362");
+
+                    if (documentMeta != null || documentMeta.Count > 0)
                     {
                         foreach (var itemDocumentMeta in documentMeta)
                         {
@@ -396,46 +447,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             }
                         }
-
                     }
-                }
-            }
-            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
-            {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
-                    data.DocumentTypeId, "0" + (int)code, "361", "362");
-
-                if (documentMeta != null || documentMeta.Count > 0)
-                {
-                    foreach (var itemDocumentMeta in documentMeta)
-                    {
-                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                        if (documentValidator != null)
-                        {
-                            data.TrackId = itemDocumentMeta.PartitionKey;
-                            break;
-                        }
-                    }
-                }
+                }                
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad 
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
             {
-                var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                    "0" + (int)code);
-                if (documentMeta != null || documentMeta.Count > 0)
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    trackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch).Event.PartitionKey;
+                else
                 {
-                    // se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
-                    documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
-                    // ...
-                    foreach (var itemDocumentMeta in documentMeta)
+                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
+                        "0" + (int)code);
+                    if (documentMeta != null || documentMeta.Count > 0)
                     {
-                        var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                        if (documentValidator != null)
+                        // se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
+                        documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
+                        // ...
+                        foreach (var itemDocumentMeta in documentMeta)
                         {
-                            trackIdAvailability = itemDocumentMeta.PartitionKey;
-                            break;
+                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
+                            if (documentValidator != null)
+                            {
+                                trackIdAvailability = itemDocumentMeta.PartitionKey;
+                                break;
+                            }
                         }
                     }
                 }
@@ -476,7 +517,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 signingTimeAvailability = Convert.ToDateTime(availabilityXmlParser.SigningTime);
             }
 
-                var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
                 signingTimeAvailability: signingTimeAvailability));

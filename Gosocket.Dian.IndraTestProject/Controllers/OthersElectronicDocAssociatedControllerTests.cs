@@ -24,13 +24,6 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
         private readonly Mock<IGlobalOtherDocElecOperationService> _globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
 
-        private readonly Mock<IContributorService> contributorService = new Mock<IContributorService>();
-        private readonly Mock<IOthersDocsElecContributorService> othersDocsElecContributorService = new Mock<IOthersDocsElecContributorService>();
-        private readonly Mock<IOthersElectronicDocumentsService> othersElectronicDocumentsService = new Mock<IOthersElectronicDocumentsService>();
-        private readonly Mock<ITestSetOthersDocumentsResultService> testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
-        private readonly Mock<IOthersDocsElecSoftwareService> othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
-        private readonly Mock<IGlobalOtherDocElecOperationService> globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
-
         [TestInitialize]
         public void TestInitialize()
         {
@@ -58,21 +51,21 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             switch (input)
             {
                 case 1:
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns((Domain.Entity.OtherDocsElectData)null);
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns((OtherDocsElectData)null);
                     break;
                 case 2:
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData());
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new OtherDocsElectData());
                     _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns((Domain.Contributor)null);
                     break;
                 case 3:
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 3, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new OtherDocsElectData() { Step = 3, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
                     _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Domain.Contributor() { ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
-                    Domain.Entity.PagedResult<Domain.Entity.OtherDocElecCustomerList> pagedResult = new Domain.Entity.PagedResult<Domain.Entity.OtherDocElecCustomerList>();
-                    pagedResult.Results = new List<Domain.Entity.OtherDocElecCustomerList>() { new Domain.Entity.OtherDocElecCustomerList() };
+                    PagedResult<OtherDocElecCustomerList> pagedResult = new PagedResult<OtherDocElecCustomerList>();
+                    pagedResult.Results = new List<OtherDocElecCustomerList>() { new OtherDocElecCustomerList() };
                     _othersElectronicDocumentsService.Setup(t => t.CustormerList(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<OtherDocElecState>(), It.IsAny<int>(), It.IsAny<int>())).Returns(pagedResult);
                     break;
                 case 4:
-                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new Domain.Entity.OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
+                    _othersDocsElecContributorService.Setup(t => t.GetCOntrinutorODE(It.IsAny<int>())).Returns(new OtherDocsElectData() { Step = 2, LegalRepresentativeIds = new List<string>(), ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
                     _contributorService.Setup(t => t.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Domain.Contributor() { ContributorTypeId = (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider });
                     break;
             }

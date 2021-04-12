@@ -194,6 +194,7 @@
     <Compile Include="EventGridManager.cs" />
     <Compile Include="EventHubHandler.cs" />
     <Compile Include="FileManager.cs" />
+    <Compile Include="ITableManager.cs" />
     <Compile Include="KeyVaultManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueueManager.cs" />

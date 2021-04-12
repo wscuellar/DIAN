@@ -812,7 +812,7 @@ namespace Gosocket.Dian.Application.Cosmos
                     case 6: //factura electronica
                         if (documentTypeId == "01")
                         {
-                            predicate = predicate.And(g => g.Events.Any() && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}")));
+                            predicate = predicate.And(g => (!g.Events.Any()) || (g.Events.Any() && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}"))));
                         }
                         break;
                     case 7:

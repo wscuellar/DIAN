@@ -142,11 +142,12 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Details(string trackId)
         {
             DocValidatorModel model = await ReturnDocValidatorModelByCufe(trackId);
+            GetDataLegitemateOwner(model);
             model.IconsData = _queryAssociatedEventsService.IconType(null, trackId);
-
             ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentDetails;
             return View(model);
         }
+
 
 
         public ActionResult Viewer(Navigation.NavigationEnum nav)
@@ -523,6 +524,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return RedirectToAction("SearchDocument", "User");
 
             DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
+            GetDataLegitemateOwner(docModel);
             listDocValidatorModels.Add(docModel);
 
             foreach (var item in listGlobalValidatorDocumentMeta)
@@ -531,7 +533,7 @@ namespace Gosocket.Dian.Web.Controllers
                 globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
 
                 docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey, globalDataDocument);
-
+                GetDataLegitemateOwner(docModel);
                 listDocValidatorModels.Add(docModel);
             }
 
@@ -728,6 +730,22 @@ namespace Gosocket.Dian.Web.Controllers
                 model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
             return model;
+        }
+
+        private static void GetDataLegitemateOwner(DocValidatorModel model)
+        {
+            if (model.Events.Count > 0)
+            {
+                var eventLegitimateOwner = model.Events.LastOrDefault(t => t.EventCode != null && Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad);
+                model.LegitimateOwner = eventLegitimateOwner != null ? eventLegitimateOwner.Receiver : model.Document.SenderName;
+                var eventDateInscription = model.Events.LastOrDefault(t => t.EventCode != null && Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion);
+                if (eventDateInscription != null)
+                {
+                    model.DateInscription = eventDateInscription.EventDate;
+                }
+            }
+            else
+                model.LegitimateOwner = model.Document.SenderName;
         }
 
         private EventsViewModel FillEventsAttorney(GlobalDocReferenceAttorney Attorney)
@@ -1049,7 +1067,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     try
                     {
-                        docView.RadianStatusName = DeterminateRadianStatus(docView.Events, model.DocumentTypeId);
+                        docView.RadianStatusName = DeterminateRadianStatus(docView.Events, docView.DocumentTypeId);
                     }
                     catch (Exception ex)
                     {
@@ -1088,7 +1106,12 @@ namespace Gosocket.Dian.Web.Controllers
         {
 
             if (events.Count == 0)
-                return RadianDocumentStatus.DontApply.GetDescription();
+            {
+                if (documentTypeId == "01")
+                    return RadianDocumentStatus.ElectronicInvoice.GetDescription();
+                else
+                    return RadianDocumentStatus.DontApply.GetDescription();
+            }
 
             Dictionary<int, string> statusValue = new Dictionary<int, string>();
             int securityTitleCounter = 0;
