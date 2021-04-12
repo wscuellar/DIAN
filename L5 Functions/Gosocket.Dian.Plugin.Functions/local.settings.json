@@ -115,7 +115,8 @@
     "ErrorMessage_DC24b": "No se puede generar el evento recibo de bien prestación de servicio antes de la fecha de generación del evento acuse de recibo de la factura electrónica de venta.",
     "ErrorMessage_AAI07b": "El valor informado es diferente a la operación de Valor total del endoso * la tasa de descuento para el evento: Endoso en Propiedad",
     "ErrorMessage_AAF19": "la sumatoria del elemento: cbc:CorporateStockAmount no coincide cn el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value",
-    "ErrorMessage_AAG20": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value"
+    "ErrorMessage_AAG20": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value",
+    "ErrorMessage_AAF01a": "No corresponde a la información del Emisor/Facturador electrónico"
 
 
     // Test UAT INDRA
