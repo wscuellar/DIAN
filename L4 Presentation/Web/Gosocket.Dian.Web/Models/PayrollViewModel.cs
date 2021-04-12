@@ -2,6 +2,7 @@
 using Gosocket.Dian.Infrastructure;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Gosocket.Dian.Web.Models
 {
@@ -226,7 +227,7 @@ namespace Gosocket.Dian.Web.Models
             List<CiudadModel> result = new List<CiudadModel>();
             result.Add(new CiudadModel() { Code = "00", Name = "Todos..." });
             var cities = municipalityTableManager.FindAll<MunicipalityByCode>();
-            foreach(var city in cities)
+            foreach(var city in cities.OrderBy(x=> x.Name))
                 result.Add(new CiudadModel() { Code = city.Code, Name = city.Name });
             return result;
         }
