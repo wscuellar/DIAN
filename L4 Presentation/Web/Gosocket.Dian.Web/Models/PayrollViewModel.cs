@@ -37,12 +37,12 @@ namespace Gosocket.Dian.Web.Models
 
         public List<LetraModel> LetrasPrimerApellido { get; set; }
 
-        [Display(Name = "Tipo Documento Empleado")]
+        [Display(Name = "Tipo Documento")]
         public string TipoDocumento { get; set; }
 
         public List<TipoDocumentoModel> TiposDocumento { get; set; }
 
-        [Display(Name = "Número de Documento Empleado")]
+        [Display(Name = "Número de Documento")]
         public string NumeroDocumento { get; set; }
 
         public string Ciudad { get; set; }
@@ -138,11 +138,11 @@ namespace Gosocket.Dian.Web.Models
             {
                 new TipoDocumentoModel() { Code = "00", Name = "Todos..." },
                 new TipoDocumentoModel() { Code = "13", Name = "Cédula de Ciudadanía" },
-                new TipoDocumentoModel() { Code = "02", Name = "Cédula de Extranjería" },
-                new TipoDocumentoModel() { Code = "03", Name = "No de identificación personal" },
-                new TipoDocumentoModel() { Code = "04", Name = "No de identificación tributaria" },
-                new TipoDocumentoModel() { Code = "05", Name = "Tarjeta de identidad" },
-                new TipoDocumentoModel() { Code = "06", Name = "Pasaporte" }
+                new TipoDocumentoModel() { Code = "22", Name = "Cédula de Extranjería" },
+                new TipoDocumentoModel() { Code = "91", Name = "No de identificación personal" },
+                new TipoDocumentoModel() { Code = "31", Name = "No de identificación tributaria" },
+                new TipoDocumentoModel() { Code = "12", Name = "Tarjeta de identidad" },
+                new TipoDocumentoModel() { Code = "41", Name = "Pasaporte" }
             };
         }
     }
