@@ -88,6 +88,7 @@
         public string DescriptionReference { get; set; }
         public string SchemeID { get; set; }
         public string EventNumberReference { get; set; }
+        public string ProviderIdNit { get; set; }
     }
 
     public class AssociatedValidationsModel
