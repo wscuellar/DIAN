@@ -274,6 +274,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");
                
                 int tempID = 0;
+                var isErrorConsecutiveDelivery = false;
+                var isErrorConsecutiveAllowance = false;
+
                 //Consecutivo regla DSBC02
                 for (int i = 0; i < deliveryTermsListResponse.Count; i++)
                 {                    
@@ -284,37 +287,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (valNumber)
                     {
                         if (i == 0)
+                        {
                             tempID = number1;
+                            if (number1 != 1)
+                            {
+                                isErrorConsecutiveDelivery = true;
+                                break;
+                            }
+                        }                                                       
                         else
                         {
                             if (!int.Equals(number1, tempID + 1))
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "DSBC02",
-                                    ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
+                                isErrorConsecutiveDelivery = true;
                                 break;
-                            }
+                            }                         
                             else
                                 tempID = Convert.ToInt32(number1);
                         }
-                    }
-                    else
+                    }                   
+                }
+
+                if (isErrorConsecutiveDelivery)
+                {
+                    responses.Add(new ValidateListResponse
                     {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "DSBC02",
-                            ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        break;
-                    }
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSBC02",
+                        ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
 
                 //Consecutivo regla DSAQ02
@@ -327,47 +330,99 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (valNumber)
                     {
                         if (i == 0)
+                        {
                             tempID = number1;
+                            if (number1 != 1)
+                            {
+                                isErrorConsecutiveAllowance = true;
+                                break;
+                            }
+                        }                           
                         else
                         {
                             if (!int.Equals(number1, tempID + 1))
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "DSAQ02",
-                                    ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
+                                isErrorConsecutiveAllowance = true;
                                 break;
                             }
                             else
                                 tempID = Convert.ToInt32(number1);
                         }
-                    }
-                    else
+                    }                   
+                }
+
+                if (isErrorConsecutiveAllowance)
+                {                   
+                    responses.Add(new ValidateListResponse
                     {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "DSAQ02",
-                            ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        break;
-                    }
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAQ02",
+                        ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });                                           
                 }
             }
             else
             {
                 //Validacion documento de impotacion 
                 XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+                XmlNodeList InvoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+                
                 int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
+                int[] arrayInvoiceListResponse = new int[InvoiceLineListResponse.Count];
                 var isErrorConsecutive = false;
+                var isErrorConsecutiveInvoice = false;
 
-                int tempID = 0;
+                int tempIDInvoice = 0;
+                for (int i = 0; i < InvoiceLineListResponse.Count; i++)
+                {
+                    var value = InvoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    // cuando no llega valor, se asume -1
+                    var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
+
+                    if (i == 0)
+                    {
+                        tempIDInvoice = xmlID;
+                        if (xmlID != 1) isErrorConsecutiveInvoice = true;
+                    }
+                    else
+                    {
+                        if (!int.Equals(xmlID, tempIDInvoice + 1))
+                            isErrorConsecutiveInvoice = true;
+                        else
+                            tempIDInvoice = xmlID;
+                    }
+
+                    arrayInvoiceListResponse[i] = xmlID;
+                }
+
+                if (isErrorConsecutiveInvoice)
+                {                   
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = false,
+                        ErrorCode = "DIAV02b",
+                        ErrorMessage = "Los números de línea de factura utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
+                bool paresInvoiceLine = arrayInvoiceListResponse.Distinct().Count() == arrayInvoiceListResponse.Length;
+                if (!paresInvoiceLine || arrayInvoiceListResponse.Contains(-1))
+                {                 
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = false,
+                        ErrorCode = "DIAV02a",
+                        ErrorMessage = "Más de un grupo conteniendo el elemento /de:Invoice/de:InvoiceLine/cbc:ID con la misma información o no existe ningún valor",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+
+                int tempID = 0;               
                 for (int i = 0; i < invoiceListResponse.Count; i++)
                 {
                     var value = invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
@@ -391,8 +446,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 if (isErrorConsecutive)
-                {
-                    responses.Clear();
+                {                   
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -405,8 +459,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 bool pares = arrayInvoiceLine.Distinct().Count() == arrayInvoiceLine.Length;
                 if (!pares || arrayInvoiceLine.Contains(-1))
-                {
-                    if (!isErrorConsecutive) responses.Clear();
+                {                    
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
