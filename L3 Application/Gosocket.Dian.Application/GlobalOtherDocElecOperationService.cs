@@ -25,9 +25,9 @@ namespace Gosocket.Dian.Application
 
         public bool Insert(GlobalOtherDocElecOperation item, OtherDocElecSoftware software)
         {
-            GlobalSoftware soft = new GlobalSoftware(software.Id.ToString(), software.Id.ToString())
+            GlobalSoftware soft = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
             {
-                Id = software.SoftwareId,
+                Id = software.Id,
                 Pin = software.Pin,
                 Timestamp = DateTime.Now,
                 StatusId = 1
