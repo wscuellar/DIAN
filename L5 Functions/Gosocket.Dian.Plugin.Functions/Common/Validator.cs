@@ -3431,7 +3431,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                     return response;
                 }
-                hash = $"{software.Id}{software.Pin}{number}".EncryptSHA384();
+
+                if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                      || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+                    hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
+                else
+                    hash = $"{software.Id}{software.Pin}{number}".EncryptSHA384();
+           
             }
 
             if (SoftwareSecurityCode.ToLower() == hash)
