@@ -436,11 +436,13 @@ namespace Gosocket.Dian.Functions.Activation
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(validateOtherDoc);
 
-                    SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL", "UPDATE-03");
+                    string[] tempSoftwareID = setResultOther.RowKey.Split('|');
+
+                    SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL Software ID: " + tempSoftwareID[1], "UPDATE-03");
                     // traigo los datos de RadianTestSetResult
 
                     // Se verifica si la operacion para el cliente y el software que usa esta habilitada para otros documentos
-                    bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+                    bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(tempSoftwareID[1]));
                     SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
                     if (isActive)
                         return;               
@@ -478,7 +480,7 @@ namespace Gosocket.Dian.Functions.Activation
                     }
 
                     Contributor contributor = contributorService.GetByCode(setResultOther.PartitionKey);
-                    GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.GetOperation(setResultOther.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
+                    GlobalOtherDocElecOperation isPartipantActiveOtherDoc = globalOtherDocElecOperation.GetOperation(setResultOther.PartitionKey, new Guid(tempSoftwareID[1]));
                     if (isPartipantActiveOtherDoc == null)
                         return;
 
@@ -510,9 +512,10 @@ namespace Gosocket.Dian.Functions.Activation
                             try
                             {
                                 SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
-                                                            
+
                                 //--Traemos la informacion del software
-                                string softwareId = globalTestSetTracking.SoftwareId;
+                                //string softwareId = globalTestSetTracking.SoftwareId;
+                                string softwareId = tempSoftwareID[1];
                                 OtherDocElecSoftware software = softwareService.GetByOtherDoc(Guid.Parse(softwareId));
 
                                 SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, "UPDATE-03.11");
