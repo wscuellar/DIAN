@@ -371,11 +371,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                {
-                    existDisponibilizaExpresa = true;
-                    data.TrackId = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch).Event.PartitionKey;
+                {                                      
+                    var trackIdEvent = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch);
+                    if (trackIdEvent != null)
+                    {
+                        existDisponibilizaExpresa = true;
+                        data.TrackId = trackIdEvent.Event.PartitionKey;
+                    }
                 }                   
-                else
+                
+                if(!existDisponibilizaExpresa)
                 {
                     var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                    "0" + (int)code);
