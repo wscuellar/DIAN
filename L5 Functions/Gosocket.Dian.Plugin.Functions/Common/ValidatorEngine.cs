@@ -379,7 +379,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         data.TrackId = trackIdEvent.Event.PartitionKey;
                     }
                 }                   
-                else
+                
+                if(!existDisponibilizaExpresa)
                 {
                     var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
                    "0" + (int)code);
