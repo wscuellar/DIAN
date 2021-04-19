@@ -55,6 +55,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
+        private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -896,8 +897,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
+            // Is Radian
+            var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(documentMeta.DocumentTypeId).FirstOrDefault();
+
             //Software provider RADIAN
-            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268")
+            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268" && docEvent.IsRadian)
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(

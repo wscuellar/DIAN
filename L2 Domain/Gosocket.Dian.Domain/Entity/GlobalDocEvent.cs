@@ -12,5 +12,6 @@ namespace Gosocket.Dian.Domain.Entity
         public string Description { get; set; }
         public string DocumentTypeId { get; set; }
         public bool Active { get; set; }
+        public bool IsRadian { get; set; }
     }
 }
