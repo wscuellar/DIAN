@@ -898,10 +898,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
             // Is Radian
-            var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(documentMeta.DocumentTypeId).FirstOrDefault();
+            var isRadian = false;
+            if (documentMeta.DocumentTypeId == "96")
+            {
+                var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(nitModel.ResponseCode).FirstOrDefault();
+                isRadian = docEvent.IsRadian;
+            }
 
             //Software provider RADIAN
-            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268" && docEvent.IsRadian)
+            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268" && isRadian)
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
@@ -961,7 +966,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else
             {
-                softwareProvider = GetContributorInstanceCache(softwareProviderCode);
+                softwareProvider = GetContributorInstanceCache(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode);
             }
 
             if (string.IsNullOrEmpty(providerCodeDigit) || providerCodeDigit == "undefined") providerCodeDigit = "11";
