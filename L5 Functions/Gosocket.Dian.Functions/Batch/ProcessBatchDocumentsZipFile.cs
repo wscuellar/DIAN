@@ -146,7 +146,7 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
                     xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
-                    var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];
+                    var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];                  
 
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
                     if (bigContributorRequestAuthorization?.StatusCode != (int)BigContributorAuthorizationStatus.Authorized)
@@ -201,8 +201,25 @@ namespace Gosocket.Dian.Functions.Batch
 
                 if (setResultOther == null)
                 {
+                    start = DateTime.UtcNow;
+                    var checksetResultOther = new GlobalLogger(zipKey, "5.1 checksetResultOther")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "Step flagApplicationResponse " + flagApplicationResponse + " multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count().ToString()
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checksetResultOther);
+
                     // Check xpaths
                     var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
+
+                    start = DateTime.UtcNow;
+                    var checkxpathValuesValidationResult = new GlobalLogger(zipKey, "5.2 checkxpathValuesValidationResult")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = "Step xpathValuesValidationResult " + xpathValuesValidationResult.Count().ToString() 
+                    };
+                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checkxpathValuesValidationResult);
+
 
                     multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
                     foreach (var responseXpathValues in multipleResponsesXpathDataValue)
@@ -640,17 +657,32 @@ namespace Gosocket.Dian.Functions.Batch
             var result = new List<XmlParamsResponseTrackId>();
             List<RadianTestSetResult> lstResult = null;
             bool messageMandato = false;
+            string blankEndorsement = string.Empty;
+            string codeMandato = string.Empty;
+
+
+            ////Si es endoso en blanco obtiene informacion del providerID
+            //if (string.IsNullOrEmpty(response.XpathsValues["AppResSenderCodeXpath"]))
+            //    blankEndorsement = "AppResProviderIdXpath";
 
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
             var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
-            var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();            
+            var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
 
-            //Aplica para eventos AR 
-            string codeMandato = string.Empty;
+            //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
-                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim());           
+            {
+                foreach (var code in codes.ToList())
+                    blankEndorsement = code;
+
+                if (string.IsNullOrEmpty(blankEndorsement))
+                    codes = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
+
+                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim());
+            }
+
 
             foreach (var code in codes.ToList())
             {
@@ -665,7 +697,8 @@ namespace Gosocket.Dian.Functions.Batch
                     Action = "Step-codeMandato " + codeMandato +                    
                     " Step-code " + code +
                     " Step-trimAuthCode " + trimAuthCode +
-                    " Step-softwareId " + softwareId
+                    " Step-softwareId " + softwareId +
+                    " Step-blankEndorsement " + blankEndorsement
                 };
                 var insertCheckVariables = TableManagerGlobalLogger.InsertOrUpdateAsync(checkVariables);
                
@@ -944,16 +977,25 @@ namespace Gosocket.Dian.Functions.Batch
             }
         }
 
-        private static List<XmlParamsResponseTrackId> ValidateXpathValues(List<ResponseXpathDataValue> responses, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> ValidateXpathValues(List<ResponseXpathDataValue> responses,  Boolean flagApplicationResponse = false)
         {
 
             string[] noteCodes = { "7", "07", "8", "08", "91", "92", "96" };
             var result = new List<XmlParamsResponseTrackId>();
+            string blankEndorsement = string.Empty;
 
             foreach (var response in responses)
             {
+                SetLogger(null, "Step ValidateXpathValues", " Paso Ingresa a ValidateXpathValues foreach response", "PROC-5.3");
+
                 bool isValid = true;
                 var documentTypeCode = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
+
+                //Si es endoso en blanco obtiene informacion del providerID
+                if (string.IsNullOrEmpty(response.XpathsValues["AppResSenderCodeXpath"]) && documentTypeCode == "96")                
+                    blankEndorsement = "AppResProviderIdXpath";                
+                   
+                SetLogger(null, "Step blankEndorsement ", blankEndorsement, "PROC-5.4");
 
                 if (string.IsNullOrEmpty(documentTypeCode))
                     documentTypeCode = response.XpathsValues["DocumentTypeId"];
@@ -966,7 +1008,7 @@ namespace Gosocket.Dian.Functions.Batch
                     isValid = false;
                 if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResNumberXpath" : "NumberXpath"]))
                     isValid = false;
-                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]))
+                if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? blankEndorsement : "SenderCodeXpath"]))
                     isValid = false;
                 if (string.IsNullOrEmpty(response.XpathsValues[flagApplicationResponse ? "AppResReceiverCodeXpath" : "ReceiverCodeXpath"]))
                     isValid = false;
@@ -979,13 +1021,15 @@ namespace Gosocket.Dian.Functions.Batch
                 if (string.IsNullOrEmpty(response.XpathsValues["SoftwareIdXpath"]))
                     isValid = false;
 
+                SetLogger(null, "Step ValidateXpathValues", " Paso Ingresa a isValid " + isValid, "PROC-5.5");
+
                 if (isValid)
                     result.Add(new XmlParamsResponseTrackId
                     {
                         Success = isValid,
                         XmlFileName = response.XpathsValues["FileName"],
                         DocumentKey = response.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"],
-                        SenderCode = response.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]
+                        SenderCode = response.XpathsValues[flagApplicationResponse ? blankEndorsement : "SenderCodeXpath"]
                     });
             }
 

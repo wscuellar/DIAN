@@ -283,6 +283,7 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.TotalReceiptNoticeSent = 0;
             testSetResult.TotalReceiptServiceSent = 0;
             testSetResult.TotalRejectInvoiceSent = 0;
+            testSetResult.TotalReportForPaymentSent = 0;
             testSetResult.EndCirculationLimitationAccepted = 0;
             testSetResult.EndCirculationLimitationRejected = 0;
             testSetResult.EndMandateAccepted = 0;
@@ -313,7 +314,7 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.TotalDocumentAccepted = 0;
             testSetResult.TotalDocumentSent = 0;
             testSetResult.TotalDocumentsRejected = 0;
-            testSetResult.ReportForPaymentTotalRequired = 0;
+            testSetResult.ReportForPaymentAccepted = 0;
             testSetResult.ReportForPaymentRejected = 0;
             testSetResult.State = "En proceso";
             testSetResult.Status = 0;
