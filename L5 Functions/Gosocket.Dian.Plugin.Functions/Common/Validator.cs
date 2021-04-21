@@ -55,6 +55,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
+        private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
 
         readonly XmlDocument _xmlDocument;
         readonly XPathDocument _document;
@@ -896,8 +897,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
+            // Is Radian
+            var isRadian = false;
+            if (documentMeta.DocumentTypeId == "96")
+            {
+                var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(nitModel.ResponseCode).FirstOrDefault();
+                isRadian = docEvent.IsRadian;
+            }
+
             //Software provider RADIAN
-            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268")
+            if (documentMeta.DocumentTypeId == "96" && !documentMeta.SendTestSet && senderCodeProvider != "800197268" && isRadian)
             {
                 senderCodeProvider = senderCode != senderCodeProvider ? senderCodeProvider : senderCode;
                 softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
@@ -957,7 +966,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else
             {
-                softwareProvider = GetContributorInstanceCache(softwareProviderCode);
+                softwareProvider = GetContributorInstanceCache(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode);
             }
 
             if (string.IsNullOrEmpty(providerCodeDigit) || providerCodeDigit == "undefined") providerCodeDigit = "11";
@@ -1005,10 +1014,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
                 //Valida software proveedor RADIAN Habilitado
-                if (documentMeta.DocumentTypeId == "96")
+                if (documentMeta.DocumentTypeId == "96" )
                 {
-                    if (softwareProviderRadian != null && habilitadoRadian)
+                    if (softwareProviderRadian != null && habilitadoRadian && isRadian)
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else if(!isRadian)
+                    {
+                        //Valida eventos Fase I Factura Electronica 
+                        if (softwareProvider?.StatusId == (int)ContributorStatus.Enabled)
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{softwareProviderCodeHab} NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
                     else
                         responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
