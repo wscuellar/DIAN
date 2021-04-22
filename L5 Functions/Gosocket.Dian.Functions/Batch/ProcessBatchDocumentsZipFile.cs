@@ -992,9 +992,12 @@ namespace Gosocket.Dian.Functions.Batch
                 var documentTypeCode = flagApplicationResponse ? "96" : response.XpathsValues["DocumentTypeXpath"];
 
                 //Si es endoso en blanco obtiene informacion del providerID
-                if (string.IsNullOrEmpty(response.XpathsValues["AppResSenderCodeXpath"]) && documentTypeCode == "96")                
-                    blankEndorsement = "AppResProviderIdXpath";                
-                   
+                if (string.IsNullOrEmpty(response.XpathsValues["AppResSenderCodeXpath"]) && documentTypeCode == "96")
+                    blankEndorsement = "AppResProviderIdXpath";
+                else
+                    blankEndorsement = "AppResSenderCodeXpath";
+
+
                 SetLogger(null, "Step blankEndorsement ", blankEndorsement, "PROC-5.4");
 
                 if (string.IsNullOrEmpty(documentTypeCode))

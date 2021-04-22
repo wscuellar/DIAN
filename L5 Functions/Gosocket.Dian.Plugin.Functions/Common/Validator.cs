@@ -5545,7 +5545,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "90, Rechazo: ",
+                    ErrorCode = "90",
                     ErrorMessage = "Documento procesado anteriormente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
