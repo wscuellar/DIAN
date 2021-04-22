@@ -543,7 +543,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.StatusMessage = message;
                     }
 
-                    if (failed.Any() && !applicationResponseExist)
+                    //if (failed.Any() && !applicationResponseExist)
+                    if (failed.Any())
                     {
                         var failedList = new List<string>();
                         foreach (var f in failed)
@@ -565,7 +566,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.ErrorMessage.AddRange(notificationList);
                     }
 
-                    if (response.IsValid || applicationResponseExist)
+                    //if (response.IsValid || applicationResponseExist)
+                    if (response.IsValid)
                     {
                         response.IsValid = true;
                         response.StatusCode = "00";

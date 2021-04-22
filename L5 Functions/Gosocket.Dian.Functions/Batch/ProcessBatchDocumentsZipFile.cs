@@ -385,6 +385,8 @@ namespace Gosocket.Dian.Functions.Batch
                             if (errors.Any()) { validateDocumentUrl = false; }
 
                             if (notifications.Any()) { validateDocumentUrl = !errors.Any(); }
+
+                            SetLogger(null, "Step prueba AR", " validateDocumentUrl " + validateDocumentUrl, "PROC-4.1");
                         }
 
                         //Registra tablas Nomina
