@@ -749,30 +749,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Consulta legitimo tenedor
                     GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey, true);
-                    //Existe mas de un legitimo tenedor requiere un mandatario
-                    string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
-                    if (endosatarios.Length == 1)
+                                   
+                    if(documentHolderExchange != null)
                     {
-                        senderCode = documentHolderExchange.PartyLegalEntity;
-                    }
-                    else
-                    {
-                        //Valida exista mandatario representante para cada legitimo tenedor
-                        foreach (string endosatario in endosatarios)
+                        //Existe mas de un legitimo tenedor requiere un mandatario
+                        string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                        if (endosatarios.Length == 1)
                         {
-                            GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(documentMeta.PartitionKey, endosatario, xmlParserCude.ProviderCode);
-                            if (documentAttorney == null)
+                            senderCode = documentHolderExchange.PartyLegalEntity;
+                        }
+                        else
+                        {
+                            //Valida exista mandatario representante para cada legitimo tenedor
+                            foreach (string endosatario in endosatarios)
                             {
-                                validFor = false;
+                                GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(documentMeta.PartitionKey, endosatario, xmlParserCude.ProviderCode);
+                                if (documentAttorney == null)
+                                {
+                                    validFor = false;
+                                }
+                            }
+
+                            if (validFor)
+                            {
+                                senderCode = xmlParserCude.ProviderCode;
                             }
                         }
-
-                        if (validFor)
-                        {
-                            senderCode = xmlParserCude.ProviderCode;
-                        }
                     }
-
+                   
                     if (validFor)
                     {
                         //Valida existe disponibilizacion posterior

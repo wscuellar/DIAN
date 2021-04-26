@@ -78,12 +78,11 @@ namespace Gosocket.Dian.Functions.Events
                             throw new Exception(xmlParserCude.ParserError);
                         InsertUpdateMandato(xmlParserCude, trackIdCude, data.AuthCode);
                         listID = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+
+                        if (listID == "3")
+                            documentMeta.DocumentReferencedKey = "01";
                     }
-
-                    //Referencia CUFE mandato abierto
-                    if (listID == "3" && Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
-                        documentMeta.DocumentReferencedKey = "01";
-
+         
                     GlobalDocRegisterProviderAR documentRegisterAR = new GlobalDocRegisterProviderAR(trackIdCude, documentMeta.TechProviderCode)
                     {
                         DocumentTypeId = documentMeta.DocumentTypeId,
@@ -245,12 +244,12 @@ namespace Gosocket.Dian.Functions.Events
                 string code = string.Empty;
 
                 //Solo si existe información referenciada del CUFE
-                if (listID != "3" && customizationID == "431" || customizationID == "432")
+                if (listID != "3" && (customizationID == "431" || customizationID == "432"))
                 {
                     attorneyModel.cufe = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                     code = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
                 }                                    
-                else if(listID != "3" && customizationID == "433" || customizationID == "434")
+                else if(listID != "3" && (customizationID == "433" || customizationID == "434"))
                 {
                     attorneyModel.cufe = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
                     code = cufeListDocumentResponse.Item(j).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
