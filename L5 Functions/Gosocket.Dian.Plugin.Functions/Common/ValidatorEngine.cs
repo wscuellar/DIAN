@@ -137,7 +137,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta != null)
             {
                 bool validEventRadian = true;
-                bool validEventTacita = true;
+                bool validEventPrev = true;
                 bool validEventReference = true;
                 var xmlBytes = await GetXmlFromStorageAsync(trackId);
                 var xmlParser = new XmlParser(xmlBytes);
@@ -219,12 +219,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     foreach (var itemResponsesTacita in responses)
                     {
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
-                            || itemResponsesTacita.ErrorCode == "LGC05")
-                            validEventTacita = false;
+                            || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
+                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30")
+                            validEventPrev = false;
                     }
                     validateResponses.AddRange(responses);
 
-                    if (validEventTacita)
+                    if (validEventPrev)
                     {
                         responses = await Instance.StartValidateSigningTimeAsync(signingTime);
                         validateResponses.AddRange(responses);
@@ -458,13 +459,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad 
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
-            {
+            {               
                 //Servicio GlobalDocAssociate
                 string eventSearch = "0" + (int)code;
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                    trackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch).Event.PartitionKey;
+                {
+                    var respTrackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch);
+                    if(respTrackIdAvailability != null)
+                    {
+                        trackIdAvailability = respTrackIdAvailability.Event.PartitionKey;
+                    }
+                }
+                    
                 else
                 {
                     var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,

@@ -33,7 +33,7 @@ namespace Gosocket.Dian.Functions.Others
             SetLogger(null, "Step OtherDocument-00", " Ingresamos a ActivateOtherDocumentContributor ", "ACTSEND-01");
 
             //Variable de validacion para registro informacion del piloto
-            bool.TryParse(ConfigurationManager.GetValue("IsProduction"), out bool IsProduction);
+            bool.TryParse(Environment.GetEnvironmentVariable("IsProduction"), out bool IsProduction);
 
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {

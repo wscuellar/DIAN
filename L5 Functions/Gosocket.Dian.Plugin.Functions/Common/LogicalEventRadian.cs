@@ -822,6 +822,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validForItem = false;
 
             responses.Add(new ValidateListResponse
             {
@@ -856,9 +857,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
+            if (listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
+                validForItem = true;
+
             if (listDisponibilizacion != null)
-            {
-                bool validForItem = false;
+            {               
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
@@ -976,6 +979,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validForItem = false;
 
             responses.Add(new ValidateListResponse
             {
@@ -1009,9 +1013,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
+            if(listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
+                validForItem = true;
+
             if (listDisponibilizacion != null)
-            {
-                bool validForItem = false;
+            {                
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
@@ -1128,6 +1134,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string senderCode = string.Empty;
             string eventCode = eventPrev.EventCode;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validForItem = false;
 
             responses.Add(new ValidateListResponse
             {
@@ -1144,9 +1151,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
+            if (listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
+                validForItem = true;
+
             if (listDisponibilizacion != null)
-            {
-                bool validForItem = false;
+            {                
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
