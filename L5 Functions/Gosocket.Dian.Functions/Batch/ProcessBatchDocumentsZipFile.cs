@@ -37,6 +37,7 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
         private static readonly TableManager tableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
         private static readonly TableManager tableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
+        private static readonly TableManager tableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
 
         // Set queue name
         private const string queueName = "global-process-batch-zip-input%Slot%";
@@ -661,11 +662,7 @@ namespace Gosocket.Dian.Functions.Batch
             bool messageMandato = false;
             string blankEndorsement = string.Empty;
             string codeMandato = string.Empty;
-
-
-            ////Si es endoso en blanco obtiene informacion del providerID
-            //if (string.IsNullOrEmpty(response.XpathsValues["AppResSenderCodeXpath"]))
-            //    blankEndorsement = "AppResProviderIdXpath";
+            string eventCode = string.Empty;          
 
             var codes = responseXpathDataValue.Select(x => x.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"]).Distinct();
             var codeProviders = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
@@ -683,6 +680,10 @@ namespace Gosocket.Dian.Functions.Batch
                     codes = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
 
                 codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim());
+
+                //Valida si evento es Radian
+                foreach (var responseCode in eventCodes.ToList())
+                    eventCode = responseCode;
             }
 
 
@@ -700,7 +701,8 @@ namespace Gosocket.Dian.Functions.Batch
                     " Step-code " + code +
                     " Step-trimAuthCode " + trimAuthCode +
                     " Step-softwareId " + softwareId +
-                    " Step-blankEndorsement " + blankEndorsement
+                    " Step-blankEndorsement " + blankEndorsement +
+                    " Step-eventCode " + eventCode
                 };
                 var insertCheckVariables = TableManagerGlobalLogger.InsertOrUpdateAsync(checkVariables);
                
@@ -824,20 +826,25 @@ namespace Gosocket.Dian.Functions.Batch
 
                         }
                         else if (objRadianTestSetResult != null)
-                        {                            
+                        {
+                            // Is Radian
+                            var isRadian = false;                          
+                            var docEvent = tableManagerGlobalDocEvent.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
+                            isRadian = docEvent.IsRadian;
+                            
                             // Validations to RADIAN 
                             start = DateTime.UtcNow;
                             var checkRadian = new GlobalLogger(zipKey, "7.3 checkPermissions")
                             {
                                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                                 Action = "Step-checkRadian softwareIdNomina " + softwareId +
-                                " Step-code " + code
+                                " Step-code " + code + " Step-isRadian " + isRadian
                             };
                             var insertRadian = TableManagerGlobalLogger.InsertOrUpdateAsync(checkRadian);
 
                             //Valida software asociado al NIT en GlobalRadianOperation
                             bool existOperation = tableManagerGlobalRadianOperations.Exist<GlobalRadianOperations>(code, softwareId);
-                            if (!existOperation)
+                            if (isRadian && !existOperation)
                             {
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"El NIT {code} no cuenta con el software con id {softwareId} asociado al proceso de habilitación RADIAN" });
                             }
