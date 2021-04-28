@@ -1116,10 +1116,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 party.SenderParty = nitModel.SenderCode;
             }
 
+            // Is Radian
+            var isRadian = false;
+         
+            var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
+            isRadian = docEvent.IsRadian;
+            
             //valida si existe los permisos del mandatario
             if (party.SenderParty != xmlParserCude.ProviderCode
                 && xmlParserCude.ProviderCode != "800197268"
-                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato)
+                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
+                && isRadian)
             {
                 var responseVal = ValidateFacultityAttorney(nitModel, party, xmlParserCude);
                 if (responseVal != null)
