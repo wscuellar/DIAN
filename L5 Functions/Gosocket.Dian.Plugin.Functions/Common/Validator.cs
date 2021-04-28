@@ -902,7 +902,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "96")
             {
                 var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(nitModel.ResponseCode).FirstOrDefault();
-                isRadian = docEvent.IsRadian;
+                if(docEvent != null)
+                    isRadian = docEvent.IsRadian;
             }
 
             //Software provider RADIAN
@@ -1120,7 +1121,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var isRadian = false;
          
             var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
-            isRadian = docEvent.IsRadian;
+            if(docEvent != null)
+                isRadian = docEvent.IsRadian;
             
             //valida si existe los permisos del mandatario
             if (party.SenderParty != xmlParserCude.ProviderCode
