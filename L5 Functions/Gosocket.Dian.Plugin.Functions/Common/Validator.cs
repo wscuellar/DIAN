@@ -888,7 +888,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (valNumber)
                     {
                         if (string.IsNullOrEmpty(agentPartyPersonSchemeID) || agentPartyPersonSchemeID == "undefined") agentPartyPersonSchemeID = "11";
-                        if (ValidateDigitCode(receiverCode, int.Parse(agentPartyPersonSchemeID)))
+                        if (ValidateDigitCode(issuerPartyCode, int.Parse(agentPartyPersonSchemeID)))
                             responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH71", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                         else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAH71", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH71"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     }
