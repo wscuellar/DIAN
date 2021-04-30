@@ -2967,7 +2967,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //Valida codigos facultades mandato General - Limitado
                     string[] tempCodeAttorney = codeAttorney.Split('-');
-                    if (modoOperacion == tempCodeAttorney[1])
+                    if (validate && modoOperacion == tempCodeAttorney[1])
                     {
                         if ((customizationID == "431" || customizationID == "432"))
                         {
@@ -3013,16 +3013,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (!codeExist)
                 {
-                    validate = false;
-                    responses.Add(new ValidateListResponse
+                    if (validate)
                     {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAL02",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAL02",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAL02"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                   
                     if (new string[] { "Mandato por documento General", "Mandato por documento Limitado" }.Contains(descriptionCode)) validDescriptionCode = true;
                     if (!validDescriptionCode)
                     {
@@ -3869,9 +3872,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
             }
 
-            //Valida referencia evento terminacion de mandato
             if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato)
             {
+                //Valida referencia evento terminacion de mandato
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
@@ -3963,6 +3966,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             Mandatory = true,
                             ErrorCode = "AAH09",
                             ErrorMessage = messageTypeId,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if(Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation 
+                        && documentMeta.DocumentTypeId != "96")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
