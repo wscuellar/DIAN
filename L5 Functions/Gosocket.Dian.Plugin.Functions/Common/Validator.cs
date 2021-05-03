@@ -390,8 +390,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //}
 
                 int tempIDInvoice = 0;
+                int indexInvoiceLine = 0;
                 for (int i = 0; i < invoiceLineListResponse.Count; i++)
                 {
+                    indexInvoiceLine += 1;
                     var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
                     // cuando no llega valor, se asume -1
                     var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
@@ -414,7 +416,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     #region AllowanceCharge
                     if (!isErrorConsecutiveAllowanceCharge)
                     {
-                        XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{xmlID}]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                        XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
                         int[] arrayAllowanceChargeListResponse = new int[allowanceChargeListResponse.Count];
 
                         int tempIDAllowanceCharge = 0;
