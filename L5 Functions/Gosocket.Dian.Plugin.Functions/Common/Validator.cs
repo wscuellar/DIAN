@@ -880,7 +880,44 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //IssuerParty Adquiriente/deudor de la Factura Electrónica evento Mandato
             if (nitModel.ResponseCode == "043")
-            {               
+            {
+                //Valida digito de verificacion SenderParty / PowerOfAttorney
+                string senderPartyPowerOfAttorneySchemeID = nitModel.SenderPartyPowerOfAttorneySchemeID;
+                string senderPartyPowerOfAttorneySchemeName = nitModel.SenderPartyPowerOfAttorneySchemeName;
+                string senderPartyPowerOfAttorneyID = nitModel.SenderPartyPowerOfAttorneyID;
+                long numberPowerOfAttorney = 0;
+                bool valNumberPowerOfAttorney = long.TryParse(senderPartyPowerOfAttorneySchemeID, out numberPowerOfAttorney);
+                if (senderPartyPowerOfAttorneySchemeName == "31")
+                {
+                    if (valNumberPowerOfAttorney)
+                    {
+                        if (string.IsNullOrEmpty(senderPartyPowerOfAttorneySchemeID) || senderPartyPowerOfAttorneySchemeID == "undefined") senderPartyPowerOfAttorneySchemeID = "11";
+                        if (ValidateDigitCode(senderPartyPowerOfAttorneyID, int.Parse(senderPartyPowerOfAttorneySchemeID)))
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+                }
+
+                //Valida digito de verificacion SenderParty / Person
+                string senderPartyPersonSchemeID = nitModel.SenderPartyPersonSchemeID;
+                string senderPartyPersonSchemeName = nitModel.SenderPartyPersonSchemeName;
+                string senderPartyPersonID = nitModel.SenderPartyPersonID;
+                long numberPerson = 0;
+                bool valNumberPerson = long.TryParse(senderPartyPersonSchemeID, out numberPerson);
+                if (senderPartyPersonSchemeName == "31")
+                {
+                    if (valNumberPerson)
+                    {
+                        if (string.IsNullOrEmpty(senderPartyPersonSchemeID) || senderPartyPersonSchemeID == "undefined") senderPartyPersonSchemeID = "11";
+                        if (ValidateDigitCode(senderPartyPersonID, int.Parse(senderPartyPersonSchemeID)))
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+                }
+
+                //Valida digito de verificacion DocumentResponse / DocumentReference / IssuerParty
                 if (string.IsNullOrEmpty(IssuerPartyCodeDigit) || IssuerPartyCodeDigit == "undefined") IssuerPartyCodeDigit = "11";
                 if (ValidateDigitCode(issuerPartyCode, int.Parse(IssuerPartyCodeDigit)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAH63", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });

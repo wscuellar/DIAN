@@ -42,5 +42,12 @@
         public string AgentPartyPersonSchemeName { get; set; }
         public string ReceiverPartyLegalEntityName { get; set; }
         public string ReceiverPartyLegalEntityCompanyID { get; set; }
+        public string SenderPartyPowerOfAttorneySchemeID { get; set; }
+        public string SenderPartyPowerOfAttorneySchemeName { get; set; }
+        public string SenderPartyPowerOfAttorneyID { get; set; }
+        public string SenderPartyPersonSchemeID { get; set; }
+        public string SenderPartyPersonSchemeName { get; set; }
+        public string SenderPartyPersonID { get; set; }
+
     }
 }
