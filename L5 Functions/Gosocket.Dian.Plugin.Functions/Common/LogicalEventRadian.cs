@@ -720,11 +720,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateExistPropertyEndorsement     
-        private List<ValidateListResponse> ValidateExistEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel)
+        private List<ValidateListResponse> ValidateExistEndorsement(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, NitModel nitModel, string senderCode)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            string senderCode = xmlParserCude.Fields["SenderCode"].ToString();
+   
             bool validFor = true;
             string errorCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? "LGC27" : "LGC30";
             string messageCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorMessage_LGC27") : ConfigurationManager.GetValue("ErrorMessage_LGC30");
@@ -838,7 +838,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
 
             //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
-            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel);
+            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel, senderCode);
             if (responseExistPropertyEndorsement != null)
             {
                 foreach (var item in responseExistPropertyEndorsement)
@@ -995,7 +995,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             senderCode = nitModel.listID == "1" ? xmlParserCude.Fields["SenderCode"].ToString() : nitModel.SenderCode;
 
             //Valida existe endoso en propiedad cambio legitimo tenedor para disponibilizacion posterior
-            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel);
+            var responseExistPropertyEndorsement = ValidateExistEndorsement(documentMeta, xmlParserCude, nitModel, senderCode);
             if (responseExistPropertyEndorsement != null)
             {
                 foreach (var item in responseExistPropertyEndorsement)
