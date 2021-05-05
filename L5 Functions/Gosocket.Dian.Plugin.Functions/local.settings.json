@@ -121,7 +121,8 @@
     "ErrorMessage_LGC63": "La FEV referenciada se encuentra en proceso de negociación.. Inténtelo nuevamente",
     "ErrorMessage_AAH59": "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
     "ErrorMessage_AAF24": "No corresponde el DV al NIT",
-    "ErrorMessage_AAF33": "No corresponde el DV al NIT"
+    "ErrorMessage_AAF33": "No corresponde el DV al NIT",
+    "ErrorMessage_LGC38": "No se puede registrar este evento si previamente no se ha registrado el evento inscripción de la factura electrónica de venta como título valor"
 
 
     // Test UAT INDRA

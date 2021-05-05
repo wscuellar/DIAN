@@ -220,7 +220,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
-                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30")
+                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
+                            || itemResponsesTacita.ErrorCode == "LGC38")
                             validEventPrev = false;
                     }
                     validateResponses.AddRange(responses);
