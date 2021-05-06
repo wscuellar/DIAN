@@ -893,10 +893,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (string.IsNullOrEmpty(senderPartyPowerOfAttorneySchemeID) || senderPartyPowerOfAttorneySchemeID == "undefined") senderPartyPowerOfAttorneySchemeID = "11";
                         if (ValidateDigitCode(senderPartyPowerOfAttorneyID, int.Parse(senderPartyPowerOfAttorneySchemeID)))
-                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     }
-                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
                 }
 
                 //Valida digito de verificacion SenderParty / Person
@@ -911,10 +911,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         if (string.IsNullOrEmpty(senderPartyPersonSchemeID) || senderPartyPersonSchemeID == "undefined") senderPartyPersonSchemeID = "11";
                         if (ValidateDigitCode(senderPartyPersonID, int.Parse(senderPartyPersonSchemeID)))
-                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     }
-                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF33", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF33"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
+                    else { responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "AAF24", ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF24"), ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds }); }
                 }
 
                 //Valida digito de verificacion DocumentResponse / DocumentReference / IssuerParty
