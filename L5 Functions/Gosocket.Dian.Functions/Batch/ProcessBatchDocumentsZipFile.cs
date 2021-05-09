@@ -609,23 +609,26 @@ namespace Gosocket.Dian.Functions.Batch
             return requestObj;
         }
 
-        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders, IEnumerable<string> eventCodes, IEnumerable<string> responseListIds, string testSetId)
+        private static string validateReferenceAttorney(IEnumerable<string> codes, IEnumerable<string> codeProviders, IEnumerable<string> eventCodes, IEnumerable<string> responseListIds, string testSetId, IEnumerable<string> responseCustomizationID)
         {
             string senderCode = string.Empty;
-            string IssuerAttorney = string.Empty;
+            string issuerAttorney = string.Empty;
             string eventCode = string.Empty;
             string listId = string.Empty;
+            string operationCode = string.Empty;
 
             foreach (var code in codes.ToList())
                 senderCode = code;
             foreach (var codeProvider in codeProviders.ToList())
-                IssuerAttorney = codeProvider;
+                issuerAttorney = codeProvider;
             foreach (var responseCode in eventCodes.ToList())
                 eventCode = responseCode;
             foreach (var itemListId in responseListIds)
                 listId = itemListId;
+            foreach (var responseCustomization in responseCustomizationID.ToList())
+                operationCode = responseCustomization;
 
-            SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + IssuerAttorney, "ATT-1");
+            SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + issuerAttorney + " operationCode " + operationCode, "ATT-1");
 
             //Se busca el set de pruebas procesado para el testsetid en curso
             RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
@@ -633,12 +636,20 @@ namespace Gosocket.Dian.Functions.Batch
             //Evento Mandato el provider es el mandatario
             if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
             {
-                if (radianTesSetResult != null && radianTesSetResult.PartitionKey == IssuerAttorney) 
-                    return IssuerAttorney;
+                if (radianTesSetResult != null && radianTesSetResult.PartitionKey == issuerAttorney) 
+                    return issuerAttorney;
                 else
                     return senderCode;
             }
-               
+
+            //Evento Terminacion de Mandato X Revocatoria del Mandante (441)
+            if (Convert.ToInt32(eventCode) == (int)EventStatus.TerminacionMandato 
+                && (Convert.ToInt32(operationCode) == (int)SubEventStatus.TerminacionRevocatoria))
+            {
+                if (radianTesSetResult != null && radianTesSetResult.PartitionKey == issuerAttorney)
+                    return issuerAttorney;
+            }
+
             SetLogger(null, "Step-itemDocsReferenceAttorney", " codeMandato return null", "ATT-3");
             return null;
         }
@@ -669,6 +680,7 @@ namespace Gosocket.Dian.Functions.Batch
             var softwareIds = responseXpathDataValue.Select(x => x.XpathsValues["SoftwareIdXpath"]).Distinct();
             var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
             var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
+            var responseCustomizationID = responseXpathDataValue.Select(x => x.XpathsValues["AppResCustomizationIDXpath"]).Distinct();
 
             //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
@@ -679,7 +691,7 @@ namespace Gosocket.Dian.Functions.Batch
                 if (string.IsNullOrEmpty(blankEndorsement))
                     codes = responseXpathDataValue.Select(x => x.XpathsValues["AppResProviderIdXpath"]).Distinct();
 
-                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim());
+                codeMandato = validateReferenceAttorney(codes, codeProviders, eventCodes, responseListIds, testSetId.Trim(), responseCustomizationID);
 
                 //Valida si evento es Radian
                 foreach (var responseCode in eventCodes.ToList())
