@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();           
-            bool validTax = true;
+            bool validTax = false;
             string xmlID = string.Empty;
             string xmlPercent = string.Empty;
 
@@ -224,7 +224,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 0; i < taxCategoryListResponse.Count; i++)
             {
                 xmlID = taxCategoryListResponse.Item(i).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                if (new string[] { "22" }.Contains(xmlID)) validTax = false;
+
+                var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
+
+                if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
 
                 if (validTax)
                 {
@@ -245,7 +248,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                validTax = true;
+                validTax = false;
             }
 
             return responses;

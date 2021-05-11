@@ -122,7 +122,8 @@
     "ErrorMessage_AAH59": "EndDate del evento no coincide con el PaymentDueDate de la factura referenciada",
     "ErrorMessage_AAF24": "No corresponde el DV al NIT",
     "ErrorMessage_AAF33": "No corresponde el DV al NIT",
-    "ErrorMessage_LGC38": "No se puede registrar este evento si previamente no se ha registrado el evento inscripción de la factura electrónica de venta como título valor"
+    "ErrorMessage_LGC38": "No se puede registrar este evento si previamente no se ha registrado el evento inscripción de la factura electrónica de venta como título valor",
+    "TaxShemeID": "01|04|05|06"
 
 
     // Test UAT INDRA
