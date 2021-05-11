@@ -26,7 +26,18 @@ namespace Gosocket.Dian.Web.Controllers
         private static readonly TableManager tableManagerNumberRange = new TableManager("GlobalNumberRange");
         private static readonly TableManager tableManagerTestSet = new TableManager("GlobalTestSet");
         private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         private TestSetManager testSetManager = new TestSetManager();
+        private static Lazy<CloudTableClient> lazyClient = new Lazy<CloudTableClient>(InitializeTableClient);
+        public static CloudTableClient tableClient => lazyClient.Value;
+        
+
+        private static CloudTableClient InitializeTableClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var tableClient = account.CreateCloudTableClient();
+            return tableClient;
+        }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Add()
@@ -380,16 +391,13 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static CloudTable GetTableRef(string nameTable)
         {
-            CloudTable tableRef = null;
-            var _account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-            CloudTableClient tableClient = _account.CreateCloudTableClient();
+            CloudTable tableRef = null;            
             tableRef = tableClient.GetTableReference(nameTable);
             return tableRef;
         }
 
         private void RegisterLog(GlobalLogger logger)
-        {
-            var tableManager = new TableManager("GlobalLogger");
+        {            
             tableManager.InsertOrUpdate(logger);
         }
 

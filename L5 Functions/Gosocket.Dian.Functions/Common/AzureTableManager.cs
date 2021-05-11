@@ -3,6 +3,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Functions.Common
@@ -10,6 +11,16 @@ namespace Gosocket.Dian.Functions.Common
     public class AzureTableManager
     {
         private static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+
+        private static Lazy<CloudTableClient> lazyClient = new Lazy<CloudTableClient>(InitializeTableClient);
+        public static CloudTableClient tableClient => lazyClient.Value;
+
+        private static CloudTableClient InitializeTableClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var tableClient = account.CreateCloudTableClient();
+            return tableClient;
+        }
 
         public static GlobalDocValidatorDocumentMeta GetGlobalDocValidatorDocumentMeta(string trackId)
         {
@@ -20,9 +31,7 @@ namespace Gosocket.Dian.Functions.Common
 
         public static CloudTable GetTableRef(string nameTable)
         {
-            CloudTable tableRef = null;
-            var _account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-            CloudTableClient tableClient = _account.CreateCloudTableClient();
+            CloudTable tableRef = null;            
             tableRef = tableClient.GetTableReference(nameTable);
             return tableRef;
         }

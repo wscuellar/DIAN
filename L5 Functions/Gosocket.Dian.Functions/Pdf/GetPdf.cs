@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 };
 
                 // Objeto que se Conecta al Storage 
-                var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+                var fileManager = new FileManager();
 
                 var storageBiller = "DefaultEndpointsProtocol=https;AccountName=gtpabillerstoragetest;AccountKey=JAuJKjEWIsOU0e4VhpuY2VH5gk5CEfZyFp3xm3NffTZug7HzUNdJdX4DT+4/UIdE0qfrwG9asG730Zv6QBVFcA==";
                 var fileManagerBiller = new FileManager(storageBiller);

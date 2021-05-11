@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Infrastructure
             try
             {
                 var emailId = Guid.NewGuid();
-                var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+                var fileManager = new FileManager();
                 var templateBaseContent = fileManager.GetText("templates-emails", templateBase);
                 var templateContent = fileManager.GetText("templates-emails", templateName + ".html");
 

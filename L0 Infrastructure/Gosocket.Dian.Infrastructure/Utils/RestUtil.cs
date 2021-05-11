@@ -7,6 +7,8 @@ namespace Gosocket.Dian.Infrastructure.Utils
 {
     public class RestUtil
     {
+        private static HttpClient client = new HttpClient();
+
         public static RestResponse ExecuteRequest(string method, object requestData)
         {
             var client = new RestClient(ConfigurationManager.GetValue("FunctionsUrl"));
@@ -21,13 +23,12 @@ namespace Gosocket.Dian.Infrastructure.Utils
 
         public static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
-            using (var client = new HttpClient())
-            {
-                var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
-                var byteContent = new ByteArrayContent(buffer);
-                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return client.PostAsync(url, byteContent).Result;
-            }
+            
+            var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return client.PostAsync(url, byteContent).Result;
+            
         }
     }
 }

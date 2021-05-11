@@ -20,6 +20,16 @@ namespace Gosocket.Dian.Functions.Cosmos
         private static readonly TableManager docValidatorNewStatsTableManager = new TableManager("GlobalDocValidatorStats");
         private static readonly TableManager rejectedDocumentTableManager = new TableManager("GlobalRejectedDocument");
 
+        private static Lazy<CloudTableClient> lazyClient = new Lazy<CloudTableClient>(InitializeTableClient);
+        public static CloudTableClient tableClient => lazyClient.Value;
+
+        private static CloudTableClient InitializeTableClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var tableClient = account.CreateCloudTableClient();
+            return tableClient;
+        }
+
         [FunctionName("RegisterDocumentStatsJob")]
         public static async Task Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
@@ -247,9 +257,7 @@ namespace Gosocket.Dian.Functions.Cosmos
 
         private static CloudTable GetTableRef(string nameTable)
         {
-            CloudTable tableRef = null;
-            var _account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-            CloudTableClient tableClient = _account.CreateCloudTableClient();
+            CloudTable tableRef = null;            
             tableRef = tableClient.GetTableReference(nameTable);
             return tableRef;
         }

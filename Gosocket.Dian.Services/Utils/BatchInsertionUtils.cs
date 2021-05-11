@@ -11,6 +11,18 @@ namespace Gosocket.Dian.Services.Utils
 {
     public class BatchInsertionUtils
     {
+        private static Lazy<CloudTableClient> lazyClient = new Lazy<CloudTableClient>(InitializeBlobClient);
+        public static CloudTableClient tableClient => lazyClient.Value;
+
+        private static CloudTableClient InitializeBlobClient()
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+            var tableClient = account.CreateCloudTableClient();
+            return tableClient;
+        }
+
+        
+
         static readonly int maxBatch = 50;
 
         public static bool InsertOrUpdateValidations(List<GlobalBatchFileResult> items, string tableName)
@@ -69,9 +81,7 @@ namespace Gosocket.Dian.Services.Utils
 
         private static CloudTable GetTableRef(string nameTable)
         {
-            CloudTable tableRef = null;
-            var _account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
-            CloudTableClient tableClient = _account.CreateCloudTableClient();
+            CloudTable tableRef = null;            
             tableRef = tableClient.GetTableReference(nameTable);
             return tableRef;
         }

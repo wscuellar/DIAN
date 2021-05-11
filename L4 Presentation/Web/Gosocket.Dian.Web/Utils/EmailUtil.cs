@@ -12,6 +12,8 @@ namespace Gosocket.Dian.Web.Utils
 {
     public class EmailUtil
     {
+        private static HttpClient client = new HttpClient();
+
         public async static Task<EmailSenderResponse> SendEmailAsync(AuthToken auth, string accessUrl)
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -21,37 +23,37 @@ namespace Gosocket.Dian.Web.Utils
                 { "##USERNAME##", auth.Email }
             };
 
-            using (var httpClient = new HttpClient())
+            
+            
+            var users = ConfigurationManager.GetValue("EmailUser").Split('|');
+            var senders = ConfigurationManager.GetValue("EmailSender").Split('|');
+            var index = GetRandomIndex(users.Length);
+            var emailUser = users[index];
+            var emailSender = senders[index];
+            EmailSenderInput emaiSenderlData = new EmailSenderInput
             {
-                var users = ConfigurationManager.GetValue("EmailUser").Split('|');
-                var senders = ConfigurationManager.GetValue("EmailSender").Split('|');
-                var index = GetRandomIndex(users.Length);
-                var emailUser = users[index];
-                var emailSender = senders[index];
-                EmailSenderInput emaiSenderlData = new EmailSenderInput
-                {
-                    Application = ConfigurationManager.GetValue("EmailApplicationName"),
-                    Server = ConfigurationManager.GetValue("EmailServer"),
-                    Username = emailUser, //ConfigurationManager.GetValue("EmailUser"),
-                    Password = ConfigurationManager.GetValue("EmailPassword"),
-                    Sender = emailSender, //ConfigurationManager.GetValue("EmailSender"),
-                    Port = ConfigurationManager.GetValue("EmailPort"),
-                    Receiver = auth.Email,
-                    Subject = "Token Acceso Dian",
-                    Body = EmailTemplateManager.GenerateHtmlBody("access_login_template", replacement),
-                    BodyIsHTML = true
-                };
+                Application = ConfigurationManager.GetValue("EmailApplicationName"),
+                Server = ConfigurationManager.GetValue("EmailServer"),
+                Username = emailUser, //ConfigurationManager.GetValue("EmailUser"),
+                Password = ConfigurationManager.GetValue("EmailPassword"),
+                Sender = emailSender, //ConfigurationManager.GetValue("EmailSender"),
+                Port = ConfigurationManager.GetValue("EmailPort"),
+                Receiver = auth.Email,
+                Subject = "Token Acceso Dian",
+                Body = EmailTemplateManager.GenerateHtmlBody("access_login_template", replacement),
+                BodyIsHTML = true
+            };
 
-                var requestUrl = ConfigurationManager.GetValue("SendEmailFunctionUrl");
-                HttpRequestMessage req = EmailSenderInput.CreatePostRequestSendEmailDataWithFile(emaiSenderlData, requestUrl);
+            var requestUrl = ConfigurationManager.GetValue("SendEmailFunctionUrl");
+            HttpRequestMessage req = EmailSenderInput.CreatePostRequestSendEmailDataWithFile(emaiSenderlData, requestUrl);
 
-                var res = httpClient.SendAsync(req).Result;
+            var res = client.SendAsync(req).Result;
 
-                var content = await res.Content.ReadAsStringAsync();
-                string emailSenderResponseString = JsonConvert.DeserializeObject<string>(content);
-                EmailSenderResponse emailSenderResponse = JsonConvert.DeserializeObject<EmailSenderResponse>(emailSenderResponseString);
-                return emailSenderResponse;
-            }
+            var content = await res.Content.ReadAsStringAsync();
+            string emailSenderResponseString = JsonConvert.DeserializeObject<string>(content);
+            EmailSenderResponse emailSenderResponse = JsonConvert.DeserializeObject<EmailSenderResponse>(emailSenderResponseString);
+            return emailSenderResponse;
+            
         }
 
         public static int GetRandomIndex(int length)
