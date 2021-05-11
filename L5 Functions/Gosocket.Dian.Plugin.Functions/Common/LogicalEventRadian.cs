@@ -2117,20 +2117,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validateAval = false;
 
             XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-            int totalValueSender = 0;
+            double totalValueSender = 0;
             for (int i = 0; i < valueListSender.Count; i++)
             {
                 string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
                 // Si no se reporta, el Avalista asume el valor del monto de quien respalda...
                 if (string.IsNullOrWhiteSpace(valueStockAmount)) return null;
 
-                totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 
                 // Si se reporta, pero en ceros (0), el Avalista asume el valor del monto de quien respalda...
                 if (totalValueSender == 0) return null;
             }
 
-            if (totalValueSender > Int32.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+            if (totalValueSender > double.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
             {
                 validateAval = true;
                 responses.Add(new ValidateListResponse
@@ -2147,11 +2147,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
             if (valueListIssuerParty.Count <= 0) return null;
 
-            int totalValueIssuerParty = 0;
+            double totalValueIssuerParty = 0;
             for (int i = 0; i < valueListIssuerParty.Count; i++)
             {
                 string valueStockAmount = valueListIssuerParty.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                if (!string.IsNullOrWhiteSpace(valueStockAmount)) totalValueIssuerParty += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
             if (totalValueIssuerParty == 0) return null;
