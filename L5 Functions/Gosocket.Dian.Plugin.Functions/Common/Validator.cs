@@ -3268,9 +3268,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida fecha de emision posterior a la fecha de final de autorizacion 
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
-                DateTime.TryParse(numberRangeModel.SigningTime, out DateTime startNumberEmision);
+                DateTime.TryParse(numberRangeModel.EmissionDate, out DateTime numberEmisionDate);
+                int.TryParse(numberEmisionDate.ToString("yyyyMMdd"), out int issueDateNumberEmision);
+
+                DateTime.TryParse(numberRangeModel.StartDate, out DateTime startNumberEmision);
                 int.TryParse(startNumberEmision.ToString("yyyyMMdd"), out int dateStartNumberEmision);
-                if (dateStartNumberEmision > range.ValidDateNumberFrom)
+                if (dateStartNumberEmision > issueDateNumberEmision)
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB07a",
+                        ErrorMessage = "Fecha de emisión anterior a la fecha de inicio de la autorización de la numeración ",                        
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                else
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = true,
@@ -3279,35 +3291,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = "Fecha emision referenciada correctamente",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
-                else
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "DSAB07a",
-                        ErrorMessage = "Fecha de emisión anterior a la fecha de inicio de la autorización de la numeración ",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
 
 
-                DateTime.TryParse(numberRangeModel.SigningTime, out DateTime endNumberEmision);
+                DateTime.TryParse(numberRangeModel.EndDate, out DateTime endNumberEmision);
                 int.TryParse(endNumberEmision.ToString("yyyyMMdd"), out int dateNumberEmision);
-                if (dateNumberEmision < range.ValidDateNumberTo)
+                if (dateNumberEmision < issueDateNumberEmision)
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB08a",
+                        ErrorMessage = "Fecha de emisión posterior a la fecha final de la autorización de numeración",                        
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                else
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = true,
                         Mandatory = true,
                         ErrorCode = "DSAB08a",
                         ErrorMessage = "Fecha emision referenciada correctamente",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                else
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "DSAB08a",
-                        ErrorMessage = "Fecha de emisión posterior a la fecha final de la autorización de numeración",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
             }

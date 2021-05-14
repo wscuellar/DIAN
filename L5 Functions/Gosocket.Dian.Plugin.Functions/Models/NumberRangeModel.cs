@@ -11,5 +11,6 @@
         public string EndNumber { get; set; }
         public string SoftwareId { get; set; }
         public string SigningTime { get; set; }
+        public string EmissionDate { get; set; }
     }
 }
