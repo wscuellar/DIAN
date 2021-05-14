@@ -160,7 +160,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     nitModel.DocumentTypeIdRef,
                     xmlParser.DocumentReferenceId,
                     nitModel.IssuerPartyCode,
-                    nitModel.IssuerPartyName
+                    nitModel.IssuerPartyName,
+                    documentMeta.SendTestSet
                     );
 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion

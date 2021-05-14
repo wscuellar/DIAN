@@ -21,7 +21,8 @@ namespace Gosocket.Dian.Plugin.Functions.Models
         public string DocumentTypeIdRef { get; set; }
         public string DocumentIdReference { get; set; }
         public string IssuerPartyCode { get; set; }
-        public string IssuerPartyName { get; set; }        
+        public string IssuerPartyName { get; set; }
+        public bool SendTestSet { get; set; }
 
         public EventRadianModel() { }
 
@@ -30,7 +31,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             string customizationId, string signingTime, 
             string endDate, string senderParty, 
             string receiverParty, string documentTypeIdRef, string documentIdReference,
-            string issuerPartyCode, string issuerPartyName)
+            string issuerPartyCode, string issuerPartyName, bool sendTestSet)
         {
             TrackId = trackId;
             TrackIdCude = trackIdCude;
@@ -46,6 +47,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             DocumentIdReference = documentIdReference;
             IssuerPartyCode = issuerPartyCode;
             IssuerPartyName = issuerPartyName;
+            SendTestSet = sendTestSet;
         }
 
         public static void SetValuesEventPrev(ref EventRadianModel eventRadian, RequestObjectEventPrev eventPrev)
@@ -67,6 +69,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             validateParty.CustomizationID = eventRadian.CustomizationId;
             validateParty.TrackIdCude = eventRadian.TrackIdCude;
             validateParty.ListId = eventRadian.ListId;
+            validateParty.SendTestSet = eventRadian.SendTestSet;
         }
         
         public static void SetValueEventAproveCufe(ref EventRadianModel eventRadian, RequestObjectEventApproveCufe eventApproveCufe)

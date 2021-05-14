@@ -509,7 +509,8 @@ namespace Gosocket.Dian.Application
         public byte[] DownloadContributorFile(string code, string fileName, out string contentType)
         {
             string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
-            var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            //var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            var fileManager = new FileManager();
             return fileManager.GetBytes("radiancontributor-files", fileNameURL, out contentType);
         }
 

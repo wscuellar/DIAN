@@ -97,6 +97,8 @@ namespace Gosocket.Dian.Plugin.Functions.ValidateParty
         public string TrackIdCude { get; set; }
         [JsonProperty(PropertyName = "ListID")]
         public string ListId { get; set; }
+        [JsonProperty(PropertyName = "SendTestSet")]
+        public bool SendTestSet { get; set; }
 
         public RequestObjectParty()
         {

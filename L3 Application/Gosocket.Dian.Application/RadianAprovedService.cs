@@ -138,7 +138,9 @@ namespace Gosocket.Dian.Application
         public ResponseMessage UploadFile(Stream fileStream, string code, RadianContributorFile radianContributorFile)
         {
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
-            var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            //var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
+            var fileManager = new FileManager();
+            
             bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
             string idFile = string.Empty;
 
