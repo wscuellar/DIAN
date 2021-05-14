@@ -123,7 +123,8 @@
     "ErrorMessage_AAF24": "No corresponde el DV al NIT",
     "ErrorMessage_AAF33": "No corresponde el DV al NIT",
     "ErrorMessage_LGC38": "No se puede registrar este evento si previamente no se ha registrado el evento inscripción de la factura electrónica de venta como título valor",
-    "TaxShemeID": "01|04|05|06"
+    "TaxShemeID": "01|04|05|06",
+    "ErrorMessage_LGC43": "No se puede registrar este evento si previamente no se ha registrado el evento Registro para la circulación."
 
 
     // Test UAT INDRA
