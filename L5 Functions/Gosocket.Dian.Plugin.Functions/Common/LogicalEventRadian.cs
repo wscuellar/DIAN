@@ -2364,17 +2364,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Valor pago
             XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-            int totalValueSender = 0;
+            double totalValueSender = 0;
             for (int i = 0; i < valueListSender.Count; i++)
             {
                 string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
             if (nitModel.CustomizationId == "452")
             {
                 //Valida Total valor pagado igual al valor actual del titulo valor
-                if (totalValueSender != Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                if (totalValueSender != double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
                 {
                     validPayment = true;
                     responses.Add(new ValidateListResponse
@@ -2389,7 +2389,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             //Valida Total valor pagado no supera el valor actual del titulo valor
-            if (totalValueSender > Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+            if (totalValueSender > double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
             {
                 validPayment = true;
                 responses.Add(new ValidateListResponse
