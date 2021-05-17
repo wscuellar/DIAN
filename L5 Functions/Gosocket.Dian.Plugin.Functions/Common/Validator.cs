@@ -3644,8 +3644,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAM37", ErrorMessage = "Responsabilidad informada para transportador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
                 isValid = true;
-                var sheldHolderTaxLevelCodeItems = xpathValues["PartyTaxSchemeTaxLevelCodes"].Split(';');
+                //sheldHolderTaxLevelCodeItems sender
+                var sheldHolderTaxLevelCodeItems = xpathValues["PartyTaxSchemeTaxLevelCodes"].Split('|');
                 foreach (var item in sheldHolderTaxLevelCodeItems)
+                {
                     if (!string.IsNullOrEmpty(item))
                     {
                         var sheldHolderTaxLevelCodes = item.Split(';');
@@ -3657,6 +3659,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 break;
                             }
                     }
+                }
+                   
                 if (isValid && sheldHolderTaxLevelCodeItems.Any(s => !string.IsNullOrEmpty(s)))
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = false, ErrorCode = "DSAJ62", ErrorMessage = "Responsabilidad informada por participantes válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
