@@ -3160,7 +3160,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             GlobalTestSetResult testSetResult = null;
             List<GlobalTestSetResult> testSetResults = null;
-            GlobalNumberRange range = null;
+            GlobalNumberRange range = null;            
             List<GlobalNumberRange> ranges = GetNumberRangeInstanceCache(senderCode);
 
             if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -3180,9 +3180,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
+            var documentType = documentMeta?.DocumentTypeId;
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                var documentType = documentMeta?.DocumentTypeId;
+            {                
                 if (Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice)
                 {
                     var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
@@ -3203,6 +3203,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DSAB05b",
+                        ErrorMessage = "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente vendedor para este Proveedor de Autorización",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
 
                     return responses;
                 }
@@ -3213,17 +3221,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
             }
-            string errorCode = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB05b" : "FAB05b";
-            string messaCode = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente vendedor para este Proveedor de Autorización"
-                : "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.";
-            // Check invoice authorization
+           
+            // Check invoice authorization Factura Electronica
             if (range.ResolutionNumber == invoiceAuthorization)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
-                    ErrorCode = errorCode,
+                    ErrorCode = "FAB05b",
                     ErrorMessage = "Número de la resolución que autoriza la numeración corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
@@ -3232,8 +3237,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = errorCode,
-                    ErrorMessage = messaCode,
+                    ErrorCode = "FAB05b",
+                    ErrorMessage = "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
@@ -3265,9 +3270,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            //Valida fecha de emision posterior a la fecha de final de autorizacion 
+            //Valida fecha de emision posterior a la fecha de final de autorizacion Documento soporte
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
+               
                 DateTime.TryParse(numberRangeModel.EmissionDate, out DateTime numberEmisionDate);
                 int.TryParse(numberEmisionDate.ToString("yyyyMMdd"), out int issueDateNumberEmision);
 
