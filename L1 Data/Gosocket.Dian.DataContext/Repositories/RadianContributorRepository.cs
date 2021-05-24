@@ -108,7 +108,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 .Include("RadianOperationMode")
                 .Include("RadianContributorFile")
                 .Include("RadianContributorOperations");
-            return query.Paginate(page, length, t => t.CreatedDate, true);
+            return query.Paginate(page, length, t => t.Update, true);
         }
 
 
