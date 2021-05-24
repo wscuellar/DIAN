@@ -152,8 +152,8 @@ namespace Gosocket.Dian.Application
             PagedResult<RadianContributor> radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
-                                                                             (DbFunctions.TruncateTime(t.CreatedDate) >= startDate || !startDate.HasValue) &&
-                                                                             (DbFunctions.TruncateTime(t.CreatedDate) <= endDate || !endDate.HasValue),
+                                                                             (DbFunctions.TruncateTime(t.Update) >= startDate || !startDate.HasValue) &&
+                                                                             (DbFunctions.TruncateTime(t.Update) <= endDate || !endDate.HasValue),
             page, size);
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
