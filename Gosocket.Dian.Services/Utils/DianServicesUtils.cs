@@ -725,13 +725,13 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
-            {
-                stringBuilder.AppendLine($"{codeMessage}012: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
+            //if($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
+            //{
+            //    stringBuilder.AppendLine($"{codeMessage}012: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
+            //    errors.Add(stringBuilder.ToString());
+            //    stringBuilder.Clear();
+            //    isValid = false;
+            //}
 
             if (!isValid)
             {
