@@ -4002,6 +4002,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
+                    //Valida se encuentre aprobado el documento referenciado
+                    var approved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier, documentMeta?.PartitionKey);
+                    if(approved == null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeReglaUUID,
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
                     if (documentMeta.SerieAndNumber != idDocumentReference)
                     {
