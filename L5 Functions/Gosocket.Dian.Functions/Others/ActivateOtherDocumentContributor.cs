@@ -35,9 +35,12 @@ namespace Gosocket.Dian.Functions.Others
             //Variable de validacion para registro informacion del piloto
             bool.TryParse(Environment.GetEnvironmentVariable("IsProduction"), out bool IsProduction);
 
+            SetLogger(null, "Step OtherDoc-00", " Ingresamos a OtherDocumentContributor " + IsProduction, "Step Other-100");
+            SetLogger(null, "Step OtherDoc-00", " Ingresamos a OtherDocumentContributor Entorno" + ConfigurationManager.GetValue("Environment"), "Step Other-101");
+
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod " + IsProduction.ToString(), "ACTSEND-02");
+                SetLogger(null, "Step OtherDocument-01", " Ingresamos a ActivateOtherDocumentContributor Ambiente Prod " + IsProduction, "ACTSEND-02");
 
                 OtherDocElecContributor otherDocElecContributor = null;
                 GlobalContributorActivation contributorActivation = null;

@@ -34,6 +34,10 @@ namespace Gosocket.Dian.Functions.Radian
             //Variable de validacion para registro informacion del piloto           
             bool.TryParse(Environment.GetEnvironmentVariable("IsProduction"), out bool IsProduction);
 
+
+            SetLogger(null, "Step RA-00", " Ingresamos a RadianActivateOperation " + IsProduction, "Step RA-100");
+            SetLogger(null, "Step RA-00", " Ingresamos a RadianActivateOperation Entorno" + ConfigurationManager.GetValue("Environment"), "Step RA-101");
+
             if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
                 SetLogger(null, "Step RA-01", " Ingresamos a ActivateRadianOperation Ambiente Prod ");

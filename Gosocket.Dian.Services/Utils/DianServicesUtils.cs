@@ -717,13 +717,13 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            if (string.IsNullOrEmpty(cunePred) && docTypeCode == "103")
-            {
-                stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
-            }
+            //if (string.IsNullOrEmpty(cunePred) && docTypeCode == "103")
+            //{
+            //    stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
+            //    errors.Add(stringBuilder.ToString());
+            //    stringBuilder.Clear();
+            //    isValid = false;
+            //}
 
             //if($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
             //{
