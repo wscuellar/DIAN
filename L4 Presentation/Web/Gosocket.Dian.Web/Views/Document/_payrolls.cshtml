@@ -64,7 +64,7 @@
                         @{
                             var monthName = string.Empty;
 
-                            switch (int.Parse(p.MesValidacion))
+                            switch (int.Parse(string.IsNullOrWhiteSpace(p.MesValidacion) ? "0" : p.MesValidacion))
                             {
                                 case 1:
                                     monthName = "Enero";
