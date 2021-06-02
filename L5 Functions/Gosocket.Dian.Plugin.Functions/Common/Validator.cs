@@ -688,7 +688,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var softwareId = objCune?.SoftwareId;
 
-            if (softwareId == billerSoftwareId)
+            if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
             {
                 key = billerSoftwarePin;
             }
