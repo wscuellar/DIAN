@@ -823,6 +823,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida emisor habilitado en Nomina GlobalOtherDocElecOperation
                 if (!documentMeta.SendTestSet)
                 {
+                    var errorCodeProveedor = Convert.ToInt32(nominaModel.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments && nominaModel.TipoNota == "2"
+                         ? "NIAE230"
+                         : Convert.ToInt32(nominaModel.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                             ? "NIE017"
+                             : "NIAE017";
+
+                    var errorCodeEmpleador = Convert.ToInt32(nominaModel.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments && nominaModel.TipoNota == "2"
+                         ? "NIAE248"
+                         : Convert.ToInt32(nominaModel.DocumentTypeId) == (int)DocumentType.IndividualPayroll
+                             ? "NIE033"
+                             : "NIAE033";
+
                     //Valida Proveedor se encuentre habilitado
                     var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
                     .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
@@ -830,17 +842,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (otherElectricDocuments != null && otherElectricDocuments.Count > 0)
                     {
-                        // ElectronicDocumentId = 1. Es para Documentos 11 y 12 (Nómina Individual y Nómina Individual de Ajuste).
+                        // ElectronicDocumentId = 1. Es para Documentos 102 y 103 (Nómina Individual y Nómina Individual de Ajuste).
                         var electricDocumentFound = otherElectricDocuments.FirstOrDefault(x => x.ElectronicDocumentId == 1);
                         if (electricDocumentFound != null)
-                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = errorCodeProveedor, ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeProveedor, ErrorMessage = "Se debe colocar el NIT sin guiones ni DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
                     }
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeProveedor, ErrorMessage = "Se debe colocar el NIT sin guiones ni DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
 
                     //Valida Empleador se encuentre habilitado
-                    var otherElectricDocumentsEmpleador = TableManagerGlobalOtherDocElecOperation
+                        var otherElectricDocumentsEmpleador = TableManagerGlobalOtherDocElecOperation
                     .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.EmpleadorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
 
@@ -848,12 +861,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         // ElectronicDocumentId = 1. Es para Documentos 11 y 12 (Nómina Individual y Nómina Individual de Ajuste).
                         var electricDocumentFoundEmpleador = otherElectricDocumentsEmpleador.FirstOrDefault(x => x.ElectronicDocumentId == 1);
-                        if (electricDocumentFoundEmpleador != null)
-                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-
+                        if (electricDocumentFoundEmpleador != null)                        
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });                        
+                        else
+                        {
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                            responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeEmpleador, ErrorMessage = "Debe ir el NIT del Empleador sin guiones ni DV.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        }
                     }
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeEmpleador, ErrorMessage = "Debe ir el NIT del Empleador sin guiones ni DV.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }                    
                 }
 
                 return responses;
