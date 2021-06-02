@@ -13,5 +13,6 @@
         public string SerieAndNumber { get; set; }
         public string EmpleadorDV { get; set; }
         public string EmpleadorNIT { get; set; }
+        public string TipoNota { get; set; }
     }
 }
