@@ -682,14 +682,15 @@ namespace Gosocket.Dian.Services.Utils
         {
             string codeMessage = string.Empty;
             bool isValid = true;
+            bool isValidTipoNota = true;
             StringBuilder stringBuilder = new StringBuilder();
 
             List<string> errors = new List<string>();
 
             var docTypeCode = documentParsed.DocumentTypeId;
-            var cune = documentParsed.CUNE;
-            var cunePred = documentParsed.CUNEPred;
-
+            var cune = documentParsed.CUNE;           
+            var tipoNota = documentParsed.TipoNota;
+         
             switch (docTypeCode)
             {
                 case "102":               
@@ -717,21 +718,36 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
-            //if (string.IsNullOrEmpty(cunePred) && docTypeCode == "103")
-            //{
-            //    stringBuilder.AppendLine($"{codeMessage}191: Debe ir el CUNE del documento a Reemplazar");
-            //    errors.Add(stringBuilder.ToString());
-            //    stringBuilder.Clear();
-            //    isValid = false;
-            //}
+            if ((string.IsNullOrEmpty(tipoNota) || (tipoNota != "1" && tipoNota != "2") )  && docTypeCode == "103")
+            {
+                isValidTipoNota = false;
+                stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
 
-            //if($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
-            //{
-            //    stringBuilder.AppendLine($"{codeMessage}012: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
-            //    errors.Add(stringBuilder.ToString());
-            //    stringBuilder.Clear();
-            //    isValid = false;
-            //}
+            if (isValidTipoNota && docTypeCode == "103")
+            {
+                var tipoNotaEliminar = xmlParser.xmlDocument.DocumentElement.SelectNodes("//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Eliminar']");
+                var tipoNotaReemplazar = xmlParser.xmlDocument.DocumentElement.SelectNodes("//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar']");
+
+                if (tipoNota == "1" && tipoNotaReemplazar.Count == 0)
+                {
+                    stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+                if (tipoNota == "2" && tipoNotaEliminar.Count == 0)
+                {                   
+                    stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }              
+            }
 
             if (!isValid)
             {

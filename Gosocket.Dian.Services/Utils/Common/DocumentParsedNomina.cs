@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string EmpleadorDV { get; set; }
         public string EmpleadorNIT { get; set; }
         public string NumeroDocumento { get; set; }
+        public string TipoNota { get; set; }
 
 
         public static void SetValues (ref DocumentParsedNomina documentParsedNomina)
@@ -28,6 +29,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             documentParsedNomina.ProveedorSoftwareID = documentParsedNomina?.ProveedorSoftwareID;
             documentParsedNomina.ProveedorSoftwareSC = documentParsedNomina?.ProveedorSoftwareSC.ToString()?.ToLower();
             documentParsedNomina.SerieAndNumber = documentParsedNomina?.SerieAndNumber.ToString()?.ToUpper();
+            documentParsedNomina.TipoNota = documentParsedNomina?.TipoNota.ToString()?.ToUpper();
         }
     }
 }
