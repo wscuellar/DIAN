@@ -800,26 +800,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (ValidateDigitCode(nominaModel.ProveedorNIT, ProveedorDV))
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIE018", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIE018", ErrorMessage = "Se debe colocar el DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    // Empleador
+                    // Empleador                   
                     if (ValidateDigitCode(nominaModel.EmpleadorNIT, EmpleadorDV))
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIE034", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
                 else
                 {
+                    string errorCodeProveedor = nominaModel.TipoNota == "2" ? "NIAE231" : "NIAE018";
+                    string errorCodeEmpleador = nominaModel.TipoNota == "2" ? "NIAE249" : "NIAE034";
+
                     // Proveedor
                     if (ValidateDigitCode(nominaModel.ProveedorNIT, ProveedorDV))
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIAE018", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE018", ErrorMessage = "Se debe colocar el DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = errorCodeProveedor, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeProveedor, ErrorMessage = "Se debe colocar el DV de la empresa dueña del Software que genera el Documento, debe estar registrado en la DIAN", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     // Empleador
                     if (ValidateDigitCode(nominaModel.EmpleadorNIT, EmpleadorDV))
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "NIAE034", ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = errorCodeEmpleador, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCodeEmpleador, ErrorMessage = "Debe ir el DV del Empleador", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
                 //Valida emisor habilitado en Nomina GlobalOtherDocElecOperation
                 if (!documentMeta.SendTestSet)
                 {
+                    //Valida Proveedor se encuentre habilitado
                     var otherElectricDocuments = TableManagerGlobalOtherDocElecOperation
                     .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.ProveedorNIT,
                     nominaModel.ProveedorSoftwareID, false, "Habilitado");
@@ -835,8 +839,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
-                }
+                    //Valida Empleador se encuentre habilitado
+                    var otherElectricDocumentsEmpleador = TableManagerGlobalOtherDocElecOperation
+                    .FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<GlobalOtherDocElecOperation>(nominaModel.EmpleadorNIT,
+                    nominaModel.ProveedorSoftwareID, false, "Habilitado");
 
+                    if (otherElectricDocumentsEmpleador != null && otherElectricDocumentsEmpleador.Count > 0)
+                    {
+                        // ElectronicDocumentId = 1. Es para Documentos 11 y 12 (Nómina Individual y Nómina Individual de Ajuste).
+                        var electricDocumentFoundEmpleador = otherElectricDocumentsEmpleador.FirstOrDefault(x => x.ElectronicDocumentId == 1);
+                        if (electricDocumentFoundEmpleador != null)
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    }
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "92", ErrorMessage = "El Emisor del Documento no se encuentra Habilitado en la Plataforma.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
 
                 return responses;
             }
@@ -3506,7 +3524,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                 response.ErrorCode = "NIE020";
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                response.ErrorCode = "NIAE020";
+                response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE233" : "NIAE020";
             if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
                 response.ErrorCode = "DSAB27b";
 
@@ -3541,7 +3559,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                         response.ErrorCode = "NIE019";
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                        response.ErrorCode = "NIAE019";
+                        response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE232" : "NIAE019";
                     if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
                         response.ErrorCode = "DSAB24b";
 
@@ -3565,7 +3583,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll)
                         response.ErrorCode = "NIE019";
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                        response.ErrorCode = "NIAE019";
+                        response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE232" : "NIAE019";
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                         response.ErrorCode = "DSAB24c";
 
