@@ -712,7 +712,11 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(cune))
             {
-                stringBuilder.AppendLine($"{codeMessage}024: Se debe indicar el CUNE según la definición establecida.");
+                string errorCode = tipoNota == "2" && docTypeCode == "103"
+                    ? "NIAE238"
+                    : docTypeCode == "102" ? "NIE024" : "NIAE024";
+
+                stringBuilder.AppendLine($"{errorCode}: Se debe indicar el CUNE según la definición establecida.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
