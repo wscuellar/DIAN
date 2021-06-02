@@ -674,8 +674,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var ValDesc = objCune?.ValDesc.ToString("F2");
             var ValTol = objCune?.ValTol.ToString("F2");
 
-            var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
-                ? "NIE024" : "NIAE024";
+            string errorMessarge = string.Empty;
+            var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayrollAdjustments && objCune.TipNota == 2
+                ? "NIAE238" 
+                : Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
+                    ? "NIE024" 
+                    : "NIAE024";
 
             string key = string.Empty;
 
@@ -683,6 +687,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
             var softwareId = objCune?.SoftwareId;
+
             if (softwareId == billerSoftwareId)
             {
                 key = billerSoftwarePin;
@@ -693,7 +698,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 key = software?.Pin;
             }
 
-            string errorMessarge = string.Empty;
             errorMessarge = ConfigurationManager.GetValue("ErrorMessage_NIE024");
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
 
@@ -720,11 +724,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 response.IsValid = true;
                 response.ErrorMessage = $"Valor calculado correctamente.";
-            }
-            else
-            {
-                response.IsValid = false;
-                response.ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_NIE024");
             }
 
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;

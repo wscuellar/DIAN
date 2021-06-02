@@ -641,6 +641,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
             cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
             cmObject.TipoXML = xmlParser.globalDocPayrolls.TipoXML;
+            cmObject.TipNota = xmlParser.globalDocPayrolls.TipoNota;
 
             // Validator instance
             var validator = new Validator();
