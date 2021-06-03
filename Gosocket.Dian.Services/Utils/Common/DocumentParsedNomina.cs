@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             documentParsedNomina.ProveedorSoftwareID = documentParsedNomina?.ProveedorSoftwareID;
             documentParsedNomina.ProveedorSoftwareSC = documentParsedNomina?.ProveedorSoftwareSC.ToString()?.ToLower();
             documentParsedNomina.SerieAndNumber = documentParsedNomina?.SerieAndNumber.ToString()?.ToUpper();
-            documentParsedNomina.TipoNota = documentParsedNomina?.TipoNota.ToString()?.ToUpper();
+            documentParsedNomina.TipoNota = documentParsedNomina?.TipoNota;
         }
     }
 }
