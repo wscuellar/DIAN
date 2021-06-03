@@ -731,6 +731,18 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
 
+            if ($"{xmlParser.globalDocPayrolls.Prefijo}{xmlParser.SequenceConsecutive}" != xmlParser.globalDocPayrolls.Numero)
+            {
+                string errorCode = tipoNota == "2" && docTypeCode == "103"
+                    ? "NIAE220"
+                    : docTypeCode == "102" ? "NIE012" : "NIAE012";
+
+                stringBuilder.AppendLine($"{errorCode}: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
+            }
+
             if (isValidTipoNota && docTypeCode == "103")
             {
                 var tipoNotaEliminar = xmlParser.xmlDocument.DocumentElement.SelectNodes("//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Eliminar']");
