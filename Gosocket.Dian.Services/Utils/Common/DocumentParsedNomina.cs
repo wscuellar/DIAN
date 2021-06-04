@@ -17,7 +17,6 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string NumeroDocumento { get; set; }
         public string TipoNota { get; set; }
 
-
         public static void SetValues (ref DocumentParsedNomina documentParsedNomina)
         {
             documentParsedNomina.DocumentTypeId = documentParsedNomina?.DocumentTypeId;
