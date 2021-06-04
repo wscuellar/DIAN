@@ -681,9 +681,13 @@ namespace Gosocket.Dian.Services.Utils
         public static bool ValidateParserNomina(DocumentParsedNomina documentParsed, XmlParseNomina xmlParser, ref DianResponse dianResponse)
         {
             string codeMessage = string.Empty;
+            string txtRegla = string.Empty;
+            string txtRechazo = string.Empty;
             bool isValid = true;
             bool isValidTipoNota = true;
             StringBuilder stringBuilder = new StringBuilder();
+            txtRegla = "Regla: ";
+            txtRechazo = ", Rechazo: ";
 
             List<string> errors = new List<string>();
 
@@ -711,12 +715,12 @@ namespace Gosocket.Dian.Services.Utils
             }
 
             if (string.IsNullOrEmpty(cune))
-            {
+            {                
                 string errorCode = tipoNota == "2" && docTypeCode == "103"
                     ? "NIAE238"
                     : docTypeCode == "102" ? "NIE024" : "NIAE024";
 
-                stringBuilder.AppendLine($"{errorCode}: Se debe indicar el CUNE según la definición establecida.");
+                stringBuilder.AppendLine($"{txtRegla + errorCode + txtRechazo} Se debe indicar el CUNE según la definición establecida.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -725,7 +729,7 @@ namespace Gosocket.Dian.Services.Utils
             if ((string.IsNullOrEmpty(tipoNota) || (tipoNota != "1" && tipoNota != "2") )  && docTypeCode == "103")
             {
                 isValidTipoNota = false;
-                stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                stringBuilder.AppendLine(txtRegla + $"{codeMessage}214" + txtRechazo + "Se debe colocar el Codigo correspondiente");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -737,7 +741,7 @@ namespace Gosocket.Dian.Services.Utils
                     ? "NIAE220"
                     : docTypeCode == "102" ? "NIE012" : "NIAE012";
 
-                stringBuilder.AppendLine($"{errorCode}: No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
+                stringBuilder.AppendLine($"{txtRegla + errorCode + txtRechazo} No se permiten caracteres adicionales como espacios o guiones. Debe corresponder a Prefijo + Número consecutivo del documento");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -750,7 +754,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (tipoNota == "1" && tipoNotaReemplazar.Count == 0)
                 {
-                    stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}214" + txtRechazo + "Se debe colocar el Codigo correspondiente");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -758,7 +762,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (tipoNota == "2" && tipoNotaEliminar.Count == 0)
                 {                   
-                    stringBuilder.AppendLine($"{codeMessage}214: Se debe colocar el Codigo correspondiente");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}214" + txtRechazo + "Se debe colocar el Codigo correspondiente");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
