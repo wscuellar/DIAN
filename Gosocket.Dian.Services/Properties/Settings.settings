@@ -95,33 +95,6 @@
     <Setting Name="Param_ApplicationResponseProcessUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ApplicationResponseProcessUrl</Value>
     </Setting>
-    <Setting Name="Param_ValidateSerie" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateSerieUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateEventCode" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateEmitionEventUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateParty" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidatePartyUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateSigningTime" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateSigningTimeUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateDocumentReferenceId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateDocumentReferenceIdUrl</Value>
-    </Setting>
-    <Setting Name="Param_EventApproveCufe" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateEventApproveCufeUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateReferenceAttorney" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateReferenceAttorneyUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidateCune" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidateCuneUrl</Value>
-    </Setting>
-    <Setting Name="Param_ValidatePredecesor" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ValidatePredecesorUrl</Value>
-    </Setting>
     <Setting Name="Msg_Error_NominaOnlyDocument" Type="System.String" Scope="Application">
       <Value Profile="(Default)">El método síncrono SendNominaSync solo puede recibir un documento.</Value>
     </Setting>
