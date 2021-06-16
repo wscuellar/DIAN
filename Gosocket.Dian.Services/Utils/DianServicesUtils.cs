@@ -971,6 +971,15 @@ namespace Gosocket.Dian.Services.Utils
                     stringBuilder.Clear();
                     isValid = false;
                 }
+
+                if (string.IsNullOrEmpty(documentKey))
+                {
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDE no está calculado correctamente.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
             }
             else if (docTypeCode == "101")
             {
