@@ -894,15 +894,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (receiverCodeSchemeNameValue == "31")
             {
                 string receiverDvErrorCode = "FAK24";
+                string receiverDvrErrorDescription = "DV no corresponde al NIT informado";
+                if (documentMeta.DocumentTypeId == "05")
+                {
+                    receiverDvErrorCode = "DSAJ24b";
+                    receiverDvrErrorDescription = "El DV del NIT no es correcto";
+                }
                 if (documentMeta.DocumentTypeId == "91") receiverDvErrorCode = "CAK24";
                 else if (documentMeta.DocumentTypeId == "92") receiverDvErrorCode = "DAK24";
-                else if (documentMeta.DocumentTypeId == "96") receiverDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK24;
+                else if (documentMeta.DocumentTypeId == "96") receiverDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK24;               
 
                 var receiverCodeDigit = nitModel.ReceiverCodeDigit;
-                if (string.IsNullOrEmpty(receiverCodeDigit) || receiverCodeDigit == "undefined") receiverCodeDigit = "11";
-                if (ValidateDigitCode(receiverCode, int.Parse(receiverCodeDigit)))
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                long numberReceiver = 0;
+                bool valNumberReceiver = long.TryParse(receiverCodeDigit, out numberReceiver);
+
+                if (valNumberReceiver)
+                {
+                    if (string.IsNullOrEmpty(receiverCodeDigit) || receiverCodeDigit == "undefined") receiverCodeDigit = "11";
+                    if (ValidateDigitCode(receiverCode, int.Parse(receiverCodeDigit)))
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = receiverDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+                else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiverDvErrorCode, ErrorMessage = receiverDvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
             }
 
 
