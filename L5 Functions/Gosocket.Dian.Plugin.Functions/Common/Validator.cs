@@ -3681,8 +3681,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             else if(Convert.ToInt32(typeDocument) == (int)DocumentType.DocumentSupportInvoice)
             {
-                //receiver tax level code validation
+                //Sender tax level code validation
                 var isValid = true;
+                var senderTaxLevelCodes = xpathValues["SenderTaxLevelCodes"].Split(';');
+                foreach (var code in senderTaxLevelCodes)
+                    if (!typeListvalues.Contains(code))
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAJ26", ErrorMessage = "Responsabilidad informada por vendedor no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        isValid = false;
+                        break;
+                    }
+                if (isValid && senderTaxLevelCodes.Any())
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAJ26", ErrorMessage = "Responsabilidad informada por vendedor válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+
+                //receiver tax level code validation
+                isValid = true;
                 var receiverTaxLevelCodes = xpathValues["ReceiverTaxLevelCodes"].Split(';');
                 foreach (var code in receiverTaxLevelCodes)
                     if (!typeListvalues.Contains(code))
