@@ -980,6 +980,22 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+                if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
+                {
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05d" + txtRechazo + "Número de documento soporte no está contenido en el rango de numeración autorizado.");                                      
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
+                if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
+                {                   
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05e" + txtRechazo + "Número de documento soporte no existe para el número de autorización.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+
             }
             else if (docTypeCode == "101")
             {

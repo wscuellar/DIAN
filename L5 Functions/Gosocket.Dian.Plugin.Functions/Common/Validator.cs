@@ -25,6 +25,7 @@ using System.Runtime.Caching;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.XPath;
@@ -276,10 +277,55 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
                 XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");
-               
+                XmlNodeList invoiceLineAllowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+
+
                 int tempID = 0;
                 var isErrorConsecutiveDelivery = false;
                 var isErrorConsecutiveAllowance = false;
+                var isErrorConsecutiveInvoiceLineAllowanceCharge = false;
+
+                //Consecutivo regla DSBE02
+                for (int i = 0; i < invoiceLineAllowanceChargeListResponse.Count; i++)
+                {
+                    var xmlID = invoiceLineAllowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    int number1 = 0;
+                    bool valNumber = int.TryParse(xmlID, out number1);
+                    if (valNumber)
+                    {
+                        if (i == 0)
+                        {
+                            tempID = number1;
+                            if (number1 != 1)
+                            {
+                                isErrorConsecutiveInvoiceLineAllowanceCharge = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (!int.Equals(number1, tempID + 1))
+                            {
+                                isErrorConsecutiveInvoiceLineAllowanceCharge = true;
+                                break;
+                            }
+                            else
+                                tempID = Convert.ToInt32(number1);
+                        }
+                    }
+                }
+
+                if (isErrorConsecutiveInvoiceLineAllowanceCharge)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = false,
+                        ErrorCode = "DSBE02",
+                        ErrorMessage = "Sin Mensaje de error en AT",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
 
                 //Consecutivo regla DSBC02
                 for (int i = 0; i < deliveryTermsListResponse.Count; i++)
@@ -328,6 +374,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
                     var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+
+                    if(string.IsNullOrWhiteSpace(xmlID))
+                    {
+                        isErrorConsecutiveAllowance = true;
+                        break;
+                    }
 
                     int number1 = 0;
                     bool valNumber = int.TryParse(xmlID, out number1);
@@ -928,15 +980,30 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (receiver2CodeSchemeNameValue == "31")
                 {
                     string receiver2DvErrorCode = "FAK47";
+                    string receiver2DvrErrorDescription = "DV no corresponde al NIT informado";
+                    if (documentMeta.DocumentTypeId == "05")
+                    {
+                        receiver2DvErrorCode = "DSAJ47";
+                        receiver2DvrErrorDescription = "DV del NIT del vendedor no informado";
+                    }
                     if (documentMeta.DocumentTypeId == "91") receiver2DvErrorCode = "CAK47";
                     else if (documentMeta.DocumentTypeId == "92") receiver2DvErrorCode = "DAK47";
                     else if (documentMeta.DocumentTypeId == "96") receiver2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK47;
 
                     var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
-                    if (string.IsNullOrEmpty(receiver2CodeDigit) || receiver2CodeDigit == "undefined") receiver2CodeDigit = "11";
-                    if (ValidateDigitCode(receiver2Code, int.Parse(receiver2CodeDigit)))
-                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "DV no corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
+                    long numberReceiver2CodeDigit = 0;
+                    bool valNumberReceiver2CodeDigit = long.TryParse(receiver2CodeDigit, out numberReceiver2CodeDigit);
+
+                    if (valNumberReceiver2CodeDigit)
+                    {
+                        if (string.IsNullOrEmpty(receiver2CodeDigit) || receiver2CodeDigit == "undefined") receiver2CodeDigit = "11";
+                        if (ValidateDigitCode(receiver2Code, int.Parse(receiver2CodeDigit)))
+                            responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = "DV corresponde al NIT informado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = receiver2DvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = receiver2DvErrorCode, ErrorMessage = receiver2DvrErrorDescription, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+
                 }
             }
 
@@ -3259,9 +3326,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (range == null)
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                {                                       
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -3332,7 +3397,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida fecha de emision posterior a la fecha de final de autorizacion Documento soporte
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
+
+                //Valida numero documento este dentro del rango autorizado
+                string validateSerie = numberRangeModel.SerieAndNumber;
+                bool validateNumberID = false;
+                if (!validateSerie.Contains(numberRangeModel.Serie)) validateNumberID = true;
                
+                long num = 0;
+                Match m = Regex.Match(validateSerie, "(\\d+)");
+                if (m.Success)
+                {
+                    long.TryParse(numberRangeModel.StartNumber, out long fromNumberID);
+                    long.TryParse(numberRangeModel.EndNumber, out long endNumberID);
+                    num = long.Parse(m.Value);
+                    if (num < fromNumberID || num > endNumberID) validateNumberID = true;                  
+                }
+
+                if(validateNumberID)
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+
                 DateTime.TryParse(numberRangeModel.EmissionDate, out DateTime numberEmisionDate);
                 int.TryParse(numberEmisionDate.ToString("yyyyMMdd"), out int issueDateNumberEmision);
 
@@ -3687,7 +3773,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 foreach (var code in senderTaxLevelCodes)
                     if (!typeListvalues.Contains(code))
                     {
-                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAJ26", ErrorMessage = "Responsabilidad informada por vendedor no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                        responses.Add(new ValidateListResponse { IsValid = false, Mandatory = false, ErrorCode = "DSAJ26", ErrorMessage = "Responsabilidad informada por vendedor no válido según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                         isValid = false;
                         break;
                     }

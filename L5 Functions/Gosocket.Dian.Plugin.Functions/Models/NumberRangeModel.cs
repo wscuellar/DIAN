@@ -12,5 +12,6 @@
         public string SoftwareId { get; set; }
         public string SigningTime { get; set; }
         public string EmissionDate { get; set; }
+        public string SerieAndNumber { get; set; }
     }
 }
