@@ -273,56 +273,97 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion Documento soporte
             string documentTypeId = xmlParser.Fields["DocumentTypeId"].ToString();
+            #region Documento Soporte
             if (Convert.ToInt32(documentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
+                XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
                 XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
-                XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");
-                XmlNodeList invoiceLineAllowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
-
+                XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");              
 
                 int tempID = 0;
                 var isErrorConsecutiveDelivery = false;
                 var isErrorConsecutiveAllowance = false;
+                var isErrorConsecutiveInvoice = false;
                 var isErrorConsecutiveInvoiceLineAllowanceCharge = false;
+                int[] arrayInvoiceListResponse = new int[invoiceLineListResponse.Count];
 
-                //Consecutivo regla DSBE02
-                for (int i = 0; i < invoiceLineAllowanceChargeListResponse.Count; i++)
+
+                int tempIDInvoice = 0;
+                int indexInvoiceLine = 0;
+                for (int i = 0; i < invoiceLineListResponse.Count; i++)
                 {
-                    var xmlID = invoiceLineAllowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
-                    int number1 = 0;
-                    bool valNumber = int.TryParse(xmlID, out number1);
-                    if (valNumber)
+                    indexInvoiceLine += 1;
+                    var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    // cuando no llega valor, se asume -1
+                    var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
+
+                    if (i == 0)
                     {
-                        if (i == 0)
-                        {
-                            tempID = number1;
-                            if (number1 != 1)
-                            {
-                                isErrorConsecutiveInvoiceLineAllowanceCharge = true;
-                                break;
-                            }
-                        }
+                        tempIDInvoice = xmlID;
+                        if (xmlID != 1) isErrorConsecutiveInvoice = true;
+                    }
+                    else
+                    {
+                        if (!int.Equals(xmlID, tempIDInvoice + 1))
+                            isErrorConsecutiveInvoice = true;
                         else
+                            tempIDInvoice = xmlID;
+                    }
+
+                    arrayInvoiceListResponse[i] = xmlID;
+
+                    #region AllowanceCharge
+                    if (!isErrorConsecutiveInvoiceLineAllowanceCharge)
+                    {
+                        XmlNodeList invoiceLineAllowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                        int[] arrayAllowanceChargeListResponse = new int[invoiceLineAllowanceChargeListResponse.Count];
+
+                        int tempIDAllowanceCharge = 0;
+                        for (int k = 0; k < invoiceLineAllowanceChargeListResponse.Count; k++)
                         {
-                            if (!int.Equals(number1, tempID + 1))
+                            var valueAllowance = invoiceLineAllowanceChargeListResponse.Item(k).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(k)?.InnerText.ToString().Trim();
+                            // cuando no llega valor, se asume -1
+                            var xmlIDAllowance = !string.IsNullOrWhiteSpace(valueAllowance) ? Convert.ToInt32(valueAllowance) : -1;
+
+                            if (k == 0)
                             {
-                                isErrorConsecutiveInvoiceLineAllowanceCharge = true;
-                                break;
+                                tempIDAllowanceCharge = xmlIDAllowance;
+                                if (xmlIDAllowance != 1) isErrorConsecutiveInvoiceLineAllowanceCharge = true;
                             }
                             else
-                                tempID = Convert.ToInt32(number1);
+                            {
+                                if (!int.Equals(xmlIDAllowance, tempIDAllowanceCharge + 1))
+                                    isErrorConsecutiveInvoiceLineAllowanceCharge = true;
+                                else
+                                    tempIDAllowanceCharge = xmlIDAllowance;
+                            }
+
+                            arrayAllowanceChargeListResponse[k] = xmlIDAllowance;
+                        }
+
+                        if (isErrorConsecutiveInvoiceLineAllowanceCharge)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = false,
+                                ErrorCode = "DSBE02",
+                                ErrorMessage = "Sin Mensaje de error en AT",
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
+                    #endregion
                 }
 
-                if (isErrorConsecutiveInvoiceLineAllowanceCharge)
+                if (isErrorConsecutiveInvoice)
                 {
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
                         Mandatory = false,
-                        ErrorCode = "DSBE02",
-                        ErrorMessage = "Sin Mensaje de error en AT",
+                        ErrorCode = "DSAV02b",
+                        ErrorMessage = "Los números de línea de Documento Soporte utilizados en los diferentes grupos no son consecutivos, empezando con “1”",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 }
@@ -419,8 +460,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });                                           
                 }
             }
+            #endregion Documento Soporte
+            #region Documento Importaciones
             else
             {
+
                 //Validacion documento de impotacion 
                 XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
                 XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
@@ -585,6 +629,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
+            #endregion Documento Importaciones
 
             return responses;
         }
