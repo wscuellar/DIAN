@@ -205,10 +205,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();           
-            bool validTax = false;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();                      
             string xmlID = string.Empty;
-            string xmlPercent = string.Empty;
+            string xmlPercent = string.Empty;            
 
             responses.Add(new ValidateListResponse
             {
@@ -228,6 +227,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int indexInvoiceLine = 0;
             for (int i = 0; i < invoiceLineListResponse.Count; i++)
             {
+                bool validTax = true;
                 indexInvoiceLine += 1;
                 var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
                 // cuando no llega valor, se asume -1
@@ -248,23 +248,25 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 arrayInvoiceListResponse[i] = xmlIDInvoice;
 
-                if (!validTax)
+                if (validTax)
                 {
                     int indexTaxCategory = 0;
                     XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
                     for (int j = 0; j < taxCategoryListResponse.Count; j++)
                     {
                         indexTaxCategory += 1;
-                        xmlID = taxCategoryListResponse.Item(j).SelectNodes("//*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(j)?.InnerText.ToString();                       
-                        XmlNodeList percentCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory'][{indexTaxCategory}]/*[local-name()='Percent']");
+                        xmlID = taxCategoryListResponse.Item(j).SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal'][{indexTaxCategory}]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
+                        xmlPercent = taxCategoryListResponse.Item(j).SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal'][{indexTaxCategory}]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(0)?.InnerText.ToString();
 
-                        for (int k = 0; k < percentCategoryListResponse.Count; k++)
+                        var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
+                        if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
+
+                        if (validTax)
                         {
-                            xmlPercent = percentCategoryListResponse.Item(k).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(k)?.InnerText.ToString();
-
                             GlobalTaxRate existTaxRate = TableManagerGlobalTaxRate.ExistTarifa<GlobalTaxRate>(xmlID, xmlPercent);
                             if (existTaxRate == null)
                             {
+                                validTax = false;
                                 responses.Add(new ValidateListResponse
                                 {
                                     IsValid = false,
@@ -275,11 +277,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                                 break;
                             }
+                            validTax = false;
                         }
-                    }
-                                  
-                    validTax = false;
-                    
+                    }                    
                 }
             }
 
