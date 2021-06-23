@@ -1163,8 +1163,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
                     if (documentMeta.DocumentTypeId == "05")
                     {
-                        senderDvErrorCode = "DSAJ24b";
-                        senderDvrErrorDescription = "El DV del NIT no es correcto";
+                        senderDvErrorCode = "DSAK24";
+                        senderDvrErrorDescription = "No está informado el DV del NIT";
                     }
                     else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
                     else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
