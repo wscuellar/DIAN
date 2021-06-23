@@ -123,7 +123,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "02", Name = "Factura de exportación electrónica" },
                 new DocumentTypeModel() { Code = "03", Name = "Factura de contingencia electrónica" },
                 new DocumentTypeModel() { Code = "04", Name = "Factura de contingencia electrónica DIAN" },
-                new DocumentTypeModel() { Code = "05", Name = "Documento soporte electrónico" },
+                new DocumentTypeModel() { Code = "05", Name = "Documento Soporte" },
                 new DocumentTypeModel() { Code = "07", Name = "Nota de crédito electrónica" },
                 new DocumentTypeModel() { Code = "08", Name = "Nota de débito electrónica" },
                 new DocumentTypeModel() { Code = "09", Name = "Factura AIU" },
