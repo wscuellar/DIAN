@@ -215,7 +215,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
             start = DateTime.UtcNow;
 
-            if (senderCode != "01")
+            if (senderCode != "01" && !String.IsNullOrWhiteSpace(senderCode))
             {
                 var authEntity = GetAuthorization(senderCode, authCode);
                 if (authEntity == null)

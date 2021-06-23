@@ -964,14 +964,6 @@ namespace Gosocket.Dian.Services.Utils
             }
             else if ( docTypeCode == "05")
             {
-                if (string.IsNullOrEmpty(senderCode))
-                {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}J21" + txtRechazo + "NIT No informado.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-
                 if (string.IsNullOrEmpty(documentKey))
                 {
                     stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDE no está calculado correctamente.");
