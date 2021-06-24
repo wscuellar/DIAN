@@ -272,7 +272,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             for (int i = 0; i < xPeriod.Count; i++)
             {
                 globalDocPayrolls.FechaIngreso = Convert.ToDateTime(xPeriod[i].Attributes["FechaIngreso"]?.InnerText);
-                globalDocPayrolls.FechaRetiro = Convert.ToDateTime(xPeriod[i].Attributes["FechaRetiro"]?.InnerText);
+                globalDocPayrolls.FechaRetiro = string.IsNullOrWhiteSpace(xPeriod[i].Attributes["FechaRetiro"]?.InnerText) ? (DateTime?)null : Convert.ToDateTime(xPeriod[i].Attributes["FechaRetiro"]?.InnerText);
                 globalDocPayrolls.FechaPagoInicio = Convert.ToDateTime(xPeriod[i].Attributes["FechaLiquidacionInicio"]?.InnerText);
                 globalDocPayrolls.FechaPagoFin = Convert.ToDateTime(xPeriod[i].Attributes["FechaLiquidacionFin"]?.InnerText);
                 globalDocPayrolls.TiempoLaborado = xPeriod[i].Attributes["TiempoLaborado"]?.InnerText;
@@ -559,7 +559,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             {
                 globalDocPayrolls.FSP_Porcentaje = xFondoSP[j].Attributes["Porcentaje"]?.InnerText;
                 globalDocPayrolls.FSP_PorcentajeSub = xFondoSP[j].Attributes["PorcentajeSub"]?.InnerText;
-                globalDocPayrolls.FSP_Deduccion = xFondoSP[j].Attributes["Deduccion"]?.InnerText;
+                globalDocPayrolls.FSP_Deduccion = xFondoSP[j].Attributes["DeduccionSP"]?.InnerText;
                 globalDocPayrolls.FSP_DeduccionSub = xFondoSP[j].Attributes["DeduccionSub"]?.InnerText;
             }
 
