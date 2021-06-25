@@ -164,6 +164,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string xmlID = string.Empty;
+            string xmlPercent = string.Empty;
+            bool validTax = true;
 
             responses.Add(new ValidateListResponse
             {
@@ -175,12 +178,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
+            XmlNodeList invoiceWithholdingListResponseId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");            
+
+            for (int i = 0; i < invoiceWithholdingListResponseId.Count; i++)
+            {
+                xmlID = invoiceWithholdingListResponseId.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                xmlPercent = invoiceWithholdingListResponseId.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString().Trim();
+
+                var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
+                if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
+
+                if (validTax)
+                {
+                    GlobalTaxRate existTaxRate = TableManagerGlobalTaxRate.ExistTarifa<GlobalTaxRate>(xmlID, xmlPercent);
+                    if (existTaxRate == null)
+                    {                       
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = false,
+                            ErrorCode = "DSAT10",
+                            ErrorMessage = "Sin mensaje en el AT",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
 
             int[] arraywithholding = new int[withholdingListResponse.Count];
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
                 var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
-                arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);
+                arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);            
             }
 
             bool pares = arraywithholding.Distinct().Count() == arraywithholding.Length;
