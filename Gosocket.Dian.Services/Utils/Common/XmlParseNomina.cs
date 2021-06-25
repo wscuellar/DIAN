@@ -410,6 +410,8 @@ namespace Gosocket.Dian.Services.Utils.Common
             for (int j = 0; j < xAuxTransporte.Count; j++)
             {
                 globalDocPayrolls.AuxTransporte = xAuxTransporte[j].Attributes["AuxilioTransporte"]?.InnerText;
+                globalDocPayrolls.ViaticoManuAlojS = xAuxTransporte[j].Attributes["ViaticoManuAlojS"]?.InnerText;
+                globalDocPayrolls.ViaticoManuAlojNS = xAuxTransporte[j].Attributes["ViaticoManuAlojNS"]?.InnerText;
             }
             XmlNodeList xHEDs = xmlDocument.GetElementsByTagName("HED");
             double HEDsTotal = 0;

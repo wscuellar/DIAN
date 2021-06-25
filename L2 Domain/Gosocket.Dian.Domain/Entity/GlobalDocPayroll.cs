@@ -153,6 +153,8 @@ namespace Gosocket.Dian.Domain.Entity
 
         //Transporte
         public string AuxTransporte { get; set; }
+        public string ViaticoManuAlojS { get; set; }
+        public string ViaticoManuAlojNS { get; set; }
 
         //Bonificaciones
         public string BonificacionNS { get; set; }
