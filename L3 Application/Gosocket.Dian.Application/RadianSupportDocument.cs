@@ -534,16 +534,18 @@ namespace Gosocket.Dian.Application
 
                 if (!Convert.ToBoolean(detail.Element(cbc + "ChargeIndicator").Value))
                 {
-                    discountsTemplates.Append($"<td>Descuento</td>");
+                    discountsTemplates.Append($"<td class='text-left'>Descuento</td>");
                 }
                 else
                 {
-                    discountsTemplates.Append("<td>Recargo</td>");
+                    discountsTemplates.Append("<td class='text-left'>Recargo</td>");
                 }
-                discountsTemplates.Append($"<td>{(detail.Element(cbc + "AllowanceChargeReasonCode") != null?  detail.Element(cbc + "AllowanceChargeReasonCode").Value : string.Empty)}</td>");
-                discountsTemplates.Append($"<td>{detail.Element(cbc + "AllowanceChargeReason").Value}</td>");
-                discountsTemplates.Append($"<td>{detail.Element(cbc + "MultiplierFactorNumeric").Value}</td>");
-                discountsTemplates.Append($"<td>{detail.Element(cbc + "Amount").Value}</td>");
+                discountsTemplates.Append($"<td class='text-left'>{(detail.Element(cbc + "AllowanceChargeReasonCode") != null?  detail.Element(cbc + "AllowanceChargeReasonCode").Value : string.Empty)}</td>");
+                discountsTemplates.Append($"<td class='text-left'>{detail.Element(cbc + "AllowanceChargeReason").Value}</td>");
+                discountsTemplates.Append($"<td class='text-centered'>{detail.Element(cbc + "MultiplierFactorNumeric").Value}</td>");
+                discountsTemplates.Append($"<td class='text-right'>{decimal.Parse(detail.Element(cbc + "Amount").Value).ToString("0,0.00",CultureInfo.InvariantCulture)}</td>");
+
+                //decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)
 
                 discountsTemplates.Append("</tr>");
             }
