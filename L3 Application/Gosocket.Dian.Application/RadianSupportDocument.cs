@@ -470,20 +470,20 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
-                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+                productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 // Discounts and surcharges
                 if (product.Element(cac + "AllowanceCharge") != null)
                 {
                     if (!Convert.ToBoolean(product.Element(cac + "AllowanceCharge").Element(cbc + "ChargeIndicator").Value))
                     {
-                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                        productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                         productsTemplates.Append("<td></td>");
                     }
                     else
                     {
                         productsTemplates.Append("<td></td>");
-                        productsTemplates.Append($"<td>{product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value}</td>");
+                        productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0, 0.00", CultureInfo.InvariantCulture)}</span></td>");
                     }
                 }
                 else
@@ -494,14 +494,14 @@ namespace Gosocket.Dian.Application
 
                 if (product.Element(cac + "TaxTotal") != null && product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount") != null)
                 {
-                    productsTemplates.Append($"<td>{product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value}</td>");
+                    productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value).ToString("0, 0.00", CultureInfo.InvariantCulture)}</span></td>");
                 }
                 else
                 {
                     productsTemplates.Append("<td></td>");
                 }
 
-                productsTemplates.Append($"<td>{product.Element(cbc + "LineExtensionAmount").Value}</td>");
+                productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0, 0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 productsTemplates.Append("</tr>");
             }
