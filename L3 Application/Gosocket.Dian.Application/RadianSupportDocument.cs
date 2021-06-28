@@ -469,7 +469,7 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cac + "SellersItemIdentification").Element(cbc + "ID").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
-                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
+                productsTemplates.Append($"<td class=\"text-currency\">{decimal.Parse(product.Element(cbc + "InvoicedQuantity").Value).ToString("#,0.00", CultureInfo.InvariantCulture)}</td>");
                 productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 // Discounts and surcharges
@@ -603,7 +603,7 @@ namespace Gosocket.Dian.Application
             {
                 retentions.Append("<tr>");
                 retentions.Append($"<td class='text-centered'>{counter}</td>");
-                retentions.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(element["cbc:TaxAmount"].InnerText).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                retentions.Append($"<td>$<span style=\"float: right;margin-right: 5px;\">{decimal.Parse(element["cbc:TaxAmount"].InnerText).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                 retentions.Append("</tr>");
                 counter++;
             }
