@@ -54,8 +54,8 @@ namespace Gosocket.Dian.Application
            
             try
             {
-                //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
                 ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 Dictionary<string, string> newFieldValues = new Dictionary<string, string>();
@@ -406,22 +406,22 @@ namespace Gosocket.Dian.Application
             totalUnitPrice += totalDiscountsDetail;
             totalUnitPrice -= totalSurchargesDetail;
 
-            template = template.Replace( "{TotalUnitPrice}", $"{totalUnitPrice}");
-            template = template.Replace("{TotalDiscountsDetail}", $"{totalDiscountsDetail}");
-            template = template.Replace("{TotalSurchargesDetail}", $"{totalSurchargesDetail}");
-            template = template.Replace("{TotalTaxableBase}", dataValues.XpathsValues["TotalTaxableBase"]);
-            template = template.Replace("{TotalTaxesDetail}", SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString());
-            template = template.Replace("{TotalOtherTaxes}", SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString());
-            template = template.Replace("{TotalTaxes}", SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString());
-            template = template.Replace( "{GlobalDiscounts}", dataValues.XpathsValues["GlobalDiscounts"]);
-            template = template.Replace( "{GlobalSurcharges}", dataValues.XpathsValues["GlobalSurcharges"]);
-            template = template.Replace( "{TotalAmount}", dataValues.XpathsValues["TotalAmount"]);
+            template = template.Replace("{TotalUnitPrice}", $"$<span style=\"float: right;margin-right: 5px;\">{totalUnitPrice.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalDiscountsDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalDiscountsDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalSurchargesDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalSurchargesDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalTaxableBase}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["TotalTaxableBase"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalTaxesDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalOtherTaxes}", $"$<span style=\"float: right;margin-right: 5px;\">{SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalTaxes}", $"$<span style=\"float: right;margin-right: 5px;\">{SplitAndSum(dataValues.XpathsValues["TotalTaxes"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{GlobalDiscounts}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["GlobalDiscounts"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{GlobalSurcharges}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["GlobalSurcharges"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalAmount}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["TotalAmount"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             // Final Data
-            template = template.Replace( "{AuthorizationNumber}", dataValues.XpathsValues["AuthorizationNumber"]);
-            template = template.Replace( "{AuthorizedRangeFrom}", dataValues.XpathsValues["AuthorizedRangeFrom"]);
-            template = template.Replace( "{AuthorizedRangeTo}", dataValues.XpathsValues["AuthorizedRangeTo"]);
-            template = template.Replace( "{ValidityDate}", dataValues.XpathsValues["ValidityDate"]);
-            template = template.Replace( "{QRCode}", dataValues.XpathsValues["QrCode"]);
+            template = template.Replace("{AuthorizationNumber}", dataValues.XpathsValues["AuthorizationNumber"]);
+            template = template.Replace("{AuthorizedRangeFrom}", dataValues.XpathsValues["AuthorizedRangeFrom"]);
+            template = template.Replace("{AuthorizedRangeTo}", dataValues.XpathsValues["AuthorizedRangeTo"]);
+            template = template.Replace("{ValidityDate}", dataValues.XpathsValues["ValidityDate"]);
+            template = template.Replace("{QRCode}", dataValues.XpathsValues["QrCode"]);
 
             return template;
         }
@@ -470,20 +470,20 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Value}</td>");
-                productsTemplates.Append($"<td>{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</td>");
+                productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 // Discounts and surcharges
                 if (product.Element(cac + "AllowanceCharge") != null)
                 {
                     if (!Convert.ToBoolean(product.Element(cac + "AllowanceCharge").Element(cbc + "ChargeIndicator").Value))
                     {
-                        productsTemplates.Append($"<td>{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</td>");
+                        productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                         productsTemplates.Append("<td></td>");
                     }
                     else
                     {
                         productsTemplates.Append("<td></td>");
-                        productsTemplates.Append($"<td>{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</td>");
+                        productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                     }
                 }
                 else
@@ -494,14 +494,14 @@ namespace Gosocket.Dian.Application
 
                 if (product.Element(cac + "TaxTotal") != null && product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount") != null)
                 {
-                    productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                    productsTemplates.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(product.Element(cac + "TaxTotal").Element(cbc + "TaxAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                 }
                 else
                 {
                     productsTemplates.Append("<td></td>");
                 }
 
-                productsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                productsTemplates.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 productsTemplates.Append("</tr>");
             }
@@ -543,7 +543,7 @@ namespace Gosocket.Dian.Application
                 discountsTemplates.Append($"<td class='text-right'>{(detail.Element(cbc + "AllowanceChargeReasonCode") != null?  detail.Element(cbc + "AllowanceChargeReasonCode").Value : string.Empty)}</td>");
                 discountsTemplates.Append($"<td class='text-left'>{detail.Element(cbc + "AllowanceChargeReason").Value}</td>");
                 discountsTemplates.Append($"<td class='text-centered'>{detail.Element(cbc + "MultiplierFactorNumeric").Value}</td>");
-                discountsTemplates.Append($"<td>$ <span style=\"float: right;\">{decimal.Parse(detail.Element(cbc + "Amount").Value).ToString("0,0.00",CultureInfo.InvariantCulture)}</span></td>");
+                discountsTemplates.Append($"<td>$ <span style=\"float: right;margin-right: 5px;\">{decimal.Parse(detail.Element(cbc + "Amount").Value).ToString("0,0.00",CultureInfo.InvariantCulture)}</span></td>");
                 discountsTemplates.Append("</tr>");
             }
 
@@ -572,7 +572,7 @@ namespace Gosocket.Dian.Application
             {
                 advances.Append("<tr>");
                 advances.Append($"<td class='text-centered'>{counter}</td>");
-                advances.Append($"<td class='text-currency'>$ {element["cbc:PaidAmount"].InnerText}</td>");
+                advances.Append($"<td>$<span style=\"float: right;margin-right: 5px;\">{decimal.Parse(element["cbc:PaidAmount"].InnerText).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                 advances.Append("</tr>");
 
                 counter++;
@@ -603,7 +603,7 @@ namespace Gosocket.Dian.Application
             {
                 retentions.Append("<tr>");
                 retentions.Append($"<td class='text-centered'>{counter}</td>");
-                retentions.Append($"<td class='text-currency'>$ {element["cbc:TaxAmount"].InnerText}</td>");
+                retentions.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(element["cbc:TaxAmount"].InnerText).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                 retentions.Append("</tr>");
                 counter++;
             }
