@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Gosocket.Dian.Functions.Others
 {
@@ -21,6 +22,7 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager TableManagerOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private static readonly TableManager TableManagerTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
+
         // Set queue name
         private const string queueName = "activate-otherdocument-operation-input";
 
@@ -29,6 +31,7 @@ namespace Gosocket.Dian.Functions.Others
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
+            var start = DateTime.UtcNow;
 
             SetLogger(null, "Step OtherDocument-00", " Ingresamos a ActivateOtherDocumentContributor ", "ACTSEND-01");
 
@@ -51,7 +54,14 @@ namespace Gosocket.Dian.Functions.Others
                     // Step 1  Validate OtherDocumentActivateContributor
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                     requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
-                    SetLogger(requestObject, "Step OtherDocument-1", "ActivateOtherContributor SoftwareId " + requestObject.SoftwareId, "ACT-01");
+
+                    start = DateTime.UtcNow;
+                    var requestObjectACT = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-02.1")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = " SoftwareID " + requestObject.SoftwareId + " SoftwareType " + requestObject.SoftwareType 
+                    };
+                    var resultRequestObjectACT = TableManagerGlobalLogger.InsertOrUpdateAsync(requestObjectACT);
 
                     //Contributorid = OtherDocumentActivateContributorID
                     int otherDocContributorId = 0;
@@ -71,7 +81,7 @@ namespace Gosocket.Dian.Functions.Others
                     }
                     else
                     {
-                        // Step 4 Actualizo OtherDocElecSoftware en SQL 
+                        // Step 4 Actualizo otherDocElecContributor en SQL 
                         otherDocElecContributor = new OtherDocElecContributor()
                         {
                             CreatedBy = requestObject.CreatedBy,
@@ -92,9 +102,18 @@ namespace Gosocket.Dian.Functions.Others
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
 
-                    //si el software No Existe  OtherDocElecOperationMode
+                    //si el software No Existe  OtherDocElecSoftware
                     if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware)
                     {
+                        start = DateTime.UtcNow;
+                        var OtherDocSW = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-05.1")
+                        {
+                            Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                            Action = " otherDocContributorId " + otherDocContributorId
+                        };
+                        var resultOtherDocSW = TableManagerGlobalLogger.InsertOrUpdateAsync(OtherDocSW);
+
+
                         OtherDocElecSoftware newSoftware = new OtherDocElecSoftware()
                         {
                             Id = new Guid(requestObject.SoftwareId),
@@ -108,7 +127,7 @@ namespace Gosocket.Dian.Functions.Others
                             OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted,
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
-                            OtherDocElecContributorId = requestObject.ContributorId,
+                            OtherDocElecContributorId = otherDocContributorId,
                             SoftwareId = new Guid(requestObject.SoftwareProvider),
                             ProviderId = requestObject.ProviderId
                         };
@@ -192,6 +211,13 @@ namespace Gosocket.Dian.Functions.Others
 
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
+                    start = DateTime.UtcNow;
+                    var endACT = new GlobalLogger(requestObject.SoftwareId, "ACT-12")
+                    {
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = " otherDocContributorId " + otherDocElecContributor.Id
+                    };
+                    var resultEndACT = TableManagerGlobalLogger.InsertOrUpdateAsync(endACT);
 
                     log.Info($"Activation OtherDocument successfully completed. Contributor with given id: {otherDocElecContributor.Id}");
 
