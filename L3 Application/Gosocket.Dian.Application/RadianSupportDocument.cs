@@ -54,8 +54,8 @@ namespace Gosocket.Dian.Application
            
             try
             {
-                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
                 ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 Dictionary<string, string> newFieldValues = new Dictionary<string, string>();
@@ -203,10 +203,10 @@ namespace Gosocket.Dian.Application
                 { "RetentionNumber", "/*[local-name() = 'Invoice']/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID']" },
                 { "RetentionAmount", "/*[local-name() = 'Invoice']/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxAmount']" },
                 // Total Data
-                { "TotalCurrency", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'LineExtensionAmount']/@currencyID" },
+                { "TotalCurrency", "/*[local-name() = 'Invoice']/*[local-name() = 'DocumentCurrencyCode']" },
                 { "TotalExchangeRate", "/*[local-name() = 'Invoice']/*[local-name() = 'PaymentAlternativeExchangeRate']/*[local-name() = 'CalculationRate']" },
                 { "TotalUnitPrice", "//cac:LegalMonetaryTotal/cbc:LineExtensionAmount" },
-                { "TotalDiscountsDetail", "//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = false()]/cbc:Amount" },
+                { "TotalDiscountsDetail", "/*/*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge'][cbc:ChargeIndicator = false()]/*[local-name()='Amount']" },
                 { "TotalSurchargesDetail", "//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount" },
                 { "TotalTaxableBase", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount'] | /*[local-name() = 'CreditNote']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount']" },
                 { "TotalTaxesDetail", "/*/*[local-name() = 'TaxTotal'][*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID'] = '01']/*[local-name() = 'TaxAmount']" },
@@ -466,11 +466,11 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append("<tr>");
 
                 productsTemplates.Append($"<td>{product.Element(cbc + "ID").Value}</td>");
-                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cac + "SellersItemIdentification").Element(cbc + "ID").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cac + "StandardItemIdentification").Element(cbc + "ID").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
-                productsTemplates.Append($"<td>{product.Element(cbc + "InvoicedQuantity").Attribute("unitCode").Value}</td>");
+                productsTemplates.Append($"<td>{product.Element(cac + "Price").Element(cbc + "BaseQuantity").Attribute("unitCode").Value}</td>");
                 productsTemplates.Append($"<td class=\"text-currency\">{decimal.Parse(product.Element(cbc + "InvoicedQuantity").Value).ToString("#,0.00", CultureInfo.InvariantCulture)}</td>");
-                productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cbc + "LineExtensionAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "Price").Element(cbc + "PriceAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 // Discounts and surcharges
                 if (product.Element(cac + "AllowanceCharge") != null)
@@ -590,20 +590,22 @@ namespace Gosocket.Dian.Application
         private StringBuilder MappingRetentions(byte[] xmlBytes, StringBuilder template)
         {
             string data = Encoding.UTF8.GetString(xmlBytes);
-            XmlDocument invoiceDoc = new XmlDocument();
             int counter = 1;
 
-            invoiceDoc.LoadXml(data);
-            XmlNodeList retentionsNodes = invoiceDoc.GetElementsByTagName("cac:WithholdingTaxTotal");
+            XElement xelement = XElement.Load(new StringReader(data));
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 
-            // Product Data mapping logic
+            var retentionsNodes = xelement.Elements(cac + "WithholdingTaxTotal");
+
+            //// Product Data mapping logic
             StringBuilder retentions = new StringBuilder();
 
-            foreach (XmlNode element in retentionsNodes)
+            foreach (XElement element in retentionsNodes)
             {
                 retentions.Append("<tr>");
                 retentions.Append($"<td class='text-centered'>{counter}</td>");
-                retentions.Append($"<td>$<span style=\"float: right;margin-right: 5px;\">{decimal.Parse(element["cbc:TaxAmount"].InnerText).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                retentions.Append($"<td>$<span style=\"float: right;margin-right: 5px;\">{decimal.Parse(element.Element(cbc + "TaxAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                 retentions.Append("</tr>");
                 counter++;
             }
