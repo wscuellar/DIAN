@@ -51,11 +51,11 @@ namespace Gosocket.Dian.Application
 
             // Load xpaths
             Dictionary<string, string> xpathRequest = CreateGetXpathDataValuesRequestObject(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-           
+
             try
             {
-                //string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
+                string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
+                //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
                 ResponseXpathDataValue fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 Dictionary<string, string> newFieldValues = new Dictionary<string, string>();
@@ -74,11 +74,11 @@ namespace Gosocket.Dian.Application
 
                 // Mapping Fields
                 template = TemplateGlobalMapping(template, fieldValues);
+                template = MappingTotalData(xmlBytes, template);
                 template = MappingProducts(xmlBytes, template);
                 template = MappingDiscounts(xmlBytes, template);
                 template = MappingRetentions(xmlBytes, template);
                 template = MappingAdvances(xmlBytes, template);
-
 
             }
             catch (Exception ex)
@@ -204,17 +204,14 @@ namespace Gosocket.Dian.Application
                 { "RetentionAmount", "/*[local-name() = 'Invoice']/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxAmount']" },
                 // Total Data
                 { "TotalCurrency", "/*[local-name() = 'Invoice']/*[local-name() = 'DocumentCurrencyCode']" },
-                { "TotalExchangeRate", "/*[local-name() = 'Invoice']/*[local-name() = 'PaymentAlternativeExchangeRate']/*[local-name() = 'CalculationRate']" },
-                { "TotalUnitPrice", "//cac:LegalMonetaryTotal/cbc:LineExtensionAmount" },
-                { "TotalDiscountsDetail", "/*/*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge'][cbc:ChargeIndicator = false()]/*[local-name()='Amount']" },
-                { "TotalSurchargesDetail", "//cac:InvoiceLine/cac:AllowanceCharge[cbc:ChargeIndicator = true()]/cbc:Amount" },
+                { "TotalExchangeRate", "/*[local-name() = 'Invoice']/*[local-name() = 'PaymentAlternativeExchangeRate']/*[local-name() = 'CalculationRate']" },                
                 { "TotalTaxableBase", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount'] | /*[local-name() = 'CreditNote']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxExclusiveAmount']" },
                 { "TotalTaxesDetail", "/*/*[local-name() = 'TaxTotal'][*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID'] = '01']/*[local-name() = 'TaxAmount']" },
-                { "TotalOtherTaxes", "/*/*[local-name() = 'TaxTotal']/*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxAmount']" },
-                { "TotalTaxes", "/*/*[local-name() = 'WithholdingTaxTotal']/*[local-name() = 'TaxAmount']" },
+                { "TotalOtherTaxes", "/*/*[local-name() = 'TaxTotal'][*[local-name() = 'TaxSubtotal']/*[local-name() = 'TaxCategory']/*[local-name() = 'TaxScheme']/*[local-name() = 'ID'] != '01']/*[local-name() = 'TaxAmount']" },
+                { "TotalTaxes", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'TaxInclusiveAmount']" },
                 { "GlobalDiscounts", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'AllowanceTotalAmount']" },
                 { "GlobalSurcharges", "/*[local-name() = 'Invoice']/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'ChargeTotalAmount']" },
-                { "TotalAmount", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'LineExtensionAmount']" },
+                { "TotalAmount", "/*/*[local-name() = 'LegalMonetaryTotal']/*[local-name() = 'PayableAmount']" },
                 // Final Data
                 { "AuthorizationNumber", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'InvoiceAuthorization']" },
                 { "AuthorizedRangeFrom", "//*[local-name() = 'UBLExtensions']/*[local-name() = 'UBLExtension']/*[local-name() = 'ExtensionContent']/*[local-name() = 'DianExtensions']/*[local-name() = 'InvoiceControl']/*[local-name() = 'AuthorizedInvoices']/*[local-name() = 'From']" },
@@ -396,19 +393,6 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{GenerationDate}", DateTime.Now.ToShortDateString());
             template = template.Replace( "{TotalCurrency}", dataValues.XpathsValues["TotalCurrency"]);
             template = template.Replace( "{TotalExchangeRate}", dataValues.XpathsValues["TotalExchangeRate"]);
-
-            // Sumas
-            double totalUnitPrice = SplitAndSum(dataValues.XpathsValues["TotalUnitPrice"]);
-            double totalDiscountsDetail = SplitAndSum(dataValues.XpathsValues["TotalDiscountsDetail"]);
-            double totalSurchargesDetail = SplitAndSum(dataValues.XpathsValues["TotalSurchargesDetail"]);
-
-            // Total Unit Price Calculation
-            totalUnitPrice += totalDiscountsDetail;
-            totalUnitPrice -= totalSurchargesDetail;
-
-            template = template.Replace("{TotalUnitPrice}", $"$<span style=\"float: right;margin-right: 5px;\">{totalUnitPrice.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
-            template = template.Replace("{TotalDiscountsDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalDiscountsDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
-            template = template.Replace("{TotalSurchargesDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalSurchargesDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             template = template.Replace("{TotalTaxableBase}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["TotalTaxableBase"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             template = template.Replace("{TotalTaxesDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{SplitAndSum(dataValues.XpathsValues["TotalTaxesDetail"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             template = template.Replace("{TotalOtherTaxes}", $"$<span style=\"float: right;margin-right: 5px;\">{SplitAndSum(dataValues.XpathsValues["TotalOtherTaxes"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
@@ -416,6 +400,7 @@ namespace Gosocket.Dian.Application
             template = template.Replace("{GlobalDiscounts}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["GlobalDiscounts"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             template = template.Replace("{GlobalSurcharges}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["GlobalSurcharges"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
             template = template.Replace("{TotalAmount}", $"$<span style=\"float: right;margin-right: 5px;\">{double.Parse(dataValues.XpathsValues["TotalAmount"]).ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+
             // Final Data
             template = template.Replace("{AuthorizationNumber}", dataValues.XpathsValues["AuthorizationNumber"]);
             template = template.Replace("{AuthorizedRangeFrom}", dataValues.XpathsValues["AuthorizedRangeFrom"]);
@@ -470,20 +455,20 @@ namespace Gosocket.Dian.Application
                 productsTemplates.Append($"<td>{product.Element(cac + "Item").Element(cbc + "Description").Value}</td>");
                 productsTemplates.Append($"<td>{product.Element(cac + "Price").Element(cbc + "BaseQuantity").Attribute("unitCode").Value}</td>");
                 productsTemplates.Append($"<td class=\"text-currency\">{decimal.Parse(product.Element(cbc + "InvoicedQuantity").Value).ToString("#,0.00", CultureInfo.InvariantCulture)}</td>");
-                productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "Price").Element(cbc + "PriceAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                productsTemplates.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(product.Element(cac + "Price").Element(cbc + "PriceAmount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
 
                 // Discounts and surcharges
                 if (product.Element(cac + "AllowanceCharge") != null)
                 {
                     if (!Convert.ToBoolean(product.Element(cac + "AllowanceCharge").Element(cbc + "ChargeIndicator").Value))
                     {
-                        productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                        productsTemplates.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                         productsTemplates.Append("<td></td>");
                     }
                     else
                     {
                         productsTemplates.Append("<td></td>");
-                        productsTemplates.Append($"<td><span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
+                        productsTemplates.Append($"<td>$<span style=\"float: right;\">{decimal.Parse(product.Element(cac + "AllowanceCharge").Element(cbc + "Amount").Value).ToString("0,0.00", CultureInfo.InvariantCulture)}</span></td>");
                     }
                 }
                 else
@@ -615,6 +600,52 @@ namespace Gosocket.Dian.Application
             return template;
         }
 
+        #endregion
+
+        #region MappingTotalData
+        private StringBuilder MappingTotalData(byte[] xmlBytes, StringBuilder template)
+        {
+            string data = Encoding.UTF8.GetString(xmlBytes);
+
+            XElement xelement = XElement.Load(new StringReader(data));
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+
+            var invoiceLineNodes = xelement.Elements(cac + "InvoiceLine");
+            var invoiceLineAllowanceChargeNodes = xelement.Elements(cac + "InvoiceLine").Elements(cac + "AllowanceCharge");
+
+            decimal totalUnitPrice = 0;
+            decimal totalDiscountsDetail = 0;
+            decimal totalSurchargesDetail = 0;
+
+            //// totalUnitPrice
+            foreach (XElement element in invoiceLineNodes)
+            {
+                decimal unitPrice = decimal.Parse(element.Element(cbc + "InvoicedQuantity").Value) * decimal.Parse(element.Element(cac + "Price").Element(cbc + "PriceAmount").Value);
+                totalUnitPrice += unitPrice;
+            }
+
+            ////totalDiscountsDetail & totalSurchargesDetail
+            foreach (XElement element in invoiceLineAllowanceChargeNodes)
+            {
+                decimal amountDetail = decimal.Parse(element.Element(cbc + "Amount").Value);
+
+                if (Boolean.Parse(element.Element(cbc + "ChargeIndicator").Value))
+                {
+                    totalSurchargesDetail += amountDetail;
+                }
+                else
+                {                    
+                    totalDiscountsDetail += amountDetail;
+                }
+            }
+
+            template = template.Replace("{TotalUnitPrice}", $"$<span style=\"float: right;margin-right: 5px;\">{totalUnitPrice.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalDiscountsDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalDiscountsDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+            template = template.Replace("{TotalSurchargesDetail}", $"$<span style=\"float: right;margin-right: 5px;\">{totalSurchargesDetail.ToString("0,0.00", CultureInfo.InvariantCulture)}</span>");
+
+            return template;
+        }
         #endregion
 
         #region
