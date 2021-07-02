@@ -50,6 +50,7 @@ namespace Gosocket.Dian.Functions.Batch
             var start = DateTime.UtcNow;
             var zipKey = string.Empty;
             string nitNomina = string.Empty;
+            string nitNominaEmp = string.Empty;
             string softwareIdNomina = string.Empty;
             XmlParseNomina xmlParser = null;
             GlobalBatchFileStatus batchFileStatus = null;
@@ -131,7 +132,10 @@ namespace Gosocket.Dian.Functions.Batch
                     xmlParser = new XmlParseNomina();                   
                     xmlParser = new XmlParseNomina(xmlBytes);
                     nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+                    nitNominaEmp = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
                     softwareIdNomina = xmlParser.globalDocPayrolls.SoftwareID;
+
+                    nitNomina = nitNomina != nitNominaEmp ? nitNominaEmp : nitNomina;
 
                     start = DateTime.UtcNow;
                     var flagNomina = new GlobalLogger(zipKey, "3 flagNomina")

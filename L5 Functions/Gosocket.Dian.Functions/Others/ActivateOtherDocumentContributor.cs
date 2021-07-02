@@ -55,6 +55,7 @@ namespace Gosocket.Dian.Functions.Others
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                     requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
 
+                    SetLogger(requestObject, "Step OtherDocument-1", "ActivateOtherContributor SoftwareId " + requestObject.SoftwareId, "ACT-01");
                     start = DateTime.UtcNow;
                     var requestObjectACT = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-02.1")
                     {
@@ -65,7 +66,7 @@ namespace Gosocket.Dian.Functions.Others
 
                     //Contributorid = OtherDocumentActivateContributorID
                     int otherDocContributorId = 0;
-                    otherDocElecContributor = contributorService.GetOtherDocElecContributor(requestObject.ContributorId, requestObject.OtherDocContributorTypeId);
+                    otherDocElecContributor = contributorService.GetOtherDocElecContributorID(requestObject.ContributorId, requestObject.OtherDocContributorTypeId, requestObject.OtherDocOperationModeId);
                     SetLogger(null, "Step ActOther-1", otherDocElecContributor == null ? "vacio" : "radiancontributor no es null", "ACT-02");
 
                     if (otherDocElecContributor != null)

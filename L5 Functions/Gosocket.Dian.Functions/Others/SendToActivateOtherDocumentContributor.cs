@@ -103,7 +103,7 @@ namespace Gosocket.Dian.Functions.Others
                                             otherDocElecContributor.ContributorId + " "
                                             + otherDocElecContributor.OtherDocElecContributorTypeId + " "
                                             + results.SoftwareId + " "
-                                            + data.SoftwareType
+                                            + data.SoftwareType + " OtherDocElecContributor.id " + otherDocElecContributor.Id
                                             , "SEND-10");
 
                     start = DateTime.UtcNow;
@@ -112,6 +112,7 @@ namespace Gosocket.Dian.Functions.Others
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "startOtehrDocElecContributor ContributorId:" + otherDocElecContributor.ContributorId +
                         " OtherDocElecContributorTypeId: " + otherDocElecContributor.OtherDocElecContributorTypeId +
+                        " OtherDocElecOperationModeId: " + otherDocElecContributor.OtherDocElecOperationModeId +
                         " SoftwareId: " + data.SoftwareId +
                         " SoftwareType: " + data.SoftwareType
                     };
@@ -120,9 +121,10 @@ namespace Gosocket.Dian.Functions.Others
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledOtherDocElecContributor(
                       otherDocElecContributor.ContributorId,
-                      otherDocElecContributor.OtherDocElecContributorTypeId,
+                      otherDocElecContributor.OtherDocElecContributorTypeId,                     
                       results.SoftwareId,
-                      Convert.ToInt32(data.SoftwareType));
+                      Convert.ToInt32(data.SoftwareType),
+                      otherDocElecContributor.OtherDocElecOperationModeId);
 
                     //Se habilita el contribuyente en la table Storage
                     globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
