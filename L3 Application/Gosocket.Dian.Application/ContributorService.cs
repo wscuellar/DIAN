@@ -469,13 +469,13 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public void SetToEnabledOtherDocElecContributor(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        public void SetToEnabledOtherDocElecContributor(int contributorId, int contributorTypeId, string softwareId, int softwareType, int contributorTypeModeId)
         {
             using (var context = new SqlDBContext())
             {
                 //Ubicar el participante que se habilitara
                 OtherDocElecContributor otherDocElec = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
-                                        && t.OtherDocElecContributorTypeId == contributorTypeId);
+                                        && t.OtherDocElecContributorTypeId == contributorTypeId && t.OtherDocElecOperationModeId == contributorTypeModeId);
 
                 if (otherDocElec != null)
                 {
@@ -612,11 +612,27 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributorId">Id a ubicar</param>
         /// <returns>Un objeto RadianCotributor buscado</returns>
+        public OtherDocElecContributor GetOtherDocElecContributorID(int contributorId, int contributorTypeId, int operationModeId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId 
+                && rc.OtherDocElecContributorTypeId == contributorTypeId
+                && rc.OtherDocElecOperationModeId == operationModeId);
+            }
+        }
+
+        /// <summary>
+        /// Metodo que devuelve un objeto OtherDocElecContributor desde SQL
+        /// </summary>
+        /// <param name="radianContributorId">Id a ubicar</param>
+        /// <returns>Un objeto RadianCotributor buscado</returns>
         public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId)
         {
             using (var context = new SqlDBContext())
             {
-                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId && rc.OtherDocElecContributorTypeId == contributorTypeId);
+                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
+                && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "En pruebas");
             }
         }
 
