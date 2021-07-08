@@ -1226,7 +1226,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string softwareproviderDvErrorCode = "FAB22";
             if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
             else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
-            else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
+            //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
             // Is Radian
