@@ -3649,7 +3649,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
-                    Mandatory = false,
+                    Mandatory = true,
                     ErrorCode = errorCodeSerie,
                     ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -3658,7 +3658,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
-                    Mandatory = false,
+                    Mandatory = true,
                     ErrorCode = errorCodeSerie,
                     ErrorMessage = "El prefijo no corresponde al prefijo de la autorización de numeración",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
