@@ -309,7 +309,11 @@ namespace Gosocket.Dian.Application
             List<GlobalDocValidatorDocumentMeta> allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
             Dictionary<int, string> icons = new Dictionary<int, string>();
 
-            GlobalDocValidatorDocument globalDocValidatorDocument = GlobalDocValidatorDocumentByGlobalId(documentKey);
+            var globalDocValidatorDocumentMeta = _radianGlobalDocValidationDocumentMeta.DocumentValidation(documentKey);
+            
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+
+            GlobalDocValidatorDocument globalDocValidatorDocument = _globalDocValidatorDocument.DocumentValidation(identifier);
 
             if (!string.IsNullOrEmpty(documentKey) && globalDocValidatorDocument.DocumentTypeId == "01")
                 icons = IconType(allReferencedDocuments);
