@@ -65,6 +65,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         readonly XmlNamespaceManager _ns;
         readonly byte[] _xmlBytes;
 
+        private const string NoErrorCode = "SinCódigo";
+        private const string DefaultStringValue = "true";
+        private const bool DefaultBoolValue = false;
+        private const string DefaultStatusRutValidationErrorMessage = "El facturador electrónico y/o proveedor tecnólogico tiene el RUT en estado cancelado, suspendido o inactivo.";        
+        private const string DefaultStatusRutValidationOkMessage = "El facturador tiene el RUT en estado válido.";        
+        private const int CacheTimePolicy24HoursInMinutes = 1440;
+        private const int CacheTimePolicy1HourInMinutes = 60;
+
         private const String BASE64_REGEX_STRING = @"^[a-zA-Z0-9\+/]*={0,3}$";
 
         #endregion
@@ -1223,10 +1231,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             // Software provider
-            string softwareproviderDvErrorCode = "FAB22";
+            string softwareproviderDvErrorCode = string.Empty;
             if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
-            else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
-            else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
+            //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
+            //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
 
             // Is Radian
@@ -1306,7 +1314,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (string.IsNullOrEmpty(softwareProviderCodeDigit) || softwareProviderCodeDigit == "undefined") softwareProviderCodeDigit = "11";
             if (ValidateDigitCode(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode, documentMeta.DocumentTypeId == "96" ? int.Parse(providerCodeDigit) : int.Parse(softwareProviderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            //else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             string senderErrorCode = "FAJ21";
             if (documentMeta.DocumentTypeId == "05") senderErrorCode = "DSAJ21";
@@ -1385,11 +1393,49 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
+            responses = GetStatusRutValidation(responses, sender, sender2);
+
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
         }
         #endregion
+
+        #region GetStatusRutValidation
+        public List<ValidateListResponse> GetStatusRutValidation(List<ValidateListResponse> responses, GlobalContributor sender, GlobalContributor sender2)
+        {
+            var statusRutValidationErrorCode = !String.IsNullOrEmpty(ConfigurationManager.GetValue("StatusRutValidationErrorCode")) ? ConfigurationManager.GetValue("StatusRutValidationErrorCode") : NoErrorCode;
+            var isStatusRutValidationMandatory = !String.IsNullOrEmpty(ConfigurationManager.GetValue("IsStatusRutValidationMandatory")) ? ConfigurationManager.GetValue("IsStatusRutValidationMandatory") == DefaultStringValue : DefaultBoolValue;
+            var statusRutValidationErrorMessage = !String.IsNullOrEmpty(ConfigurationManager.GetValue("StatusRutValidationErrorMessage")) ? ConfigurationManager.GetValue("StatusRutValidationErrorMessage") : DefaultStatusRutValidationErrorMessage;
+            var statusRutValidationListStatusCode = !String.IsNullOrEmpty(ConfigurationManager.GetValue("StatusRutValidationListStatusCode")) ? ConfigurationManager.GetValue("StatusRutValidationListStatusCode") : new System.Text.StringBuilder().Append(((int)StatusRut.Cancelled).ToString()).Append('|').Append(((int)StatusRut.Inactive).ToString()).Append('|').Append(((int)StatusRut.Suspension).ToString()).ToString();
+
+            if (sender != null)
+            {
+                if (statusRutValidationListStatusCode.Contains(sender.StatusRut.ToString()))
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = isStatusRutValidationMandatory, ErrorCode = statusRutValidationErrorCode, ErrorMessage = statusRutValidationErrorMessage, ExecutionTime = DateTime.UtcNow.Subtract(DateTime.UtcNow).TotalSeconds });
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = isStatusRutValidationMandatory, ErrorCode = statusRutValidationErrorCode, ErrorMessage = DefaultStatusRutValidationOkMessage, ExecutionTime = DateTime.UtcNow.Subtract(DateTime.UtcNow).TotalSeconds });
+                }
+            }
+            if (sender2 != null)
+            {
+                if (statusRutValidationListStatusCode.Contains(sender2.StatusRut.ToString()))
+                {
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = isStatusRutValidationMandatory, ErrorCode = statusRutValidationErrorCode, ErrorMessage = statusRutValidationErrorMessage, ExecutionTime = DateTime.UtcNow.Subtract(DateTime.UtcNow).TotalSeconds });
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = isStatusRutValidationMandatory, ErrorCode = statusRutValidationErrorCode, ErrorMessage = DefaultStatusRutValidationOkMessage, ExecutionTime = DateTime.UtcNow.Subtract(DateTime.UtcNow).TotalSeconds });
+                }
+            }
+
+            return responses;
+        }
+        #endregion
+
 
         #region Note validations
         public ValidateListResponse ValidateNoteReference(string trackId)
@@ -3603,7 +3649,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
-                    Mandatory = false,
+                    Mandatory = true,
                     ErrorCode = errorCodeSerie,
                     ErrorMessage = "El prefijo corresponde al prefijo autorizado en la resolución.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -3612,7 +3658,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
-                    Mandatory = false,
+                    Mandatory = true,
                     ErrorCode = errorCodeSerie,
                     ErrorMessage = "El prefijo no corresponde al prefijo de la autorización de numeración",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -4006,6 +4052,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #region Private methods
         private GlobalContributor GetContributorInstanceCache(string code)
         {
+            var contributorInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("ContributorInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var itemKey = $"contributor-{code}";
             GlobalContributor contributor = null;
             var cacheItem = InstanceCache.ContributorInstanceCache.GetCacheItem(itemKey);
@@ -4015,8 +4062,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 contributor = contributorTableManager.Find<GlobalContributor>(code, code);
                 if (contributor == null) return null;
                 CacheItemPolicy policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
+                {                    
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(contributorInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.ContributorInstanceCache.Set(new CacheItem(itemKey, contributor), policy);
             }
@@ -4030,6 +4077,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private List<GlobalNumberRange> GetNumberRangeInstanceCache(string senderCode)
         {
             var env = ConfigurationManager.GetValue("Environment");
+            var numberRangesInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("NumberRangesInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy1HourInMinutes;
             List<GlobalNumberRange> numberRanges = new List<GlobalNumberRange>();
             var cacheItemKey = $"number-range-{senderCode}";
             if (env == "Hab")
@@ -4043,8 +4091,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (env == "Prod" || env == "Test")
                     numberRanges = numberRangeTableManager.FindByPartition<GlobalNumberRange>(senderCode);
                 CacheItemPolicy policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
+                {                    
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(numberRangesInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.NumberRangesInstanceCache.Set(new CacheItem(cacheItemKey, numberRanges), policy);
             }
@@ -4065,6 +4113,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             var itemKey = id;
             GlobalSoftware software = null;
+            var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var cacheItem = InstanceCache.SoftwareInstanceCache.GetCacheItem(itemKey);
             if (cacheItem == null)
             {
@@ -4072,7 +4121,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (software == null) return null;
                 CacheItemPolicy policy = new CacheItemPolicy
                 {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(softwareInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.SoftwareInstanceCache.Set(new CacheItem(itemKey, software), policy);
             }
@@ -4085,13 +4134,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             GlobalTypeList typeList = null;
             List<GlobalTypeList> typesList;
+            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
             var cacheItem = InstanceCache.TypesListInstanceCache.GetCacheItem("TypesList");
             if (cacheItem == null)
             {
                 typesList = typeListTableManager.FindByPartition<GlobalTypeList>("new-dian-ubl21");
                 CacheItemPolicy policy = new CacheItemPolicy
                 {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(typesListInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.TypesListInstanceCache.Set(new CacheItem("TypesList", typesList), policy);
             }

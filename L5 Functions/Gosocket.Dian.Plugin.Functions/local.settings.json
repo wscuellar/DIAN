@@ -49,6 +49,15 @@
     //"BillerSoftwarePin": "20191",
     //"TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
     //"TestHabSoftwarePin": "20191"
+    // Test StatusRut
+    "IsStatusRutValidationMandatory": "false",
+    "StatusRutValidationErrorCode": "00000",
+    "StatusRutValidationListStatusCode": "12310324|12310343|12310396",
+    "StatusRutValidationErrorMessage": "El facturador tiene el RUT en estado cancelado, suspendido o inactivo.",
+    "TypesListInstanceCacheTimePolicyInMinutes": 1440,
+    "SoftwareInstanceCacheTimePolicyInMinutes": 1440,
+    "NumberRangesInstanceCacheTimePolicyInMinutes": 60,
+    "ContributorInstanceCacheTimePolicyInMinutes": 1440,
 
     // Test INDRA
     "Environment": "Test",
