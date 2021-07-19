@@ -27,19 +27,6 @@ using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using EnumHelper = Gosocket.Dian.Web.Models.EnumHelper;
-using Gosocket.Dian.Services.Utils.Common;
-using iTextSharp.text.pdf;
-using iTextSharp.text;
-using iTextSharp.tool.xml;
-using System.Web;
-using System.Drawing;
-using Image = iTextSharp.text.Image;
-using iTextSharp.tool.xml.pipeline.html;
-using iTextSharp.tool.xml.html;
-using iTextSharp.tool.xml.pipeline.css;
-using iTextSharp.tool.xml.pipeline.end;
-using iTextSharp.tool.xml.parser;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Gosocket.Dian.Web.Controllers
 {
