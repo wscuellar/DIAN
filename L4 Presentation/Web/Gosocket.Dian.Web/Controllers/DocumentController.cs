@@ -41,6 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
+        private readonly TableManager municipalitiesTableManager = new TableManager("municipalities");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IAssociateDocuments _associateDocuments;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
@@ -281,6 +282,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             this.GetPayrollData(20, model);
 
+            model.Payrolls = GetPayrollsList(model);
+
             return View(model);
         }
 
@@ -327,6 +330,14 @@ namespace Gosocket.Dian.Web.Controllers
 
             this.GetPayrollData(50, model);
 
+            model.Payrolls = GetPayrollsList(model);
+            LoadData(ref model);
+
+            return View(model);
+        }
+
+        private List<DocumentViewPayroll> GetPayrollsList(PayrollViewModel model)
+        {
             model.TotalItems = this.PayrollList.Count;
             model.HasMoreData = false;
             var resultPayroll = new List<GlobalDocPayroll>();
@@ -403,10 +414,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            model.Payrolls = result;
-            LoadData(ref model);
-
-            return View(model);
+           return result;
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1300,7 +1308,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.RangosSalarial = RangoSalarialModel.List();
             model.MesesValidacion = MesModel.List();
             model.Ordenadores = OrdenarModel.List();
-            model.Ciudades = new CiudadModelList().List();
+            model.Ciudades = GetCiudadModelLists();
         }
         private void GetPayrollData(int toTake, PayrollViewModel model)
         {
@@ -1378,6 +1386,15 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.FirstSurnameData = firstSurnames;
         }
 
+        private List<CiudadModelList.CiudadModel> GetCiudadModelLists()
+        {
+            List<CiudadModelList.CiudadModel> result = new List<CiudadModelList.CiudadModel>();
+            result.Add(new CiudadModelList.CiudadModel() { Code = "00", Name = "Todos..." });
+            var cities = municipalitiesTableManager.FindByPartition<Municipalities>("Municipality");
+            foreach (var city in cities.OrderBy(x => x.Name))
+                result.Add(new CiudadModelList.CiudadModel() { Code = city.Code, Name = city.Name });
+            return result;
+        }
         #endregion
 
         #region Mailing
