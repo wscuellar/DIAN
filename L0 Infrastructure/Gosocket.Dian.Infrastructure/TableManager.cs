@@ -560,27 +560,6 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
-              QueryComparisons.NotEqual,
-              null));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
         public List<T> FindDocumentRegisterAR<T>(string providerCode, string documentTypeId, string serieandNumber) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();

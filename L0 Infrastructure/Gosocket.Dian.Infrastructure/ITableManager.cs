@@ -38,8 +38,7 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorneyFaculitity<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new();
+        List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new();        
         List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new();
         List<T> FindDocumentReferenced_EventCode_TypeIdNotPartitionKey<T>(string documentReferencedKey, string documentTypeId, string eventCode, string partitionKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new();

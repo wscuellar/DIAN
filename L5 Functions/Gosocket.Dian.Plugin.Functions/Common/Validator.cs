@@ -2546,7 +2546,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document1 = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
+
+            //Servicio
+            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(trackId.ToLower());
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() : null;
+               
             foreach (var document in documentMeta)
             {
                 document1 = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.Identifier, document.Identifier);
@@ -4401,8 +4405,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Servicio
             List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(eventPrev.TrackId.ToLower());
 
-            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() 
-                    : documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() : null;
                        
             //Valida si el documento AR transmitido ya se encuentra aprobado
             switch (Convert.ToInt32(eventPrev.EventCode))
