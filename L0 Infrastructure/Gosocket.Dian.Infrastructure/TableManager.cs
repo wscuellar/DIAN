@@ -1324,7 +1324,8 @@ namespace Gosocket.Dian.Infrastructure
 
         public T FindGlobalPayrollByCUNE<T>(string cune) where T : ITableEntity, new()
         {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("CUNE", QueryComparisons.Equal, cune));
+            //El CUNE es el mismo PartitionKey en la tabla GlobalDocPayroll
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, cune));
             return CloudTable.ExecuteQuery(query).FirstOrDefault();
         }
 

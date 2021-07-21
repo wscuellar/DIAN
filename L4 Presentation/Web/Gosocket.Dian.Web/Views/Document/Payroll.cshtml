@@ -273,17 +273,21 @@
             });
 
             var arrayFirstSurname = [];
-            @foreach (var item in firstSurnameData)
-            {
-                <text>arrayFirstSurname.push({ value: '@item' });</text>
+
+            @if (firstSurnameData != null) {
+                foreach (var item in firstSurnameData)
+                {
+                    <text>arrayFirstSurname.push({ value: '@item' });</text>
+                }                
             }
 
             $("#LetraPrimerApellido").autocomplete({
                 source: arrayFirstSurname,
                 select: function (event, ui) {
-                    
+
                 }
             });
+
         });
     </script>
 }

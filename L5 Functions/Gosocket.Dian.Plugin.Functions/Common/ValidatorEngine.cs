@@ -118,141 +118,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-
-        public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
+        public async Task<List<ValidateListResponse>> StartNewValidationEventRadianAsync(string trackId)
         {
+            var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
-            var validateResponses = new List<ValidateListResponse>();
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
-            RequestObjectDocReference docReference = new RequestObjectDocReference();
-            RequestObjectParty requestParty = new RequestObjectParty();
-            RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
-            RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
-            RequestObjectReferenceAttorney referenceAttorney = new RequestObjectReferenceAttorney();
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
 
-            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (documentMeta != null)
-            {
-                bool validEventRadian = true;
-                bool validEventPrev = true;
-                bool validEventReference = true;
-                var xmlBytes = await GetXmlFromStorageAsync(trackId);
-                var xmlParser = new XmlParser(xmlBytes);
-                if (!xmlParser.Parser())
-                    throw new Exception(xmlParser.ParserError);
+            NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-                NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
-
-               EventRadianModel eventRadian = new EventRadianModel(
-                    documentMeta.DocumentReferencedKey,
-                    documentMeta.PartitionKey,
-                    documentMeta.EventCode,
-                    documentMeta.DocumentTypeId,
-                    nitModel.listID,
-                    documentMeta.CustomizationID,
-                    xmlParser.SigningTime,
-                    nitModel.ValidityPeriodEndDate,
-                    documentMeta.SenderCode,
-                    documentMeta.ReceiverCode,
-                    nitModel.DocumentTypeIdRef,
-                    xmlParser.DocumentReferenceId,
-                    nitModel.IssuerPartyCode,
-                    nitModel.IssuerPartyName,
-                    documentMeta.SendTestSet
-                    );
-
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
-                    || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                {
-                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
-                }
-
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;
-
-                responses = await Instance.StartValidateSerieAndNumberAsync(trackId);
-                validateResponses.AddRange(responses);
-
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
-                {
-                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
-                    responses = await Instance.StartEventApproveCufe(eventApproveCufe);
-                    validateResponses.AddRange(responses);
-                }
-
-                //Si es mandato 
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
-                    && validEventRadian)
-                {
-                    referenceAttorney.TrackId = trackId;
-                    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
-                    foreach (var itemReferenceAttorney in responses)
-                    {
-                        if (itemReferenceAttorney.ErrorCode == "AAH07")
-                            validEventReference = false;
-                    }
-                    validateResponses.AddRange(responses);
-                }
-
-                if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
-                {
-                    EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
-                    responses = await Instance.StartValidateDocumentReference(docReference);
-                    foreach (var itemReference in responses)
-                    {
-                        if (!itemReference.IsValid)
-                            validEventRadian = false;
-                    }
-                    validateResponses.AddRange(responses);
-                }
-
-                //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID && validEventRadian && validEventReference)
-                {
-                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
-                    EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
-                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
-                    responses = await Instance.StartValidateParty(requestParty);
-                    validateResponses.AddRange(responses);
-                    responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
-                    foreach (var itemResponsesTacita in responses)
-                    {
-                        if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
-                            || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
-                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC38")
-                            validEventPrev = false;
-                    }
-                    validateResponses.AddRange(responses);
-
-                    if (validEventPrev)
-                    {
-                        responses = await Instance.StartValidateSigningTimeAsync(signingTime);
-                        validateResponses.AddRange(responses);
-                    }
-
-                }
-
-                validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
-
-            }
-            else
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH07",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-                validateResponses.AddRange(responses);
-            }
+            validateResponses.AddRange(validator.NewValidateEventRadianAsync(xmlParser, trackId, nitModel));
 
             return validateResponses;
         }
+
 
         public List<ValidateListResponse> StartDocumentDuplicityValidationAsync(string trackId)
         {
@@ -945,6 +828,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
+
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
 

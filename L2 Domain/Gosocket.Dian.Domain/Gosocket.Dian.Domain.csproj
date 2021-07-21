@@ -212,6 +212,7 @@
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\Municipalities.cs" />
     <Compile Include="Entity\MunicipalityByCode.cs" />
     <Compile Include="Entity\OtherDocElecCustomerList.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
