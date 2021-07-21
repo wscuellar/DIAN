@@ -213,28 +213,6 @@ namespace Gosocket.Dian.Application.Tests
         }
 
         [TestMethod()]
-        public void InvoiceAndNotesTest()
-        {
-            //arrage
-            var lst = new List<GlobalDocValidatorDocumentMeta>
-            {
-                new GlobalDocValidatorDocumentMeta(){ EventCode="030",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="032",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="033",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="036",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="037",Timestamp = DateTimeOffset.Now}
-            };
-
-            _ = _globalDocValidatorDocument.Setup(t => t.FindByGlobalDocumentId(It.IsAny<string>())).Returns(new GlobalDocValidatorDocument() { DocumentTypeId = "01" });
-            _ = _radianGlobalDocValidationDocumentMeta.Setup(t => t.FindDocumentByReference(It.IsAny<string>())).Returns(lst);
-            //act
-            var result = _current.InvoiceAndNotes(It.IsAny<string>());
-            //assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>>));
-        }
-
-        [TestMethod()]
         public void CreditAndDebitNotesTest()
         {
             //arrage

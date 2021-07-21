@@ -509,24 +509,33 @@ namespace Gosocket.Dian.Web.Controllers
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> ShowDocumentToPublic(string Id)
-        {
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+        {            
             List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
-            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
+            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = new List<GlobalDocValidatorDocumentMeta>();
 
-            DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
-            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
-            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(Id, Id);
+
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+
+            GlobalDocValidatorDocument globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+
+            DateTime date = DateNumberToDateTime(globalDocValidatorDocument.EmissionDateNumber);
+            string partitionKey = ReturnPartitionKey(globalDocValidatorDocument.EmissionDateNumber, globalDocValidatorDocument.DocumentKey);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocument.DocumentKey, partitionKey, date);
             if (globalDataDocument.DocumentTypeId == "96")
                 return RedirectToAction("SearchDocument", "User");
 
-            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
+            Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(globalDataDocument.DocumentTags, Id, globalDocValidatorDocument.DocumentTypeId);
+
+            listGlobalValidatorDocumentMeta = invoiceAndNotes.Item1;
+
+            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(globalDocValidatorDocument.DocumentKey, globalDataDocument);
             GetDataLegitemateOwner(docModel);
             listDocValidatorModels.Add(docModel);
 
             foreach (var item in listGlobalValidatorDocumentMeta)
             {
-                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
+                partitionKey = ReturnPartitionKey(globalDocValidatorDocument.EmissionDateNumber, item.DocumentKey);
                 globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
 
                 docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey, globalDataDocument);
@@ -534,7 +543,7 @@ namespace Gosocket.Dian.Web.Controllers
                 listDocValidatorModels.Add(docModel);
             }
 
-            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2, listDocValidatorModels, invoiceAndNotes.Item3);
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(globalDocValidatorDocument, invoiceAndNotes.Item1, listDocValidatorModels, invoiceAndNotes.Item2);
 
             return View(invoiceNotes);
         }
@@ -1320,7 +1329,12 @@ namespace Gosocket.Dian.Web.Controllers
                 if (payrollByCUNE != null) this.PayrollList.Add(payrollByCUNE);
             }
             else if (!String.IsNullOrEmpty(model.NumeroDocumento))
+            {
+                //DateTime date = DateTime.Now;
+                //List<GlobalDataDocument> listGlobalDataDocument = await CosmosDBService.Instance(date).ReadDocumentByReceiverCodeAsync(model.NumeroDocumento, date);
+                
                 this.PayrollList = payrollTableManager.FindGlobalPayrollByDocumentNumber<GlobalDocPayroll>(toTake, model.NumeroDocumento);
+            }
             else
             {
                 DateTime? monthStart = null, monthEnd = null;

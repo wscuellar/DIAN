@@ -1,5 +1,5 @@
-﻿using Gosocket.Dian.Common.Resources;
-using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using System;
@@ -303,26 +303,6 @@ namespace Gosocket.Dian.Application
             return events;
         }
 
-        //Pass Information to DocumentController for Debit And Credit Notes
-        public Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(string documentKey)
-        {
-            List<GlobalDocValidatorDocumentMeta> allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
-            Dictionary<int, string> icons = new Dictionary<int, string>();
-
-            var globalDocValidatorDocumentMeta = _radianGlobalDocValidationDocumentMeta.DocumentValidation(documentKey);
-            
-            var identifier = globalDocValidatorDocumentMeta.Identifier;
-
-            GlobalDocValidatorDocument globalDocValidatorDocument = _globalDocValidatorDocument.DocumentValidation(identifier);
-
-            if (!string.IsNullOrEmpty(documentKey) && globalDocValidatorDocument.DocumentTypeId == "01")
-                icons = IconType(allReferencedDocuments);
-
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(globalDocValidatorDocument, CreditAndDebitNotes(allReferencedDocuments), icons);
-
-            return tuple;
-        }
-
         //Join Credit and Debit Notes in one list
         public List<GlobalDocValidatorDocumentMeta> CreditAndDebitNotes(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments)
         {
@@ -377,6 +357,27 @@ namespace Gosocket.Dian.Application
         public GlobalDocPayroll GetPayrollById(string partitionKey)
         {
             return this._globalDocPayrollService.Find(partitionKey);
+        }
+
+        //Pass Information to DocumentController for Debit And Credit Notes
+        public Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(List<DocumentTag> documentTags, string documentKey, string documentTypeId)
+        {
+            List<GlobalDocValidatorDocumentMeta> allReferencedDocuments = new List<GlobalDocValidatorDocumentMeta>();
+            Dictionary<int, string> icons = new Dictionary<int, string>();
+
+            foreach (var item in documentTags)
+            {
+                var GlobalDocValidationDocumentMeta = _radianGlobalDocValidationDocumentMeta.DocumentValidation(item.Value);
+
+                allReferencedDocuments.Add(GlobalDocValidationDocumentMeta);
+            }
+
+            if (!string.IsNullOrEmpty(documentKey) && documentTypeId == "01")
+                icons = IconType(allReferencedDocuments);
+
+            Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(allReferencedDocuments, icons);
+
+            return tuple;
         }
     }
 }
