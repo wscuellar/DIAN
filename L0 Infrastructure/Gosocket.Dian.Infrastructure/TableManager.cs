@@ -436,6 +436,15 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public List<T> FindFirstSurNameByPartition<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = CloudTable.CreateQuery<T>().Where(x => x.PartitionKey == partitionKey).Select(x => x).AsTableQuery();
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+
         public T FindByGlobalOtherDocumentTestId<T>(string Id) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, Id));
@@ -1158,24 +1167,6 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public List<T> FindDocumentSenderCodeReceiverCode<T>(string senderCode, string receiverCode) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("SenderCode",
-                    QueryComparisons.Equal,
-                    senderCode),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("ReceiverCode",
-                    QueryComparisons.Equal,
-                    receiverCode));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
-
         public List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -1213,12 +1204,6 @@ namespace Gosocket.Dian.Infrastructure
             //El CUNE es el mismo PartitionKey en la tabla GlobalDocPayroll
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, cune));
             return CloudTable.ExecuteQuery(query).FirstOrDefault();
-        }
-
-        public List<T> FindGlobalPayrollByDocumentNumber<T>(int take, string employeeDocNumber) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("NumeroDocumento", QueryComparisons.Equal, employeeDocNumber));
-            return CloudTable.ExecuteQuery(query).Take(take).OrderByDescending(x => x.Timestamp).ToList();
         }
 
         public List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>

@@ -41,7 +41,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
-        private readonly TableManager municipalitiesTableManager = new TableManager("municipalities");
+        private readonly TableManager municipalitiesTableManager = new TableManager("Municipalities");
+        private readonly TableManager globalDocPayrollEmployeesTableManager = new TableManager("GlobalDocPayrollEmployees");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IAssociateDocuments _associateDocuments;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
@@ -265,7 +266,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Payroll()
+        public async Task<ActionResult> Payroll()
         {
             var model = new PayrollViewModel();
 
@@ -280,7 +281,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             this.SetViewBag_FirstSurnameData();
 
-            this.GetPayrollData(20, model);
+            await this.GetPayrollData(20, model);
 
             model.Payrolls = GetPayrollsList(model);
 
@@ -291,8 +292,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Payroll(PayrollViewModel model)
         {
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
-            this.SetViewBag_FirstSurnameData();
+            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;            
 
             if (string.IsNullOrWhiteSpace(model.CUNE) && string.IsNullOrWhiteSpace(model.NumeroDocumento))
             {
@@ -328,10 +328,12 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            this.GetPayrollData(50, model);
+            await this.GetPayrollData(50, model);
 
             model.Payrolls = GetPayrollsList(model);
+
             LoadData(ref model);
+            this.SetViewBag_FirstSurnameData();
 
             return View(model);
         }
@@ -1326,7 +1328,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Ordenadores = OrdenarModel.List();
             model.Ciudades = GetCiudadModelLists();
         }
-        private void GetPayrollData(int toTake, PayrollViewModel model)
+        private async Task GetPayrollData(int toTake, PayrollViewModel model)
         {
             this.PayrollList = null;
 
@@ -1337,10 +1339,14 @@ namespace Gosocket.Dian.Web.Controllers
             }
             else if (!String.IsNullOrEmpty(model.NumeroDocumento))
             {
-                //DateTime date = DateTime.Now;
-                //List<GlobalDataDocument> listGlobalDataDocument = await CosmosDBService.Instance(date).ReadDocumentByReceiverCodeAsync(model.NumeroDocumento, date);
-                
-                this.PayrollList = payrollTableManager.FindGlobalPayrollByDocumentNumber<GlobalDocPayroll>(toTake, model.NumeroDocumento);
+                DateTime date = DateTime.Now;
+                List<GlobalDataDocument> listGlobalDataDocument = await CosmosDBService.Instance(date).ReadDocumentByReceiverCodeAsync(model.NumeroDocumento, date);
+
+                foreach (GlobalDataDocument item in listGlobalDataDocument)
+                {
+                    GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
+                    this.PayrollList.Add(payroll);
+                }
             }
             else
             {
@@ -1397,11 +1403,13 @@ namespace Gosocket.Dian.Web.Controllers
                 this.PayrollList = payrollTableManager.FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<GlobalDocPayroll>(
                     toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
+
+                //return globalDocPayroll;
             }
         }
         private void SetViewBag_FirstSurnameData()
         {
-            var globalDocPayroll = payrollTableManager.FindAll<GlobalDocPayroll>();
+            var globalDocPayroll = globalDocPayrollEmployeesTableManager.FindFirstSurNameByPartition<GlobalDocPayrollEmployees>("Employee");
             var firstSurnames = new List<string>();
             if (globalDocPayroll != null && globalDocPayroll.Count() > 0) firstSurnames = globalDocPayroll.Select(x => x.PrimerApellido).Distinct().ToList();
             ViewBag.FirstSurnameData = firstSurnames;
