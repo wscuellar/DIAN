@@ -14,6 +14,7 @@ namespace Gosocket.Dian.Application
         private readonly IGlobalDocValidatorDocumentService _globalDocValidatorDocument;
         private readonly IGlobalDocValidatorTrackingService _globalDocValidatorTracking;
         private readonly IGlobalDocPayrollService _globalDocPayrollService;
+        private readonly IAssociateDocuments _associateDocuments;
 
         const string CONS361 = "361";
         const string CONS362 = "362";
@@ -32,12 +33,13 @@ namespace Gosocket.Dian.Application
         const string CREDITNOTE = "91";
         const string DEBITNOTE = "92";
 
-        public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking, IGlobalDocPayrollService globalDocPayrollService)
+        public QueryAssociatedEventsService(IGlobalDocValidationDocumentMetaService radianGlobalDocValidationDocumentMeta, IGlobalDocValidatorDocumentService globalDocValidatorDocument, IGlobalDocValidatorTrackingService globalDocValidatorTracking, IGlobalDocPayrollService globalDocPayrollService, IAssociateDocuments associateDocuments)
         {
             _radianGlobalDocValidationDocumentMeta = radianGlobalDocValidationDocumentMeta;
             _globalDocValidatorDocument = globalDocValidatorDocument;
             _globalDocValidatorTracking = globalDocValidatorTracking;
             _globalDocPayrollService = globalDocPayrollService;
+            _associateDocuments = associateDocuments;
         }
 
         public GlobalDocValidatorDocumentMeta DocumentValidation(string reference)
@@ -232,7 +234,16 @@ namespace Gosocket.Dian.Application
             statusValue.Add(1, $"{RadianDocumentStatus.ElectronicInvoice.GetDescription()}");
 
             if (documentKey != "")
-                allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+            {
+                List<InvoiceWrapper> invoiceWrapper = _associateDocuments.GetEventsByTrackId(documentKey);
+                allReferencedDocuments = (invoiceWrapper.Any() && invoiceWrapper[0].Documents.Any()) ? invoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+                if (allReferencedDocuments == null)
+                    return statusValue;
+                allReferencedDocuments = allReferencedDocuments.Where(t => int.Parse(t.DocumentTypeId) == (int)DocumentType.ApplicationResponse).ToList();
+                //allReferencedDocuments = _radianGlobalDocValidationDocumentMeta.FindDocumentByReference(documentKey);
+            }
+
+              
             allReferencedDocuments = allReferencedDocuments.Where(t => t.EventCode != null && _radianGlobalDocValidationDocumentMeta.EventValidator(t) != null).ToList();
 
             allReferencedDocuments = allReferencedDocuments.OrderBy(t => t.Timestamp).ToList();

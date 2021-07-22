@@ -667,22 +667,22 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 var invoice = invoiceData.First();
 
-                foreach (var eventItem in invoice.Events)
+                foreach (var eventItem in invoice.Documents)
                 {
-                    EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.Event.EventCode.ToString());
-                    eventcodetext = _queryAssociatedEventsService.EventTitle(eventStatus, eventItem.Event.CustomizationID, eventItem.Event.EventCode,
-                       eventItem.Event.EventCode == "043" ? eventItem.Attorney?.SchemeID : string.Empty);
+                    EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.DocumentMeta.EventCode.ToString());
+                    eventcodetext = _queryAssociatedEventsService.EventTitle(eventStatus, eventItem.DocumentMeta.CustomizationID, eventItem.DocumentMeta.EventCode,
+                       eventItem.DocumentMeta.EventCode == "043" ? eventItem.Attorney?.SchemeID : string.Empty);
 
                     model.Events.Add(new EventsViewModel()
                     {
-                        DocumentKey = eventItem.Event.DocumentKey,
-                        EventCode = eventItem.Event.EventCode,
+                        DocumentKey = eventItem.DocumentMeta.DocumentKey,
+                        EventCode = eventItem.DocumentMeta.EventCode,
                         Description = eventcodetext,
-                        EventDate = eventItem.Event.SigningTimeStamp,
-                        SenderCode = eventItem.Event.SenderCode,
-                        Sender = eventItem.Event.SenderName,
-                        ReceiverCode = eventItem.Event.ReceiverCode,
-                        Receiver = eventItem.Event.ReceiverName
+                        EventDate = eventItem.DocumentMeta.SigningTimeStamp,
+                        SenderCode = eventItem.DocumentMeta.SenderCode,
+                        Sender = eventItem.DocumentMeta.SenderName,
+                        ReceiverCode = eventItem.DocumentMeta.ReceiverCode,
+                        Receiver = eventItem.DocumentMeta.ReceiverName
                     });
                 }
 
@@ -690,51 +690,58 @@ namespace Gosocket.Dian.Web.Controllers
                 return model;
             }
 
-            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-
-            if (eventsByInvoice.Any())
+            if (invoiceData.Any())
             {
-                foreach (var eventItem in eventsByInvoice)
+                List<GlobalDocValidatorDocumentMeta> eventsByInvoice = (invoiceData[0].Documents.Any()) ? invoiceData[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+                if (eventsByInvoice.Any())
+                    eventsByInvoice = eventsByInvoice.Where(t => int.Parse(t.DocumentTypeId) == (int)DocumentType.ApplicationResponse).ToList();
+
+                if (eventsByInvoice.Any())
                 {
-                    if (!string.IsNullOrEmpty(eventItem.EventCode))
+                    foreach (var eventItem in eventsByInvoice)
                     {
-                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
-
-                        if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                        if (!string.IsNullOrEmpty(eventItem.EventCode))
                         {
-                            attorney = new GlobalDocReferenceAttorney();
-                            eventcodetext = string.Empty;
-                            if (eventItem.EventCode == "043")
-                                attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
+                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
 
-                            eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
-                            eventItem.CustomizationID, eventItem.EventCode, eventItem.EventCode == "043" ? attorney?.SchemeID : string.Empty);
+                            if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                            {
+                                attorney = new GlobalDocReferenceAttorney();
+                                eventcodetext = string.Empty;
+                                if (eventItem.EventCode == "043")
+                                    attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
 
-                            model.Events.Add(new EventsViewModel()
-                            {
-                                DocumentKey = eventItem.DocumentKey,
-                                EventCode = eventItem.EventCode,
-                                Description = eventcodetext,
-                                EventDate = eventItem.SigningTimeStamp,
-                                SenderCode = eventItem.SenderCode,
-                                Sender = eventItem.SenderName,
-                                ReceiverCode = eventItem.ReceiverCode,
-                                Receiver = eventItem.ReceiverName
-                            });
-                            //Adiciono el evento de finalizacion de mandato.
-                            if (eventItem.EventCode == "043")
-                            {
-                                EventsViewModel _event = FillEventsAttorney(attorney);
-                                if (_event != null)
-                                    model.Events.Add(_event);
+                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                eventItem.CustomizationID, eventItem.EventCode, eventItem.EventCode == "043" ? attorney?.SchemeID : string.Empty);
+
+                                model.Events.Add(new EventsViewModel()
+                                {
+                                    DocumentKey = eventItem.DocumentKey,
+                                    EventCode = eventItem.EventCode,
+                                    Description = eventcodetext,
+                                    EventDate = eventItem.SigningTimeStamp,
+                                    SenderCode = eventItem.SenderCode,
+                                    Sender = eventItem.SenderName,
+                                    ReceiverCode = eventItem.ReceiverCode,
+                                    Receiver = eventItem.ReceiverName
+                                });
+                                //Adiciono el evento de finalizacion de mandato.
+                                if (eventItem.EventCode == "043")
+                                {
+                                    EventsViewModel _event = FillEventsAttorney(attorney);
+                                    if (_event != null)
+                                        model.Events.Add(_event);
+                                }
+
                             }
 
                         }
-
                     }
+                    model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
                 }
-                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
+
+
             return model;
         }
 

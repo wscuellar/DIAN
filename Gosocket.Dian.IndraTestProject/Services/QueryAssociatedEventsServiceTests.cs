@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IGlobalDocValidatorDocumentService> _globalDocValidatorDocument = new Mock<IGlobalDocValidatorDocumentService>();
         private readonly Mock<IGlobalDocValidatorTrackingService> _globalDocValidatorTracking = new Mock<IGlobalDocValidatorTrackingService>();
         private readonly Mock<IGlobalDocPayrollService> _globalDocPayrollService = new Mock<IGlobalDocPayrollService>();
+        private readonly Mock<IAssociateDocuments> _associateDocuments = new Mock<IAssociateDocuments>();
 
 
         [TestInitialize]
@@ -28,7 +29,8 @@ namespace Gosocket.Dian.Application.Tests
                  _radianGlobalDocValidationDocumentMeta.Object,
              _globalDocValidatorDocument.Object,
              _globalDocValidatorTracking.Object,
-             _globalDocPayrollService.Object
+             _globalDocPayrollService.Object,
+             _associateDocuments.Object
                 );
         }
 

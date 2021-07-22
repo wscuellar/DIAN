@@ -630,40 +630,7 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
-
-        public List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = (
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
-
-
-        public List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
-
+        
         public List<T> FindOthersDocumentsNitTestSetId<T>(string PartitionKey, string Id) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -680,89 +647,8 @@ namespace Gosocket.Dian.Infrastructure
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.ToList();
-        }
+        }       
 
-        public List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
-               QueryComparisons.Equal,
-               eventCode));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
-
-        public List<T> FindDocumentReferenced_EventCode_TypeIdNotPartitionKey<T>(string documentReferencedKey, string documentTypeId, string eventCode, string partitionKey) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
-               QueryComparisons.Equal,
-               eventCode));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("PartitionKey",
-               QueryComparisons.NotEqual,
-               partitionKey));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
-
-        public List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("DocumentReferencedKey",
-                    QueryComparisons.Equal,
-                    documentReferencedKey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentTypeId",
-                    QueryComparisons.Equal,
-                    documentTypeId));
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("EventCode",
-                QueryComparisons.Equal,
-                eventCode));
-
-            var customization1 = TableQuery.GenerateFilterCondition("CustomizationID",
-                QueryComparisons.Equal,
-                customizationId);
-
-            var customization2 = TableQuery.GenerateFilterCondition("CustomizationID",
-                QueryComparisons.Equal,
-                customizationId2);
-
-            prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.CombineFilters(customization1,
-                TableOperators.Or,
-                customization2));
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.ToList();
-        }
         public List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();

@@ -715,14 +715,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                                {
                                    Cufe = cufe,
                                    Associate = associate,
-                                   Event = docMeta,                                  
+                                   DocumentMeta = docMeta,                                  
                                };
 
                 InvoiceWrapper invoiceWrapper = new InvoiceWrapper()
                 {
                     Cufe = cufe,
                     Invoice = invoice,
-                    Events = eventDoc.OrderByDescending(t => t.Event.SigningTimeStamp).ToList()
+                    Documents = eventDoc.OrderByDescending(t => t.DocumentMeta.SigningTimeStamp).ToList()
                 };
 
                 list.Add(invoiceWrapper);
@@ -784,7 +784,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         //Servicio
                         List<InvoiceWrapper> InvoiceWrapper = GetEventsByTrackId(trackId.ToLower());
 
-                        events = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() : null;
+                        events = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
 
                         if (events != null && events.Count > 0)
                         {
