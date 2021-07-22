@@ -44,12 +44,10 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new();
         List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new();
         List<T> FindDocumentRegisterAR<T>(string providerCode, string documentTypeId, string serieandNumber) where T : ITableEntity, new();
-        List<T> FindDocumentSenderCodeIssueAttorney<T>(string issuerAttorney, string senderCode) where T : ITableEntity, new();
-        List<T> FindDocumentSenderCodeReceiverCode<T>(string senderCode, string receiverCode) where T : ITableEntity, new();
+        List<T> FindDocumentSenderCodeIssueAttorney<T>(string issuerAttorney, string senderCode) where T : ITableEntity, new();        
         T FindGlobalEvent<T>(string partitionKey, string rowKey, string documentTypeId) where T : ITableEntity, new();
         List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new();
         T FindGlobalPayrollByCUNE<T>(string cune) where T : ITableEntity, new();
-        List<T> FindGlobalPayrollByDocumentNumber<T>(int take, string employeeDocNumber) where T : ITableEntity, new();
         List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>(int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new();
         T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new();
         T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new();
