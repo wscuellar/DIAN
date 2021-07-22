@@ -79,5 +79,6 @@ namespace Gosocket.Dian.Infrastructure
         bool Update(DynamicTableEntity entity, string partitionKey, string rowKey);
         bool Update(TableEntity entity);
         bool Update(TableEntity entity, string partitionKey, string rowKey);
+        List<T> FindFirstSurNameByPartition<T>(string partitionKey) where T : ITableEntity, new();
     }
 }
