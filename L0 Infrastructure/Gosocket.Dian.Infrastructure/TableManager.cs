@@ -436,6 +436,15 @@ namespace Gosocket.Dian.Infrastructure
             return entities.ToList();
         }
 
+        public List<T> FindFirstSurNameByPartition<T>(string partitionKey, string columnName) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey)).Select(new string[] { columnName }).AsTableQuery();
+
+            var entities = CloudTable.ExecuteQuery(query);
+
+            return entities.ToList();
+        }
+
         public T FindByGlobalOtherDocumentTestId<T>(string Id) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, Id));

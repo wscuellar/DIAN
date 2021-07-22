@@ -41,7 +41,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
-        private readonly TableManager municipalitiesTableManager = new TableManager("municipalities");
+        private readonly TableManager municipalitiesTableManager = new TableManager("Municipalities");
+        private readonly TableManager globalDocPayrollEmployeesTableManager = new TableManager("GlobalDocPayrollEmployees");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IAssociateDocuments _associateDocuments;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
@@ -1394,7 +1395,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
         private void SetViewBag_FirstSurnameData()
         {
-            var globalDocPayroll = payrollTableManager.FindAll<GlobalDocPayroll>();
+            var globalDocPayroll = globalDocPayrollEmployeesTableManager.FindFirstSurNameByPartition<GlobalDocPayrollEmployees>("Employee", "PrimerApellido");
             var firstSurnames = new List<string>();
             if (globalDocPayroll != null && globalDocPayroll.Count() > 0) firstSurnames = globalDocPayroll.Select(x => x.PrimerApellido).Distinct().ToList();
             ViewBag.FirstSurnameData = firstSurnames;
