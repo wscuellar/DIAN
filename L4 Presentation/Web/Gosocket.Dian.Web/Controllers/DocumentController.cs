@@ -41,6 +41,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
+        private readonly TableManager municipalitiesTableManager = new TableManager("Municipalities");
+        private readonly TableManager globalDocPayrollEmployeesTableManager = new TableManager("GlobalDocPayrollEmployees");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
         private readonly IAssociateDocuments _associateDocuments;
         private readonly IRadianGraphicRepresentationService _radianGraphicRepresentationService;
@@ -264,7 +266,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
-        public ActionResult Payroll()
+        public async Task<ActionResult> Payroll()
         {
             var model = new PayrollViewModel();
 
@@ -279,7 +281,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             this.SetViewBag_FirstSurnameData();
 
-            this.GetPayrollData(20, model);
+            await this.GetPayrollData(20, model);
+
+            model.Payrolls = GetPayrollsList(model);
 
             return View(model);
         }
@@ -288,8 +292,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Payroll(PayrollViewModel model)
         {
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
-            this.SetViewBag_FirstSurnameData();
+            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;            
 
             if (string.IsNullOrWhiteSpace(model.CUNE) && string.IsNullOrWhiteSpace(model.NumeroDocumento))
             {
@@ -325,8 +328,18 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            this.GetPayrollData(50, model);
+            await this.GetPayrollData(50, model);
 
+            model.Payrolls = GetPayrollsList(model);
+
+            LoadData(ref model);
+            this.SetViewBag_FirstSurnameData();
+
+            return View(model);
+        }
+
+        private List<DocumentViewPayroll> GetPayrollsList(PayrollViewModel model)
+        {
             model.TotalItems = this.PayrollList.Count;
             model.HasMoreData = false;
             var resultPayroll = new List<GlobalDocPayroll>();
@@ -403,10 +416,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            model.Payrolls = result;
-            LoadData(ref model);
-
-            return View(model);
+           return result;
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -501,24 +511,33 @@ namespace Gosocket.Dian.Web.Controllers
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> ShowDocumentToPublic(string Id)
-        {
-            Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(Id);
+        {            
             List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
-            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = invoiceAndNotes.Item2;
+            List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = new List<GlobalDocValidatorDocumentMeta>();
 
-            DateTime date = DateNumberToDateTime(invoiceAndNotes.Item1.EmissionDateNumber);
-            string partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, invoiceAndNotes.Item1.DocumentKey);
-            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(invoiceAndNotes.Item1.DocumentKey, partitionKey, date);
+            var globalDocValidatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(Id, Id);
+
+            var identifier = globalDocValidatorDocumentMeta.Identifier;
+
+            GlobalDocValidatorDocument globalDocValidatorDocument = globalDocValidatorDocumentTableManager.Find<GlobalDocValidatorDocument>(identifier, identifier);
+
+            DateTime date = DateNumberToDateTime(globalDocValidatorDocument.EmissionDateNumber);
+            string partitionKey = ReturnPartitionKey(globalDocValidatorDocument.EmissionDateNumber, globalDocValidatorDocument.DocumentKey);
+            GlobalDataDocument globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(globalDocValidatorDocument.DocumentKey, partitionKey, date);
             if (globalDataDocument.DocumentTypeId == "96")
                 return RedirectToAction("SearchDocument", "User");
 
-            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(invoiceAndNotes.Item1.DocumentKey, globalDataDocument);
+            Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> invoiceAndNotes = _queryAssociatedEventsService.InvoiceAndNotes(globalDataDocument.DocumentTags, Id, globalDocValidatorDocument.DocumentTypeId);
+
+            listGlobalValidatorDocumentMeta = invoiceAndNotes.Item1;
+
+            DocValidatorModel docModel = await ReturnDocValidatorModelByCufe(globalDocValidatorDocument.DocumentKey, globalDataDocument);
             GetDataLegitemateOwner(docModel);
             listDocValidatorModels.Add(docModel);
 
             foreach (var item in listGlobalValidatorDocumentMeta)
             {
-                partitionKey = ReturnPartitionKey(invoiceAndNotes.Item1.EmissionDateNumber, item.DocumentKey);
+                partitionKey = ReturnPartitionKey(globalDocValidatorDocument.EmissionDateNumber, item.DocumentKey);
                 globalDataDocument = await CosmosDBService.Instance(date).ReadDocumentAsync(item.DocumentKey, partitionKey, date);
 
                 docModel = await ReturnDocValidatorModelByCufe(item.DocumentKey, globalDataDocument);
@@ -526,7 +545,7 @@ namespace Gosocket.Dian.Web.Controllers
                 listDocValidatorModels.Add(docModel);
             }
 
-            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(invoiceAndNotes.Item1, invoiceAndNotes.Item2, listDocValidatorModels, invoiceAndNotes.Item3);
+            InvoiceNotesViewModel invoiceNotes = new InvoiceNotesViewModel(globalDocValidatorDocument, invoiceAndNotes.Item1, listDocValidatorModels, invoiceAndNotes.Item2);
 
             return View(invoiceNotes);
         }
@@ -650,22 +669,22 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 var invoice = invoiceData.First();
 
-                foreach (var eventItem in invoice.Events)
+                foreach (var eventItem in invoice.Documents)
                 {
-                    EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.Event.EventCode.ToString());
-                    eventcodetext = _queryAssociatedEventsService.EventTitle(eventStatus, eventItem.Event.CustomizationID, eventItem.Event.EventCode,
-                       eventItem.Event.EventCode == "043" ? eventItem.Attorney?.SchemeID : string.Empty);
+                    EventStatus eventStatus = (EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.DocumentMeta.EventCode.ToString());
+                    eventcodetext = _queryAssociatedEventsService.EventTitle(eventStatus, eventItem.DocumentMeta.CustomizationID, eventItem.DocumentMeta.EventCode,
+                       eventItem.DocumentMeta.EventCode == "043" ? eventItem.Attorney?.SchemeID : string.Empty);
 
                     model.Events.Add(new EventsViewModel()
                     {
-                        DocumentKey = eventItem.Event.DocumentKey,
-                        EventCode = eventItem.Event.EventCode,
+                        DocumentKey = eventItem.DocumentMeta.DocumentKey,
+                        EventCode = eventItem.DocumentMeta.EventCode,
                         Description = eventcodetext,
-                        EventDate = eventItem.Event.SigningTimeStamp,
-                        SenderCode = eventItem.Event.SenderCode,
-                        Sender = eventItem.Event.SenderName,
-                        ReceiverCode = eventItem.Event.ReceiverCode,
-                        Receiver = eventItem.Event.ReceiverName
+                        EventDate = eventItem.DocumentMeta.SigningTimeStamp,
+                        SenderCode = eventItem.DocumentMeta.SenderCode,
+                        Sender = eventItem.DocumentMeta.SenderName,
+                        ReceiverCode = eventItem.DocumentMeta.ReceiverCode,
+                        Receiver = eventItem.DocumentMeta.ReceiverName
                     });
                 }
 
@@ -673,51 +692,58 @@ namespace Gosocket.Dian.Web.Controllers
                 return model;
             }
 
-            List<GlobalDocValidatorDocumentMeta> eventsByInvoice = documentMetaTableManager.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(trackId, "96");
-
-            if (eventsByInvoice.Any())
+            if (invoiceData.Any())
             {
-                foreach (var eventItem in eventsByInvoice)
+                List<GlobalDocValidatorDocumentMeta> eventsByInvoice = (invoiceData[0].Documents.Any()) ? invoiceData[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+                if (eventsByInvoice.Any())
+                    eventsByInvoice = eventsByInvoice.Where(t => int.Parse(t.DocumentTypeId) == (int)DocumentType.ApplicationResponse).ToList();
+
+                if (eventsByInvoice.Any())
                 {
-                    if (!string.IsNullOrEmpty(eventItem.EventCode))
+                    foreach (var eventItem in eventsByInvoice)
                     {
-                        GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
-
-                        if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                        if (!string.IsNullOrEmpty(eventItem.EventCode))
                         {
-                            attorney = new GlobalDocReferenceAttorney();
-                            eventcodetext = string.Empty;
-                            if (eventItem.EventCode == "043")
-                                attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
+                            GlobalDocValidatorDocument eventVerification = globalDocValidatorDocumentTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(eventItem.Identifier, eventItem.Identifier, eventItem.PartitionKey);
 
-                            eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
-                            eventItem.CustomizationID, eventItem.EventCode, eventItem.EventCode == "043" ? attorney?.SchemeID : string.Empty);
+                            if (eventVerification != null && (eventVerification.ValidationStatus == 0 || eventVerification.ValidationStatus == 1 || eventVerification.ValidationStatus == 10))
+                            {
+                                attorney = new GlobalDocReferenceAttorney();
+                                eventcodetext = string.Empty;
+                                if (eventItem.EventCode == "043")
+                                    attorney = globalDocReferenceAttorneyTableManager.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(eventItem.DocumentKey);
 
-                            model.Events.Add(new EventsViewModel()
-                            {
-                                DocumentKey = eventItem.DocumentKey,
-                                EventCode = eventItem.EventCode,
-                                Description = eventcodetext,
-                                EventDate = eventItem.SigningTimeStamp,
-                                SenderCode = eventItem.SenderCode,
-                                Sender = eventItem.SenderName,
-                                ReceiverCode = eventItem.ReceiverCode,
-                                Receiver = eventItem.ReceiverName
-                            });
-                            //Adiciono el evento de finalizacion de mandato.
-                            if (eventItem.EventCode == "043")
-                            {
-                                EventsViewModel _event = FillEventsAttorney(attorney);
-                                if (_event != null)
-                                    model.Events.Add(_event);
+                                eventcodetext = _queryAssociatedEventsService.EventTitle((EventStatus)Enum.Parse(typeof(Domain.Common.EventStatus), eventItem.EventCode.ToString()),
+                                eventItem.CustomizationID, eventItem.EventCode, eventItem.EventCode == "043" ? attorney?.SchemeID : string.Empty);
+
+                                model.Events.Add(new EventsViewModel()
+                                {
+                                    DocumentKey = eventItem.DocumentKey,
+                                    EventCode = eventItem.EventCode,
+                                    Description = eventcodetext,
+                                    EventDate = eventItem.SigningTimeStamp,
+                                    SenderCode = eventItem.SenderCode,
+                                    Sender = eventItem.SenderName,
+                                    ReceiverCode = eventItem.ReceiverCode,
+                                    Receiver = eventItem.ReceiverName
+                                });
+                                //Adiciono el evento de finalizacion de mandato.
+                                if (eventItem.EventCode == "043")
+                                {
+                                    EventsViewModel _event = FillEventsAttorney(attorney);
+                                    if (_event != null)
+                                        model.Events.Add(_event);
+                                }
+
                             }
 
                         }
-
                     }
+                    model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
                 }
-                model.Events = model.Events.OrderBy(t => t.EventDate).ToList();
             }
+
+
             return model;
         }
 
@@ -1300,9 +1326,9 @@ namespace Gosocket.Dian.Web.Controllers
             model.RangosSalarial = RangoSalarialModel.List();
             model.MesesValidacion = MesModel.List();
             model.Ordenadores = OrdenarModel.List();
-            model.Ciudades = new CiudadModelList().List();
+            model.Ciudades = GetCiudadModelLists();
         }
-        private void GetPayrollData(int toTake, PayrollViewModel model)
+        private async Task GetPayrollData(int toTake, PayrollViewModel model)
         {
             this.PayrollList = null;
 
@@ -1312,7 +1338,16 @@ namespace Gosocket.Dian.Web.Controllers
                 if (payrollByCUNE != null) this.PayrollList.Add(payrollByCUNE);
             }
             else if (!String.IsNullOrEmpty(model.NumeroDocumento))
-                this.PayrollList = payrollTableManager.FindGlobalPayrollByDocumentNumber<GlobalDocPayroll>(toTake, model.NumeroDocumento);
+            {
+                DateTime date = DateTime.Now;
+                List<GlobalDataDocument> listGlobalDataDocument = await CosmosDBService.Instance(date).ReadDocumentByReceiverCodeAsync(model.NumeroDocumento, date);
+
+                foreach (GlobalDataDocument item in listGlobalDataDocument)
+                {
+                    GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
+                    this.PayrollList.Add(payroll);
+                }
+            }
             else
             {
                 DateTime? monthStart = null, monthEnd = null;
@@ -1368,16 +1403,27 @@ namespace Gosocket.Dian.Web.Controllers
                 this.PayrollList = payrollTableManager.FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<GlobalDocPayroll>(
                     toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
+
+                //return globalDocPayroll;
             }
         }
         private void SetViewBag_FirstSurnameData()
         {
-            var globalDocPayroll = payrollTableManager.FindAll<GlobalDocPayroll>();
+            var globalDocPayroll = globalDocPayrollEmployeesTableManager.FindFirstSurNameByPartition<GlobalDocPayrollEmployees>("Employee");
             var firstSurnames = new List<string>();
             if (globalDocPayroll != null && globalDocPayroll.Count() > 0) firstSurnames = globalDocPayroll.Select(x => x.PrimerApellido).Distinct().ToList();
             ViewBag.FirstSurnameData = firstSurnames;
         }
 
+        private List<CiudadModelList.CiudadModel> GetCiudadModelLists()
+        {
+            List<CiudadModelList.CiudadModel> result = new List<CiudadModelList.CiudadModel>();
+            result.Add(new CiudadModelList.CiudadModel() { Code = "00", Name = "Todos..." });
+            var cities = municipalitiesTableManager.FindByPartition<Municipalities>("Municipality");
+            foreach (var city in cities.OrderBy(x => x.Name))
+                result.Add(new CiudadModelList.CiudadModel() { Code = city.Code, Name = city.Name });
+            return result;
+        }
         #endregion
 
         #region Mailing

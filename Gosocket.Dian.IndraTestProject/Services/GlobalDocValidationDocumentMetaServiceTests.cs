@@ -67,34 +67,6 @@ namespace Gosocket.Dian.Application.Tests
         }
 
         [TestMethod()]
-        public void FindReferencedDocumentsTest()
-        {
-            //arrange 
-            _ = documentMetaTableManager.Setup(x => x.FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(It.IsAny<string>(), It.IsAny<string>())).
-                Returns(new List<GlobalDocValidatorDocumentMeta>() { new GlobalDocValidatorDocumentMeta() { DocumentKey = "07" } });
-            //act
-            var result = _current.FindReferencedDocuments("documentReferencedKey", "documentType");
-            //assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(List<GlobalDocValidatorDocumentMeta>));
-            Assert.AreEqual("07", result.First().DocumentKey);
-        }
-
-        [TestMethod()]
-        public void FindDocumentByReferenceTest()
-        {
-            //arrange 
-            _ = documentMetaTableManager.Setup(x => x.FindDocumentByReference<GlobalDocValidatorDocumentMeta>(It.IsAny<string>())).
-                Returns(new List<GlobalDocValidatorDocumentMeta>() { new GlobalDocValidatorDocumentMeta() { DocumentKey = "07" } });
-            //act
-            var result = _current.FindDocumentByReference("documentReferencedKey");
-            //assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(List<GlobalDocValidatorDocumentMeta>));
-            Assert.AreEqual("07", result.First().DocumentKey);
-        }
-
-        [TestMethod()]
         public void EventValidatorTest()
         {
             //arrange 

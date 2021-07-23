@@ -8,7 +8,9 @@ using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
+using Gosocket.Dian.Plugin.Functions.Cufe;
 using Gosocket.Dian.Plugin.Functions.Event;
+using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
@@ -37,7 +39,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 {
     public class Validator
     {
-        #region Global properties
+        #region Global properties        
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         static readonly TableManager contingencyTableManager = new TableManager("GlobalContingency");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -2546,7 +2549,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document1 = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
+
+            //Servicio
+            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(trackId.ToLower());
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+               
             foreach (var document in documentMeta)
             {
                 document1 = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.Identifier, document.Identifier);
@@ -4401,8 +4408,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Servicio
             List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(eventPrev.TrackId.ToLower());
 
-            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() 
-                    : documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
                        
             //Valida si el documento AR transmitido ya se encuentra aprobado
             switch (Convert.ToInt32(eventPrev.EventCode))
@@ -4807,7 +4813,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
-        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufe.RequestObjectEventApproveCufe data)
+        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();          
@@ -5973,6 +5979,495 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             return responses;
+        }
+        #endregion
+
+        #region RequestValidateSigningTime
+
+        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data)
+        {            
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+
+            EventStatus code;
+            string trackIdAvailability = null;
+            string originalTrackId = data.TrackId;
+
+            switch (int.Parse(data.EventCode))
+            {
+                case (int)EventStatus.Receipt:
+                    code = EventStatus.Received;
+                    break;
+                case (int)EventStatus.SolicitudDisponibilizacion:
+                    code = EventStatus.Accepted;
+                    break;
+                case (int)EventStatus.NotificacionPagoTotalParcial:
+                case (int)EventStatus.NegotiatedInvoice:
+                    code = EventStatus.SolicitudDisponibilizacion;
+                    break;
+                case (int)EventStatus.Avales:
+                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+                    code = EventStatus.SolicitudDisponibilizacion;
+                    break;
+                default:
+                    code = EventStatus.Receipt;
+                    break;
+            }
+
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                )
+            {
+                bool existDisponibilizaExpresa = false;
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                {
+                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
+                    if (trackIdEvent != null)
+                    {
+                        existDisponibilizaExpresa = true;
+                        data.TrackId = trackIdEvent.DocumentMeta.PartitionKey;
+                    }
+                }               
+
+                // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
+                if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
+                {
+                    //Servicio GlobalDocAssociate
+                    code = EventStatus.AceptacionTacita;
+                    string eventSearchTacita = "0" + (int)code;
+                    List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                    if (InvoiceWrapperTacita.Any())
+                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita
+                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;                   
+                }
+            }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
+            {
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    data.TrackId = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse
+                    && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362")).DocumentMeta.PartitionKey;                
+            }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                {
+                    var respTrackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
+                    if (respTrackIdAvailability != null)
+                    {
+                        trackIdAvailability = respTrackIdAvailability.DocumentMeta.PartitionKey;
+                    }
+                }                
+            }
+
+            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+            var xmlParser = new XmlParser(xmlBytes.Result);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
+            // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
+            string parameterPaymentDueDateFE = null;
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
+                var originalXmlParser = new XmlParser(originalXmlBytes.Result);
+                if (!originalXmlParser.Parser())
+                    throw new Exception(originalXmlParser.ParserError);
+
+                parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+            }
+
+            DateTime? signingTimeAvailability = null;
+            if ((Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion) && !string.IsNullOrWhiteSpace(trackIdAvailability))
+            {
+                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                signingTimeAvailability = Convert.ToDateTime(availabilityXmlParser.SigningTime);
+            }
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+                signingTimeAvailability: signingTimeAvailability));
+
+            return validateResponses;
+        } 
+
+        #endregion
+
+
+        #region RequestValidateParty
+
+        public List<ValidateListResponse> RequestValidateParty(RequestObjectParty party)
+        {           
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
+            string receiverCancelacion = String.Empty;
+            string issuerAttorney = string.Empty;
+            string senderAttorney = string.Empty;
+            string trackIdAvailability = null;
+
+            //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(party.ResponseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    party.TrackId = documentMeta.DocumentReferencedKey;
+                    receiverCancelacion = documentMeta.ReceiverCode;
+                }
+            }
+
+            //Obtiene XML Factura Electornica CUFE
+            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(party.TrackId);
+            xmlParserCufe = new XmlParser(xmlBytes.Result);
+            if (!xmlParserCufe.Parser())
+                throw new Exception(xmlParserCufe.ParserError);
+
+            //Obtiene XML ApplicationResponse CUDE
+            var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(party.TrackIdCude.ToLower());
+            xmlParserCude = new XmlParser(xmlBytesCude.Result);
+            if (!xmlParserCude.Parser())
+                throw new Exception(xmlParserCude.ParserError);
+
+            var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
+            bool valid = true;
+
+            // ...
+            List<string> issuerAttorneyList = null;
+            var eventCode = int.Parse(party.ResponseCode);
+            if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var attorneyList = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorneyByCUFEList<GlobalDocReferenceAttorney>(party.TrackId);
+                if (attorneyList != null && attorneyList.Count > 0)
+                {
+                    issuerAttorneyList = new List<string>();
+                    // ForEach...
+                    attorneyList.ForEach(item =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(item.EndDate))
+                        {
+                            var endDate = Convert.ToDateTime(item.EndDate);
+                            if (endDate.Date > DateTime.Now.Date) issuerAttorneyList.Add(item.IssuerAttorney);
+                        }
+                        else issuerAttorneyList.Add(item.IssuerAttorney);
+                    });
+                }
+            }
+            else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    trackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;               
+            }
+
+            string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
+            if ((Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(trackIdAvailability)))
+            {
+                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                partyLegalEntityName = availabilityXmlParser.Fields["PartyLegalEntityName"].ToString();
+                partyLegalEntityCompanyID = availabilityXmlParser.Fields["PartyLegalEntityCompanyID"].ToString();
+                availabilityCustomizationId = availabilityXmlParser.Fields["CustomizationId"].ToString();
+            }
+
+
+            if (eventCode == (int)EventStatus.TerminacionMandato)
+            {
+                var attorney = TableManagerGlobalDocReferenceAttorney.FindByPartition<GlobalDocReferenceAttorney>(party.TrackId).ToList();
+
+                if (attorney != null && attorney.Count > 0)
+                {
+                    foreach (var item in attorney)
+                    {
+                        issuerAttorney = item.IssuerAttorney;
+                        senderAttorney = item.SenderCode;
+                    }
+                }
+            }
+
+            //Valida existe cambio legitimo tenedor
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            if (documentHolderExchange != null)
+            {
+                //Existe mas de un legitimo tenedor requiere un mandatario
+                string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                if (endosatarios.Length == 1)
+                {
+                    nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
+                }
+                else
+                {
+                    foreach (string endosatario in endosatarios)
+                    {
+                        GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, xmlParserCude.ProviderCode);
+                        if (documentAttorney == null)
+                        {
+                            valid = false;
+                            validateResponses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC35",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    if (valid)
+                    {
+                        nitModel.SenderCode = party.SenderParty;
+                    }
+                }
+            }
+            if (valid)
+            {
+                //Enodsatario Anulacion endoso
+                nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
+                var validator = new Validator();
+                validateResponses.AddRange(ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList,
+                    issuerAttorney, senderAttorney, partyLegalEntityName, partyLegalEntityCompanyID, availabilityCustomizationId));
+            }
+            return validateResponses;
+        }
+        #endregion
+
+
+        #region RequestValidateEmitionEventPrev
+
+        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+            var nitModel = new NitModel();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
+
+            //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    //Obtiene XML ApplicationResponse CUDE
+                    var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                    xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                    if (!xmlParserCude.Parser())
+                        throw new Exception(xmlParserCude.ParserError);
+                }
+            }
+            //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+            {
+                //Obtiene XML Factura electronica CUFE
+                var xmlBytes = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackId);
+                xmlParserCufe = new XmlParser(xmlBytes.Result);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
+                //Obtiene XML ApplicationResponse CUDE
+                var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                if (!xmlParserCude.Parser())
+                    throw new Exception(xmlParserCude.ParserError);
+
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+            }
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+
+            return validateResponses;
+        }
+
+        #endregion      
+
+        #region NewValidateEventRADIAN
+        public List<ValidateListResponse> NewValidateEventRadianAsync(XmlParser xmlParser, string trackId, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();            
+            
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento NewValidateEventRadianAsync referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+
+            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta != null)
+            {
+                bool validEventRadian = true;
+                bool validEventPrev = true;
+                bool validEventReference = true;
+                RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
+                RequestObjectDocReference docReference = new RequestObjectDocReference();
+                RequestObjectParty requestParty = new RequestObjectParty();
+                RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
+                RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
+
+                EventRadianModel eventRadian = new EventRadianModel(
+                     documentMeta.DocumentReferencedKey,
+                     documentMeta.PartitionKey,
+                     documentMeta.EventCode,
+                     documentMeta.DocumentTypeId,
+                     nitModel.listID,
+                     documentMeta.CustomizationID,
+                     xmlParser.SigningTime,
+                     nitModel.ValidityPeriodEndDate,
+                     documentMeta.SenderCode,
+                     documentMeta.ReceiverCode,
+                     nitModel.DocumentTypeIdRef,
+                     xmlParser.DocumentReferenceId,
+                     nitModel.IssuerPartyCode,
+                     nitModel.IssuerPartyName,
+                     documentMeta.SendTestSet
+                     );
+
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
+                    || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+                {
+                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
+                }
+
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
+                responses = ValidateSerieAndNumber(nitModel);
+                validateResponses.AddRange(responses);
+
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                {
+                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);                   
+                    responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si es mandato 
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                    && validEventRadian)
+                {                                 
+                    responses = ValidateReferenceAttorney(xmlParser, trackId);
+                    foreach (var itemReferenceAttorney in responses)
+                    {
+                        if (itemReferenceAttorney.ErrorCode == "AAH07")
+                            validEventReference = false;
+                    }
+                    validateResponses.AddRange(responses);
+                }
+
+                if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
+                {
+                    EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
+                    responses = ValidateDocumentReferencePrev(docReference.TrackId, docReference.IdDocumentReference, 
+                        docReference.EventCode, docReference.DocumentTypeIdRef, docReference.IssuerPartyCode,
+                        docReference.IssuerPartyName);
+                    foreach (var itemReference in responses)
+                    {
+                        if (!itemReference.IsValid)
+                            validEventRadian = false;
+                    }
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si Mandato contiene CUFEs Referenciados
+                if (validaMandatoListID && validEventRadian && validEventReference)
+                {
+                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
+                    EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
+                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
+                    
+                    responses = RequestValidateParty(requestParty);
+                    validateResponses.AddRange(responses);
+
+                    responses = RequestValidateEmitionEventPrev(eventPrev);
+                    foreach (var itemResponsesTacita in responses)
+                    {
+                        if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
+                            || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
+                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
+                            || itemResponsesTacita.ErrorCode == "LGC38")
+                            validEventPrev = false;
+                    }
+                    validateResponses.AddRange(responses);
+
+                    if (validEventPrev)
+                    {
+                        responses = RequestValidateSigningTime(signingTime);                      
+                        validateResponses.AddRange(responses);
+                    }
+
+                }
+
+                UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
+
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                validateResponses.AddRange(responses);
+            }
+
+
+            return validateResponses;
         }
         #endregion
     }

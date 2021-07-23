@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,11 @@ namespace Gosocket.Dian.Interfaces.Services
         Domain.Entity.GlobalDocValidatorDocument GlobalDocValidatorDocumentByGlobalId(string globalDocumentId);
         Dictionary<int, string> IconType(List<GlobalDocValidatorDocumentMeta> allReferencedDocuments, string documentKey = "");
         EventStatus IdentifyEvent(GlobalDocValidatorDocumentMeta eventItem);
-        Tuple<Domain.Entity.GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(string documentKey);
         bool IsVerificated(GlobalDocValidatorDocumentMeta otherEvent);
         List<Domain.Entity.GlobalDocValidatorTracking> ListTracking(string eventDocumentKey);
         List<GlobalDocValidatorDocumentMeta> OtherEvents(string documentKey, EventStatus eventCode);
         List<GlobalDocReferenceAttorney> ReferenceAttorneys(string documentKey, string documentReferencedKey, string receiverCode, string senderCode);
         GlobalDocPayroll GetPayrollById(string partitionKey);
+        Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> InvoiceAndNotes(List<DocumentTag> documentTags, string documentKey, string documentTypeId);
     }
 }
