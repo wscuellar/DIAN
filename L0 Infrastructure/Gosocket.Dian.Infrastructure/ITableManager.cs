@@ -30,8 +30,7 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindByPartition<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();
         List<DynamicTableEntity> FindByPartitionWithPagination(string partitionKey);
         List<T> FindByPartitionWithPagination<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindByPartitionWithPagination<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();
-        T FindBySerieAndNumberAttorney<T>(string SerieAndNumber) where T : ITableEntity, new();
+        List<T> FindByPartitionWithPagination<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();        
         T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new();       
         T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new();
@@ -46,8 +45,7 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>(int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new();
         T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new();
         T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new();
-        T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new();
-        DynamicTableEntity FindhByGlobalDocumentId(string globalDocumentId, string documentKey);
+        T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new();       
         T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string softwareId) where T : ITableEntity, new();
         T FindhByRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new();
         List<DynamicTableEntity> FindhByTimeStamp(DateTime timeStampFrom, DateTime timeStampTo);
