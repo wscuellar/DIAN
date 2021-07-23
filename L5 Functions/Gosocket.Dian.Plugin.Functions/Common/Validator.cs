@@ -4717,43 +4717,47 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             }
 
-            foreach (var documentIdentifier in documentMeta)
+            if(documentMeta != null)
             {
-                document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
-
-                if (documentMeta.Count >= 2)
+                foreach (var documentIdentifier in documentMeta)
                 {
-                    //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
+                    document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
+
+                    if (documentMeta.Count >= 2)
                     {
-                        if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
-                        && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
-                        ))
+                        //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
+                        if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
                         {
-                            responses.Add(new ValidateListResponse
+                            if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
+                            && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
+                            ))
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "LGC01",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "LGC01",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
-                }
-                else
-                {
-                    responses.Add(new ValidateListResponse
+                    else
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = successfulMessage,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = successfulMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
 
+                }
             }
+           
             return responses;
         }
 
