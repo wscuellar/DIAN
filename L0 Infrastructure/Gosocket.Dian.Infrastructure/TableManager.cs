@@ -454,16 +454,6 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public T FindBySerieAndNumberAttorney<T>(string SerieAndNumber) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("SerieAndNumber", QueryComparisons.Equal, SerieAndNumber));
-
-            var entities = CloudTable.ExecuteQuery(query);
-
-            return entities.FirstOrDefault();
-        }
-
-
         public T FindByDocumentKey<T>(string partitionKey, string rowKey, string documentKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
@@ -954,26 +944,7 @@ namespace Gosocket.Dian.Infrastructure
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.FirstOrDefault();
-        }
-
-        public DynamicTableEntity FindhByGlobalDocumentId(string globalDocumentId, string documentKey)
-        {
-            var query = new TableQuery();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("GlobalDocumentId",
-                    QueryComparisons.Equal,
-                    globalDocumentId),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("DocumentKey",
-                    QueryComparisons.Equal,
-                    documentKey));
-
-
-            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
-
-            return entities.FirstOrDefault();
-        }
+        }       
 
         public T FindhByRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new()
         {
