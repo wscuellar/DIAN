@@ -65,9 +65,9 @@ namespace Gosocket.Dian.Application
                                {
                                    Cufe = cufe,
                                    Associate = associate,
-                                   Event = docMeta,
+                                   DocumentMeta = docMeta,
                                    Attorney = item,
-                                   Document = document,
+                                   ValidateDocument = document,
                                    IsNotifications = notifications.Any(t => t.PartitionKey == document.DocumentKey),
                                    Notifications = notifications.Where(t => t.PartitionKey == document.DocumentKey).ToList()
                                };
@@ -76,7 +76,7 @@ namespace Gosocket.Dian.Application
                 {
                     Cufe = cufe,
                     Invoice = invoice,
-                    Events = eventDoc.OrderByDescending(t => t.Event.SigningTimeStamp).ToList()
+                    Documents = eventDoc.OrderByDescending(t => t.DocumentMeta.SigningTimeStamp).ToList()
                 };
 
                 list.Add(invoiceWrapper);
@@ -104,8 +104,8 @@ namespace Gosocket.Dian.Application
                 for (int i = 0; i < associations.Count; i++)
                 {
                     GlobalDocValidatorDocumentMeta current = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(associations[i].RowKey, associations[i].RowKey);
-                    if (!string.IsNullOrEmpty(current.EventCode))
-                        meta.Add(current);
+                    //if (!string.IsNullOrEmpty(current.EventCode))
+                    meta.Add(current);
                 }
             });
 
@@ -164,6 +164,21 @@ namespace Gosocket.Dian.Application
             return invoice;
         }
 
+        //public InvoiceWrapper GetEventFromInvoice(string trackId)
+        //{
+        //    InvoiceWrapper response = new InvoiceWrapper();
+
+        //    var globalDocValidatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+
+        //    var identifier = globalDocValidatorDocumentMeta.Identifier;
+
+        //    GlobalDocValidatorDocument globalDocValidatorDocument = TableManagerGlobalDocValidatorDocument.FindByDocumentKey<GlobalDocValidatorDocument>(identifier, identifier, trackId);
+
+
+
+
+        //    return response;
+        //}
 
     }
 }

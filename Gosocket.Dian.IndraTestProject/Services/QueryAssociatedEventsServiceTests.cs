@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IGlobalDocValidatorDocumentService> _globalDocValidatorDocument = new Mock<IGlobalDocValidatorDocumentService>();
         private readonly Mock<IGlobalDocValidatorTrackingService> _globalDocValidatorTracking = new Mock<IGlobalDocValidatorTrackingService>();
         private readonly Mock<IGlobalDocPayrollService> _globalDocPayrollService = new Mock<IGlobalDocPayrollService>();
+        private readonly Mock<IAssociateDocuments> _associateDocuments = new Mock<IAssociateDocuments>();
 
 
         [TestInitialize]
@@ -28,7 +29,8 @@ namespace Gosocket.Dian.Application.Tests
                  _radianGlobalDocValidationDocumentMeta.Object,
              _globalDocValidatorDocument.Object,
              _globalDocValidatorTracking.Object,
-             _globalDocPayrollService.Object
+             _globalDocPayrollService.Object,
+             _associateDocuments.Object
                 );
         }
 
@@ -210,28 +212,6 @@ namespace Gosocket.Dian.Application.Tests
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(Dictionary<int, string>));
 
-        }
-
-        [TestMethod()]
-        public void InvoiceAndNotesTest()
-        {
-            //arrage
-            var lst = new List<GlobalDocValidatorDocumentMeta>
-            {
-                new GlobalDocValidatorDocumentMeta(){ EventCode="030",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="032",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="033",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="036",Timestamp = DateTimeOffset.Now},
-                new GlobalDocValidatorDocumentMeta(){ EventCode="037",Timestamp = DateTimeOffset.Now}
-            };
-
-            _ = _globalDocValidatorDocument.Setup(t => t.FindByGlobalDocumentId(It.IsAny<string>())).Returns(new GlobalDocValidatorDocument() { DocumentTypeId = "01" });
-            _ = _radianGlobalDocValidationDocumentMeta.Setup(t => t.FindDocumentByReference(It.IsAny<string>())).Returns(lst);
-            //act
-            var result = _current.InvoiceAndNotes(It.IsAny<string>());
-            //assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(Tuple<GlobalDocValidatorDocument, List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>>));
         }
 
         [TestMethod()]

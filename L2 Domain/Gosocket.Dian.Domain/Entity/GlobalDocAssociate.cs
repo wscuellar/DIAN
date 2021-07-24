@@ -45,7 +45,7 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Informacion general del evento
         /// </summary>
-        public GlobalDocValidatorDocumentMeta Event { get; set; }
+        public GlobalDocValidatorDocumentMeta DocumentMeta { get; set; }
         /// <summary>
         /// Asociacion de referencia al mandato.
         /// </summary>
@@ -53,7 +53,7 @@ namespace Gosocket.Dian.Domain.Entity
         /// <summary>
         /// Informacion resumen de la validacion
         /// </summary>
-        public GlobalDocValidatorDocument Document { get; set; }
+        public GlobalDocValidatorDocument ValidateDocument { get; set; }
         /// <summary>
         /// Validaciones
         /// </summary>
@@ -66,7 +66,7 @@ namespace Gosocket.Dian.Domain.Entity
     {
         public string Cufe { get; set; }
         public GlobalDocValidatorDocumentMeta Invoice { get; set; }
-        public List<EventDocument> Events { get; set; }
+        public List<EventDocument> Documents { get; set; }
     }
 
 }

@@ -32,26 +32,9 @@ namespace Gosocket.Dian.Application
         }
 
         public List<GlobalDocValidatorDocumentMeta> GetAssociatedDocuments(string documentKey, string eventCode)
-        {
-            //return documentMetaTableManager
-            //    .FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(documentKey, eventCode);
-
+        {           
             return documentMetaTableManager
                 .FindpartitionKey<GlobalDocValidatorDocumentMeta>(documentKey).Where(x => x.EventCode == eventCode).ToList();
-        }
-
-        //FindDocumentReferenced_TypeId
-        public List<GlobalDocValidatorDocumentMeta> FindReferencedDocuments(string documentReferencedKey, string documentType)
-        {
-            return documentMetaTableManager
-                .FindDocumentReferenced_TypeId<GlobalDocValidatorDocumentMeta>(documentReferencedKey, documentType);
-        }
-
-        //Find All referenced documents
-        public List<GlobalDocValidatorDocumentMeta> FindDocumentByReference(string documentReferencedKey)
-        {
-            return documentMetaTableManager
-                .FindDocumentByReference<GlobalDocValidatorDocumentMeta>(documentReferencedKey);
         }
 
         public GlobalDocValidatorDocument EventValidator(GlobalDocValidatorDocumentMeta eventItem)

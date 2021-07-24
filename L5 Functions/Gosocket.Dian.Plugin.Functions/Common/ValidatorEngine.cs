@@ -118,141 +118,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-
-        public async Task<List<ValidateListResponse>> StartValidationEventRadianAsync(string trackId)
+        public async Task<List<ValidateListResponse>> StartNewValidationEventRadianAsync(string trackId)
         {
+            var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
             DateTime startDate = DateTime.UtcNow;
-            var validateResponses = new List<ValidateListResponse>();
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
-            RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
-            RequestObjectDocReference docReference = new RequestObjectDocReference();
-            RequestObjectParty requestParty = new RequestObjectParty();
-            RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
-            RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
-            RequestObjectReferenceAttorney referenceAttorney = new RequestObjectReferenceAttorney();
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            var xmlParser = new XmlParser(xmlBytes);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
 
-            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-            if (documentMeta != null)
-            {
-                bool validEventRadian = true;
-                bool validEventPrev = true;
-                bool validEventReference = true;
-                var xmlBytes = await GetXmlFromStorageAsync(trackId);
-                var xmlParser = new XmlParser(xmlBytes);
-                if (!xmlParser.Parser())
-                    throw new Exception(xmlParser.ParserError);
+            NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-                NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
-
-               EventRadianModel eventRadian = new EventRadianModel(
-                    documentMeta.DocumentReferencedKey,
-                    documentMeta.PartitionKey,
-                    documentMeta.EventCode,
-                    documentMeta.DocumentTypeId,
-                    nitModel.listID,
-                    documentMeta.CustomizationID,
-                    xmlParser.SigningTime,
-                    nitModel.ValidityPeriodEndDate,
-                    documentMeta.SenderCode,
-                    documentMeta.ReceiverCode,
-                    nitModel.DocumentTypeIdRef,
-                    xmlParser.DocumentReferenceId,
-                    nitModel.IssuerPartyCode,
-                    nitModel.IssuerPartyName,
-                    documentMeta.SendTestSet
-                    );
-
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
-                    || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                {
-                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
-                }
-
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;
-
-                responses = await Instance.StartValidateSerieAndNumberAsync(trackId);
-                validateResponses.AddRange(responses);
-
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
-                {
-                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
-                    responses = await Instance.StartEventApproveCufe(eventApproveCufe);
-                    validateResponses.AddRange(responses);
-                }
-
-                //Si es mandato 
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
-                    && validEventRadian)
-                {
-                    referenceAttorney.TrackId = trackId;
-                    responses = await Instance.StartValidateReferenceAttorney(referenceAttorney);
-                    foreach (var itemReferenceAttorney in responses)
-                    {
-                        if (itemReferenceAttorney.ErrorCode == "AAH07")
-                            validEventReference = false;
-                    }
-                    validateResponses.AddRange(responses);
-                }
-
-                if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
-                {
-                    EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
-                    responses = await Instance.StartValidateDocumentReference(docReference);
-                    foreach (var itemReference in responses)
-                    {
-                        if (!itemReference.IsValid)
-                            validEventRadian = false;
-                    }
-                    validateResponses.AddRange(responses);
-                }
-
-                //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID && validEventRadian && validEventReference)
-                {
-                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
-                    EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
-                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
-                    responses = await Instance.StartValidateParty(requestParty);
-                    validateResponses.AddRange(responses);
-                    responses = await Instance.StartValidateEmitionEventPrevAsync(eventPrev);
-                    foreach (var itemResponsesTacita in responses)
-                    {
-                        if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
-                            || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
-                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC38")
-                            validEventPrev = false;
-                    }
-                    validateResponses.AddRange(responses);
-
-                    if (validEventPrev)
-                    {
-                        responses = await Instance.StartValidateSigningTimeAsync(signingTime);
-                        validateResponses.AddRange(responses);
-                    }
-
-                }
-
-                validator.UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
-
-            }
-            else
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH07",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-                validateResponses.AddRange(responses);
-            }
+            validateResponses.AddRange(validator.NewValidateEventRadianAsync(xmlParser, trackId, nitModel));
 
             return validateResponses;
         }
+
 
         public List<ValidateListResponse> StartDocumentDuplicityValidationAsync(string trackId)
         {
@@ -375,32 +258,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (InvoiceWrapper.Any())
                 {                                      
-                    var trackIdEvent = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch);
+                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch 
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse );
                     if (trackIdEvent != null)
                     {
                         existDisponibilizaExpresa = true;
-                        data.TrackId = trackIdEvent.Event.PartitionKey;
+                        data.TrackId = trackIdEvent.DocumentMeta.PartitionKey;
                     }
-                }                   
-                
-                if(!existDisponibilizaExpresa)
-                {
-                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                   "0" + (int)code);
-                    if (documentMeta != null)
-                    {
-                        foreach (var itemDocumentMeta in documentMeta)
-                        {
-                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                            if (documentValidator != null)
-                            {
-                                existDisponibilizaExpresa = true;
-                                data.TrackId = itemDocumentMeta.PartitionKey;
-                                break;
-                            }
-                        }
-                    }
-                }
+                }                                                  
                
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
@@ -410,24 +275,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string eventSearchTacita = "0" + (int)code;
                     List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
                     if (InvoiceWrapperTacita.Any())
-                        data.TrackId = InvoiceWrapperTacita[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearchTacita).Event.PartitionKey;
-                    else
-                    {
-                       var documentMetaTacita = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                      "0" + (int)code);
-                        if (documentMetaTacita != null)
-                        {
-                            foreach (var itemDocumentMeta in documentMetaTacita)
-                            {
-                                var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                                if (documentValidator != null)
-                                {
-                                    data.TrackId = itemDocumentMeta.PartitionKey;
-                                    break;
-                                }
-                            }
-                        }
-                    }                  
+                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita).DocumentMeta.PartitionKey;                             
                 }
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
@@ -437,26 +285,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                    data.TrackId = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch 
-                    && (x.Event.CustomizationID == "361" || x.Event.CustomizationID == "362" )).Event.PartitionKey;
-                else
-                {
-                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId_CustomizationID<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(),
-                    data.DocumentTypeId, "0" + (int)code, "361", "362");
-
-                    if (documentMeta != null || documentMeta.Count > 0)
-                    {
-                        foreach (var itemDocumentMeta in documentMeta)
-                        {
-                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                            if (documentValidator != null)
-                            {
-                                data.TrackId = itemDocumentMeta.PartitionKey;
-                                break;
-                            }
-                        }
-                    }
-                }                
+                    data.TrackId = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse
+                    && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362" )).DocumentMeta.PartitionKey;
+                   
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad 
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
@@ -468,33 +300,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (InvoiceWrapper.Any())
                 {
-                    var respTrackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventSearch);
+                    var respTrackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
                     if(respTrackIdAvailability != null)
                     {
-                        trackIdAvailability = respTrackIdAvailability.Event.PartitionKey;
+                        trackIdAvailability = respTrackIdAvailability.DocumentMeta.PartitionKey;
                     }
-                }
-                    
-                else
-                {
-                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(data.TrackId.ToLower(), data.DocumentTypeId,
-                        "0" + (int)code);
-                    if (documentMeta != null || documentMeta.Count > 0)
-                    {
-                        // se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
-                        documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
-                        // ...
-                        foreach (var itemDocumentMeta in documentMeta)
-                        {
-                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                            if (documentValidator != null)
-                            {
-                                trackIdAvailability = itemDocumentMeta.PartitionKey;
-                                break;
-                            }
-                        }
-                    }
-                }
+                }                                  
             }
 
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
@@ -716,27 +528,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
                                            
                 if(InvoiceWrapper.Any())
-                    trackIdAvailability = InvoiceWrapper[0].Events.FirstOrDefault(x => x.Event.EventCode == eventDisponibiliza).Event.PartitionKey;   
-                else
-                {
-                    var documentMeta = documentMetaTableManager.FindDocumentReferenced_EventCode_TypeId<GlobalDocValidatorDocumentMeta>(party.TrackId.ToLower(), "96",
-                   "0" + (int)EventStatus.SolicitudDisponibilizacion);
-                    if (documentMeta != null || documentMeta.Count > 0)
-                    {
-                        // se filtra por CustomizationID y se ordena por SigningTimeStamp descendentemente, para que seleccionar la fecha de la última disponibilización (036).
-                        documentMeta = documentMeta.OrderByDescending(x => x.SigningTimeStamp).ToList();
-                        // ...
-                        foreach (var itemDocumentMeta in documentMeta)
-                        {
-                            var documentValidator = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemDocumentMeta.Identifier, itemDocumentMeta.Identifier, itemDocumentMeta.PartitionKey);
-                            if (documentValidator != null)
-                            {
-                                trackIdAvailability = itemDocumentMeta.PartitionKey;
-                                break;
-                            }
-                        }
-                    }
-                }
+                    trackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;               
             }
 
             string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
@@ -945,6 +738,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
+
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
 

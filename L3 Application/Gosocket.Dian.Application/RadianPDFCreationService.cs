@@ -24,17 +24,19 @@ namespace Gosocket.Dian.Application
 
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IGlobalDocValidationDocumentMetaService _globalDocValidationDocumentMetaService;
+        private readonly IAssociateDocuments _associateDocuments;
         private readonly FileManager _fileManager;
 
         #endregion
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService, IAssociateDocuments associateDocuments)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
             _fileManager = fileManager;
             _globalDocValidationDocumentMetaService = globalDocValidationDocumentMetaService;
+            _associateDocuments = associateDocuments;
         }
 
         #endregion
@@ -89,7 +91,13 @@ namespace Gosocket.Dian.Application
             Task hilo3 = Task.Run(() =>
             {
                 #region hilo3
-                storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
+                //storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
+                List<InvoiceWrapper> invoiceWrapper = _associateDocuments.GetEventsByTrackId(documentMeta.DocumentKey);
+
+                storageEvents = (invoiceWrapper.Any() && invoiceWrapper[0].Documents.Any()) ? invoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+                if(storageEvents != null)
+                    storageEvents = storageEvents.Where(t => int.Parse(t.DocumentTypeId) == (int)DocumentType.ApplicationResponse).ToList();
+
                 GlobalDataDocument cosmosDocument = DocumentInfoFromCosmos(documentMeta).Result;
                 List<Event> eventsCosmos = cosmosDocument != null ? cosmosDocument.Events : new List<Event>() ;
                 events = ListEvents(eventsCosmos, storageEvents);
