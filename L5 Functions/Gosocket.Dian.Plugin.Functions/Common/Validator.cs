@@ -1400,8 +1400,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 }
             }
-
+            /*
             responses = GetStatusRutValidation(responses, sender, sender2);
+            24 julio 2021
+            desactivar la regla RUT01
+            */
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
