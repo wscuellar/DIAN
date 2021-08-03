@@ -8,7 +8,9 @@ using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Plugin.Functions.Cache;
 using Gosocket.Dian.Plugin.Functions.Common.Encryption;
 using Gosocket.Dian.Plugin.Functions.Cryptography.Verify;
+using Gosocket.Dian.Plugin.Functions.Cufe;
 using Gosocket.Dian.Plugin.Functions.Event;
+using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
@@ -37,7 +39,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 {
     public class Validator
     {
-        #region Global properties
+        #region Global properties        
+        static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
         static readonly TableManager contingencyTableManager = new TableManager("GlobalContingency");
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -794,6 +797,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
             var documentKey = cufeModel.DocumentKey;
 
+            if(cufeModel.DocumentTypeId == "05")
+            {
+               data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{receiverCode}{senderCode}{key}{environmentType}";
+            }
+
             if(cufeModel.DocumentTypeId == "101")
             {
                 data = $"{number}{emissionDate}{emissionHour}{amount}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
@@ -1392,8 +1400,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 }
             }
-
+            /*
             responses = GetStatusRutValidation(responses, sender, sender2);
+            24 julio 2021
+            desactivar la regla RUT01
+            */
 
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -2592,7 +2603,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalDocValidatorDocument document1 = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            var documentMeta = documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(trackId.ToLower(), documentTypeId);
+
+            //Servicio
+            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(trackId.ToLower());
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
+               
             foreach (var document in documentMeta)
             {
                 document1 = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(document.Identifier, document.Identifier);
@@ -4448,242 +4463,353 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
 
+                       
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = successfulMessage,
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+           
             //Servicio
             List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(eventPrev.TrackId.ToLower());
 
-            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Events.Select(x => x.Event).ToList() 
-                    : documentMetaTableManager.FindDocumentReferenced<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId.ToLower(), eventPrev.DocumentTypeId);
+            List<GlobalDocValidatorDocumentMeta> documentMeta = (InvoiceWrapper.Any()) ? InvoiceWrapper[0].Documents.Select(x => x.DocumentMeta).ToList() : null;
                        
             //Valida si el documento AR transmitido ya se encuentra aprobado
             switch (Convert.ToInt32(eventPrev.EventCode))
             {
                 case (int)EventStatus.Rejected:
                     //Valida eventos previos Rechazo de la FEV
-                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-                    var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(documentMeta);
-                    if (eventRadianRejected != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianRejected in eventRadianRejected)
+                        LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+                        var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(documentMeta);
+                        if (eventRadianRejected != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianRejected in eventRadianRejected)
                             {
-                                IsValid = itemEventRadianRejected.IsValid,
-                                Mandatory = itemEventRadianRejected.Mandatory,
-                                ErrorCode = itemEventRadianRejected.ErrorCode,
-                                ErrorMessage = itemEventRadianRejected.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianRejected.IsValid,
+                                    Mandatory = itemEventRadianRejected.Mandatory,
+                                    ErrorCode = itemEventRadianRejected.ErrorCode,
+                                    ErrorMessage = itemEventRadianRejected.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC03",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC03"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    
                     break;
                 case (int)EventStatus.Receipt:
                     //Valida eventos previos Constancia de recibo del Bien de la FEV
-                    LogicalEventRadian logicalEventRadianReceipt = new LogicalEventRadian();
-                    var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(documentMeta);
-                    if (eventRadianReceipt != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemeventRadianReceipt in eventRadianReceipt)
+                        LogicalEventRadian logicalEventRadianReceipt = new LogicalEventRadian();
+                        var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(documentMeta);
+                        if (eventRadianReceipt != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemeventRadianReceipt in eventRadianReceipt)
                             {
-                                IsValid = itemeventRadianReceipt.IsValid,
-                                Mandatory = itemeventRadianReceipt.Mandatory,
-                                ErrorCode = itemeventRadianReceipt.ErrorCode,
-                                ErrorMessage = itemeventRadianReceipt.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemeventRadianReceipt.IsValid,
+                                    Mandatory = itemeventRadianReceipt.Mandatory,
+                                    ErrorCode = itemeventRadianReceipt.ErrorCode,
+                                    ErrorMessage = itemeventRadianReceipt.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC09",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC09"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    
                     break;
                 case (int)EventStatus.Accepted:
                     //Valida eventos previos Aceptacion expresa de la FEV
-                    LogicalEventRadian logicalEventRadianAccepted = new LogicalEventRadian();
-                    var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(documentMeta);
-                    if (eventRadianAccepted != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemeventRadianAccepted in eventRadianAccepted)
+                        LogicalEventRadian logicalEventRadianAccepted = new LogicalEventRadian();
+                        var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(documentMeta);
+                        if (eventRadianAccepted != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemeventRadianAccepted in eventRadianAccepted)
                             {
-                                IsValid = itemeventRadianAccepted.IsValid,
-                                Mandatory = itemeventRadianAccepted.Mandatory,
-                                ErrorCode = itemeventRadianAccepted.ErrorCode,
-                                ErrorMessage = itemeventRadianAccepted.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemeventRadianAccepted.IsValid,
+                                    Mandatory = itemeventRadianAccepted.Mandatory,
+                                    ErrorCode = itemeventRadianAccepted.ErrorCode,
+                                    ErrorMessage = itemeventRadianAccepted.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    else
+                    {
+
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC12",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC12"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC13",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC13"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     break;
                 case (int)EventStatus.AceptacionTacita:
                     //Valida eventos previos Aceptacion Tacita de la FEV
-                    LogicalEventRadian logicalEventRadianTacitAcceptance = new LogicalEventRadian();
-                    var eventRadianTacitAcceptance = logicalEventRadianTacitAcceptance.ValidateTacitAcceptanceEventPrev(documentMeta);
-                    if (eventRadianTacitAcceptance != null)
+                    if (documentMeta != null)
                     {
-                        foreach (var itemEventRadianTacitAcceptance in eventRadianTacitAcceptance)
+                        LogicalEventRadian logicalEventRadianTacitAcceptance = new LogicalEventRadian();
+                        var eventRadianTacitAcceptance = logicalEventRadianTacitAcceptance.ValidateTacitAcceptanceEventPrev(documentMeta);
+                        if (eventRadianTacitAcceptance != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianTacitAcceptance in eventRadianTacitAcceptance)
                             {
-                                IsValid = itemEventRadianTacitAcceptance.IsValid,
-                                Mandatory = itemEventRadianTacitAcceptance.Mandatory,
-                                ErrorCode = itemEventRadianTacitAcceptance.ErrorCode,
-                                ErrorMessage = itemEventRadianTacitAcceptance.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianTacitAcceptance.IsValid,
+                                    Mandatory = itemEventRadianTacitAcceptance.Mandatory,
+                                    ErrorCode = itemEventRadianTacitAcceptance.ErrorCode,
+                                    ErrorMessage = itemEventRadianTacitAcceptance.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC14",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC14"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     break;
                 case (int)EventStatus.Avales:
                     //Valida eventos previos Aval
-                    LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
-                    var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, xmlParserCufe, xmlParserCude);
-                    if (eventRadianAval != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianAval in eventRadianAval)
+                        LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
+                        var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, xmlParserCufe, xmlParserCude);
+                        if (eventRadianAval != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianAval in eventRadianAval)
                             {
-                                IsValid = itemEventRadianAval.IsValid,
-                                Mandatory = itemEventRadianAval.Mandatory,
-                                ErrorCode = itemEventRadianAval.ErrorCode,
-                                ErrorMessage = itemEventRadianAval.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianAval.IsValid,
+                                    Mandatory = itemEventRadianAval.Mandatory,
+                                    ErrorCode = itemEventRadianAval.ErrorCode,
+                                    ErrorMessage = itemEventRadianAval.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     //Valida eventos previos Solicitud Disponibilizacion
-                    LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
-                    var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianDisponibilizacion != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianDisponibilizacion in eventRadianDisponibilizacion)
+                        LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
+                        var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, xmlParserCufe, xmlParserCude, nitModel);
+                        if (eventRadianDisponibilizacion != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianDisponibilizacion in eventRadianDisponibilizacion)
                             {
-                                IsValid = itemEventRadianDisponibilizacion.IsValid,
-                                Mandatory = itemEventRadianDisponibilizacion.Mandatory,
-                                ErrorCode = itemEventRadianDisponibilizacion.ErrorCode,
-                                ErrorMessage = itemEventRadianDisponibilizacion.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianDisponibilizacion.IsValid,
+                                    Mandatory = itemEventRadianDisponibilizacion.Mandatory,
+                                    ErrorCode = itemEventRadianDisponibilizacion.ErrorCode,
+                                    ErrorMessage = itemEventRadianDisponibilizacion.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    
                     break;
                 case (int)EventStatus.EndosoPropiedad:
                     //Valida eventos previos Endoso en Propiedad
-                    LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
-                    var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoPropiedad != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianEndosoPropiedad in eventRadianEndosoPropiedad)
+                        LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
+                        var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        if (eventRadianEndosoPropiedad != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianEndosoPropiedad in eventRadianEndosoPropiedad)
                             {
-                                IsValid = itemEventRadianEndosoPropiedad.IsValid,
-                                Mandatory = itemEventRadianEndosoPropiedad.Mandatory,
-                                ErrorCode = itemEventRadianEndosoPropiedad.ErrorCode,
-                                ErrorMessage = itemEventRadianEndosoPropiedad.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianEndosoPropiedad.IsValid,
+                                    Mandatory = itemEventRadianEndosoPropiedad.Mandatory,
+                                    ErrorCode = itemEventRadianEndosoPropiedad.ErrorCode,
+                                    ErrorMessage = itemEventRadianEndosoPropiedad.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    
                     break;
                 case (int)EventStatus.EndosoGarantia:
                     //Valida eventos previos Endoso en Garantia
-                    LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
-                    var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoGarantia != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianEndosoGarantia in eventRadianEndosoGarantia)
+                        LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
+                        var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        if (eventRadianEndosoGarantia != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianEndosoGarantia in eventRadianEndosoGarantia)
                             {
-                                IsValid = itemEventRadianEndosoGarantia.IsValid,
-                                Mandatory = itemEventRadianEndosoGarantia.Mandatory,
-                                ErrorCode = itemEventRadianEndosoGarantia.ErrorCode,
-                                ErrorMessage = itemEventRadianEndosoGarantia.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianEndosoGarantia.IsValid,
+                                    Mandatory = itemEventRadianEndosoGarantia.Mandatory,
+                                    ErrorCode = itemEventRadianEndosoGarantia.ErrorCode,
+                                    ErrorMessage = itemEventRadianEndosoGarantia.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                   
                     break;
                 case (int)EventStatus.EndosoProcuracion:
                     //Valida eventos previos Endoso en Procuracion
-                    LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
-                    var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
-                    if (eventRadianEndosoProcuracion != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianEndosoProcuracion in eventRadianEndosoProcuracion)
+                        LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
+                        var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        if (eventRadianEndosoProcuracion != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianEndosoProcuracion in eventRadianEndosoProcuracion)
                             {
-                                IsValid = itemEventRadianEndosoProcuracion.IsValid,
-                                Mandatory = itemEventRadianEndosoProcuracion.Mandatory,
-                                ErrorCode = itemEventRadianEndosoProcuracion.ErrorCode,
-                                ErrorMessage = itemEventRadianEndosoProcuracion.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianEndosoProcuracion.IsValid,
+                                    Mandatory = itemEventRadianEndosoProcuracion.Mandatory,
+                                    ErrorCode = itemEventRadianEndosoProcuracion.ErrorCode,
+                                    ErrorMessage = itemEventRadianEndosoProcuracion.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                   
                     break;
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                     //Valida eventos previos Cancelacion Endosos
-                    LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
-                    var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev, xmlParserCude);
-                    if (eventRadianCancelaEndoso != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianCancelaEndoso in eventRadianCancelaEndoso)
+                        LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
+                        var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev, xmlParserCude);
+                        if (eventRadianCancelaEndoso != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianCancelaEndoso in eventRadianCancelaEndoso)
                             {
-                                IsValid = itemEventRadianCancelaEndoso.IsValid,
-                                Mandatory = itemEventRadianCancelaEndoso.Mandatory,
-                                ErrorCode = itemEventRadianCancelaEndoso.ErrorCode,
-                                ErrorMessage = itemEventRadianCancelaEndoso.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianCancelaEndoso.IsValid,
+                                    Mandatory = itemEventRadianCancelaEndoso.Mandatory,
+                                    ErrorCode = itemEventRadianCancelaEndoso.ErrorCode,
+                                    ErrorMessage = itemEventRadianCancelaEndoso.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                   
                     break;
                 case (int)EventStatus.NegotiatedInvoice:
                     //Valida eventos previos Limitacion de Circulacion
-                    LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
-                    var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
-                    if (eventRadianNegotiatedInvoice != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
+                        LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
+                        var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
+                        if (eventRadianNegotiatedInvoice != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
                             {
-                                IsValid = itemEventRadianNegotiatedInvoice.IsValid,
-                                Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
-                                ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
-                                ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianNegotiatedInvoice.IsValid,
+                                    Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
+                                    ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
+                                    ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                   
                     break;
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     //Valida eventos previos Anulacion de la Limitacion de Circulacion
-                    LogicalEventRadian logicalEventRadianNegotiatedInvoiceCancell = new LogicalEventRadian();
-                    var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(documentMeta);
-                    if (eventRadianNegotiatedInvoiceCancell != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianNegotiatedInvoiceCancell in eventRadianNegotiatedInvoiceCancell)
+                        LogicalEventRadian logicalEventRadianNegotiatedInvoiceCancell = new LogicalEventRadian();
+                        var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(documentMeta);
+                        if (eventRadianNegotiatedInvoiceCancell != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianNegotiatedInvoiceCancell in eventRadianNegotiatedInvoiceCancell)
                             {
-                                IsValid = itemEventRadianNegotiatedInvoiceCancell.IsValid,
-                                Mandatory = itemEventRadianNegotiatedInvoiceCancell.Mandatory,
-                                ErrorCode = itemEventRadianNegotiatedInvoiceCancell.ErrorCode,
-                                ErrorMessage = itemEventRadianNegotiatedInvoiceCancell.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianNegotiatedInvoiceCancell.IsValid,
+                                    Mandatory = itemEventRadianNegotiatedInvoiceCancell.Mandatory,
+                                    ErrorCode = itemEventRadianNegotiatedInvoiceCancell.ErrorCode,
+                                    ErrorMessage = itemEventRadianNegotiatedInvoiceCancell.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                   
                     break;
                 case (int)EventStatus.Mandato:
                     //Valida eventos previos Mandato / El mandato no cuenta con eventos previos
@@ -4717,82 +4843,81 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                     //Valida eventos previos Pago parcial o Total
-                    LogicalEventRadian logicalEventRadianPartialPayment = new LogicalEventRadian();
-                    var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(documentMeta, eventPrev, xmlParserCude, nitModel);
-                    if (eventRadianPartialPayment != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianPartialPayment in eventRadianPartialPayment)
+                        LogicalEventRadian logicalEventRadianPartialPayment = new LogicalEventRadian();
+                        var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(documentMeta, eventPrev, xmlParserCude, nitModel);
+                        if (eventRadianPartialPayment != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianPartialPayment in eventRadianPartialPayment)
                             {
-                                IsValid = itemEventRadianPartialPayment.IsValid,
-                                Mandatory = itemEventRadianPartialPayment.Mandatory,
-                                ErrorCode = itemEventRadianPartialPayment.ErrorCode,
-                                ErrorMessage = itemEventRadianPartialPayment.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianPartialPayment.IsValid,
+                                    Mandatory = itemEventRadianPartialPayment.Mandatory,
+                                    ErrorCode = itemEventRadianPartialPayment.ErrorCode,
+                                    ErrorMessage = itemEventRadianPartialPayment.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
                     }
+                    
                     break;
                 case (int)EventStatus.ValInfoPago:
                     //Valida eventos previos Informacion Pago
-                    LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
-                    var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
-                    if (eventRadianPaymentInfo != null)
+                    if(documentMeta != null)
                     {
-                        foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
+                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
+                        var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
+                        if (eventRadianPaymentInfo != null)
                         {
-                            responses.Add(new ValidateListResponse
+                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
                             {
-                                IsValid = itemEventRadianPaymentInfo.IsValid,
-                                Mandatory = itemEventRadianPaymentInfo.Mandatory,
-                                ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
-                                ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianPaymentInfo.IsValid,
+                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
+                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
+                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
-                    }
+                    }                   
                     break;
 
             }
 
-            foreach (var documentIdentifier in documentMeta)
+            if(documentMeta != null)
             {
-                document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
-
-                if (documentMeta.Count >= 2)
+                foreach (var documentIdentifier in documentMeta)
                 {
-                    //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                    if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
+                    document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
+
+                    if (documentMeta.Count >= 2)
                     {
-                        if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
-                        && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
-                        ))
+                        //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
+                        if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
                         {
-                            responses.Add(new ValidateListResponse
+                            if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
+                            && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
+                            ))
                             {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "LGC01",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "LGC01",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
                         }
-                    }
+                    }                    
                 }
-                else
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = successfulMessage,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
             }
+           
             return responses;
         }
 
@@ -4857,7 +4982,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
-        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, EventApproveCufe.RequestObjectEventApproveCufe data)
+        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();          
@@ -6023,6 +6148,495 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             return responses;
+        }
+        #endregion
+
+        #region RequestValidateSigningTime
+
+        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data)
+        {            
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+
+            EventStatus code;
+            string trackIdAvailability = null;
+            string originalTrackId = data.TrackId;
+
+            switch (int.Parse(data.EventCode))
+            {
+                case (int)EventStatus.Receipt:
+                    code = EventStatus.Received;
+                    break;
+                case (int)EventStatus.SolicitudDisponibilizacion:
+                    code = EventStatus.Accepted;
+                    break;
+                case (int)EventStatus.NotificacionPagoTotalParcial:
+                case (int)EventStatus.NegotiatedInvoice:
+                    code = EventStatus.SolicitudDisponibilizacion;
+                    break;
+                case (int)EventStatus.Avales:
+                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+                    code = EventStatus.SolicitudDisponibilizacion;
+                    break;
+                default:
+                    code = EventStatus.Receipt;
+                    break;
+            }
+
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.Rejected ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Receipt ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.Accepted ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.AceptacionTacita ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion ||
+                Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                )
+            {
+                bool existDisponibilizaExpresa = false;
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                {
+                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
+                    if (trackIdEvent != null)
+                    {
+                        existDisponibilizaExpresa = true;
+                        data.TrackId = trackIdEvent.DocumentMeta.PartitionKey;
+                    }
+                }               
+
+                // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
+                if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
+                {
+                    //Servicio GlobalDocAssociate
+                    code = EventStatus.AceptacionTacita;
+                    string eventSearchTacita = "0" + (int)code;
+                    List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                    if (InvoiceWrapperTacita.Any())
+                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita
+                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;                   
+                }
+            }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
+            {
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    data.TrackId = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse
+                    && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362")).DocumentMeta.PartitionKey;                
+            }
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                //Servicio GlobalDocAssociate
+                string eventSearch = "0" + (int)code;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                {
+                    var respTrackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
+                    if (respTrackIdAvailability != null)
+                    {
+                        trackIdAvailability = respTrackIdAvailability.DocumentMeta.PartitionKey;
+                    }
+                }                
+            }
+
+            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+            var xmlParser = new XmlParser(xmlBytes.Result);
+            if (!xmlParser.Parser())
+                throw new Exception(xmlParser.ParserError);
+
+            // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
+            // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
+            string parameterPaymentDueDateFE = null;
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+            {
+                var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
+                var originalXmlParser = new XmlParser(originalXmlBytes.Result);
+                if (!originalXmlParser.Parser())
+                    throw new Exception(originalXmlParser.ParserError);
+
+                parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+            }
+
+            DateTime? signingTimeAvailability = null;
+            if ((Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion) && !string.IsNullOrWhiteSpace(trackIdAvailability))
+            {
+                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                signingTimeAvailability = Convert.ToDateTime(availabilityXmlParser.SigningTime);
+            }
+
+            var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+                signingTimeAvailability: signingTimeAvailability));
+
+            return validateResponses;
+        } 
+
+        #endregion
+
+
+        #region RequestValidateParty
+
+        public List<ValidateListResponse> RequestValidateParty(RequestObjectParty party)
+        {           
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
+            string receiverCancelacion = String.Empty;
+            string issuerAttorney = string.Empty;
+            string senderAttorney = string.Empty;
+            string trackIdAvailability = null;
+
+            //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(party.ResponseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    party.TrackId = documentMeta.DocumentReferencedKey;
+                    receiverCancelacion = documentMeta.ReceiverCode;
+                }
+            }
+
+            //Obtiene XML Factura Electornica CUFE
+            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(party.TrackId);
+            xmlParserCufe = new XmlParser(xmlBytes.Result);
+            if (!xmlParserCufe.Parser())
+                throw new Exception(xmlParserCufe.ParserError);
+
+            //Obtiene XML ApplicationResponse CUDE
+            var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(party.TrackIdCude.ToLower());
+            xmlParserCude = new XmlParser(xmlBytesCude.Result);
+            if (!xmlParserCude.Parser())
+                throw new Exception(xmlParserCude.ParserError);
+
+            var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
+            bool valid = true;
+
+            // ...
+            List<string> issuerAttorneyList = null;
+            var eventCode = int.Parse(party.ResponseCode);
+            if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var attorneyList = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorneyByCUFEList<GlobalDocReferenceAttorney>(party.TrackId);
+                if (attorneyList != null && attorneyList.Count > 0)
+                {
+                    issuerAttorneyList = new List<string>();
+                    // ForEach...
+                    attorneyList.ForEach(item =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(item.EndDate))
+                        {
+                            var endDate = Convert.ToDateTime(item.EndDate);
+                            if (endDate.Date > DateTime.Now.Date) issuerAttorneyList.Add(item.IssuerAttorney);
+                        }
+                        else issuerAttorneyList.Add(item.IssuerAttorney);
+                    });
+                }
+            }
+            else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            {
+                string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
+                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
+
+                if (InvoiceWrapper.Any())
+                    trackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;               
+            }
+
+            string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
+            if ((Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(trackIdAvailability)))
+            {
+                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
+                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
+                if (!availabilityXmlParser.Parser())
+                    throw new Exception(availabilityXmlParser.ParserError);
+
+                partyLegalEntityName = availabilityXmlParser.Fields["PartyLegalEntityName"].ToString();
+                partyLegalEntityCompanyID = availabilityXmlParser.Fields["PartyLegalEntityCompanyID"].ToString();
+                availabilityCustomizationId = availabilityXmlParser.Fields["CustomizationId"].ToString();
+            }
+
+
+            if (eventCode == (int)EventStatus.TerminacionMandato)
+            {
+                var attorney = TableManagerGlobalDocReferenceAttorney.FindByPartition<GlobalDocReferenceAttorney>(party.TrackId).ToList();
+
+                if (attorney != null && attorney.Count > 0)
+                {
+                    foreach (var item in attorney)
+                    {
+                        issuerAttorney = item.IssuerAttorney;
+                        senderAttorney = item.SenderCode;
+                    }
+                }
+            }
+
+            //Valida existe cambio legitimo tenedor
+            GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(party.TrackId.ToLower(), true);
+            if (documentHolderExchange != null)
+            {
+                //Existe mas de un legitimo tenedor requiere un mandatario
+                string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
+                if (endosatarios.Length == 1)
+                {
+                    nitModel.SenderCode = documentHolderExchange.PartyLegalEntity;
+                }
+                else
+                {
+                    foreach (string endosatario in endosatarios)
+                    {
+                        GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, xmlParserCude.ProviderCode);
+                        if (documentAttorney == null)
+                        {
+                            valid = false;
+                            validateResponses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC35",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC35"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    if (valid)
+                    {
+                        nitModel.SenderCode = party.SenderParty;
+                    }
+                }
+            }
+            if (valid)
+            {
+                //Enodsatario Anulacion endoso
+                nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
+                var validator = new Validator();
+                validateResponses.AddRange(ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList,
+                    issuerAttorney, senderAttorney, partyLegalEntityName, partyLegalEntityCompanyID, availabilityCustomizationId));
+            }
+            return validateResponses;
+        }
+        #endregion
+
+
+        #region RequestValidateEmitionEventPrev
+
+        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+            var nitModel = new NitModel();
+            XmlParser xmlParserCufe = null;
+            XmlParser xmlParserCude = null;
+
+            //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            {
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                if (documentMeta != null)
+                {
+                    //Obtiene el CUFE
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    //Obtiene XML ApplicationResponse CUDE
+                    var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                    xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                    if (!xmlParserCude.Parser())
+                        throw new Exception(xmlParserCude.ParserError);
+                }
+            }
+            //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
+            if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+            {
+                //Obtiene XML Factura electronica CUFE
+                var xmlBytes = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackId);
+                xmlParserCufe = new XmlParser(xmlBytes.Result);
+                if (!xmlParserCufe.Parser())
+                    throw new Exception(xmlParserCufe.ParserError);
+
+                //Obtiene XML ApplicationResponse CUDE
+                var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                if (!xmlParserCude.Parser())
+                    throw new Exception(xmlParserCude.ParserError);
+
+                nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+            }
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+
+            return validateResponses;
+        }
+
+        #endregion      
+
+        #region NewValidateEventRADIAN
+        public List<ValidateListResponse> NewValidateEventRadianAsync(XmlParser xmlParser, string trackId, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            var validateResponses = new List<ValidateListResponse>();
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();            
+            
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "100",
+                ErrorMessage = "Evento NewValidateEventRadianAsync referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+
+            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta != null)
+            {
+                bool validEventRadian = true;
+                bool validEventPrev = true;
+                bool validEventReference = true;
+                RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
+                RequestObjectDocReference docReference = new RequestObjectDocReference();
+                RequestObjectParty requestParty = new RequestObjectParty();
+                RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
+                RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
+
+                EventRadianModel eventRadian = new EventRadianModel(
+                     documentMeta.DocumentReferencedKey,
+                     documentMeta.PartitionKey,
+                     documentMeta.EventCode,
+                     documentMeta.DocumentTypeId,
+                     nitModel.listID,
+                     documentMeta.CustomizationID,
+                     xmlParser.SigningTime,
+                     nitModel.ValidityPeriodEndDate,
+                     documentMeta.SenderCode,
+                     documentMeta.ReceiverCode,
+                     nitModel.DocumentTypeIdRef,
+                     xmlParser.DocumentReferenceId,
+                     nitModel.IssuerPartyCode,
+                     nitModel.IssuerPartyName,
+                     documentMeta.SendTestSet
+                     );
+
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
+                    || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+                {
+                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
+                }
+
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
+                responses = ValidateSerieAndNumber(nitModel);
+                validateResponses.AddRange(responses);
+
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                {
+                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);                   
+                    responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si es mandato 
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                    && validEventRadian)
+                {                                 
+                    responses = ValidateReferenceAttorney(xmlParser, trackId);
+                    foreach (var itemReferenceAttorney in responses)
+                    {
+                        if (itemReferenceAttorney.ErrorCode == "AAH07")
+                            validEventReference = false;
+                    }
+                    validateResponses.AddRange(responses);
+                }
+
+                if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
+                {
+                    EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
+                    responses = ValidateDocumentReferencePrev(docReference.TrackId, docReference.IdDocumentReference, 
+                        docReference.EventCode, docReference.DocumentTypeIdRef, docReference.IssuerPartyCode,
+                        docReference.IssuerPartyName);
+                    foreach (var itemReference in responses)
+                    {
+                        if (!itemReference.IsValid)
+                            validEventRadian = false;
+                    }
+                    validateResponses.AddRange(responses);
+                }
+
+                //Si Mandato contiene CUFEs Referenciados
+                if (validaMandatoListID && validEventRadian && validEventReference)
+                {
+                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
+                    EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
+                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
+                    
+                    responses = RequestValidateParty(requestParty);
+                    validateResponses.AddRange(responses);
+
+                    responses = RequestValidateEmitionEventPrev(eventPrev);
+                    foreach (var itemResponsesTacita in responses)
+                    {
+                        if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
+                            || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
+                            || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
+                            || itemResponsesTacita.ErrorCode == "LGC38")
+                            validEventPrev = false;
+                    }
+                    validateResponses.AddRange(responses);
+
+                    if (validEventPrev)
+                    {
+                        responses = RequestValidateSigningTime(signingTime);                      
+                        validateResponses.AddRange(responses);
+                    }
+
+                }
+
+                UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
+
+            }
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAH07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                validateResponses.AddRange(responses);
+            }
+
+
+            return validateResponses;
         }
         #endregion
     }

@@ -39,8 +39,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
 
             try
             {
-
-                var validateResponses = await ValidatorEngine.Instance.StartValidationEventRadianAsync(trackId);
+                var validateResponses = await ValidatorEngine.Instance.StartNewValidationEventRadianAsync(trackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)

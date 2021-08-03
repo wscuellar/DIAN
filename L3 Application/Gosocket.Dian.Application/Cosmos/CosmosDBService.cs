@@ -928,6 +928,26 @@ namespace Gosocket.Dian.Application.Cosmos
             await client.ReplaceOfferAsync(offer);
         }
 
+        public async Task<List<GlobalDataDocument>> ReadDocumentByReceiverCodeAsync(string receiverCode, DateTime date)
+        {
+
+            var collectionName = GetCollectionName(date);
+            var collectionLink = collections[collectionName].SelfLink;
+
+            var options = new FeedOptions()
+            {
+                EnableCrossPartitionQuery = true,
+            };
+
+            IOrderedQueryable<GlobalDataDocument> query = null;
+
+            query = (IOrderedQueryable<GlobalDataDocument>)
+                 client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+                 .Where(e => e.ReceiverCode == receiverCode).AsEnumerable();
+            var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            return result.ToList<GlobalDataDocument>();
+        }
+
         #region Utils
         public static List<string> GeneratePartitionKeys(DateTime from, DateTime to)
         {
@@ -958,7 +978,7 @@ namespace Gosocket.Dian.Application.Cosmos
             return GetPermutations(list, length - 1)
                 .SelectMany(t => list,
                     (t1, t2) => t1.Concat(new T[] { t2 }));
-        }
+        }        
         #endregion
 
         #region Mapper

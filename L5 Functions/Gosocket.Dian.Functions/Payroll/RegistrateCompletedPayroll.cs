@@ -19,6 +19,8 @@ namespace Gosocket.Dian.Functions.Payroll
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
         private static readonly TableManager TableManagerGlobalDocPayrollHistoric = new TableManager("GlobalDocPayrollHistoric");
+        private static readonly TableManager TableManagerGlobalDocPayrollEmployees = new TableManager("GlobalDocPayrollEmployees");
+
 
         [FunctionName("RegistrateCompletedPayroll")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -55,6 +57,20 @@ namespace Gosocket.Dian.Functions.Payroll
 
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
+
+                GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
+                {
+                    PartitionKey = "Employee",
+                    RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{docGlobalPayroll.NumeroDocumento}",
+                    NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                    TipoDocumento = docGlobalPayroll.TipoDocumento,
+                    NitEmpresa = docGlobalPayroll.NIT,
+                    PrimerApellido = docGlobalPayroll.PrimerApellido.ToUpper(),
+                    PrimerNombre = docGlobalPayroll.PrimerNombre.ToUpper(),
+                    Timestamp = DateTime.Now,
+                };
+
+                arrayTasks.Add(TableManagerGlobalDocPayrollEmployees.InsertOrUpdateAsync(globalDocPayrollEmployees));
 
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
 

@@ -133,7 +133,9 @@
     "ErrorMessage_AAF33": "No corresponde el DV al NIT",
     "ErrorMessage_LGC38": "No se puede registrar este evento si previamente no se ha registrado el evento inscripción de la factura electrónica de venta como título valor",
     "TaxShemeID": "01|04|05|06",
-    "ErrorMessage_LGC43": "No se puede registrar este evento si previamente no se ha registrado el evento Registro para la circulación."
+    "ErrorMessage_LGC43": "No se puede registrar este evento si previamente no se ha registrado el evento Registro para la circulación.",
+    "ErrorMessage_AAG01a": "El adquiriente no esta autorizado para recibir esté evento",
+    "ErrorMessage_DC24z": "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio."
 
 
     // Test UAT INDRA

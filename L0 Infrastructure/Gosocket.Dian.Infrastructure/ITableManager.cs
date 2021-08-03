@@ -30,32 +30,22 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindByPartition<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();
         List<DynamicTableEntity> FindByPartitionWithPagination(string partitionKey);
         List<T> FindByPartitionWithPagination<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindByPartitionWithPagination<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();
-        T FindBySerieAndNumberAttorney<T>(string SerieAndNumber) where T : ITableEntity, new();
-        T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new();
-        List<T> FindDocumentByReference<T>(string documentReferencedKey) where T : ITableEntity, new();
+        List<T> FindByPartitionWithPagination<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();        
+        T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new();       
         T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorneyFaculitity<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced_EventCode_TypeId<T>(string documentReferencedKey, string documentTypeId, string eventCode) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced_EventCode_TypeIdNotPartitionKey<T>(string documentReferencedKey, string documentTypeId, string eventCode, string partitionKey) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced_EventCode_TypeId_CustomizationID<T>(string documentReferencedKey, string documentTypeId, string eventCode, string customizationId, string customizationId2) where T : ITableEntity, new();
-        List<T> FindDocumentReferenced_TypeId<T>(string documentReferencedKey, string documentTypeId) where T : ITableEntity, new();
+        List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new();       
         List<T> FindDocumentRegisterAR<T>(string providerCode, string documentTypeId, string serieandNumber) where T : ITableEntity, new();
-        List<T> FindDocumentSenderCodeIssueAttorney<T>(string issuerAttorney, string senderCode) where T : ITableEntity, new();
-        List<T> FindDocumentSenderCodeReceiverCode<T>(string senderCode, string receiverCode) where T : ITableEntity, new();
+        List<T> FindDocumentSenderCodeIssueAttorney<T>(string issuerAttorney, string senderCode) where T : ITableEntity, new();        
         T FindGlobalEvent<T>(string partitionKey, string rowKey, string documentTypeId) where T : ITableEntity, new();
         List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new();
         T FindGlobalPayrollByCUNE<T>(string cune) where T : ITableEntity, new();
-        List<T> FindGlobalPayrollByDocumentNumber<T>(int take, string employeeDocNumber) where T : ITableEntity, new();
         List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>(int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new();
         T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new();
         T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new();
-        T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new();
-        DynamicTableEntity FindhByGlobalDocumentId(string globalDocumentId, string documentKey);
+        T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new();       
         T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string softwareId) where T : ITableEntity, new();
         T FindhByRadianStatus<T>(string partitionKey, bool deleted, string radianStatus) where T : ITableEntity, new();
         List<DynamicTableEntity> FindhByTimeStamp(DateTime timeStampFrom, DateTime timeStampTo);
@@ -87,5 +77,6 @@ namespace Gosocket.Dian.Infrastructure
         bool Update(DynamicTableEntity entity, string partitionKey, string rowKey);
         bool Update(TableEntity entity);
         bool Update(TableEntity entity, string partitionKey, string rowKey);
+        List<T> FindFirstSurNameByPartition<T>(string partitionKey) where T : ITableEntity, new();
     }
 }

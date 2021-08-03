@@ -178,6 +178,7 @@
     <Compile Include="Entity\GlobalDocHolderExchange.cs" />
     <Compile Include="Entity\GlobalDocModelFolio.cs" />
     <Compile Include="Entity\GlobalDocPayroll.cs" />
+    <Compile Include="Entity\GlobalDocPayrollEmployees.cs" />
     <Compile Include="Entity\GlobalDocPayrollHistoric.cs" />
     <Compile Include="Entity\GlobalDocumentWithEventRegistered.cs" />
     <Compile Include="Entity\GlobalDocReference.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Entity\GlobalOseTrackIdMapper.cs" />
     <Compile Include="Entity\GlobalTypeList.cs" />
     <Compile Include="Entity\KeyValue.cs" />
+    <Compile Include="Entity\Municipalities.cs" />
     <Compile Include="Entity\MunicipalityByCode.cs" />
     <Compile Include="Entity\OtherDocElecCustomerList.cs" />
     <Compile Include="Entity\PagedResultBase.cs" />
