@@ -10,6 +10,8 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using Gosocket.Dian.Web.Utils;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,12 +30,15 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IGlobalRadianOperationService _globalRadianOperationService;
         private readonly UserService userService = new UserService();
 
+        private TelemetryClient telemetry;
+
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
                                         IRadianApprovedService radianAprovedService,
                                         IRadianTestSetResultService radianTestSetResultService,
                                         IRadianTestSetAppliedService radianTestSetAppliedService,
-                                        IGlobalRadianOperationService globalRadianOperationService
+                                        IGlobalRadianOperationService globalRadianOperationService,
+                                        TelemetryClient telemetry
                                         )
         {
             _radianContributorService = radianContributorService;
@@ -42,6 +47,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianTestSetResultService = radianTestSetResultService;
             _radianTestSetAppliedService = radianTestSetAppliedService;
             _globalRadianOperationService = globalRadianOperationService;
+            this.telemetry = telemetry;
         }
 
         [HttpGet]
@@ -550,13 +556,15 @@ namespace Gosocket.Dian.Web.Controllers
                 var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
 
-                if (!response.Success)
+                if (!response.Success) { 
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);
                     return Json(new
                     {
                         success = false,
                         message = response.Message
                     }, JsonRequestBehavior.AllowGet);
-
+                }
+                telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
                 return Json(new
                 {
                     success = true,
@@ -565,6 +573,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
+                telemetry.TrackException(ex);
+
                 return Json(new
                 {
                     success = false,

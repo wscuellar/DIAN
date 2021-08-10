@@ -16,6 +16,7 @@ using System.Web.Mvc;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Domain;
+using Microsoft.ApplicationInsights;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -45,13 +46,16 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
         private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
+        private readonly TelemetryClient telemetry;
 
         public OthersElectronicDocAssociatedController(IContributorService contributorService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
             IOthersElectronicDocumentsService othersElectronicDocumentsService,
             ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
-            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService)
+            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService,
+            TelemetryClient telemetry
+            )
         {
             _contributorService = contributorService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -59,6 +63,7 @@ namespace Gosocket.Dian.Web.Controllers
             _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
             _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
+            this.telemetry = telemetry;
         }
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
@@ -611,7 +616,7 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 //TODO afinar filtro
                 OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(softwareId));
-                
+
                 var pk = code.ToString();
                 var rk = contributorTypeId.ToString() + "|" + software.SoftwareId;
                 GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
@@ -633,13 +638,15 @@ namespace Gosocket.Dian.Web.Controllers
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
 
-                if (!response.Success)
+                if (!response.Success) {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);
                     return Json(new
                     {
                         success = false,
                         message = response.Message
                     }, JsonRequestBehavior.AllowGet);
-
+                }
+                telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
                 return Json(new
                 {
                     success = true,
@@ -648,6 +655,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
+                telemetry.TrackException(ex);
                 return Json(new
                 {
                     success = false,
