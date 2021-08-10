@@ -14,6 +14,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Gosocket.Dian.Web.Common;
+using Gosocket.Dian.Services.Utils.Helpers;
+using Gosocket.Dian.Domain;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -601,5 +603,58 @@ namespace Gosocket.Dian.Web.Controllers
 
             return Json(null, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId)
+        {
+            try
+            {
+                //TODO afinar filtro
+                OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(softwareId));
+                
+                var pk = code.ToString();
+                var rk = contributorTypeId.ToString() + "|" + software.SoftwareId;
+                GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
+                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), software.SoftwareId);
+
+                var data = new RadianActivationRequest();
+                data.Code = code.ToString();
+                data.ContributorId = contributorId;
+                data.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
+                data.Pin = software.Pin;
+                data.SoftwareId = software.Id.ToString();
+                data.SoftwareName = software.Name;
+                data.SoftwarePassword = software.SoftwarePassword;
+                data.SoftwareType = globalRadianOperations.OperationModeId.ToString();
+                data.SoftwareUser = software.SoftwareUser;
+                data.TestSetId = testSetResult.Id;
+                data.Url = software.Url;
+
+                var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
+                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
+
+                if (!response.Success)
+                    return Json(new
+                    {
+                        success = false,
+                        message = response.Message
+                    }, JsonRequestBehavior.AllowGet);
+
+                return Json(new
+                {
+                    success = true,
+                    message = response.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = ex.InnerException?.Message ?? ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+    
     }
 }

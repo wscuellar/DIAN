@@ -299,7 +299,48 @@
                 cancelRegister(cancelData);
         });
 
+        $('.btn-sync-to-production').click(function () {
+                bootbox.dialog({
+                    title: "Advertencia",
+                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
+                    buttons: {
+                        del: {
+                            label: "Aceptar",
+                            className: "btn-gosocket",
+                            callback: function () {
+                                syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId)
+                            }
+                        },
+                    }
+                });
+            });
+
      });
+
+     syncToProduction = (code, contributorTypeId, contributorId) => {
+            showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
+            var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+                url: "@Url.Action("SyncToProduction", "RadianApproved")",
+                method: "Post",
+                data: {
+                    code: code,
+                    contributorTypeId: contributorTypeId,
+                    contributorId: contributorId
+                },
+                error: function (a, b, c) {
+                    hideLoading('#panel-form');
+                    showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                },
+                success: function (data) {
+                    hideLoading('#panel-form');
+                    if (data.success)
+                        showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
+                    if (!data.success)
+                        showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
+                }
+            });
+        }
 
 
     </script>
