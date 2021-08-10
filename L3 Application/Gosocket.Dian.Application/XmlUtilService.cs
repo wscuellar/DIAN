@@ -376,7 +376,7 @@ namespace Gosocket.Dian.Application
 
                             new XAttribute("schemeID", "4"),
 
-                            new XAttribute("schemeName", $"{processResultEntity.SenderTypeCode}")),
+                            new XAttribute("schemeName", $"{processResultEntity.SenderSchemeCode}")),
 
                         new XElement(cac + "TaxScheme",
 
