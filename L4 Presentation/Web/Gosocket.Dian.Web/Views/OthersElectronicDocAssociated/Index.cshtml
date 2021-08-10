@@ -497,6 +497,7 @@
                 url: "@Url.Action("SyncToProduction", "OthersElectronicDocAssociated")",
                 method: "Post",
                 data: {
+                    __RequestVerificationToken: __RequestVerificationToken,
                     code: code,
                     contributorTypeId: contributorTypeId,
                     contributorId: contributorId,

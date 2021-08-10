@@ -604,6 +604,7 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(null, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId)
         {
             try

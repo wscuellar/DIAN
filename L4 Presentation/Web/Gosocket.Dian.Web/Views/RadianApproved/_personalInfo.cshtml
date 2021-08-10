@@ -1,5 +1,6 @@
 ﻿@using Gosocket.Dian.Infrastructure;
 @model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
+@Html.AntiForgeryToken()
 @{
     ViewBag.Title = "Datos";
     string contributorType = "";
@@ -73,7 +74,7 @@
             </div>
         </div>
     }
-    if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.RadianState == "Habilitado" && !User.IsInRole("Administrador"))
+    @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.RadianState == "Habilitado" && !User.IsInRole("Administrador"))
         {
             <div id="panel" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                 <div class="panel-body text-right">

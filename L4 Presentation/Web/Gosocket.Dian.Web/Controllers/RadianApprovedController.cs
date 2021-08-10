@@ -103,7 +103,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.FileHistories = resultH;
             model.FileHistoriesRowCount = data.RowCount;
 
-            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct || 
+            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct ||
                 model.RadianState == RadianState.Habilitado.GetDescription())
                 return View(model);
 
@@ -522,7 +522,8 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpPost]                
+        [HttpPost]  
+        [ValidateAntiForgeryToken]
         public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId)
         {
             try

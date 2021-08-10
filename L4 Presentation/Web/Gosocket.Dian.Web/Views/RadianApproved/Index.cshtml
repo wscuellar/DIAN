@@ -324,6 +324,7 @@
                 url: "@Url.Action("SyncToProduction", "RadianApproved")",
                 method: "Post",
                 data: {
+                    __RequestVerificationToken: __RequestVerificationToken,
                     code: code,
                     contributorTypeId: contributorTypeId,
                     contributorId: contributorId
