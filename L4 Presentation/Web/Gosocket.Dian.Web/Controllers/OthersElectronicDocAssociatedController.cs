@@ -17,6 +17,7 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Domain;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Gosocket.Dian.Web.Controllers
 {
