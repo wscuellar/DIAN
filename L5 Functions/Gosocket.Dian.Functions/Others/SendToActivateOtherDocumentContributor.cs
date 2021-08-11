@@ -173,10 +173,14 @@ namespace Gosocket.Dian.Functions.Others
 
                     return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
                 }
+
+
+                var response = new { success = true, message = "Contribuyente Otros Documentos Electrónicos se envió a activar a producción con éxito." };
+                return req.CreateResponse(HttpStatusCode.OK, response);
             }
 
-
-            return null;
+            var fail = new { success = false, message = $"Wrong enviroment {ConfigurationManager.GetValue("Environment")}." };
+            return req.CreateResponse(HttpStatusCode.BadRequest, fail);
         }
 
         /// <summary>

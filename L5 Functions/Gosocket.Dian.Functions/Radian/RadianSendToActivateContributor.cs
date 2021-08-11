@@ -165,6 +165,11 @@ namespace Gosocket.Dian.Functions.Radian
 
                     return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
                 }
+
+
+                var response = new { success = true, message = "Contribuyente RADIAN se envió a activar a producción con éxito." };
+                return req.CreateResponse(HttpStatusCode.OK, response);
+
             }
 
             var fail = new { success = false, message = $"Wrong enviroment {ConfigurationManager.GetValue("Environment")}." };
