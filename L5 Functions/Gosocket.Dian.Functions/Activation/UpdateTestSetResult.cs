@@ -533,7 +533,8 @@ namespace Gosocket.Dian.Functions.Activation
                                     softwarePassword = software.SoftwarePassword,
                                     pin = software.Pin,
                                     url = software.Url,
-                                    softwareName = software.Name
+                                    softwareName = software.Name,
+                                    enabled = false
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
