@@ -611,7 +611,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId)
+        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId, string softwareIdBase)
         {
             try
             {
@@ -628,7 +628,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.ContributorId = contributorId;
                 data.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
                 data.Pin = software.Pin;
-                data.SoftwareId = software.Id.ToString();
+                data.SoftwareId = softwareIdBase;
                 data.SoftwareName = software.Name;
                 data.SoftwarePassword = software.SoftwarePassword;
                 data.SoftwareType = globalRadianOperations.OperationModeId.ToString();
