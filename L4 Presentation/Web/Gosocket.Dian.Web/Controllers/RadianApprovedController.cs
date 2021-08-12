@@ -552,6 +552,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;
                 data.TestSetId = testSetResult.Id;
                 data.Url = software.Url;
+                data.Enabled = true;
 
                 var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
@@ -619,6 +620,9 @@ namespace Gosocket.Dian.Web.Controllers
 
         [JsonProperty(PropertyName = "testSetId")]
         public string TestSetId { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
 
     }
 }
