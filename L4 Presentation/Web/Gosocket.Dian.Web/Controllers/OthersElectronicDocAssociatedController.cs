@@ -635,6 +635,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;
                 data.TestSetId = testSetResult.Id;
                 data.Url = software.Url;
+                data.Enabled = true;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
