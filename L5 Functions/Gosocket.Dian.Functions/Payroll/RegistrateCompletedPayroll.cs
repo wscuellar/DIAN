@@ -58,21 +58,24 @@ namespace Gosocket.Dian.Functions.Payroll
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
-                GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
-                {
-                    PartitionKey = "Employee",
-                    RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{docGlobalPayroll.NumeroDocumento}",
-                    NumeroDocumento = docGlobalPayroll.NumeroDocumento,
-                    TipoDocumento = docGlobalPayroll.TipoDocumento,
-                    NitEmpresa = docGlobalPayroll.NIT,
-                    PrimerApellido = docGlobalPayroll.PrimerApellido.ToUpper(),
-                    PrimerNombre = docGlobalPayroll.PrimerNombre.ToUpper(),
-                    Timestamp = DateTime.Now,
-                };
-
-                arrayTasks.Add(TableManagerGlobalDocPayrollEmployees.InsertOrUpdateAsync(globalDocPayrollEmployees));
-
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
+
+                //Registra empleado solo para Nomina Individual
+                if (documentTypeId == (int)DocumentType.IndividualPayroll)
+                {
+                    GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
+                    {
+                        PartitionKey = "Employee",
+                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{docGlobalPayroll.NumeroDocumento}",
+                        NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                        TipoDocumento = docGlobalPayroll.TipoDocumento,
+                        NitEmpresa = docGlobalPayroll.NIT,
+                        PrimerApellido = docGlobalPayroll.PrimerApellido.ToUpper(),
+                        PrimerNombre = docGlobalPayroll.PrimerNombre.ToUpper(),
+                        Timestamp = DateTime.Now,
+                    };
+                    arrayTasks.Add(TableManagerGlobalDocPayrollEmployees.InsertOrUpdateAsync(globalDocPayrollEmployees));
+                }               
 
                 // Nómina Individual de Ajuste...
                 if ((documentTypeId == (int)DocumentType.IndividualPayroll && xmlParser.Novelty)
