@@ -627,12 +627,20 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributorId">Id a ubicar</param>
         /// <returns>Un objeto RadianCotributor buscado</returns>
-        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId)
+        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId, bool enabled)
         {
             using (var context = new SqlDBContext())
             {
-                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "En pruebas");
+                if (enabled)
+                {
+                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
+                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "Habilitado");
+                }
+                else
+                {
+                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
+                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "En pruebas");
+                }
             }
         }
 

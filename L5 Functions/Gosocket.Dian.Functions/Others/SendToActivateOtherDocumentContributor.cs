@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Functions.Others
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
 
                 //Se obtiene participante otros documentos habilitacion
-                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId);
+                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
                     throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
@@ -173,10 +173,14 @@ namespace Gosocket.Dian.Functions.Others
 
                     return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
                 }
+
+
+                var response = new { success = true, message = "Contribuyente Otros Documentos Electrónicos se envió a activar a producción con éxito." };
+                return req.CreateResponse(HttpStatusCode.OK, response);
             }
 
-
-            return null;
+            var fail = new { success = false, message = $"Wrong enviroment {ConfigurationManager.GetValue("Environment")}." };
+            return req.CreateResponse(HttpStatusCode.BadRequest, fail);
         }
 
         /// <summary>
@@ -256,6 +260,10 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "testSetId")]
             public string TestSetId { get; set; }
+
+            [JsonProperty(PropertyName = "enabled")]
+            public bool Enabled { get; set; }
+            
         }
 
         class OtherDocumentActivateContributorRequestObject
