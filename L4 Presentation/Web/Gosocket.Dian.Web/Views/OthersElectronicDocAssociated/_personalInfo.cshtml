@@ -55,8 +55,8 @@
             </div>
         </div>
     }
-     @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.State == "Habilitado" && !User.IsInRole("Administrador"))
-        {
+     @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true" )
+     {
             <div id="panel" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                 <div class="panel-body text-right">
                     <div class="col-md-3 col-md-offset-9">
