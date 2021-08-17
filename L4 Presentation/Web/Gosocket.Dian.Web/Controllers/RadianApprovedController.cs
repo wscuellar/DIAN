@@ -5,10 +5,14 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
 using Gosocket.Dian.Web.Utils;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,19 +27,27 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianApprovedService _radianAprovedService;
         private readonly IRadianTestSetResultService _radianTestSetResultService;
         private readonly IRadianTestSetAppliedService _radianTestSetAppliedService;
+        private readonly IGlobalRadianOperationService _globalRadianOperationService;
         private readonly UserService userService = new UserService();
+
+        private readonly TelemetryClient telemetry;
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
                                         IRadianApprovedService radianAprovedService,
                                         IRadianTestSetResultService radianTestSetResultService,
-                                        IRadianTestSetAppliedService radianTestSetAppliedService)
+                                        IRadianTestSetAppliedService radianTestSetAppliedService,
+                                        IGlobalRadianOperationService globalRadianOperationService,
+                                        TelemetryClient telemetry
+                                        )
         {
             _radianContributorService = radianContributorService;
             _radianTestSetService = radianTestSetService;
             _radianAprovedService = radianAprovedService;
             _radianTestSetResultService = radianTestSetResultService;
             _radianTestSetAppliedService = radianTestSetAppliedService;
+            _globalRadianOperationService = globalRadianOperationService;
+            this.telemetry = telemetry;
         }
 
         [HttpGet]
@@ -97,7 +109,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.FileHistories = resultH;
             model.FileHistoriesRowCount = data.RowCount;
 
-            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct || 
+            if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct ||
                 model.RadianState == RadianState.Habilitado.GetDescription())
                 return View(model);
 
@@ -515,6 +527,102 @@ namespace Gosocket.Dian.Web.Controllers
             };
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]  
+        [ValidateAntiForgeryToken]
+        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId)
+        {
+            try
+            {
+                Software software = _radianAprovedService.SoftwareByContributor(contributorId);
+                var pk = code.ToString();
+                var rk = contributorTypeId.ToString() + "|" + software.Id;
+                RadianTestSetResult testSetResult = _radianTestSetResultService.GetTestSetResult(pk, rk);
+                var globalRadianOperations = _globalRadianOperationService.GetOperation(code.ToString(), software.Id);
+
+                var data = new RadianActivationRequest();
+                data.Code = code.ToString();
+                data.ContributorId = contributorId;
+                data.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);                
+                data.Pin = software.Pin;
+                data.SoftwareId = software.Id.ToString();
+                data.SoftwareName = software.Name;
+                data.SoftwarePassword = software.SoftwarePassword;
+                data.SoftwareType = globalRadianOperations.SoftwareType.ToString();
+                data.SoftwareUser = software.SoftwareUser;
+                data.TestSetId = testSetResult.Id;
+                data.Url = software.Url;
+                data.Enabled = true;
+
+                var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
+                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
+
+                if (!response.Success) { 
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);
+                    return Json(new
+                    {
+                        success = false,
+                        message = response.Message
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
+                return Json(new
+                {
+                    success = true,
+                    message = response.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                telemetry.TrackException(ex);
+
+                return Json(new
+                {
+                    success = false,
+                    message = ex.InnerException?.Message ?? ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+    }
+    class RadianActivationRequest
+    {
+
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "contributorId")]
+        public int ContributorId { get; set; }
+
+        [JsonProperty(PropertyName = "contributorTypeId")]
+        public int ContributorTypeId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareId")]
+        public string SoftwareId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareType")]
+        public string SoftwareType { get; set; }
+
+        [JsonProperty(PropertyName = "softwareUser")]
+        public string SoftwareUser { get; set; }
+
+        [JsonProperty(PropertyName = "softwarePassword")]
+        public string SoftwarePassword { get; set; }
+
+        [JsonProperty(PropertyName = "pin")]
+        public string Pin { get; set; }
+
+        [JsonProperty(PropertyName = "softwareName")]
+        public string SoftwareName { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "testSetId")]
+        public string TestSetId { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
 
     }
 }
