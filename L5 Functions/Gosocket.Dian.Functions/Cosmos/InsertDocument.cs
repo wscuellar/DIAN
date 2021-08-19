@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Functions.Cosmos
         private const string queueName = "global-document-input%Slot%";
 
         [FunctionName("InsertDocument")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
