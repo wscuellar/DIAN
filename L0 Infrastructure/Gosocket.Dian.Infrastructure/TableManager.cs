@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Infrastructure
             return tableClient;
         }
 
-        public TableManager(string tableName, bool createIfNotExists = true)
+        public TableManager(string tableName, bool createIfNotExists = false)
         {            
 
             CloudTable = tableClient.GetTableReference(tableName);
