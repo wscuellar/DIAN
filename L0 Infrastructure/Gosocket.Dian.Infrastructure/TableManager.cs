@@ -33,7 +33,7 @@ namespace Gosocket.Dian.Infrastructure
                 CloudTable.CreateIfNotExists();
         }
 
-        public TableManager(string tableName, string connectionString, bool createIfNotExists = true)
+        public TableManager(string tableName, string connectionString, bool createIfNotExists = false)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var tableClient = account.CreateCloudTableClient();
