@@ -56,16 +56,14 @@ namespace Gosocket.Dian.Functions.Utils
                 var stringIssueTime = _xmlApplication.SelectSingleNode(@"/descendant::*[local-name()='ApplicationResponse']/descendant::*[local-name()='IssueTime']", _nsmgr)?.InnerText;
                 var stringSigningTime = _xml.SelectSingleNode(@"/descendant::*[local-name()='UBLExtension']/descendant::*[local-name()='ExtensionContent']/descendant::*[local-name()='Signature']/descendant::*[local-name()='Object']/descendant::*[local-name()='QualifyingProperties']/descendant::*[local-name()='SignedProperties']/descendant::*[local-name()='SignedSignatureProperties']/descendant::*[local-name()='SigningTime']", _nsmgr)?.InnerText;
                 var stringDocument = "Documento generado el: ";
-                DateTime fecha = Convert.ToDateTime(stringIssueDate);
-                DateTime hora = Convert.ToDateTime(stringIssueTime);
+                DateTime fecha = Convert.ToDateTime($"{stringIssueDate} {stringIssueTime}");
                 DateTime signingTime = Convert.ToDateTime(stringSigningTime);
-                stringIssueDate = fecha.ToString("dd/MM/yyyy");
-                stringIssueTime = hora.ToString("HH:mm:ss");
                 stringSigningTime = signingTime.ToString("dd/MM/yyyy HH:mm:ss");
+                var stringIssueDateTime = fecha.ToString("dd/MM/yyyy HH:mm:ss");
 
                 XmlNode createElementDocumentResponse = _xml.CreateElement("DocumentResponse", _xml.DocumentElement.NamespaceURI);
                 XmlNode createElementSigningTime = _xml.CreateElement("ConvertSigningTime", _xml.DocumentElement.NamespaceURI);
-                createElementDocumentResponse.InnerText = string.Concat(stringDescription, " ", stringIssueDate, " ", stringIssueTime);
+                createElementDocumentResponse.InnerText = string.Concat(stringDescription, " ", stringIssueDateTime);
                 createElementSigningTime.InnerText = string.Concat(stringDocument, stringSigningTime);
                 _xml.DocumentElement.AppendChild(createElementDocumentResponse);
                 _xml.DocumentElement.AppendChild(createElementSigningTime);
