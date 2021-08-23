@@ -22,11 +22,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     public class ValidatorEngine
     {
         #region Global properties
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
-        static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
+        
+        private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorRuntime");
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
        
         #endregion
@@ -782,7 +783,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
-            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;

@@ -39,6 +39,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 {
     public class Validator
     {
+        private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
+        private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
@@ -2823,8 +2826,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
-                TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+                
                 var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(xmlUUID.ToLower(), true);
                 if (docHolderExchange != null)
                 {
