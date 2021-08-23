@@ -52,4 +52,11 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public bool IsInvoiceTV { get; set; }
     public bool SendTestSet { get; set; }
     public bool? Novelty { get; set; }
+    public string DocumentReferencedId { get; set; }
+    public string DocumentReferencedTypeId { get; set; }
+    public string ResponseCodeListID { get; set; }
+    public string ValidityPeriodEndDate { get; set; }
+    public string IssuerPartyCode { get; set; }
+    public string IssuerPartyName { get; set; }
+
 }
