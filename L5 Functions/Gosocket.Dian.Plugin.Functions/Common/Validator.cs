@@ -2642,13 +2642,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));            
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
-            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
-            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
-            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
-            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']");
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode").Item(0)?.Attributes["listID"].Value;
+            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID").Item(0)?.InnerText.ToString();
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID").Item(0)?.InnerText.ToString();
+            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:ID");
+            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:ID");
+            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse");
+            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference");
             int countCufeListDocumentResponse = cufeListDocumentResponse.Count - 1;
             int countCufeListDocumentResponseReference = cufeListDocumentResponseReference.Count;
             string xmlID2 = string.Empty;
@@ -2697,11 +2697,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara ID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:ID").Item(i)?.InnerText.ToString();
                     if (customizationID == "431" || customizationID == "432")
-                        xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:ID").Item(i)?.InnerText.ToString();
                     else
-                        xmlID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        xmlID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:ID").Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
@@ -2723,11 +2723,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:UUID").Item(i)?.InnerText.ToString();
                     if (customizationID == "431" || customizationID == "432")
-                        xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:UUID").Item(i)?.InnerText.ToString();
                     else
-                        xmlUUID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        xmlUUID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID").Item(i)?.InnerText.ToString();
 
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
@@ -2751,9 +2751,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida documentos referenciados
             for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
-                var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                var xmlDocumentTypeCode = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                var xmlID = cufeListResponse.Item(i).SelectNodes("//cac:DocumentReference/cbc:ID").Item(i)?.InnerText.ToString();
+                var xmlUUID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID").Item(i)?.InnerText.ToString();
+                var xmlDocumentTypeCode = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:DocumentTypeCode").Item(i)?.InnerText.ToString();
 
                 //Valida CUFE referenciado existe en sistema DIAN                
                 var resultValidateCufe = ValidateDocumentReferencePrev(xmlUUID, xmlID, "043", xmlDocumentTypeCode);
@@ -2844,7 +2844,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
-                dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID").Item(i)?.InnerText.ToString();
                 var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
                 var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
                 if (!xmlParserCufe.Parser())
@@ -2890,23 +2890,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string providerCode = xmlParser.FieldValue("ProviderCode", true).ToString();
-            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']");
-            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
-            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']/@schemeID").Item(0)?.InnerText.ToString();
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject");
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID").Item(0)?.InnerText.ToString();
+            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse");
+            XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference");
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID").Item(0)?.InnerText.ToString();
+            string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID/@schemeID").Item(0)?.InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode").Item(0)?.Attributes["listID"].Value;
             dataSigningtime.EventCode = "043";
             dataSigningtime.SigningTime = xmlParser.SigningTime;
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
-            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
-            string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
+            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cac:AgentParty/cac:PartyIdentification/cbc:ID").Item(0)?.InnerText.ToString();
+            string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:Description").Item(0)?.InnerText.ToString();
+            string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cac:AgentParty/cac:PartyIdentification/cbc:ID").Item(0)?.InnerText.ToString();
+            string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cbc:ID").Item(0)?.InnerText.ToString();
+            string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cbc:Description").Item(0)?.InnerText.ToString();
 
             bool sendTestSet = false;
             string modoOperacion = string.Empty;
@@ -3171,7 +3171,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
-                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString().Trim();
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject").Item(i)?.InnerText.ToString().Trim();
 
                     if (!IsBase64(AttachmentBase64))
                     {
@@ -3220,8 +3220,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (cufeList.Count > 2)
                 {
-                    descriptionCode = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(i)?.InnerText.ToString();
-                    string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                    descriptionCode = cufeList.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:Description").Item(i)?.InnerText.ToString();
+                    string code = cufeList.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode").Item(i)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
                         tempCode = code.Split(';');
@@ -3229,8 +3229,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    descriptionCode = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(1)?.InnerText.ToString();
-                    string code = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
+                    descriptionCode = cufeList.Item(1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:Description").Item(1)?.InnerText.ToString();
+                    string code = cufeList.Item(1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode").Item(1)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
                         tempCode = code.Split(';');
