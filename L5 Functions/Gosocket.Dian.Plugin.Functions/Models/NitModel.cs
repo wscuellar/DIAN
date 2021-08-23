@@ -49,5 +49,21 @@
         public string SenderPartyPersonSchemeName { get; set; }
         public string SenderPartyPersonID { get; set; }
 
+        public NitModel() { }
+
+        public NitModel(string _listID, string _validityPeriodEndDate, string _documentTypeIdRef, 
+            string _issuerPartyCode, string _issuerPartyName, string _providerCode, string _serieAndNumber, string _documentTypeId,
+            string _senderCode)
+        {
+            listID = _listID;
+            ValidityPeriodEndDate = _validityPeriodEndDate;
+            DocumentTypeIdRef = _documentTypeIdRef;
+            IssuerPartyCode = _issuerPartyCode;
+            IssuerPartyName = _issuerPartyName;
+            ProviderCode = _providerCode;
+            SerieAndNumber = _serieAndNumber;
+            DocumentTypeId = _documentTypeId;
+            SenderCode = _senderCode;
+        }
     }
 }
