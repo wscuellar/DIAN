@@ -122,16 +122,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
-            DateTime startDate = DateTime.UtcNow;
+            //DateTime startDate = DateTime.UtcNow;
 
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParser = new XmlParser(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            //var xmlBytes = await GetXmlFromStorageAsync(trackId);
+            //var xmlParser = new XmlParser(xmlBytes);
+            //if (!xmlParser.Parser())
+            //    throw new Exception(xmlParser.ParserError);
 
-            NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
+            //NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
 
-            validateResponses.AddRange(validator.NewValidateEventRadianAsync(xmlParser, trackId, nitModel));
+            validateResponses.AddRange(validator.NewValidateEventRadianAsync(trackId));
 
             return validateResponses;
         }

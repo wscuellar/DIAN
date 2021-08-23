@@ -6391,6 +6391,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
+        {
+            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            if (documentStatusValidation == null)
+                return null;
+
+            var fileManager = new FileManager();
+            var container = $"global";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+
+            return xmlBytes;
+        }
+
 
         #region RequestValidateEmitionEventPrev
 
@@ -6447,7 +6462,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion      
 
         #region NewValidateEventRADIAN
-        public List<ValidateListResponse> NewValidateEventRadianAsync(XmlParser xmlParser, string trackId, NitModel nitModel)
+        public List<ValidateListResponse> NewValidateEventRadianAsync(string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -6480,26 +6495,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                      documentMeta.PartitionKey,
                      documentMeta.EventCode,
                      documentMeta.DocumentTypeId,
-                     nitModel.listID,
+                     documentMeta.ResponseCodeListID,
                      documentMeta.CustomizationID,
-                     xmlParser.SigningTime,
-                     nitModel.ValidityPeriodEndDate,
+                     documentMeta.SigningTimeStamp.ToString(),
+                     documentMeta.ValidityPeriodEndDate,
                      documentMeta.SenderCode,
                      documentMeta.ReceiverCode,
-                     nitModel.DocumentTypeIdRef,
-                     xmlParser.DocumentReferenceId,
-                     nitModel.IssuerPartyCode,
-                     nitModel.IssuerPartyName,
+                     documentMeta.DocumentReferencedTypeId,
+                     documentMeta.DocumentReferencedId,
+                     documentMeta.IssuerPartyCode,
+                     documentMeta.IssuerPartyName,
                      documentMeta.SendTestSet
                      );
 
+                NitModel nitModel = new NitModel(
+                    documentMeta.ResponseCodeListID,
+                    documentMeta.ValidityPeriodEndDate,
+                    documentMeta.DocumentReferencedTypeId,
+                    documentMeta.IssuerPartyCode,
+                    documentMeta.IssuerPartyName,
+                    documentMeta.TechProviderCode,
+                    documentMeta.SerieAndNumber,
+                    documentMeta.DocumentTypeId,
+                    documentMeta.SenderCode
+                    );
+
+
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
                     || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                {
-                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
+                {                   
+                    eventRadian.TrackId = documentMeta.DocumentReferencedKey;
                 }
 
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;               
                 responses = ValidateSerieAndNumber(nitModel);
                 validateResponses.AddRange(responses);
 
@@ -6513,7 +6541,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                     && validEventRadian)
-                {                                 
+                {
+                    var xmlBytes = GetXmlFromStorageAsync(trackId);
+                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    if (!xmlParser.Parser())
+                        throw new Exception(xmlParser.ParserError);
+
                     responses = ValidateReferenceAttorney(xmlParser, trackId);
                     foreach (var itemReferenceAttorney in responses)
                     {
