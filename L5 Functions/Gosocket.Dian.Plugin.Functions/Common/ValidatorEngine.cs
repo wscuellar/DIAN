@@ -13,9 +13,12 @@ using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-
+using System.Xml;
+using System.Xml.XPath;
 
 namespace Gosocket.Dian.Plugin.Functions.Common
 {
@@ -28,7 +31,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
-       
+
+        XmlDocument _xmlDocument;
+        XPathDocument _document;
+        XPathNavigator _navigator;
+        XPathNavigator _navNs;
+        XmlNamespaceManager _ns;
+        byte[] _xmlBytes;
+
         #endregion
 
         public ValidatorEngine() { }
@@ -121,15 +131,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartNewValidationEventRadianAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
-            var validator = new Validator();
-            //DateTime startDate = DateTime.UtcNow;
-
-            //var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            //var xmlParser = new XmlParser(xmlBytes);
-            //if (!xmlParser.Parser())
-            //    throw new Exception(xmlParser.ParserError);
-
-            //NitModel nitModel = xmlParser.Fields.ToObject<NitModel>();
+            var validator = new Validator();           
 
             validateResponses.AddRange(validator.NewValidateEventRadianAsync(trackId));
 
@@ -739,8 +741,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId));
+            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId, _ns));
 
             return validateResponses;
         }
@@ -761,6 +765,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateIndividualPayroll(xmlParser, documentParsed));
             return validateResponses;
+        }
+
+        public void validatorDocumentNameSpaces(byte[] xmlBytes)
+        {
+            _xmlBytes = xmlBytes;
+            _xmlDocument = new XmlDocument() { PreserveWhitespace = true };
+            _xmlDocument.LoadXml(Encoding.UTF8.GetString(xmlBytes));
+
+            var xmlReader = new XmlTextReader(new MemoryStream(xmlBytes)) { Namespaces = true };
+
+            _document = new XPathDocument(xmlReader);
+            _navigator = _document.CreateNavigator();
+
+            _navNs = _document.CreateNavigator();
+            _navNs.MoveToFollowing(XPathNodeType.Element);
+            IDictionary<string, string> nameSpaceList = _navNs.GetNamespacesInScope(XmlNamespaceScope.All);
+
+            _ns = new XmlNamespaceManager(_xmlDocument.NameTable);
+
+            foreach (var nsItem in nameSpaceList)
+            {
+                if (string.IsNullOrEmpty(nsItem.Key))
+                    _ns.AddNamespace("sig", nsItem.Value);
+                else
+                    _ns.AddNamespace(nsItem.Key, nsItem.Value);
+            }
+            _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
 
