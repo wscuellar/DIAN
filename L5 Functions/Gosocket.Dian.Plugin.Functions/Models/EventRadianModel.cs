@@ -3,6 +3,7 @@ using Gosocket.Dian.Plugin.Functions.Event;
 using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using System;
 
 namespace Gosocket.Dian.Plugin.Functions.Models
 {

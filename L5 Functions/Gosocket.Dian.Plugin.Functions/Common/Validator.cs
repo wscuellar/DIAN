@@ -61,12 +61,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
         private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
 
-        readonly XmlDocument _xmlDocument;
-        readonly XPathDocument _document;
-        readonly XPathNavigator _navigator;
-        readonly XPathNavigator _navNs;
-        readonly XmlNamespaceManager _ns;
-        readonly byte[] _xmlBytes;
+        XmlDocument _xmlDocument;
+        XPathDocument _document;
+        XPathNavigator _navigator;
+        XPathNavigator _navNs;
+        XmlNamespaceManager _ns;
+        byte[] _xmlBytes;
 
         private const string NoErrorCode = "SinCódigo";
         private const string DefaultStringValue = "true";
@@ -87,29 +87,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public Validator(byte[] xmlBytes)
         {
-            _xmlBytes = xmlBytes;
-            _xmlDocument = new XmlDocument() { PreserveWhitespace = true };
-            _xmlDocument.LoadXml(Encoding.UTF8.GetString(xmlBytes));
-
-            var xmlReader = new XmlTextReader(new MemoryStream(xmlBytes)) { Namespaces = true };
-
-            _document = new XPathDocument(xmlReader);
-            _navigator = _document.CreateNavigator();
-
-            _navNs = _document.CreateNavigator();
-            _navNs.MoveToFollowing(XPathNodeType.Element);
-            IDictionary<string, string> nameSpaceList = _navNs.GetNamespacesInScope(XmlNamespaceScope.All);
-
-            _ns = new XmlNamespaceManager(_xmlDocument.NameTable);
-
-            foreach (var nsItem in nameSpaceList)
-            {
-                if (string.IsNullOrEmpty(nsItem.Key))
-                    _ns.AddNamespace("sig", nsItem.Value);
-                else
-                    _ns.AddNamespace(nsItem.Key, nsItem.Value);
-            }
-            _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
+            validatorDocumentNameSpaces(xmlBytes);
         }
         #endregion
 
@@ -2678,7 +2656,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateReferenceAttorney
-        private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser)
+        private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -2691,13 +2669,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));            
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
-            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='CompanyID']").Item(0)?.InnerText.ToString();
-            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']");
-            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']");
-            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']");
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(0)?.Attributes["listID"].Value;
+            string companyId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PartyTaxScheme/cbc:CompanyID", ns).Item(0)?.InnerText.ToString();
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID", ns).Item(0)?.InnerText.ToString();
+            XmlNodeList cufeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:ID", ns);
+            XmlNodeList cufeListResponseRefeerence = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:ID", ns);
+            XmlNodeList cufeListDocumentResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse", ns);
+            XmlNodeList cufeListDocumentResponseReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference", ns);
             int countCufeListDocumentResponse = cufeListDocumentResponse.Count - 1;
             int countCufeListDocumentResponseReference = cufeListDocumentResponseReference.Count;
             string xmlID2 = string.Empty;
@@ -2746,11 +2724,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara ID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                    var xmlID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:ID", ns).Item(i)?.InnerText.ToString();
                     if (customizationID == "431" || customizationID == "432")
-                        xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        xmlID2 = cufeListResponseRefeerence.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:ID", ns).Item(i)?.InnerText.ToString();
                     else
-                        xmlID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
+                        xmlID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:ID", ns).Item(i)?.InnerText.ToString();
 
                     if (!String.Equals(xmlID, xmlID2))
                     {
@@ -2772,11 +2750,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Compara UUID seccion DocumentReference 1 /  DocumentReference 2
                 for (int i = 0; i < cufeListResponse.Count; i++)
                 {
-                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][1]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                    var xmlUUID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[1]/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
                     if (customizationID == "431" || customizationID == "432")
-                        xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        xmlUUID2 = cufeListResponseRefeerence.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
                     else
-                        xmlUUID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                        xmlUUID2 = cufeListDocumentResponse.Item(i + 1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
 
 
                     if (!String.Equals(xmlUUID, xmlUUID2))
@@ -2800,9 +2778,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida documentos referenciados
             for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
-                var xmlID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='ID']").Item(i)?.InnerText.ToString();
-                var xmlUUID = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
-                var xmlDocumentTypeCode = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='DocumentTypeCode']").Item(i)?.InnerText.ToString();
+                var xmlID = cufeListResponse.Item(i).SelectNodes("//cac:DocumentReference/cbc:ID", ns).Item(i)?.InnerText.ToString();
+                var xmlUUID = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
+                var xmlDocumentTypeCode = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:DocumentTypeCode", ns).Item(i)?.InnerText.ToString();
 
                 //Valida CUFE referenciado existe en sistema DIAN                
                 var resultValidateCufe = ValidateDocumentReferencePrev(xmlUUID, xmlID, "043", xmlDocumentTypeCode);
@@ -2893,7 +2871,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 0; i < cufeListResponse.Count && !validateID && !validate; i++)
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
-                dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("//*[local-name()='DocumentReference']/*[local-name()='UUID']").Item(i)?.InnerText.ToString();
+                dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
                 var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
                 var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
                 if (!xmlParserCufe.Parser())
@@ -2930,7 +2908,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate Reference Attorney
-        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId)
+        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId, XmlNamespaceManager ns)
         {
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
@@ -2939,23 +2917,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string senderCode = xmlParser.FieldValue("SenderCode", true).ToString();
             string providerCode = xmlParser.FieldValue("ProviderCode", true).ToString();
-            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']");
-            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']");
-            XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse'][2]/*[local-name()='DocumentReference']");
-            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
-            string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']/@schemeID").Item(0)?.InnerText.ToString();
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
+
+            ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+            ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+                     
+            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject",ns);
+                        
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID",ns).Item(0)?.InnerText.ToString();
+            XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse", ns);
+            XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference", ns);
+            string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID", ns).Item(0)?.InnerText.ToString();
+            string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID/@schemeID", ns).Item(0)?.InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(0)?.Attributes["listID"].Value;
             dataSigningtime.EventCode = "043";
             dataSigningtime.SigningTime = xmlParser.SigningTime;
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
-            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
-            string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='PartyIdentification']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-            string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PowerOfAttorney']/*[local-name()='Description']").Item(0)?.InnerText.ToString();
+            string factorTemp = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cac:AgentParty/cac:PartyIdentification/cbc:ID", ns).Item(0)?.InnerText.ToString();
+            string description = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:Description", ns).Item(0)?.InnerText.ToString();
+            string senderId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cac:AgentParty/cac:PartyIdentification/cbc:ID", ns).Item(0)?.InnerText.ToString();
+            string senderPowerOfAttorney = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cbc:ID", ns).Item(0)?.InnerText.ToString();
+            string descriptionSender = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:SenderParty/cac:PowerOfAttorney/cbc:Description", ns).Item(0)?.InnerText.ToString();
 
             bool sendTestSet = false;
             string modoOperacion = string.Empty;
@@ -2973,7 +2956,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Validaciones previas secciones DocumentResponse / DocumentReference 1 y 2
             if (listID != "3")
             {
-                var validateCufeReferenceAttorney = ValidateCufeReferenceAttorney(xmlParser);
+                var validateCufeReferenceAttorney = ValidateCufeReferenceAttorney(xmlParser, ns);
                 if (validateCufeReferenceAttorney != null)
                 {
                     validate = false;
@@ -3220,7 +3203,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
                 {
-                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='LineResponse']/*[local-name()='LineReference']/*[local-name()='DocumentReference']/*[local-name()='Attachment']/*[local-name()='EmbeddedDocumentBinaryObject']").Item(i)?.InnerText.ToString().Trim();
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", ns).Item(i)?.InnerText.ToString().Trim();
 
                     if (!IsBase64(AttachmentBase64))
                     {
@@ -3269,8 +3252,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (cufeList.Count > 2)
                 {
-                    descriptionCode = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(i)?.InnerText.ToString();
-                    string code = cufeList.Item(i).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(i)?.InnerText.ToString();
+                    descriptionCode = cufeList.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:Description", ns).Item(i)?.InnerText.ToString();
+                    string code = cufeList.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(i)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
                         tempCode = code.Split(';');
@@ -3278,8 +3261,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
                 else
                 {
-                    descriptionCode = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='Description']").Item(1)?.InnerText.ToString();
-                    string code = cufeList.Item(1).SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(1)?.InnerText.ToString();
+                    descriptionCode = cufeList.Item(1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:Description", ns).Item(1)?.InnerText.ToString();
+                    string code = cufeList.Item(1).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(1)?.InnerText.ToString();
                     if (!string.IsNullOrWhiteSpace(code))
                     {
                         tempCode = code.Split(';');
@@ -5062,7 +5045,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                 case (int)EventStatus.Mandato:
                     DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime);
-                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     if (dataSigningTime >= modelSigningTime)
                     {
                         responses.Add(new ValidateListResponse
@@ -5081,13 +5064,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = errorCodeRef,
-                            ErrorMessage = errorMesaageRef,
+                            ErrorMessage = errorMessageSign,
+                            //ErrorMessage = errorMesaageRef,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
                     break;
                 case (int)EventStatus.Rejected:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                          ? new ValidateListResponse
                          {
@@ -5108,7 +5092,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Accepted:
                     DateTime signingTimeAccepted = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeReceipt, signingTimeAccepted);
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
@@ -5129,7 +5113,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.AceptacionTacita:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
@@ -5219,7 +5203,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5276,7 +5260,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362" ||
                        nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5296,7 +5280,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5318,7 +5302,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Avales:
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -5349,7 +5333,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -5409,7 +5393,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     string errorCode = string.Empty;
                     string errorMessage = string.Empty;
                     string errorMessageAvailability;
@@ -5483,7 +5467,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
                     if (nitModel.CustomizationId == "432" || nitModel.CustomizationId == "434") //que se mayor
                     {
-                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
+                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                         if (signingTime >= dateMandato)
                         {
                             responses.Add(new ValidateListResponse
@@ -6444,6 +6428,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
+        {
+            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            if (documentStatusValidation == null)
+                return null;
+
+            var fileManager = new FileManager();
+            var container = $"global";
+            var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+
+            return xmlBytes;
+        }
+
 
         #region RequestValidateEmitionEventPrev
 
@@ -6500,7 +6499,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion      
 
         #region NewValidateEventRADIAN
-        public List<ValidateListResponse> NewValidateEventRadianAsync(XmlParser xmlParser, string trackId, NitModel nitModel)
+        public List<ValidateListResponse> NewValidateEventRadianAsync(string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -6522,6 +6521,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 bool validEventRadian = true;
                 bool validEventPrev = true;
                 bool validEventReference = true;
+                string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");
                 RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
                 RequestObjectDocReference docReference = new RequestObjectDocReference();
                 RequestObjectParty requestParty = new RequestObjectParty();
@@ -6533,26 +6533,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                      documentMeta.PartitionKey,
                      documentMeta.EventCode,
                      documentMeta.DocumentTypeId,
-                     nitModel.listID,
+                     documentMeta.ResponseCodeListID,
                      documentMeta.CustomizationID,
-                     xmlParser.SigningTime,
-                     nitModel.ValidityPeriodEndDate,
+                     signingTimeStamp,
+                     documentMeta.ValidityPeriodEndDate,
                      documentMeta.SenderCode,
                      documentMeta.ReceiverCode,
-                     nitModel.DocumentTypeIdRef,
-                     xmlParser.DocumentReferenceId,
-                     nitModel.IssuerPartyCode,
-                     nitModel.IssuerPartyName,
+                     documentMeta.DocumentReferencedTypeId,
+                     documentMeta.DocumentReferencedId,
+                     documentMeta.IssuerPartyCode,
+                     documentMeta.IssuerPartyName,
                      documentMeta.SendTestSet
                      );
 
+                NitModel nitModel = new NitModel(
+                    documentMeta.ResponseCodeListID,
+                    documentMeta.ValidityPeriodEndDate,
+                    documentMeta.DocumentReferencedTypeId,
+                    documentMeta.IssuerPartyCode,
+                    documentMeta.IssuerPartyName,
+                    documentMeta.TechProviderCode,
+                    documentMeta.SerieAndNumber,
+                    documentMeta.DocumentTypeId,
+                    documentMeta.SenderCode
+                    );
+
+
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
                     || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                {
-                    eventRadian.TrackId = xmlParser.Fields["DocumentKey"].ToString();
+                {                   
+                    eventRadian.TrackId = documentMeta.DocumentReferencedKey;
                 }
 
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && nitModel.listID == "3") ? false : true;               
+                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;               
                 responses = ValidateSerieAndNumber(nitModel);
                 validateResponses.AddRange(responses);
 
@@ -6566,8 +6579,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                     && validEventRadian)
-                {                                 
-                    responses = ValidateReferenceAttorney(xmlParser, trackId);
+                {
+                    var xmlBytes = GetXmlFromStorageAsync(trackId);
+                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    if (!xmlParser.Parser())
+                        throw new Exception(xmlParser.ParserError);
+
+                    validatorDocumentNameSpaces(xmlBytes.Result);
+
+                    responses = ValidateReferenceAttorney(xmlParser, trackId, _ns);
                     foreach (var itemReferenceAttorney in responses)
                     {
                         if (itemReferenceAttorney.ErrorCode == "AAH07")
@@ -6639,5 +6659,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
         #endregion
+
+        public void validatorDocumentNameSpaces(byte[] xmlBytes)
+        {
+            _xmlBytes = xmlBytes;
+            _xmlDocument = new XmlDocument() { PreserveWhitespace = true };
+            _xmlDocument.LoadXml(Encoding.UTF8.GetString(xmlBytes));
+
+            var xmlReader = new XmlTextReader(new MemoryStream(xmlBytes)) { Namespaces = true };
+
+            _document = new XPathDocument(xmlReader);
+            _navigator = _document.CreateNavigator();
+
+            _navNs = _document.CreateNavigator();
+            _navNs.MoveToFollowing(XPathNodeType.Element);
+            IDictionary<string, string> nameSpaceList = _navNs.GetNamespacesInScope(XmlNamespaceScope.All);
+
+            _ns = new XmlNamespaceManager(_xmlDocument.NameTable);
+
+            foreach (var nsItem in nameSpaceList)
+            {
+                if (string.IsNullOrEmpty(nsItem.Key))
+                    _ns.AddNamespace("sig", nsItem.Value);
+                else
+                    _ns.AddNamespace(nsItem.Key, nsItem.Value);
+            }
+            _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
+        }
+
     }
 }
