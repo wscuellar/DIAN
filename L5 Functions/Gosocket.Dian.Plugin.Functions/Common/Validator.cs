@@ -2813,7 +2813,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             dataSigningtime.EventCode = "043";
-            dataSigningtime.SigningTime = xmlParser.SigningTime;
+            dataSigningtime.SigningTime = Convert.ToDateTime(xmlParser.SigningTime);
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
@@ -2881,7 +2881,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID/@schemeID", ns).Item(0)?.InnerText.ToString();
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(0)?.Attributes["listID"].Value;
             dataSigningtime.EventCode = "043";
-            dataSigningtime.SigningTime = xmlParser.SigningTime;
+            dataSigningtime.SigningTime = Convert.ToDateTime(xmlParser.SigningTime);
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
@@ -6480,7 +6480,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                      documentMeta.DocumentTypeId,
                      documentMeta.ResponseCodeListID,
                      documentMeta.CustomizationID,
-                     documentMeta.SigningTimeStamp.ToString(),
+                     documentMeta.SigningTimeStamp,
                      documentMeta.ValidityPeriodEndDate,
                      documentMeta.SenderCode,
                      documentMeta.ReceiverCode,
