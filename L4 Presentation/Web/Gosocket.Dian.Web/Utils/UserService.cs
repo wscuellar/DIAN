@@ -126,6 +126,8 @@ namespace Gosocket.Dian.Web.Utils
         }
         public List<ApplicationUser> GetUsers(string code, int status, int page, int length)
         {
+            //TODO Para revisar
+            return new List<ApplicationUser>();
             var query = _sqlDBContext.Users.Where(c =>
                          (string.IsNullOrEmpty(code) || c.Code == code)
                          ).OrderByDescending(c => c.Code).Skip(page * length).Take(length);

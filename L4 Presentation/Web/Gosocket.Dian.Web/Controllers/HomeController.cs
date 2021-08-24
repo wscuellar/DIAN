@@ -187,26 +187,34 @@ namespace Gosocket.Dian.Web.Controllers
                 var emmited = new List<GlobalDataDocument>();
                 bool hasMoreResults = true;
                 var ct = "";
-                do
-                {
-                    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, null, 1000, null, "00");
-                    hasMoreResults = result.Item1;
-                    ct = result.Item2;
-                    emmited.AddRange(result.Item3);
-                } while (hasMoreResults && emmited.Count() < 10000);
-                totalDocumentsEmitted = emmited.Count();
+                //do
+                //{
+                //    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, null, 1000, null, "00");
+                //    hasMoreResults = result.Item1;
+                //    ct = result.Item2;
+                //    emmited.AddRange(result.Item3);
+                //} while (hasMoreResults && emmited.Count() < 10000);
+                //totalDocumentsEmitted = emmited.Count();
+
+
+                //TODO Analizar después
+
+                totalDocumentsEmitted = 0;
 
                 var received = new List<GlobalDataDocument>();
                 hasMoreResults = true;
                 ct = "";
-                do
-                {
-                    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", null, null, contributorCode, null, 1000, null, "00");
-                    hasMoreResults = result.Item1;
-                    ct = result.Item2;
-                    received.AddRange(result.Item3);
-                } while (hasMoreResults && received.Count() < 10000);
-                totalDocumentsReceived = received.Count();
+                //do
+                //{
+                //    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", null, null, contributorCode, null, 1000, null, "00");
+                //    hasMoreResults = result.Item1;
+                //    ct = result.Item2;
+                //    received.AddRange(result.Item3);
+                //} while (hasMoreResults && received.Count() < 10000);
+                //totalDocumentsReceived = received.Count();
+
+                totalDocumentsReceived = 0;
+
             }
             catch (Exception)
             {
