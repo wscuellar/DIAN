@@ -2813,7 +2813,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             dataSigningtime.EventCode = "043";
-            dataSigningtime.SigningTime = Convert.ToDateTime(xmlParser.SigningTime);
+            dataSigningtime.SigningTime = xmlParser.SigningTime;
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
@@ -2881,7 +2881,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string operacionMandato = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID/@schemeID", ns).Item(0)?.InnerText.ToString();
             string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:Response/cbc:ResponseCode", ns).Item(0)?.Attributes["listID"].Value;
             dataSigningtime.EventCode = "043";
-            dataSigningtime.SigningTime = Convert.ToDateTime(xmlParser.SigningTime);
+            dataSigningtime.SigningTime = xmlParser.SigningTime;
             dataSigningtime.DocumentTypeId = "96";
             dataSigningtime.CustomizationID = customizationID;
             dataSigningtime.EndDate = "";
@@ -4992,7 +4992,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                 case (int)EventStatus.Mandato:
                     DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime);
-                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     if (dataSigningTime >= modelSigningTime)
                     {
                         responses.Add(new ValidateListResponse
@@ -5011,13 +5011,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = errorCodeRef,
-                            ErrorMessage = errorMesaageRef,
+                            ErrorMessage = errorMessageSign,
+                            //ErrorMessage = errorMesaageRef,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
                     break;
                 case (int)EventStatus.Rejected:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                          ? new ValidateListResponse
                          {
@@ -5038,7 +5039,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Accepted:
                     DateTime signingTimeAccepted = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeReceipt, signingTimeAccepted);
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
@@ -5059,7 +5060,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.AceptacionTacita:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
@@ -5149,7 +5150,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5206,7 +5207,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362" ||
                        nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5226,7 +5227,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -5248,7 +5249,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Avales:
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -5279,7 +5280,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -5339,7 +5340,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime);
+                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                     string errorCode = string.Empty;
                     string errorMessage = string.Empty;
                     string errorMessageAvailability;
@@ -5413,7 +5414,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
                     if (nitModel.CustomizationId == "432" || nitModel.CustomizationId == "434") //que se mayor
                     {
-                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime);
+                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
                         if (signingTime >= dateMandato)
                         {
                             responses.Add(new ValidateListResponse
@@ -6467,6 +6468,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 bool validEventRadian = true;
                 bool validEventPrev = true;
                 bool validEventReference = true;
+                string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");
                 RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
                 RequestObjectDocReference docReference = new RequestObjectDocReference();
                 RequestObjectParty requestParty = new RequestObjectParty();
@@ -6480,7 +6482,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                      documentMeta.DocumentTypeId,
                      documentMeta.ResponseCodeListID,
                      documentMeta.CustomizationID,
-                     documentMeta.SigningTimeStamp,
+                     signingTimeStamp,
                      documentMeta.ValidityPeriodEndDate,
                      documentMeta.SenderCode,
                      documentMeta.ReceiverCode,

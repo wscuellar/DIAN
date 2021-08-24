@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
         public string DocumentTypeId { get; set; }
         public string ListId { get; set; }
         public string CustomizationId { get; set; }
-        public DateTime SigningTime { get; set; }
+        public string SigningTime { get; set; }
         public string EndDate { get; set; }
         public string SenderParty { get; set; }
         public string ReceiverParty { get; set; }
@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
 
         public EventRadianModel(string trackId, string trackIdCude, string eventCode, 
             string documentTypeId, string listId, 
-            string customizationId, DateTime signingTime, 
+            string customizationId, string signingTime, 
             string endDate, string senderParty, 
             string receiverParty, string documentTypeIdRef, string documentIdReference,
             string issuerPartyCode, string issuerPartyName, bool sendTestSet)
