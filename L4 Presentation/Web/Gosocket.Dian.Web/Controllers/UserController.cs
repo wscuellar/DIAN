@@ -58,10 +58,12 @@ namespace Gosocket.Dian.Web.Controllers
                 _userManager = value;
             }
         }
-        private readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
-        private readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
-        private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        private static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
+
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
 
         private IdentificationTypeService identificationTypeService = new IdentificationTypeService();
         private ContributorService contributorService = new ContributorService();
@@ -537,7 +539,7 @@ namespace Gosocket.Dian.Web.Controllers
                         RouteData = "",
                         StackTrace = ex.StackTrace
                     };
-                    var tableManager = new TableManager("GlobalLogger");
+                    
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
                     return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -671,7 +673,7 @@ namespace Gosocket.Dian.Web.Controllers
                         RouteData = "",
                         StackTrace = ex.StackTrace
                     };
-                    var tableManager = new TableManager("GlobalLogger");
+                    
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
                     return View("CompanyLogin", model);
@@ -777,7 +779,7 @@ namespace Gosocket.Dian.Web.Controllers
                     catch (Exception ex)
                     {
                         var logger = new GlobalLogger("ZD05-WEB", model.CompanyCode) { Action = "CertificateLogin", Controller = "UserController", Message = ex.Message };
-                        var tableManager = new TableManager("GlobalLogger");
+                        
                         tableManager.InsertOrUpdate(logger);
 
                         ModelState.AddModelError($"CertificateLoginFailed", ex.Message);

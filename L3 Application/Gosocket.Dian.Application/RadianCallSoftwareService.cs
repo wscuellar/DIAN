@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Application
         private readonly SoftwareService _softwareService = new SoftwareService();
 
         public readonly IRadianSoftwareRepository _RadianSoftwareRepository;
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         public RadianCallSoftwareService(IRadianSoftwareRepository radianSoftwareRepository)
         {
             _RadianSoftwareRepository = radianSoftwareRepository;
@@ -80,7 +81,7 @@ namespace Gosocket.Dian.Application
 
         private void RegisterException(GlobalLogger logger)
         {
-            var tableManager = new TableManager("GlobalLogger");
+            
             tableManager.InsertOrUpdate(logger);
         }
 

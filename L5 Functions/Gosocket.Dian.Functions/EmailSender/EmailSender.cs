@@ -21,6 +21,7 @@ namespace Gosocket.Dian.Functions.EmailSender
     {
         static string mailServerQueueId = string.Empty;
         static StringBuilder mailServerProtocol = new StringBuilder();
+        private static readonly TableManager manager = new TableManager("DianEmailTracker");
 
         [FunctionName("EmailSender")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -161,7 +162,7 @@ namespace Gosocket.Dian.Functions.EmailSender
 
         private static async Task TrackEmailResponse(DianEmailTracker tracker)
         {
-            var manager = new TableManager("DianEmailTracker");
+            
             await manager.InsertOrUpdateAsync(tracker);
         }
     }

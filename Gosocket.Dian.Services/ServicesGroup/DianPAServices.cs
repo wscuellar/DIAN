@@ -19,28 +19,28 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class DianPAServices : IDisposable
     {
-        private TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");      
-        private TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
-        private TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
-        private TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
-        private TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
+        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");      
+        private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
+        private static readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
+        private static readonly TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
+        private static readonly TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
 
-        private TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
-        private TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
-        private TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
-        private TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
-        private TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
+        private static readonly TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
+        private static readonly TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
+        private static readonly TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
+        private static readonly TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
+        private static readonly TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
 
-        private TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
-        private TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private static readonly TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
+        private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
-        private TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
-        private readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
-        private readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
+        private static readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
+        private static readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
-        private FileManager fileManager = new FileManager();
+        private static readonly FileManager fileManager = new FileManager();
 
         private readonly string blobContainer = "global";
         private readonly string blobContainerFolder = "batchValidator";

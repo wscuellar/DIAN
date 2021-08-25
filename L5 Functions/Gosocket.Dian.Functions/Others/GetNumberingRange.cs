@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Functions.Others
 {
     public static class GetNumberingRange
     {
+        private static readonly TableManager tableManagerGlobalDocFolioManager = new TableManager("FolioManager");
         [FunctionName("GetNumberingRange")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
@@ -34,7 +35,7 @@ namespace Gosocket.Dian.Functions.Others
             if (senderCode == null)
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a senderCode on the query string or in the request body");
 
-            var tableManagerGlobalDocFolioManager = new TableManager("FolioManager");
+            
 
             var folios = tableManagerGlobalDocFolioManager.FindByPartition<GlobalDocModelFolio>(senderCode).ToList();
 
