@@ -4169,7 +4169,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+
         #region Validación de la Sección DocumentReference - CUFE Informado
+
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729
         public List<ValidateListResponse> ValidateDocumentReferencePrev(string trackId, string idDocumentReference, string eventCode,
@@ -4251,7 +4254,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else
             {
                 //Valida exista CUFE/CUDE en sistema DIAN
-                var documentMeta = documentMetaTableManager.FindpartitionKey<GlobalDocValidatorDocumentMeta>(trackId?.ToLower()).FirstOrDefault();
+                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId?.ToLower(), trackId?.ToLower());
                 if (documentMeta != null)
                 {
                     responses.Add(new ValidateListResponse
@@ -4265,7 +4268,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //Valida se encuentre aprobado el documento referenciado
                     var approved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier, documentMeta?.PartitionKey);
-                    if(approved == null)
+                    if (approved == null)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -4307,7 +4310,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    if(Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation 
+                    if (Convert.ToInt32(eventCode) == (int)EventStatus.InvoiceOfferedForNegotiation
                         && documentMeta.DocumentTypeId != "96")
                     {
                         responses.Add(new ValidateListResponse
@@ -4349,7 +4352,226 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
 
-                        var responseListEndoso = ValidateTransactionCufe(trackId.ToLower());
+                        var responseListEndoso = ValidateTransactionCufe(documentMeta);
+                        if (responseListEndoso != null)
+                        {
+                            foreach (var item in responseListEndoso)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = item.IsValid,
+                                    Mandatory = item.Mandatory,
+                                    ErrorCode = item.ErrorCode,
+                                    ErrorMessage = item.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = errorCodeReglaUUID,
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            return responses;
+        }
+
+        //Validación de la Sección DocumentReference - CUFE Informado TASK 804
+        //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729     
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(GlobalDocValidatorDocumentMeta documentMeta)
+        {
+            string messageTypeId = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
+                ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
+                : ConfigurationManager.GetValue("ErrorMessage_AAH09");
+            string errorCodeReglaUUID = "AAH07";
+            string trackidRef = documentMeta.DocumentReferencedKey;
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            DateTime startDate = DateTime.UtcNow;
+
+            if (string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey))
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = errorCodeReglaUUID,
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
+            {
+                //Valida referencia evento terminacion de mandato
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = "100",
+                    ErrorMessage = "Evento ValidateDocumentReferencePrev referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                var referenceAttorneyResult = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(documentMeta.DocumentReferencedKey?.ToLower());
+                if (referenceAttorneyResult == null)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAH07",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
+                    if (referenceAttorneyResult.SerieAndNumber != documentMeta.DocumentReferencedId)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_043"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida DocumentTypeCode coincida con el documento informado
+                    if ("96" != documentMeta.DocumentReferencedTypeId)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH09",
+                            ErrorMessage = "No corresponde al literal '96'",
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
+            else
+            {
+                //Valida exista CUFE/CUDE en sistema DIAN
+                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
+                   || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+                {
+                    trackidRef = documentMeta.CancelElectronicEvent;
+                }
+
+
+                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackidRef?.ToLower(), trackidRef?.ToLower());
+                if (documentMetaRef != null)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = "Evento ValidateDocumentReferencePrev referenciado correctamente",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    //Valida se encuentre aprobado el documento referenciado
+                    var approved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMetaRef?.Identifier, documentMetaRef?.Identifier, documentMetaRef?.PartitionKey);
+                    if(approved == null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeReglaUUID,
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
+                    if (documentMetaRef.SerieAndNumber != documentMeta.DocumentReferencedId)
+                    {
+                        string message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                            || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
+                            ? ConfigurationManager.GetValue("ErrorMessage_AAH06_043")
+                            : ConfigurationManager.GetValue("ErrorMessage_AAH06");
+
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = message,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    //Valida DocumentTypeCode coincida con el documento informado
+                    if (documentMetaRef.DocumentTypeId != documentMeta.DocumentReferencedTypeId)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH09",
+                            ErrorMessage = messageTypeId,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation 
+                        && documentMetaRef.DocumentTypeId != "96")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad ||
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoGarantia ||
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion)
+                    {
+                        //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
+                        if (documentMetaRef.ReceiverCode != documentMeta.IssuerPartyCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAH26b",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH26b"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
+                        if (documentMetaRef.ReceiverName != documentMeta.IssuerPartyName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAH25b",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH25b"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
                         if (responseListEndoso != null)
                         {
                             foreach (var item in responseListEndoso)
@@ -5503,14 +5725,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateTransactionCufe
-        private List<ValidateListResponse> ValidateTransactionCufe(string trackId)
+        private List<ValidateListResponse> ValidateTransactionCufe(GlobalDocValidatorDocumentMeta validatorDocumentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<Task> arrayTasks = new List<Task>();
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validTransaction = false;
-
-            GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            
             if (validatorDocumentMeta != null)
             {
                 if (!validatorDocumentMeta.SendTestSet)
@@ -5547,13 +5768,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
         #region validation for CBC ID
-        public List<ValidateListResponse> ValidateSerieAndNumber(NitModel nitModel)
+        public List<ValidateListResponse> ValidateSerieAndNumber(NitModel nitModel, GlobalDocValidatorDocumentMeta documentMeta)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             List<ValidateListResponse> listResponses = new List<ValidateListResponse>();
-            var documentReference = TableManagerGlobalDocRegisterProviderAR.FindDocumentRegisterAR<GlobalDocRegisterProviderAR>(nitModel.ProviderCode, nitModel.DocumentTypeId, nitModel.SerieAndNumber);
-
             responses.Add(new ValidateListResponse
             {
                 IsValid = true,
@@ -5563,18 +5782,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            if (documentReference.Count() > 0)
+            var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier, documentMeta.PartitionKey);
+            if(document != null)
             {
-                responses.Add(new ValidateListResponse
+                if(documentMeta.SerieAndNumber == nitModel.SerieAndNumber && documentMeta.TechProviderCode == nitModel.ProviderCode && documentMeta.DocumentTypeId == nitModel.DocumentTypeId)
                 {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAD05b",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD05b"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAD05b",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD05b"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
             }
-
+         
             var responseCheckDocument = CheckDocument(nitModel.SenderCode, nitModel.DocumentTypeId, nitModel.SerieAndNumber);
             if (responseCheckDocument != null)
             {
@@ -6513,7 +6736,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;               
-                responses = ValidateSerieAndNumber(nitModel);
+                responses = ValidateSerieAndNumber(nitModel, documentMeta);
                 validateResponses.AddRange(responses);
 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
@@ -6546,9 +6769,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
-                    responses = ValidateDocumentReferencePrev(docReference.TrackId, docReference.IdDocumentReference, 
-                        docReference.EventCode, docReference.DocumentTypeIdRef, docReference.IssuerPartyCode,
-                        docReference.IssuerPartyName);
+                    responses = ValidateDocumentReferencePrev(documentMeta);
+
+
+                    //responses = ValidateDocumentReferencePrev(docReference.TrackId, docReference.IdDocumentReference, 
+                    //    docReference.EventCode, docReference.DocumentTypeIdRef, docReference.IssuerPartyCode,
+                    //    docReference.IssuerPartyName);
+
+
                     foreach (var itemReference in responses)
                     {
                         if (!itemReference.IsValid)
