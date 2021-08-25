@@ -6521,7 +6521,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 bool validEventRadian = true;
                 bool validEventPrev = true;
                 bool validEventReference = true;
-                string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");
+                string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");                
                 RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
                 RequestObjectDocReference docReference = new RequestObjectDocReference();
                 RequestObjectParty requestParty = new RequestObjectParty();
@@ -6562,7 +6562,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
                     || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
                 {                   
-                    eventRadian.TrackId = documentMeta.DocumentReferencedKey;
+                    eventRadian.TrackId = documentMeta.CancelElectronicEvent;                    
                 }
 
                 bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;               
