@@ -466,7 +466,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Obtiene legitimo tenedor               
             LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude);
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude.ProviderCode.ToString());
             if (responseHolderExchange != null)
                 senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
 
@@ -673,7 +673,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region RetrieveSenderHolderExchange
-        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe, XmlParser xmlParserCude)
+        public HolderExchangeModel RetrieveSenderHolderExchange(string cufe, string providerCode)
         {
             HolderExchangeModel response = new HolderExchangeModel();
 
@@ -693,7 +693,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida exista mandatario representante para cada legitimo tenedor
                     foreach (string endosatario in endosatarios)
                     {
-                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(cufe, endosatario, xmlParserCude.ProviderCode);
+                        GlobalDocReferenceAttorney documentAttorney = documentAttorneyTableManager.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(cufe, endosatario, providerCode);
                         if (documentAttorney == null)
                         {
                             validFor = false;
@@ -702,7 +702,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     if (validFor)
-                        response.PartyLegalEntity = xmlParserCude.ProviderCode;
+                        response.PartyLegalEntity = providerCode;
                 }
 
                 response.PartitionKey = documentHolderExchange.PartitionKey;
@@ -869,7 +869,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validForItem = false;
                         var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).NewAmountTV;
-                        var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
+                        var responseListEndoso = ValidateEndoso(xmlParserCude, nitModel, eventCode, newAmountTV);
                         if (responseListEndoso != null)
                         {
                             foreach (var item in responseListEndoso)
@@ -1025,7 +1025,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validForItem = false;
                         var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).NewAmountTV;
-                        var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
+                        var responseListEndoso = ValidateEndoso(xmlParserCude, nitModel, eventCode, newAmountTV);
                         if (responseListEndoso != null)
                         {
                             foreach (var item in responseListEndoso)
@@ -1163,7 +1163,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         validForItem = false;
                         var newAmountTV = documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).NewAmountTV;
-                        var responseListEndoso = ValidateEndoso(xmlParserCufe, xmlParserCude, nitModel, eventCode, newAmountTV);
+                        var responseListEndoso = ValidateEndoso(xmlParserCude, nitModel, eventCode, newAmountTV);
                         if (responseListEndoso != null)
                         {
                             foreach (var item in responseListEndoso)
@@ -1402,7 +1402,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Obtiene legitimo tenedor               
             LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude);
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude.ProviderCode.ToString());
             if (responseHolderExchange != null)
                 senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
             else
@@ -2177,7 +2177,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndoso
-        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode, double newAmountTV)
+        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCude, NitModel nitModel, string eventCode, double newAmountTV)
         {
             DateTime startDate = DateTime.UtcNow;
             //valor total Endoso Electronico AR

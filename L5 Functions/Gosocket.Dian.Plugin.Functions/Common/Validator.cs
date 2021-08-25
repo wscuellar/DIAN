@@ -1449,7 +1449,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 && !party.SendTestSet
                 && isRadian)
             {
-                var responseVal = ValidateFacultityAttorney(nitModel, party, xmlParserCude);
+                var responseVal = ValidateFacultityAttorney(party, xmlParserCude.ProviderCode, xmlParserCude.Fields["SenderCode"].ToString(), xmlParserCude.NoteMandato, xmlParserCude.NoteMandato2,
+                    xmlParserCude.Fields["SoftwareId"].ToString());
                 if (responseVal != null)
                 {
                     foreach (var item in responseVal)
@@ -1627,7 +1628,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida existe cambio legitimo tenedor factura
                     bool validHolderExchang = false;
                     LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey, xmlParserCude);
+                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey, xmlParserCude.ProviderCode.ToString());
                     if (responseHolderExchange != null)
                     {
                         validHolderExchang = true;
@@ -2077,6 +2078,672 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
         }
+
+        public List<ValidateListResponse> ValidateParty(NitModel nitModel, RequestObjectParty party, GlobalDocValidatorDocumentMeta documentMetaCude,
+            List<string> issuerAttorneyList = null, string issuerAttorney = null, string senderAttorney = null,
+            string partyLegalEntityName = null, string partyLegalEntityCompanyID = null, string availabilityCustomizationId = null)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            party.TrackId = party.TrackId.ToLower();
+            ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            string eventCode = party.ResponseCode;
+            //Valida cambio legitimo tenedor
+            string senderCode = nitModel.SenderCode;
+            string receiverCode = nitModel.ReceiverCode;
+            string receiverNameCude = documentMetaCude.ReceiverName;
+            string receiverNameCufe = nitModel.ReceiverName;
+            string errorMessageParty = "Evento ValidateParty referenciado correctamente";
+
+            //Endoso en Blanco
+            if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
+               Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion) && party.ListId == "2")
+            {
+                party.SenderParty = nitModel.SenderCode;
+            }
+
+            // Is Radian
+            var isRadian = false;
+
+            var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
+            if (docEvent != null)
+                isRadian = docEvent.IsRadian;
+
+            //valida si existe los permisos del mandatario
+            if (party.SenderParty != documentMetaCude.TechProviderCode
+                && documentMetaCude.TechProviderCode != "800197268"
+                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
+                && !party.SendTestSet
+                && isRadian)
+            {
+                var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
+                if (responseVal != null)
+                {
+                    foreach (var item in responseVal)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = item.IsValid,
+                            Mandatory = item.Mandatory,
+                            ErrorCode = item.ErrorCode,
+                            ErrorMessage = item.ErrorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
+
+            switch (Convert.ToInt16(party.ResponseCode))
+            {
+                case (int)EventStatus.Received:
+                case (int)EventStatus.Rejected:
+                case (int)EventStatus.Receipt:
+                case (int)EventStatus.Accepted:
+                    //Valida emeisor documento 
+                    if (party.SenderParty != receiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCodeFETV,
+                            ErrorMessage = errorCodeMessage.errorMessageFETV,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    //Valida receptor documento AR coincida con el Emisor/Facturador
+                    if (party.ReceiverParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCodeReceiverFETV,
+                            ErrorMessage = errorCodeMessage.errorMessageReceiverFETV,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.AceptacionTacita:
+
+                    if (party.SenderParty != senderCode && (Convert.ToInt32(eventCode) != (int)EventStatus.Mandato))
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = (Convert.ToInt32(eventCode) == 34) ? errorCodeMessage.errorCodeFETV : errorCodeMessage.errorCode,
+                            ErrorMessage = (Convert.ToInt32(eventCode) == 34) ? errorCodeMessage.errorMessageFETV : errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida receptor documento AR coincida con DIAN
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = Convert.ToInt16(party.ResponseCode) == 34 ? "AAG01e" : "AAG04",
+                            ErrorMessage = Convert.ToInt16(party.ResponseCode) == 34 ? ConfigurationManager.GetValue("ErrorMessage_AAG01e") : ConfigurationManager.GetValue("ErrorMessage_AAG04"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.Mandato:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    return responses;
+
+                case (int)EventStatus.Avales:
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    if ((party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                        || (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty)))
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+                case (int)EventStatus.SolicitudDisponibilizacion:
+
+                    //Valida existe cambio legitimo tenedor factura
+                    bool validHolderExchang = false;
+                    LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
+                    HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(nitModel.DocumentKey, documentMetaCude.TechProviderCode);
+                    if (responseHolderExchange != null)
+                    {
+                        validHolderExchang = true;
+                        senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
+                    }
+
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = validHolderExchang ? errorCodeMessage.errorCodeB : errorCodeMessage.errorCode,
+                            ErrorMessage = validHolderExchang ? errorCodeMessage.errorMessageB : errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.EndosoPropiedad:
+                case (int)EventStatus.EndosoGarantia:
+                case (int)EventStatus.EndosoProcuracion:
+
+                    var receiverNameEndoso = documentMetaCude.ReceiverName;
+                    var receiverCodeEndoso = documentMetaCude.ReceiverCode;
+
+                    if (party.ListId != "2") // No informa SenderParty es un endoso en blanco entonces no valida emisor documento
+                    {
+                        if (party.SenderParty != senderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = errorMessageParty,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    // EndosoPropiedad
+                    if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
+                        && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
+                    {
+                        if (partyLegalEntityName != receiverNameEndoso)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG03",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG03_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (partyLegalEntityCompanyID != receiverCodeEndoso)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        var receiverPartyLegalEntityCompanyID = documentMetaCude.ReceiverPartyLegalEntityCompanyID;
+                        var receiverPartyLegalEntityName = documentMetaCude.ReceiverPartyLegalEntityName;
+
+                        if (receiverNameEndoso != receiverPartyLegalEntityName)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG13",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG13"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (receiverCodeEndoso != receiverPartyLegalEntityCompanyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG14",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG14"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.InvoiceOfferedForNegotiation:
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida receptor documento AR coincida con el Endosatario
+                    if (party.ReceiverParty != receiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04a",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04a"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.NegotiatedInvoice:
+                case (int)EventStatus.AnulacionLimitacionCirculacion:
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    if ((party.SenderParty == senderCode || party.SenderParty == receiverCode)
+                        || (issuerAttorneyList != null && issuerAttorneyList.Contains(party.SenderParty)))
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC64",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    // Valida receptor documento AR coincida con DIAN
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+
+                case (int)EventStatus.TerminacionMandato:
+                    //Revocación es información del mandante
+                    if (party.CustomizationID == "441")
+                    {
+                        if (party.SenderParty != senderAttorney)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = errorMessageParty,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        // Valida receptor documento AR coincida con DIAN
+                        if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = errorMessageParty,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+                    //Renuncia
+                    else if (party.CustomizationID == "442")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                        //Renuncia es información del mandatario
+                        if (party.SenderParty != issuerAttorney)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = errorCodeMessage.errorCode,
+                                ErrorMessage = errorCodeMessage.errorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                    }
+                    return responses;
+
+                //NotificacionPagoTotalParcial
+                case (int)EventStatus.NotificacionPagoTotalParcial:
+                    if (party.SenderParty == receiverCode || party.SenderParty == senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    return responses;
+                //Valor Informe 3 dias pago
+                case (int)EventStatus.ValInfoPago:
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = true,
+                        Mandatory = true,
+                        ErrorCode = "100",
+                        ErrorMessage = errorMessageParty,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    if (party.SenderParty != receiverCode)
+                    {
+                        var valid = ValidateBuyThreeDay(party.TrackId, party.SenderParty, nitModel.DocumentTypeId, (int)EventStatus.ValInfoPago);
+                        if (valid != null)
+                        {
+                            responses.Add(valid);
+                        }
+                        else
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = true,
+                                Mandatory = true,
+                                ErrorCode = "100",
+                                ErrorMessage = errorMessageParty,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                    // Valida receptor documento AR coincida con DIAN
+                    if (party.ReceiverParty != nitModel.ReceiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_046"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    // Valida nombre receptor documento Adquirente/Deudor/aceptante"
+                    if (receiverNameCude != receiverNameCufe)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG01_046"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+            }
+            foreach (var r in responses)
+                r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return responses;
+        }
         #endregion
 
 
@@ -2286,16 +2953,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateFacultityAttorney
-        private List<ValidateListResponse> ValidateFacultityAttorney(NitModel nitModel, RequestObjectParty party, XmlParser xmlParserCude)
+        private List<ValidateListResponse> ValidateFacultityAttorney(RequestObjectParty party, string providerCode, string senderCode, string noteMandato, string noteMandato2, string softwareId)
         {
             DateTime startDate = DateTime.UtcNow;
-            string issueAtorney = xmlParserCude.ProviderCode;
+            string issueAtorney = providerCode;
             string eventCode = party.ResponseCode;
             string cufe = party.TrackId;
-            string senderCode = xmlParserCude.Fields["SenderCode"].ToString();
-            string noteMandato = xmlParserCude.NoteMandato;
-            string noteMandato2 = xmlParserCude.NoteMandato2;
-            string softwareId = xmlParserCude.Fields["SoftwareId"].ToString();
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(eventCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validError = false;
@@ -4387,13 +5050,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         //Validación de la Sección DocumentReference - CUFE Informado TASK 804
         //Validación de la Sección DocumentReference - CUDE  del evento referenciado TASK 729     
-        public List<ValidateListResponse> ValidateDocumentReferencePrev(GlobalDocValidatorDocumentMeta documentMeta)
+        public List<ValidateListResponse> ValidateDocumentReferencePrev(GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaRef)
         {
             string messageTypeId = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
                 ? ConfigurationManager.GetValue("ErrorMessage_AAH09_043")
                 : ConfigurationManager.GetValue("ErrorMessage_AAH09");
             string errorCodeReglaUUID = "AAH07";
-            string trackidRef = documentMeta.DocumentReferencedKey;
+            //string trackidRef = documentMeta.DocumentReferencedKey;
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
@@ -4466,14 +5129,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else
             {
                 //Valida exista CUFE/CUDE en sistema DIAN
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
-                   || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
-                {
-                    trackidRef = documentMeta.CancelElectronicEvent;
-                }
+                //if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
+                //   || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
+                //{
+                //    trackidRef = documentMeta.CancelElectronicEvent;
+                //}
 
 
-                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackidRef?.ToLower(), trackidRef?.ToLower());
+                //var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackidRef?.ToLower(), trackidRef?.ToLower());
                 if (documentMetaRef != null)
                 {
                     responses.Add(new ValidateListResponse
@@ -6453,52 +7116,63 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateParty
 
-        public List<ValidateListResponse> RequestValidateParty(RequestObjectParty party)
+        public List<ValidateListResponse> RequestValidateParty(RequestObjectParty party, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {           
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
             ValidatorEngine validatorEngine = new ValidatorEngine();
-            XmlParser xmlParserCufe = null;
-            XmlParser xmlParserCude = null;
             string receiverCancelacion = String.Empty;
             string issuerAttorney = string.Empty;
             string senderAttorney = string.Empty;
-            string trackIdAvailability = null;
+            var eventCode = int.Parse(party.ResponseCode);
+            GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
+            GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
+            NitModel nitModel = new NitModel();
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
-            if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
-                Convert.ToInt32(party.ResponseCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+            if (eventCode == (int)EventStatus.InvoiceOfferedForNegotiation ||
+                eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
                     party.TrackId = documentMeta.DocumentReferencedKey;
                     receiverCancelacion = documentMeta.ReceiverCode;
+
+                    //Obtiene XML Factura Electornica CUFE
+                    cufeDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(party.TrackId, party.TrackId);
                 }
             }
 
             //Obtiene XML Factura Electornica CUFE
-            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(party.TrackId);
-            xmlParserCufe = new XmlParser(xmlBytes.Result);
-            if (!xmlParserCufe.Parser())
-                throw new Exception(xmlParserCufe.ParserError);
+            if (string.IsNullOrEmpty(cufeDocumentMeta.PartitionKey))
+            {
+                nitModel.SenderCode = documentMeta.SenderCode;
+                nitModel.ReceiverCode = documentMeta.ReceiverCode;
+                nitModel.ReceiverName = documentMeta.ReceiverName;
+                nitModel.DocumentKey = documentMeta.DocumentKey;
+                nitModel.DocumentTypeId = documentMeta.DocumentTypeId;                
+            } 
+            else
+            {
+                nitModel.SenderCode = cufeDocumentMeta.SenderCode;
+                nitModel.ReceiverCode = cufeDocumentMeta.ReceiverCode;
+                nitModel.ReceiverName = cufeDocumentMeta.ReceiverName;
+                nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
+                nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
+            }
 
-            //Obtiene XML ApplicationResponse CUDE
-            var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(party.TrackIdCude.ToLower());
-            xmlParserCude = new XmlParser(xmlBytesCude.Result);
-            if (!xmlParserCude.Parser())
-                throw new Exception(xmlParserCude.ParserError);
-
-            var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
 
             // ...
             List<string> issuerAttorneyList = null;
-            var eventCode = int.Parse(party.ResponseCode);
+
+            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
+
             if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                var attorneyList = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorneyByCUFEList<GlobalDocReferenceAttorney>(party.TrackId);
+                List<GlobalDocReferenceAttorney> attorneyList = InvoiceWrapper.Select(s => s.Documents).ToList()[0].Where(w => w.Attorney != null).Select(x => x.Attorney).ToList();
+
                 if (attorneyList != null && attorneyList.Count > 0)
                 {
                     issuerAttorneyList = new List<string>();
@@ -6514,29 +7188,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
-            else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
+            else if (eventCode == (int)EventStatus.EndosoPropiedad)
             {
                 string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
-                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                    trackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
-                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;               
+                    availabilityDocumentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
             }
 
             string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
-            if ((Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(trackIdAvailability)))
+            if ((eventCode == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(availabilityDocumentMeta.PartitionKey)))
             {
-                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
-                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
-                if (!availabilityXmlParser.Parser())
-                    throw new Exception(availabilityXmlParser.ParserError);
-
-                partyLegalEntityName = availabilityXmlParser.Fields["PartyLegalEntityName"].ToString();
-                partyLegalEntityCompanyID = availabilityXmlParser.Fields["PartyLegalEntityCompanyID"].ToString();
-                availabilityCustomizationId = availabilityXmlParser.Fields["CustomizationId"].ToString();
+                partyLegalEntityName = availabilityDocumentMeta.PartyLegalEntityName;
+                partyLegalEntityCompanyID = availabilityDocumentMeta.PartyLegalEntityCompanyID;
+                availabilityCustomizationId = availabilityDocumentMeta.CustomizationID;
             }
-
 
             if (eventCode == (int)EventStatus.TerminacionMandato)
             {
@@ -6566,7 +7233,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach (string endosatario in endosatarios)
                     {
-                        GlobalDocReferenceAttorney documentAttorney = TableManagerGlobalDocReferenceAttorney.FindhByCufeSenderAttorney<GlobalDocReferenceAttorney>(party.TrackId.ToLower(), endosatario, xmlParserCude.ProviderCode);
+                        string providerCode = documentMetaCude.TechProviderCode;
+
+                        List<GlobalDocReferenceAttorney> attorneyList = InvoiceWrapper.Select(s => s.Documents).ToList()[0].Where(w => w.Attorney != null).Select(x => x.Attorney).Where(w => w.EndDate != null).ToList();
+                        GlobalDocReferenceAttorney documentAttorney = attorneyList.Where(w => w.SenderCode == endosatario && w.IssuerAttorney == providerCode).FirstOrDefault();
+                        
                         if (documentAttorney == null)
                         {
                             valid = false;
@@ -6591,7 +7262,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Enodsatario Anulacion endoso
                 nitModel.ReceiverCode = receiverCancelacion != "" ? receiverCancelacion : nitModel.ReceiverCode;
                 var validator = new Validator();
-                validateResponses.AddRange(ValidateParty(nitModel, party, xmlParserCude, issuerAttorneyList,
+                validateResponses.AddRange(ValidateParty(nitModel, party, documentMetaCude, issuerAttorneyList,
                     issuerAttorney, senderAttorney, partyLegalEntityName, partyLegalEntityCompanyID, availabilityCustomizationId));
             }
             return validateResponses;
@@ -6616,24 +7287,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateEmitionEventPrev
 
-        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev)
+        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {
             var validateResponses = new List<ValidateListResponse>();
             ValidatorEngine validatorEngine = new ValidatorEngine();
-            var nitModel = new NitModel();
+            NitModel nitModel = new NitModel();
             XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
+            GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
+            GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
                 Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
+                //var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
-                    //Obtiene XML ApplicationResponse CUDE
+                    ////Obtiene XML ApplicationResponse CUDE
                     var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
                     xmlParserCude = new XmlParser(xmlBytesCude.Result);
                     if (!xmlParserCude.Parser())
@@ -6651,13 +7324,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!xmlParserCufe.Parser())
                     throw new Exception(xmlParserCufe.ParserError);
 
-                //Obtiene XML ApplicationResponse CUDE
+                ////Obtiene XML ApplicationResponse CUDE
                 var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
                 xmlParserCude = new XmlParser(xmlBytesCude.Result);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
                 nitModel = xmlParserCude.Fields.ToObject<NitModel>();
+                //nitModel.CustomizationId = documentMetaCude.CustomizationID;
+                //nitModel.SenderCode = documentMetaCude.SenderCode;
+                //nitModel.listID = documentMetaCude.ResponseCodeListID;
+                //nitModel.ProviderCode = documentMetaCude.TechProviderCode;
+                //nitModel.ValorTotalEndoso = documentMetaCude;
+                //nitModel.PrecioPagarseFEV = documentMetaCude;
+                //nitModel.TasaDescuento = documentMetaCude;
+                //nitModel.ResponseCode = documentMetaCude;
+                //nitModel.ValorActualTituloValor = documentMetaCude;
             }
 
             var validator = new Validator();
@@ -6766,16 +7448,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.AddRange(responses);
                 }
 
+                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());
+
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
-                    responses = ValidateDocumentReferencePrev(documentMeta);
-
-
-                    //responses = ValidateDocumentReferencePrev(docReference.TrackId, docReference.IdDocumentReference, 
-                    //    docReference.EventCode, docReference.DocumentTypeIdRef, docReference.IssuerPartyCode,
-                    //    docReference.IssuerPartyName);
-
+                    responses = ValidateDocumentReferencePrev(documentMeta, documentMetaRef);
 
                     foreach (var itemReference in responses)
                     {
@@ -6791,11 +7469,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
                     EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
-                    
-                    responses = RequestValidateParty(requestParty);
+
+                    responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
                     validateResponses.AddRange(responses);
 
-                    responses = RequestValidateEmitionEventPrev(eventPrev);
+                    responses = RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
                     foreach (var itemResponsesTacita in responses)
                     {
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
