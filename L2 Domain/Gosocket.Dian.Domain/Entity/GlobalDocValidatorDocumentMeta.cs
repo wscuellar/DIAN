@@ -64,5 +64,6 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string ReceiverPartyLegalEntityName { get; set; }
     public string PartyLegalEntityName { get; set; }
     public string PartyLegalEntityCompanyID { get; set; }
+    public string PaymentDueDate { get; set; }
 
 }
