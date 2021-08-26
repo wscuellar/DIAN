@@ -6079,7 +6079,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateManadatory,
                             ErrorCode = "89",
                             ErrorMessage = "PaymentDueDate llega NULL",
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -7335,12 +7335,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
-                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;
-                    //////Obtiene XML ApplicationResponse CUDE
-                    //var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                    //xmlParserCude = new XmlParser(xmlBytesCude.Result);
-                    //if (!xmlParserCude.Parser())
-                    //    throw new Exception(xmlParserCude.ParserError);
+                    eventPrev.TrackId = documentMeta.DocumentReferencedKey;                  
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
