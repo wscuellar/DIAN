@@ -1,14 +1,17 @@
-﻿using Gosocket.Dian.Infrastructure;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Gosocket.Dian.Application.Managers
+namespace Gosocket.Dian.Infrastructure
 {
     public class CategoryManager
     {
         public static string PartitionKey = "Category";
         private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorCategory");
 
-        public bool Insert(string code, string name, string description)
+        public bool Insert(string code, string name, string description, string xpathCondition)
         {
             return Insert(new Domain.Entity.GlobalDocValidatorCategory
             {
@@ -16,7 +19,9 @@ namespace Gosocket.Dian.Application.Managers
                 RowKey = code,
                 Code = code,
                 Name = name,
-                Description = description
+                Description = description,
+                XpathCondition = xpathCondition,
+                Active = true,
             });
         }
 

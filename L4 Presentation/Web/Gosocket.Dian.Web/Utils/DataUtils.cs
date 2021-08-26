@@ -2,6 +2,7 @@
 using Gosocket.Dian.Application.Managers;
 using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 
