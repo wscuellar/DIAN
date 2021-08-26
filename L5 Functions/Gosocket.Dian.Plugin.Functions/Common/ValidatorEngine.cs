@@ -348,7 +348,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser.SigningTime, xmlParser.PaymentDueDate, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
                 signingTimeAvailability: signingTimeAvailability));
 
             return validateResponses;

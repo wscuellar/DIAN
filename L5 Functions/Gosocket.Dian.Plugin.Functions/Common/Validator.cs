@@ -3491,8 +3491,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (!xmlParserCufe.Parser())
                     throw new Exception(xmlParserCufe.ParserError);
 
-
-                var resultValidateSignInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe, nitModel);
+                var resultValidateSignInTime = ValidateSigningTime(dataSigningtime, xmlParserCufe.SigningTime, xmlParserCufe.PaymentDueDate, nitModel);
                 foreach (var itemSingInTIme in resultValidateSignInTime)
                 {
                     if (!itemSingInTIme.IsValid)
@@ -5831,7 +5830,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateSigningTime
-        public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, XmlParser dataModel, NitModel nitModel, string paymentDueDateFE = null,
+        public List<ValidateListResponse> ValidateSigningTime(RequestObjectSigningTime data, string dataModelSigningTime, string dataModelPaymentDueDate, NitModel nitModel, string paymentDueDateFE = null,
             DateTime? signingTimeAvailability = null)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();            
@@ -5877,7 +5876,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                 case (int)EventStatus.Mandato:
                     DateTime dataSigningTime = Convert.ToDateTime(data.SigningTime);
-                    DateTime modelSigningTime = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
+                    DateTime modelSigningTime = Convert.ToDateTime(dataModelSigningTime).AddHours(-5);
                     if (dataSigningTime >= modelSigningTime)
                     {
                         responses.Add(new ValidateListResponse
@@ -5903,7 +5902,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.Rejected:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModelSigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                          ? new ValidateListResponse
                          {
@@ -5924,7 +5923,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Accepted:
                     DateTime signingTimeAccepted = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
+                    DateTime signingTimeReceipt = Convert.ToDateTime(dataModelSigningTime).AddHours(-5);
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeReceipt, signingTimeAccepted);
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
@@ -5945,7 +5944,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     break;
                 case (int)EventStatus.AceptacionTacita:
-                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModel.SigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
+                    businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModelSigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
                     responses.Add(businessDays > 3
                         ? new ValidateListResponse
                         {
@@ -5967,7 +5966,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.ValInfoPago:
                     DateTime signingTimeEvento = Convert.ToDateTime(data.SigningTime).Date;
                     DateTime endDatePaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime paymentDueDateFactura = Convert.ToDateTime(dataModel.PaymentDueDate).Date;
+                    DateTime paymentDueDateFactura = Convert.ToDateTime(dataModelPaymentDueDate).Date;
                     if (signingTimeEvento > paymentDueDateFactura)
                     {
                         responses.Add(new ValidateListResponse
@@ -6035,7 +6034,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -6092,7 +6091,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362" ||
                        nitModel.CustomizationId == "363" || nitModel.CustomizationId == "364")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -6112,7 +6111,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -6134,7 +6133,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.Avales:
                     if (nitModel.CustomizationId == "361" || nitModel.CustomizationId == "362")
                     {
-                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
+                        responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -6165,7 +6164,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModel.SigningTime).AddHours(-5)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -6225,7 +6224,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     DateTime signingTimeEndoso = Convert.ToDateTime(data.SigningTime);
-                    DateTime signingTimeFEV = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
+                    DateTime signingTimeFEV = Convert.ToDateTime(dataModelSigningTime).AddHours(-5);
                     string errorCode = string.Empty;
                     string errorMessage = string.Empty;
                     string errorMessageAvailability;
@@ -6299,7 +6298,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //General por tiempo ilimitado_432 - limitado por tiempo ilimitado_434
                     if (nitModel.CustomizationId == "432" || nitModel.CustomizationId == "434") //que se mayor
                     {
-                        DateTime dateMandato = Convert.ToDateTime(dataModel.SigningTime).AddHours(-5);
+                        DateTime dateMandato = Convert.ToDateTime(dataModelSigningTime).AddHours(-5);
                         if (signingTime >= dateMandato)
                         {
                             responses.Add(new ValidateListResponse
@@ -6383,6 +6382,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validatorDocumentMeta.InTransaction = false;
                     arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
                 }
+            }
+        }
+        #endregion
+
+        #region UpdateInPaymentDueDate
+        public void UpdateInPaymentDueDate(GlobalDocValidatorDocumentMeta validatorDocumentMeta, string paymentDueDate)
+        {
+            //valida InTransaction eventos Endoso en propeidad, Garantia y procuración
+            var arrayTasks = new List<Task>();
+            if (validatorDocumentMeta != null)
+            {
+                validatorDocumentMeta.PaymentDueDate= paymentDueDate;
+                arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
             }
         }
         #endregion
@@ -6970,14 +6982,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateSigningTime
 
-        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data)
+        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
         {            
             var validateResponses = new List<ValidateListResponse>();
-            ValidatorEngine validatorEngine = new ValidatorEngine();
-
-            EventStatus code;
-            string trackIdAvailability = null;
             string originalTrackId = data.TrackId;
+            string parameterPaymentDueDateFE = null;
+            ValidatorEngine validatorEngine = new ValidatorEngine();
+            List<InvoiceWrapper> InvoiceWrapper = new List<InvoiceWrapper>();
+            GlobalDocValidatorDocumentMeta documentMeta = new GlobalDocValidatorDocumentMeta();
+            GlobalDocValidatorDocumentMeta documentMetaOriginal = new GlobalDocValidatorDocumentMeta();
+            DateTime? signingTimeAvailability = null;
+            EventStatus code;
+            NitModel nitModel = new NitModel();
 
             switch (int.Parse(data.EventCode))
             {
@@ -7013,16 +7029,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 bool existDisponibilizaExpresa = false;
                 //Servicio GlobalDocAssociate
                 string eventSearch = "0" + (int)code;
-                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
                 {
-                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
-                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
-                    if (trackIdEvent != null)
+                    //trackIdEvent
+                    documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
+
+                    if (!string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
                         existDisponibilizaExpresa = true;
-                        data.TrackId = trackIdEvent.DocumentMeta.PartitionKey;
+                        data.TrackId = documentMeta.PartitionKey;
                     }
                 }               
 
@@ -7032,22 +7050,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Servicio GlobalDocAssociate
                     code = EventStatus.AceptacionTacita;
                     string eventSearchTacita = "0" + (int)code;
-                    List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
-                    if (InvoiceWrapperTacita.Any())
-                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita
-                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;                   
+
+                    //InvoiceWrapperTacita
+                    InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+
+                    if (InvoiceWrapper.Any())
+                    {
+                        documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita
+                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
+
+                        data.TrackId = string.IsNullOrEmpty(documentMeta.PartitionKey) ? data.TrackId : documentMeta.PartitionKey;
+                    }
                 }
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
             {
                 //Servicio GlobalDocAssociate
                 string eventSearch = "0" + (int)code;
-                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                    data.TrackId = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                {
+                    documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse
-                    && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362")).DocumentMeta.PartitionKey;                
+                    && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362")).DocumentMeta;
+
+                    data.TrackId = string.IsNullOrEmpty(documentMeta.PartitionKey) ? data.TrackId : documentMeta.PartitionKey;
+                }
+                                
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
@@ -7055,57 +7085,60 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 //Servicio GlobalDocAssociate
                 string eventSearch = "0" + (int)code;
-                List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
                 {
-                    var respTrackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
-                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
-                    if (respTrackIdAvailability != null)
+                    //respTrackIdAvailability
+                    documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
+
+                    if (string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
-                        trackIdAvailability = respTrackIdAvailability.DocumentMeta.PartitionKey;
+                        signingTimeAvailability = documentMeta.SigningTimeStamp;
                     }
                 }                
             }
 
-            var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-            var xmlParser = new XmlParser(xmlBytes.Result);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            if (string.IsNullOrEmpty(documentMeta.PartitionKey))
+            {
+                    documentMeta = documentMetaRef;
+            }
 
             // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
             // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
-            string parameterPaymentDueDateFE = null;
+
             if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
             {
-                var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
-                var originalXmlParser = new XmlParser(originalXmlBytes.Result);
-                if (!originalXmlParser.Parser())
-                    throw new Exception(originalXmlParser.ParserError);
+                
+                documentMetaOriginal = originalTrackId == data.TrackId ? documentMeta: documentMetaRef;
+                
+                if (string.IsNullOrEmpty(documentMetaOriginal.PaymentDueDate))
+                {
+                    var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
+                    var originalXmlParser = new XmlParser(originalXmlBytes.Result);
+                    if (!originalXmlParser.Parser())
+                        throw new Exception(originalXmlParser.ParserError);
 
-                parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+                    parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+
+                    //actualizar en GlobalDocValidatorDocumentMeta el campo en la documentMeta
+                    UpdateInPaymentDueDate(documentMetaOriginal, parameterPaymentDueDateFE);
+                }
+                else
+                {
+                    parameterPaymentDueDateFE = documentMetaOriginal.PaymentDueDate;
+                }                
             }
+            
+            nitModel.CustomizationId = documentMeta.CustomizationID;
+            nitModel.ValidityPeriodEndDate = documentMeta.ValidityPeriodEndDate;
 
-            DateTime? signingTimeAvailability = null;
-            if ((Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
-                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
-                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion) && !string.IsNullOrWhiteSpace(trackIdAvailability))
-            {
-                var availabilityXmlBytes = validatorEngine.GetXmlFromStorageAsync(trackIdAvailability);
-                var availabilityXmlParser = new XmlParser(availabilityXmlBytes.Result);
-                if (!availabilityXmlParser.Parser())
-                    throw new Exception(availabilityXmlParser.ParserError);
-
-                signingTimeAvailability = Convert.ToDateTime(availabilityXmlParser.SigningTime);
-            }
-
-            var nitModel = xmlParser.Fields.ToObject<NitModel>();
-            var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+            validateResponses.AddRange(ValidateSigningTime(data, documentMeta.SigningTimeStamp.ToString("yyyy-MM-ddTHH:mm:ss"), documentMeta.PaymentDueDate, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
                 signingTimeAvailability: signingTimeAvailability));
 
             return validateResponses;
@@ -7393,7 +7426,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion
                     || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation)
                 {                   
-                    eventRadian.TrackId = documentMeta.CancelElectronicEvent;                    
+                    eventRadian.TrackId = documentMeta.CancelElectronicEvent;
                 }
 
                 bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;               
@@ -7465,14 +7498,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (validEventPrev)
                     {
-                        responses = RequestValidateSigningTime(signingTime);                      
+                        responses = RequestValidateSigningTime(signingTime, documentMetaRef);                      
                         validateResponses.AddRange(responses);
                     }
-
                 }
 
                 UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
-
             }
             else
             {
@@ -7486,7 +7517,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
                 validateResponses.AddRange(responses);
             }
-
 
             return validateResponses;
         }
