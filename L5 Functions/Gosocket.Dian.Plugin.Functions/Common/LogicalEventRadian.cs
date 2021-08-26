@@ -449,7 +449,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region VakidateEndorsementCancell
-        public List<ValidateListResponse> ValidateEndorsementCancell(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateEndorsementCancell(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -466,7 +466,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Obtiene legitimo tenedor               
             LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, xmlParserCude.ProviderCode.ToString());
+            GlobalDocValidatorDocumentMeta documentMetaCude = documentMeta.Where(w => w.PartitionKey == eventPrev.TrackIdCude).FirstOrDefault();
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, documentMetaCude.TechProviderCode);
             if (responseHolderExchange != null)
                 senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
 
@@ -528,7 +529,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(eventPrev.CustomizationID) == (int)EventCustomization.CancellationEndorsementProcurement)
             {
                 //El evento debe informar una nota donde manifieste los motivos de la revocatoria contenida del endoso.
-                var responseListEndosoNota = this.ValidateEndosoNota(documentMeta, xmlParserCude, eventPrev.EventCode);
+                var responseListEndosoNota = this.ValidateEndosoNota(documentMeta, documentMetaCude.NoteMandato, eventPrev.EventCode);
                 if (responseListEndosoNota != null)
                 {
                     foreach (var item in responseListEndosoNota)
@@ -816,7 +817,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementProcurement
-        public List<ValidateListResponse> ValidateEndorsementProcurement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEndorsementProcurement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev,XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -973,7 +974,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementGatantia
-        public List<ValidateListResponse> ValidateEndorsementGatantia(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEndorsementGatantia(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -1128,7 +1129,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidatePropertyEndorsement
-        public List<ValidateListResponse> ValidatePropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidatePropertyEndorsement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -1267,7 +1268,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementEventPrev
-        public List<ValidateListResponse> ValidateEndorsementEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        public List<ValidateListResponse> ValidateEndorsementEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, string totalInvoice, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -1292,7 +1293,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
 
-                        var responseListAval = ValidateAval(xmlParserCufe, xmlParserCude);
+                        var responseListAval = ValidateAval(totalInvoice, xmlParserCude);
                         if (responseListAval != null)
                         {
                             foreach (var item in responseListAval)
@@ -1394,7 +1395,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateAvailabilityRequest
-        public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, string totalInvoice, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -1622,7 +1623,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Comparar ValorFEV-TV contra el valor total de la FE
             if (xmlParserCude.ValorOriginalTV != null)
             {
-                if (xmlParserCude.ValorOriginalTV == xmlParserCufe.TotalInvoice)
+                if (xmlParserCude.ValorOriginalTV == totalInvoice)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -2109,10 +2110,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateAval
-        private List<ValidateListResponse> ValidateAval(XmlParser xmlParserCufe, XmlParser xmlParserCude)
+        private List<ValidateListResponse> ValidateAval(string totalInvoice, XmlParser xmlParserCude)
         {
             DateTime startDate = DateTime.UtcNow;
-            string valueTotalInvoice = xmlParserCufe.TotalInvoice;
+            string valueTotalInvoice = totalInvoice;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validateAval = false;
 
@@ -2305,7 +2306,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndosoNota
-        private List<ValidateListResponse> ValidateEndosoNota(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, string eventCode)
+        private List<ValidateListResponse> ValidateEndosoNota(List<GlobalDocValidatorDocumentMeta> documentMetaList, string noteMandato, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -2331,7 +2332,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         return responses;
                     }
 
-                    if (string.IsNullOrWhiteSpace(xmlParserCude.NoteMandato))
+                    if (string.IsNullOrWhiteSpace(noteMandato))
                     {
                         validEndoso = true;
                         responses.Add(new ValidateListResponse

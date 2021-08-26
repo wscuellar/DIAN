@@ -5269,7 +5269,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region validation to emition to event
-        public List<ValidateListResponse> ValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, string totalInvoice, XmlParser xmlParserCude, NitModel nitModel)
         {
             string eventCode = eventPrev.EventCode;
             string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
@@ -5447,7 +5447,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
-                        var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, xmlParserCufe, xmlParserCude);
+                        var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, totalInvoice, xmlParserCude);
                         if (eventRadianAval != null)
                         {
                             foreach (var itemEventRadianAval in eventRadianAval)
@@ -5470,7 +5470,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
-                        var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, xmlParserCufe, xmlParserCude, nitModel);
+                        var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, totalInvoice, xmlParserCude, nitModel);
                         if (eventRadianDisponibilizacion != null)
                         {
                             foreach (var itemEventRadianDisponibilizacion in eventRadianDisponibilizacion)
@@ -5493,7 +5493,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
-                        var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCude, nitModel);
                         if (eventRadianEndosoPropiedad != null)
                         {
                             foreach (var itemEventRadianEndosoPropiedad in eventRadianEndosoPropiedad)
@@ -5516,7 +5516,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
-                        var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCude, nitModel);
                         if (eventRadianEndosoGarantia != null)
                         {
                             foreach (var itemEventRadianEndosoGarantia in eventRadianEndosoGarantia)
@@ -5539,7 +5539,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
-                        var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCufe, xmlParserCude, nitModel);
+                        var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCude, nitModel);
                         if (eventRadianEndosoProcuracion != null)
                         {
                             foreach (var itemEventRadianEndosoProcuracion in eventRadianEndosoProcuracion)
@@ -5562,7 +5562,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if(documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
-                        var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev, xmlParserCude);
+                        var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev);
                         if (eventRadianCancelaEndoso != null)
                         {
                             foreach (var itemEventRadianCancelaEndoso in eventRadianCancelaEndoso)
@@ -7292,25 +7292,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             ValidatorEngine validatorEngine = new ValidatorEngine();
             NitModel nitModel = new NitModel();
-            XmlParser xmlParserCufe = null;
             XmlParser xmlParserCude = null;
-            GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
-            GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
+            string totalInvoice = string.Empty;
 
             //Anulacion de endoso electronico obtiene CUFE referenciado en el CUDE emitido
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation ||
                 Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
-                //var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackId, eventPrev.TrackId);
                 if (documentMeta != null)
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
-                    ////Obtiene XML ApplicationResponse CUDE
-                    var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                    xmlParserCude = new XmlParser(xmlBytesCude.Result);
-                    if (!xmlParserCude.Parser())
-                        throw new Exception(xmlParserCude.ParserError);
+                    //////Obtiene XML ApplicationResponse CUDE
+                    //var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                    //xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                    //if (!xmlParserCude.Parser())
+                    //    throw new Exception(xmlParserCude.ParserError);
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
@@ -7318,11 +7315,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
                 || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
             {
-                //Obtiene XML Factura electronica CUFE
-                var xmlBytes = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackId);
-                xmlParserCufe = new XmlParser(xmlBytes.Result);
-                if (!xmlParserCufe.Parser())
-                    throw new Exception(xmlParserCufe.ParserError);
+                totalInvoice = documentMeta.TotalAmount.ToString();
 
                 ////Obtiene XML ApplicationResponse CUDE
                 var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
@@ -7331,19 +7324,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     throw new Exception(xmlParserCude.ParserError);
 
                 nitModel = xmlParserCude.Fields.ToObject<NitModel>();
-                //nitModel.CustomizationId = documentMetaCude.CustomizationID;
-                //nitModel.SenderCode = documentMetaCude.SenderCode;
-                //nitModel.listID = documentMetaCude.ResponseCodeListID;
-                //nitModel.ProviderCode = documentMetaCude.TechProviderCode;
-                //nitModel.ValorTotalEndoso = documentMetaCude;
-                //nitModel.PrecioPagarseFEV = documentMetaCude;
-                //nitModel.TasaDescuento = documentMetaCude;
-                //nitModel.ResponseCode = documentMetaCude;
-                //nitModel.ValorActualTituloValor = documentMetaCude;
             }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, totalInvoice, xmlParserCude, nitModel));
 
             return validateResponses;
         }
