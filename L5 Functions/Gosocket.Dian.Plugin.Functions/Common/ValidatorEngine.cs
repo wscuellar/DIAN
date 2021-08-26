@@ -195,7 +195,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe.TotalInvoice.ToString(), xmlParserCude, nitModel));
 
             return validateResponses;
 
