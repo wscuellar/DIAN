@@ -17,22 +17,23 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class LogicalNMService : IDisposable
     {
-        private readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
-        private readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
-        private readonly TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
-        private readonly TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
+        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
+        private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
+        private static readonly TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
+        private static readonly TableManager TableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
 
-        private readonly TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
-        private readonly TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
-        private readonly TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
-        private readonly TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
-        private readonly TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
-        private readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private static readonly TableManager TableManagerGlobalBatchFileMapper = new TableManager("GlobalBatchFileMapper");
+        private static readonly TableManager TableManagerGlobalBatchFileRuntime = new TableManager("GlobalBatchFileRuntime");
+        private static readonly TableManager TableManagerGlobalBatchFileResult = new TableManager("GlobalBatchFileResult");
+        private static readonly TableManager TableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
+        private static readonly TableManager TableManagerGlobalContributor = new TableManager("GlobalContributor");
+        private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
-        private readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorRuntime");
 
-        private FileManager fileManager = new FileManager();
+        private static readonly FileManager fileManager = new FileManager();
 
         private readonly string blobContainer = "global";
         private readonly string blobContainerFolder = "batchValidator";
@@ -134,7 +135,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         }
         public static byte[] GetXmlFromStorage(string trackId)
         {
-            var tableManager = new TableManager("GlobalDocValidatorRuntime");
+            
             var documentStatusValidation = tableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;

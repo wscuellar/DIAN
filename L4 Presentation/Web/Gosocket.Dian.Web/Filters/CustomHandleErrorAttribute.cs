@@ -11,6 +11,7 @@ namespace Gosocket.Dian.Web.Filters
 {
     public class CustomHandleErrorAttribute : HandleErrorAttribute
     {
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         /// <summary>
         /// Called when an exception occurs.
         /// </summary>
@@ -133,7 +134,7 @@ namespace Gosocket.Dian.Web.Filters
 
         private void RegisterException(GlobalLogger logger)
         {
-            var tableManager = new TableManager("GlobalLogger");
+            
             tableManager.InsertOrUpdate(logger);
         }
     }
