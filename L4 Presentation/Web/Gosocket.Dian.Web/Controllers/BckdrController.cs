@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Web.Controllers
                 _userManager = value;
             }
         }
-        private readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
 
         private IdentificationTypeService identificationTypeService = new IdentificationTypeService();
         private ContributorService contributorService = new ContributorService();

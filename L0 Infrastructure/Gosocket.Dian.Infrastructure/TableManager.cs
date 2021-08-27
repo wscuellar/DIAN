@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Infrastructure
             return tableClient;
         }
 
-        public TableManager(string tableName, bool createIfNotExists = true)
+        public TableManager(string tableName, bool createIfNotExists = false)
         {            
 
             CloudTable = tableClient.GetTableReference(tableName);
@@ -33,7 +33,7 @@ namespace Gosocket.Dian.Infrastructure
                 CloudTable.CreateIfNotExists();
         }
 
-        public TableManager(string tableName, string connectionString, bool createIfNotExists = true)
+        public TableManager(string tableName, string connectionString, bool createIfNotExists = false)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             var tableClient = account.CreateCloudTableClient();
@@ -459,13 +459,13 @@ namespace Gosocket.Dian.Infrastructure
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-             TableQuery.GenerateFilterCondition("RowKey",
-                 QueryComparisons.Equal,
-                 rowKey),
-             TableOperators.And,
              TableQuery.GenerateFilterCondition("PartitionKey",
                  QueryComparisons.Equal,
-                 partitionKey));
+                 partitionKey),
+             TableOperators.And,
+             TableQuery.GenerateFilterCondition("RowKey",
+                 QueryComparisons.Equal,
+                 rowKey));
 
             prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("DocumentKey",
              QueryComparisons.Equal,

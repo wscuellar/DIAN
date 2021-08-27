@@ -225,7 +225,6 @@
     <Compile Include="Cosmos\DocumentClientHelper.cs" />
     <Compile Include="Cosmos\DocumentCollectionSpec.cs" />
     <Compile Include="logger\LoggerService.cs" />
-    <Compile Include="Managers\CategoryManager.cs" />
     <Compile Include="Managers\CertificateManager.cs" />
     <Compile Include="Managers\RadianTestSetManager.cs" />
     <Compile Include="Managers\RedisConnectorManager.cs" />

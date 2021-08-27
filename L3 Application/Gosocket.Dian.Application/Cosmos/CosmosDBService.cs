@@ -36,6 +36,9 @@ namespace Gosocket.Dian.Application.Cosmos
         private static Dictionary<string, CosmosDBService> instances = new Dictionary<string, CosmosDBService>();
         private static Dictionary<string, DocumentCollection> collections = new Dictionary<string, DocumentCollection>();
 
+        // table manager instance
+        private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+
         //public static CosmosDBService Instance()
         //{
         //    var collectionName = GetCollectionName();
@@ -869,8 +872,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 if (!collections.ContainsKey(collectionName))
                     Instance(documentTagMessage.Date);
 
-                // table manager instance
-                var tableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+                
 
                 //
                 var documentTag = Mapper<DocumentTagMessage, DocumentTag>(documentTagMessage);

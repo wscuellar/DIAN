@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Web.Utils
     {
         ApplicationDbContext _sqlDBContext;
         readonly SqlDBContext _sqlAspDBContext;
+        private static readonly TableManager globalLogger = new TableManager("GlobalLogger");
         public UserService()
         {
             if (_sqlDBContext == null)
@@ -288,7 +289,7 @@ namespace Gosocket.Dian.Web.Utils
                 StackTrace = null
             };
 
-            new TableManager("GlobalLogger").InsertOrUpdate(logger);
+            globalLogger.InsertOrUpdate(logger);
         }
 
         public ApplicationUser FindUserByIdentificationAndTypeId(string Id, int identificationTypeId, string identificationId)

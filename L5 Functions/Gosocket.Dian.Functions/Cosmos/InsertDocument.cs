@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Functions.Cosmos
         private static readonly TableManager tableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalDocValidatorTracking = new TableManager("GlobalDocValidatorTracking");
+        private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorDocument");
 
         // Set queue name
         private const string queueName = "global-document-input%Slot%";
@@ -37,7 +38,7 @@ namespace Gosocket.Dian.Functions.Cosmos
             GlobalDocValidatorDocument globalDocValidatorDocument = null;
             try
             {
-                var tableManager = new TableManager("GlobalDocValidatorDocument");
+                
                 globalDocValidatorDocument = tableManager.Find<GlobalDocValidatorDocument>(document.Identifier, document.Identifier);
                 if (globalDocValidatorDocument == null)
                 {
