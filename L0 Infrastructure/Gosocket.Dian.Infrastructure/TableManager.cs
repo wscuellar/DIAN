@@ -459,13 +459,13 @@ namespace Gosocket.Dian.Infrastructure
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-             TableQuery.GenerateFilterCondition("RowKey",
-                 QueryComparisons.Equal,
-                 rowKey),
-             TableOperators.And,
              TableQuery.GenerateFilterCondition("PartitionKey",
                  QueryComparisons.Equal,
-                 partitionKey));
+                 partitionKey),
+             TableOperators.And,
+             TableQuery.GenerateFilterCondition("RowKey",
+                 QueryComparisons.Equal,
+                 rowKey));
 
             prefixCondition = TableQuery.CombineFilters(prefixCondition, TableOperators.And, TableQuery.GenerateFilterCondition("DocumentKey",
              QueryComparisons.Equal,

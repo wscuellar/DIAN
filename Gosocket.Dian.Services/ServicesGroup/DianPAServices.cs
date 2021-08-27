@@ -971,6 +971,23 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Parser
             start = DateTime.UtcNow;
             var xmlBytes = contentFileList.First().XmlBytes;
+
+            try
+            {
+                var documentMetaManager = new DocumentMetaManager(xmlBytes);
+                var category = documentMetaManager.GetCategory()?.RowKey;
+            }
+            catch (Exception ex)
+            {
+                var failedList = new List<string> { $"Regla: ZB01, Rechazo: Fallo en el esquema XML del archivo" };
+                dianResponse.IsValid = false;
+                dianResponse.StatusCode = "99";
+                dianResponse.StatusMessage = "Error al subir xml. " + ex.Message;
+                dianResponse.StatusDescription = "Documento con errores en campos mandatorios.";
+                dianResponse.ErrorMessage.AddRange(failedList);
+                return dianResponse;
+            }
+
             XmlParser xmlParser;
             try
             {

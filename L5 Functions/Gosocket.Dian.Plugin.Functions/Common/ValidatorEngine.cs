@@ -196,7 +196,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe.TotalInvoice.ToString(), xmlParserCude, nitModel));
 
             return validateResponses;
 
@@ -349,7 +349,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser.SigningTime, xmlParser.PaymentDueDate, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
                 signingTimeAvailability: signingTimeAvailability));
 
             return validateResponses;
@@ -372,6 +372,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateSerieAndNumberAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
+            GlobalDocValidatorDocumentMeta documentMeta = new GlobalDocValidatorDocumentMeta();
 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
             var xmlParser = new XmlParser(xmlBytes);
@@ -379,9 +380,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSerieAndNumber(nitModel));
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(nitModel, documentMeta));
             return validateResponses;
         }
 
