@@ -20,8 +20,9 @@ namespace Gosocket.Dian.Functions.Export
 {
     public static class ExportDocumentsContributor
     {
-        private static readonly FileManager fileManager = new FileManager();
+        
         private static readonly TableManager globalTaskTableMabager = new TableManager("GlobalTask");
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
 
         // Set queue name
         private const string queueName = "global-export-documents-to-excel-contributor-input%Slot%";
@@ -129,7 +130,7 @@ namespace Gosocket.Dian.Functions.Export
                 #endregion
 
                 #region Upload file to storage
-                var upload = fileManager.Upload("global", $"export/{task.PartitionKey}/{task.RowKey}.xlsx", fileBytes);
+                var upload = GlobalFileManager.Upload($"export/{task.PartitionKey}/{task.RowKey}.xlsx", fileBytes);
                 #endregion
 
                 #region Update task

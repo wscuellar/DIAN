@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Services.Utils
     public class DianServicesUtils
     {
         private const string CategoryContainerName = "dian";
+        private static readonly FileManager DianFileManager = new FileManager(CategoryContainerName);
         private static readonly TableManager tableManagerDianFileMapper = new TableManager("DianFileMapper");
         private static readonly TableManager tableManagerDianProcessResult = new TableManager("DianProcessResult");
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -34,7 +35,7 @@ namespace Gosocket.Dian.Services.Utils
         public static DianResponse GenerateApplicationResponse(long nsu, string trackId, GlobalDocValidatorDocumentMeta docMetadataEntity, List<GlobalDocValidatorTracking> validatorTrackings = null)
         {
             var response = new DianResponse();
-            var fileManager = new FileManager();
+            
 
             var docTypeCode = docMetadataEntity.DocumentTypeId;
 
@@ -340,7 +341,7 @@ namespace Gosocket.Dian.Services.Utils
             var serieFolder = string.IsNullOrEmpty(series) ? "Sin Serie" : series;
 
             string cdrFileName = $"responses/{entityProcessResult.Timestamp.Year}/{entityProcessResult.Timestamp.Month.ToString().PadLeft(2, '0')}/{entityProcessResult.Timestamp.Day.ToString().PadLeft(2, '0')}/{folder}/{senderCode}/{documentType.ToString()}/{serieFolder}/{number}.xml";
-            if (new FileManager().Exists(container, cdrFileName))
+            if (DianFileManager.Exists(cdrFileName))
             {
                 return new Tuple<string, string>(container, cdrFileName);
             }
@@ -352,7 +353,7 @@ namespace Gosocket.Dian.Services.Utils
         public static DianResponse ParamsExistsFilenameInBlob(GlobalDocValidatorDocumentMeta documentMeta)
         {
             var dianResponse = new DianResponse();
-            var fileManager = new FileManager();
+            
 
             byte[] xmlBytes = null;
             bool existsFile = false;
@@ -363,16 +364,16 @@ namespace Gosocket.Dian.Services.Utils
 
             var isValidFolder = "Success";
 
-            var container = CategoryContainerName;
+            
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
             dianResponse.XmlBase64Bytes = null;
 
-            existsFile = fileManager.Exists(container, fileName);
+            existsFile = DianFileManager.Exists(fileName);
 
             if (existsFile)
             {
-                xmlBytes = fileManager.GetBytes(container, fileName);
+                xmlBytes = DianFileManager.GetBytes(fileName);
             }
 
             if (!existsFile)
@@ -380,11 +381,11 @@ namespace Gosocket.Dian.Services.Utils
                 isValidFolder = "Error";
                 fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-                existsFile = fileManager.Exists(container, fileName);
+                existsFile = DianFileManager.Exists(fileName);
 
                 if (existsFile)
                 {
-                    xmlBytes = fileManager.GetBytes(container, fileName);
+                    xmlBytes = DianFileManager.GetBytes(fileName);
                 }
             }
 

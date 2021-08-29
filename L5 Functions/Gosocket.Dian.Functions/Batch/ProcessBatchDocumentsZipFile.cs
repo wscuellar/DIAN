@@ -23,9 +23,9 @@ namespace Gosocket.Dian.Functions.Batch
 {
     public static class ProcessBatchDocumentsZipFile
     {
-        private static readonly string blobContainer = "global";
+        
         private static readonly string blobContainerFolder = "batchValidator";
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
         private static readonly TableManager tableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");       
         private static readonly TableManager tableManagerbatchFileResult = new TableManager("GlobalBatchFileResult");
         private static readonly TableManager tableManagerGlobalBatchFileStatus = new TableManager("GlobalBatchFileStatus");
@@ -87,7 +87,7 @@ namespace Gosocket.Dian.Functions.Batch
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startBatch);
 
                 // Get zip from storgae
-                var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/{obj.BlobPath}/{zipKey}.zip");
+                var zipBytes = await GlobalFileManager.GetBytesAsync( $"{blobContainerFolder}/{obj.BlobPath}/{zipKey}.zip");
                 // Unzip files
                 var maxBatch = string.IsNullOrEmpty(testSetId) ? 500 : 50;
                 var contentFileList = zipBytes.ExtractMultipleZip(maxBatch);
@@ -521,7 +521,7 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             SetLogger(null, "Step Hilo successAppResponses ", " Upload applition responses zip OK ", "PROC-04");
                             var multipleZipBytes = ZipExtensions.CreateMultipleZip(zipKey, successAppResponses);
-                            var uploadResult = new FileManager().Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
+                            var uploadResult = GlobalFileManager.Upload( $"{blobContainerFolder}/applicationResponses/{zipKey}.zip", multipleZipBytes);
                             log.Info($"Upload applition responses zip OK.");
                         }
                         catch (Exception ex)

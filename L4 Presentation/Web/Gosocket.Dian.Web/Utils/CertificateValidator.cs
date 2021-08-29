@@ -11,7 +11,7 @@ namespace Gosocket.Dian.Web.Utils
 {
     public class CertificateValidator : X509CertificateValidator
     {
-        private static readonly FileManager fileManager = new FileManager();
+        
 
         public override void Validate(X509Certificate2 certificate)
         {

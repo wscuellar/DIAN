@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Web.Services.Validator
 {
     public class CertificateValidator : X509CertificateValidator
     {
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager CertificatesFileManager = new FileManager("certificates");
         private static List<string> revoked = new List<string>();
         private static List<string> untrusted = new List<string>();
 
@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Web.Services.Validator
                     {
                         var authCode = GetAuthCode(certificate);
                         untrusted.Add(certificate.SerialNumber);
-                        fileManager.Upload("certificates", $"untrusted/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
+                        CertificatesFileManager.Upload($"untrusted/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
                 catch { }
@@ -64,7 +64,7 @@ namespace Gosocket.Dian.Web.Services.Validator
                     {
                         var authCode = GetAuthCode(certificate);
                         revoked.Add(certificate.SerialNumber);
-                        fileManager.Upload("certificates", $"revoked/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
+                        CertificatesFileManager.Upload($"revoked/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
                 catch { }
