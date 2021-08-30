@@ -64,8 +64,9 @@ namespace Gosocket.Dian.Infrastructure
         Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(int take, TableContinuationToken continuationToken) where T : ITableEntity, new();
         Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(string PartitionKey, int take, TableContinuationToken continuationToken) where T : ITableEntity, new();
         IEnumerable<T> GetRowsContainsInPartitionKeys<T>(IEnumerable<string> partitionKeys) where T : ITableEntity, new();
-        List<T> GlobalPayrollByRowKey_DocumentNumber<T>(string rowkey, string documentNumber) where T : ITableEntity, new();
-        T GlobalPayrollByRowKey_Number<T>(string rowkey, string number) where T : ITableEntity, new();
+        List<T> globalDocPayrollRegisterByPartitionKey_DocumentNumber<T>(string partitionKey, string numeroDocumento) where T : ITableEntity, new();
+        List<T> globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<T>(string partitionKey, string serieAndNumnber) where T : ITableEntity, new();
+
         bool Insert(DynamicTableEntity entity);
         bool Insert(DynamicTableEntity entity, string rowKey2);
         bool Insert(DynamicTableEntity[] entitys, string partitionKey = null);

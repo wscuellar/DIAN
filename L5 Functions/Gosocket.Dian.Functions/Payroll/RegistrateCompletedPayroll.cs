@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Functions.Payroll
         private static readonly TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
         private static readonly TableManager TableManagerGlobalDocPayrollHistoric = new TableManager("GlobalDocPayrollHistoric");
         private static readonly TableManager TableManagerGlobalDocPayrollEmployees = new TableManager("GlobalDocPayrollEmployees");
+        private static readonly TableManager TableManagerGlobalDocPayrollRegister = new TableManager("GlobalDocPayrollRegister");       
 
 
         [FunctionName("RegistrateCompletedPayroll")]
@@ -94,6 +95,19 @@ namespace Gosocket.Dian.Functions.Payroll
                     documentMetaAdjustment.DocumentReferencedKey = trackIdCune;
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMetaAdjustment));
                 }
+
+                //Guarda el registro para validar futuras duplicidades y duplicidad en el mismo mes
+                GlobalDocPayrollRegister globalDocPayrollRegister = new GlobalDocPayrollRegister
+                {
+                    PartitionKey = docGlobalPayroll.RowKey,
+                    RowKey = docGlobalPayroll.Numero,
+                    FechaPagoFin = docGlobalPayroll.FechaPagoFin,
+                    FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
+                    NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                    Timestamp = DateTime.Now,
+                };
+                arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
+
                 // ...
                 Task.WhenAll(arrayTasks).Wait();
             }
