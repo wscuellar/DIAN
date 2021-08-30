@@ -34,10 +34,12 @@ namespace Gosocket.Dian.Infrastructure
             return blobClient;
         }
 
-        public FileManager(string container)
+        public FileManager(string container, bool createIfNotExists=false)
         {
             ContainerName = container;
             BlobContainer = BlobClient.GetContainerReference(container);
+            if (createIfNotExists)
+                BlobContainer.CreateIfNotExists();
         }
 
         
@@ -209,7 +211,7 @@ namespace Gosocket.Dian.Infrastructure
             {
                 
                 var blob = BlobContainer.GetBlockBlobReference(name);
-                BlobContainer.CreateIfNotExists();
+                
                 using (var ms = new MemoryStream(content))
                 {
                     await blob.UploadFromStreamAsync(ms);
@@ -229,7 +231,7 @@ namespace Gosocket.Dian.Infrastructure
             {
                 
                 var blob = BlobContainer.GetBlockBlobReference(name);
-                BlobContainer.CreateIfNotExists();
+                
                 using (var ms = new MemoryStream(content))
                 {
                     blob.UploadFromStream(ms);
@@ -269,7 +271,7 @@ namespace Gosocket.Dian.Infrastructure
             {
                 
                 var blob = BlobContainer.GetBlockBlobReference(name);
-                BlobContainer.CreateIfNotExists();
+                
                 blob.UploadFromStream(content);
                 if (cacheControl != null)
                 {
