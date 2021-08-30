@@ -25,11 +25,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     public class ValidatorEngine
     {
         #region Global properties
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        
         static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
-        static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
+        
+        private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorRuntime");
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
 
         XmlDocument _xmlDocument;
@@ -195,7 +196,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe, xmlParserCude, nitModel));
+            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, xmlParserCufe.TotalInvoice.ToString(), xmlParserCude, nitModel));
 
             return validateResponses;
 
@@ -348,7 +349,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
+            validateResponses.AddRange(validator.ValidateSigningTime(data, xmlParser.SigningTime, xmlParser.PaymentDueDate, nitModel, paymentDueDateFE: parameterPaymentDueDateFE,
                 signingTimeAvailability: signingTimeAvailability));
 
             return validateResponses;
@@ -371,6 +372,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateSerieAndNumberAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
+            GlobalDocValidatorDocumentMeta documentMeta = new GlobalDocValidatorDocumentMeta();
 
             var xmlBytes = await GetXmlFromStorageAsync(trackId);
             var xmlParser = new XmlParser(xmlBytes);
@@ -378,9 +380,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 throw new Exception(xmlParser.ParserError);
 
             var nitModel = xmlParser.Fields.ToObject<NitModel>();
+            documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateSerieAndNumber(nitModel));
+            validateResponses.AddRange(validator.ValidateSerieAndNumber(nitModel, documentMeta));
             return validateResponses;
         }
 
@@ -813,7 +816,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
-            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;

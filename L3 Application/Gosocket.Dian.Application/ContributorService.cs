@@ -13,6 +13,7 @@ namespace Gosocket.Dian.Application
     public class ContributorService : IContributorService
     {
         SqlDBContext sqlDBContext;
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         //private static StackExchange.Redis.IDatabase cache;
 
         public ContributorService()
@@ -437,7 +438,7 @@ namespace Gosocket.Dian.Application
 
         private void RegisterException(GlobalLogger logger)
         {
-            var tableManager = new TableManager("GlobalLogger");
+            
             tableManager.InsertOrUpdate(logger);
         }
 
