@@ -60,6 +60,7 @@ namespace Gosocket.Dian.Functions.Payroll
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
+                var numeroDocumento = string.IsNullOrEmpty(docGlobalPayroll.NumeroDocumento) ? "0" : docGlobalPayroll.NumeroDocumento;
 
                 //Registra empleado solo para Nomina Individual
                 if (documentTypeId == (int)DocumentType.IndividualPayroll)
@@ -67,8 +68,8 @@ namespace Gosocket.Dian.Functions.Payroll
                     GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
                     {
                         PartitionKey = "Employee",
-                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{docGlobalPayroll.NumeroDocumento}",
-                        NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
+                        NumeroDocumento = numeroDocumento,
                         TipoDocumento = docGlobalPayroll.TipoDocumento,
                         NitEmpresa = docGlobalPayroll.NIT,
                         PrimerApellido = docGlobalPayroll.PrimerApellido.ToUpper(),
@@ -103,7 +104,7 @@ namespace Gosocket.Dian.Functions.Payroll
                     RowKey = docGlobalPayroll.Numero,
                     FechaPagoFin = docGlobalPayroll.FechaPagoFin,
                     FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
-                    NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                    NumeroDocumento = numeroDocumento,
                     Timestamp = DateTime.Now,
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
