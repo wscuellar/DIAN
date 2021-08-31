@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedOperationModeViewModel
+@using Gosocket.Dian.Infrastructure;
 
 @{
     ViewBag.title = "Configurar modo de operación";
@@ -111,7 +112,10 @@
                                             {
                                                 <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
                                             }
-                                            <button type="submit" id="save-operation-mode" class="btn btn-radian-success">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
+                                            @if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                            {
+                                                <button type="submit" id="save-operation-mode" class="btn btn-radian-success">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
+                                            }
                                         </div>
 
                                     </div>
