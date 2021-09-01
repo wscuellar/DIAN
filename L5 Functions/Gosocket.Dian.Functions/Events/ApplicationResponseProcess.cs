@@ -23,7 +23,8 @@ namespace Gosocket.Dian.Functions.Events
     {
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ApplicationResponseProcess")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -62,7 +63,7 @@ namespace Gosocket.Dian.Functions.Events
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "Start ApplicationResponseProcess: trackIdCude " + trackIdCude + " responseCode " + responseCode + " trackId " + trackId + " listId " + data.ListId
             };
-            await TableManagerGlobalLogger.InsertOrUpdateAsync(startBatch);
+            await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startBatch);
 
             if (!StringUtils.HasOnlyNumbers(responseCode))
                 return new EventResponse { Code = ((int)EventValidationMessage.InvalidResponseCode).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.InvalidResponseCode) };
@@ -223,7 +224,7 @@ namespace Gosocket.Dian.Functions.Events
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                 Action = "Finish ApplicationResponseProcess"
             };
-            await TableManagerGlobalLogger.InsertOrUpdateAsync(finishtBatch);
+            await TableLoggerManagerFACELogger.InsertOrUpdateAsync(finishtBatch);
 
             var response = new EventResponse { Code = ((int)EventValidationMessage.Success).ToString(), Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success) };
             return response;

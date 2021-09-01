@@ -20,7 +20,9 @@ namespace Gosocket.Dian.Functions.Others
 {
     public static class SendToActivateOtherDocumentContributor
     {        
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("GlobalTestSetOthersDocumentsResult");      
         private static readonly GlobalOtherDocElecOperationService globalOtherDocElecOperation = new GlobalOtherDocElecOperationService();       
@@ -47,7 +49,7 @@ namespace Gosocket.Dian.Functions.Others
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Start SendToActivateOtherDocument"
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
 
                 //Se obtiene participante otros documentos habilitacion
                 OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled);
@@ -63,7 +65,7 @@ namespace Gosocket.Dian.Functions.Others
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "startSendContributorId ContributorId: " + data.ContributorId
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendContributorId);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startSendContributorId);
 
 
                     if (data.ContributorId == 0)
@@ -116,7 +118,7 @@ namespace Gosocket.Dian.Functions.Others
                         " SoftwareId: " + data.SoftwareId +
                         " SoftwareType: " + data.SoftwareType
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
 
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledOtherDocElecContributor(
@@ -161,7 +163,7 @@ namespace Gosocket.Dian.Functions.Others
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "finish SendToActivateOtherDocument"
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(finishSendContributorId);
 
                 }
                 catch (Exception ex)
@@ -204,7 +206,7 @@ namespace Gosocket.Dian.Functions.Others
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
         private static async Task SendToActivateOtherDocumentContributorToProduction(OtherDocumentActivateContributorRequestObject activateContributorRequestObject)

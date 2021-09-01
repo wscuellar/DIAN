@@ -33,7 +33,8 @@ namespace Gosocket.Dian.Functions.Batch
         private static readonly TableManager tableManagerGlobalBigContributorRequestAuthorization = new TableManager("GlobalBigContributorRequestAuthorization");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentResult = new TableManager("GlobalTestSetOthersDocumentsResult");
         private static readonly TableManager tableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
         private static readonly TableManager tableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
@@ -84,7 +85,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Start ProcessBatchZip"
                 };              
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(startBatch);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startBatch);
 
                 // Get zip from storgae
                 var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/{obj.BlobPath}/{zipKey}.zip");
@@ -123,7 +124,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian + " trackIdCude " + trackIdCude + " listId " + listId
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(flagAppResponse);
 
                 var xmlBytes = contentFileList.First().XmlBytes;               
 
@@ -143,7 +144,7 @@ namespace Gosocket.Dian.Functions.Batch
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "Step prueba nomina Trajo datos testSetId " + testSetId + " nitNomina " + nitNomina
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(flagNomina);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(flagNomina);
                 }
 
                 // Check big contributor
@@ -169,7 +170,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step BatchThreads " + ConfigurationManager.GetValue("BatchThreads")
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchThreads);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(batchThreads);
 
                 var threads = int.Parse(ConfigurationManager.GetValue("BatchThreads"));
 
@@ -202,7 +203,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step nits.Count() " + nits.Count()
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(checkNits);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkNits);
 
                 if (setResultOther == null)
                 {
@@ -212,7 +213,7 @@ namespace Gosocket.Dian.Functions.Batch
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "Step flagApplicationResponse " + flagApplicationResponse + " multipleResponsesXpathDataValue " + multipleResponsesXpathDataValue.Count().ToString()
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checksetResultOther);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(checksetResultOther);
 
                     // Check xpaths
                     var xpathValuesValidationResult = ValidateXpathValues(multipleResponsesXpathDataValue, flagApplicationResponse);
@@ -223,7 +224,7 @@ namespace Gosocket.Dian.Functions.Batch
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "Step xpathValuesValidationResult " + xpathValuesValidationResult.Count().ToString() 
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checkxpathValuesValidationResult);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkxpathValuesValidationResult);
 
 
                     multipleResponsesXpathDataValue = multipleResponsesXpathDataValue.Where(c => xpathValuesValidationResult.Where(v => v.Success).Select(v => v.DocumentKey).Contains(c.XpathsValues[flagApplicationResponse ? "AppResDocumentKeyXpath" : "DocumentKeyXpath"])).ToList();
@@ -241,7 +242,7 @@ namespace Gosocket.Dian.Functions.Batch
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "Step checkXpath "
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(checkXpath);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkXpath);
                 }
 
                 // Check permissions
@@ -253,7 +254,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step checkPermissions Paso permisos " + result.Count.ToString()
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkPermissions);
                
                 if (result.Count > 0)
                 {
@@ -281,7 +282,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step  multipleResponsesXpathDataValue.Count " + multipleResponsesXpathDataValue.Count
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(upload);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(upload);
 
                 bool sendTestSet = !string.IsNullOrWhiteSpace(testSetId);
                 Parallel.ForEach(multipleResponsesXpathDataValue, new ParallelOptions { MaxDegreeOfParallelism = threads }, response =>
@@ -353,7 +354,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step  multipleResponsesXpathDataValue.Count " + multipleResponsesXpathDataValue.Count
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(validador);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validador);
 
 
                 log.Info($"Init validation xml�s.");
@@ -507,7 +508,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step  ProcessBatchFileResults.Count "
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchUpdate);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(batchUpdate);
 
                 await ProcessBatchFileResults(batchFileResults);              
 
@@ -542,7 +543,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Step proceso terminado"
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchFileRuntime);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(batchFileRuntime);
 
             }
             catch (Exception ex)
@@ -554,7 +555,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Action = "Step proceso Exception => " + ex.Message,
                     StackTrace = ex.StackTrace 
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(batchException);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(batchException);
               
                 log.Error($"Error al procesar batch con trackId {zipKey}. Ex: {ex.StackTrace}");
                 batchFileStatus.StatusCode = "ex";
@@ -670,7 +671,7 @@ namespace Gosocket.Dian.Functions.Batch
                 " Step-nitNomina " + nitNomina +
                 " Step-flagApplicationResponse " + flagApplicationResponse.ToString()
             };
-            var insertLog = TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
+            var insertLog = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkPermissions);
 
             var result = new List<XmlParamsResponseTrackId>();
             List<RadianTestSetResult> lstResult = null;
@@ -720,7 +721,7 @@ namespace Gosocket.Dian.Functions.Batch
                     " Step-blankEndorsement " + blankEndorsement +
                     " Step-eventCode " + eventCode
                 };
-                var insertCheckVariables = TableManagerGlobalLogger.InsertOrUpdateAsync(checkVariables);
+                var insertCheckVariables = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkVariables);
                
                 GlobalAuthorization authEntity = null;
                 RadianTestSetResult objRadianTestSetResult = null;
@@ -761,7 +762,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                                 Action = "Step-checkFE Factura Electronica"
                             };
-                            var insertCheckFE = TableManagerGlobalLogger.InsertOrUpdateAsync(checkFE);
+                            var insertCheckFE = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkFE);
                             
                             authEntity = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(trimAuthCode, code);
                             if (authEntity == null)
@@ -811,7 +812,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 Action = "Step-checkOtherDoc softwareIdNomina " + softwareIdNomina +
                                 " Step-nitNomina " + nitNomina
                             };
-                            var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
+                            var insertCheckOtherDoc = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkOtherDoc);
 
                             //Valida software asociado al NIT en GlobalOtherDocElecOperation
                             bool existOperation = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
@@ -857,7 +858,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 " Step-code " + code + " Step-isRadian " + isRadian +
                                 " Step-codeMandato " + codeMandato
                             };
-                            var insertRadian = TableManagerGlobalLogger.InsertOrUpdateAsync(checkRadian);
+                            var insertRadian = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkRadian);
 
                             //Valida software asociado al NIT en GlobalRadianOperation
                             string codefinal = !string.IsNullOrWhiteSpace(codeMandato) ? codeMandato : code;
@@ -891,7 +892,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                                 Action = "Step-messageMandato " + messageMandato.ToString()
                             };
-                            var insertCheckElse = TableManagerGlobalLogger.InsertOrUpdateAsync(checkElse);
+                            var insertCheckElse = TableLoggerManagerFACELogger.InsertOrUpdateAsync(checkElse);
 
                             if (messageMandato)                                                            
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });                            
@@ -1081,7 +1082,7 @@ namespace Gosocket.Dian.Functions.Batch
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
         public class RequestObject

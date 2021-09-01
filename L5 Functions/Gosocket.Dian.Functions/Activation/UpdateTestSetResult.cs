@@ -30,7 +30,8 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");        
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
 
@@ -56,7 +57,7 @@ namespace Gosocket.Dian.Functions.Activation
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Start startUpdateTest"
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(startUpdateTest);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startUpdateTest);
 
 
                 testSetId = globalTestSetTracking.TestSetId;
@@ -75,7 +76,7 @@ namespace Gosocket.Dian.Functions.Activation
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "validateTestSet"
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(validateTestSet);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validateTestSet);
 
 
                 //Si existe el set de pruebas se Valida RADIAN
@@ -88,7 +89,7 @@ namespace Gosocket.Dian.Functions.Activation
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "validateRadian"
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateRadian);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validateRadian);
 
                     // traigo los datos de RadianTestSetResult
                     SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", "UPDATE-02");
@@ -434,7 +435,7 @@ namespace Gosocket.Dian.Functions.Activation
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "setResultOther"
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateOtherDoc);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validateOtherDoc);
 
                     string[] tempSoftwareID = setResultOther.RowKey.Split('|');
 
@@ -584,7 +585,7 @@ namespace Gosocket.Dian.Functions.Activation
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "Factura Electronica"
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(validateFE);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validateFE);
 
                     var testSetResults = globalTestSetResultTableManager.FindByPartition<GlobalTestSetResult>(globalTestSetTracking.SenderCode);
 
@@ -701,7 +702,7 @@ namespace Gosocket.Dian.Functions.Activation
                     Action = "Step endUpdateTest Exception =>  " + ex.Message,
                     StackTrace = ex.StackTrace
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(endUpdateTest);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(endUpdateTest);
                 
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 throw;
@@ -729,7 +730,7 @@ namespace Gosocket.Dian.Functions.Activation
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
         private static async Task MigrateCertificate(string contributorCode)

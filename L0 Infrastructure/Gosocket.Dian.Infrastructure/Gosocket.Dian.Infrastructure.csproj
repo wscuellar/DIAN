@@ -201,6 +201,7 @@
     <Compile Include="QueueManager.cs" />
     <Compile Include="StorageTools.cs" />
     <Compile Include="StringTools.cs" />
+    <Compile Include="TableLoggerManager.cs" />
     <Compile Include="TableManager.cs" />
     <Compile Include="Utils\BusinessDaysHolidays.cs" />
     <Compile Include="Utils\Extensions.cs" />

@@ -16,7 +16,8 @@ namespace Gosocket.Dian.Plugin.Functions.Software
 {
     public static class ValidateSoftware
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateSoftware")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Plugin.Functions.Software
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"SOFTPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

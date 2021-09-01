@@ -16,7 +16,8 @@ namespace Gosocket.Dian.Plugin.Functions.NumberRange
 {
     public static class ValidateNumberingRange
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateNumberingRange")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Plugin.Functions.NumberRange
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"NUMRANGEPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

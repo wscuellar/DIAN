@@ -17,7 +17,8 @@ namespace Gosocket.Dian.Plugin.Functions.Notes
 {
     public static class ValidateNoteReference
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateNoteReference")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -44,7 +45,7 @@ namespace Gosocket.Dian.Plugin.Functions.Notes
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"NOTREFPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

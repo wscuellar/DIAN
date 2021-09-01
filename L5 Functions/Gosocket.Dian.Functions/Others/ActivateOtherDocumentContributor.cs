@@ -14,7 +14,9 @@ namespace Gosocket.Dian.Functions.Others
 {
     public static class ActivateOtherDocumentContributor
     {
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly SoftwareService softwareService = new SoftwareService();
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
@@ -62,7 +64,7 @@ namespace Gosocket.Dian.Functions.Others
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = " SoftwareID " + requestObject.SoftwareId + " SoftwareType " + requestObject.SoftwareType 
                     };
-                    var resultRequestObjectACT = TableManagerGlobalLogger.InsertOrUpdateAsync(requestObjectACT);
+                    var resultRequestObjectACT = TableLoggerManagerFACELogger.InsertOrUpdateAsync(requestObjectACT);
 
                     //Contributorid = OtherDocumentActivateContributorID
                     int otherDocContributorId = 0;
@@ -112,7 +114,7 @@ namespace Gosocket.Dian.Functions.Others
                             Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                             Action = " otherDocContributorId " + otherDocContributorId
                         };
-                        var resultOtherDocSW = TableManagerGlobalLogger.InsertOrUpdateAsync(OtherDocSW);
+                        var resultOtherDocSW = TableLoggerManagerFACELogger.InsertOrUpdateAsync(OtherDocSW);
 
 
                         OtherDocElecSoftware newSoftware = new OtherDocElecSoftware()
@@ -218,7 +220,7 @@ namespace Gosocket.Dian.Functions.Others
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = " otherDocContributorId " + otherDocElecContributor.Id
                     };
-                    var resultEndACT = TableManagerGlobalLogger.InsertOrUpdateAsync(endACT);
+                    var resultEndACT = TableLoggerManagerFACELogger.InsertOrUpdateAsync(endACT);
 
                     log.Info($"Activation OtherDocument successfully completed. Contributor with given id: {otherDocElecContributor.Id}");
 
@@ -266,7 +268,7 @@ namespace Gosocket.Dian.Functions.Others
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
         class OtherDocumentActivateContributorRequestObject

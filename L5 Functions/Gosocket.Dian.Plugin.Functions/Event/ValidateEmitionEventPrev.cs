@@ -16,7 +16,8 @@ namespace Gosocket.Dian.Plugin.Functions.Event
 {
     public static  class ValidateEmitionEventPrev
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateEmitionEventPrev")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -50,7 +51,7 @@ namespace Gosocket.Dian.Plugin.Functions.Event
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"VALIDATEEMITIONEVENTPLGNS-{DateTime.UtcNow:yyyyMMdd}-Evento {data.EventCode}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {
