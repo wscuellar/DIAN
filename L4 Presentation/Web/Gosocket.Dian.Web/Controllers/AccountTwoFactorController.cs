@@ -26,7 +26,7 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
-        private readonly TableManager dianAuthTableManager = new TableManager("DianAuthToken");
+        private static readonly TableManager dianAuthTableManager = new TableManager("DianAuthToken");
         private IdentificationTypeService identificationTypeService = new IdentificationTypeService();
         private UserService userService = new UserService();
 

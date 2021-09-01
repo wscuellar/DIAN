@@ -16,6 +16,9 @@ namespace Gosocket.Dian.Application
         private readonly SoftwareService _softwareService = new SoftwareService();
 
         public readonly IOthersDocsElecSoftwareRepository _othersDocsElecSoftwareRepository;
+
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
+
         public OthersDocsElecSoftwareService(IOthersDocsElecSoftwareRepository othersDocsElecSoftwareRepository)
         {
             _othersDocsElecSoftwareRepository = othersDocsElecSoftwareRepository;
@@ -85,7 +88,7 @@ namespace Gosocket.Dian.Application
 
         private void RegisterException(GlobalLogger logger)
         {
-            var tableManager = new TableManager("GlobalLogger");
+            
             tableManager.InsertOrUpdate(logger);
         }
 

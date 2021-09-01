@@ -13,6 +13,7 @@ namespace Gosocket.Dian.Functions.Others
     {
         // Set queue name
         private const string queueName = "global-rejected-document-input%Slot%";
+        private static readonly TableManager tableManager = new TableManager("GlobalRejectedDocument");
 
         [FunctionName("RegisterRejectedDocument")]
         [return: Table("GlobalRejectedDocument", Connection = "GlobalStorage")]
@@ -26,8 +27,9 @@ namespace Gosocket.Dian.Functions.Others
             GlobalRejectedDocument rejectedDocument = null;
             try
             {
-                var tableManager = new TableManager("GlobalRejectedDocument");
+                
                 rejectedDocument = new GlobalRejectedDocument("REJECTED", Guid.NewGuid().ToString()) { SenderCode = document.SenderCode, SenderName = document.SenderName, GenerationTimeStamp = document.GenerationTimeStamp };
+                tableManager.InsertOrUpdate(rejectedDocument);
             }
             catch (Exception ex)
             {

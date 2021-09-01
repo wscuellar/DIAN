@@ -1,5 +1,4 @@
-﻿using Gosocket.Dian.Application.Managers;
-using Gosocket.Dian.Domain.Entity;
+﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Models;
 using Gosocket.Dian.Functions.Utils;
 using Gosocket.Dian.Infrastructure;
@@ -79,10 +78,10 @@ namespace Gosocket.Dian.Functions.Common
             if (requestObject.Category == null)
                 throw new Exception($"No se encontró una categoría configurada para el objecto seleccionado.");
 
-            var globalDocumentType = DocumentTypeManager.Instance.GetAll().FirstOrDefault(d => d.PartitionKey == requestObject.Category && d.RowKey == requestObject.DocumentTypeId);
+            var globalDocumentType = Application.Managers.DocumentTypeManager.Instance.GetAll().FirstOrDefault(d => d.PartitionKey == requestObject.Category && d.RowKey == requestObject.DocumentTypeId);
             if (globalDocumentType == null)
                 throw new Exception($"Tipo de documento {requestObject.DocumentTypeId} no implementado.");
-            var rules = RuleManager.Instance.GetAll().Where(r => r.Category == requestObject.Category && r.DocumentTypeCode == requestObject.DocumentTypeId && r.Active);
+            var rules = Application.Managers.RuleManager.Instance.GetAll().Where(r => r.Category == requestObject.Category && r.DocumentTypeCode == requestObject.DocumentTypeId && r.Active);
             if (rules.Count() == 0)
                 throw new Exception($"No hay reglas creadas para tipo de documento {requestObject.DocumentTypeId} y categoría {requestObject.Category}.");
             GlobalDocValidatorDocumentMeta documentMeta = SetDocumentDataInstance(requestObject, globalDocumentType);

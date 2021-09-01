@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Functions.Utils
     public class Utils
     {
         private static HttpClient client = new HttpClient();
+        private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorRuntime");
 
         public static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
@@ -114,7 +115,7 @@ namespace Gosocket.Dian.Functions.Utils
 
         public static async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
-            var TableManager = new TableManager("GlobalDocValidatorRuntime");
+            
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;

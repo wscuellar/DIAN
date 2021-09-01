@@ -58,5 +58,12 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string ValidityPeriodEndDate { get; set; }
     public string IssuerPartyCode { get; set; }
     public string IssuerPartyName { get; set; }
+    public string NoteMandato { get; set; }
+    public string NoteMandato2 { get; set; }
+    public string ReceiverPartyLegalEntityCompanyID { get; set; }
+    public string ReceiverPartyLegalEntityName { get; set; }
+    public string PartyLegalEntityName { get; set; }
+    public string PartyLegalEntityCompanyID { get; set; }
+    public string PaymentDueDate { get; set; }
 
 }
