@@ -425,7 +425,7 @@ namespace Gosocket.Dian.Services.Utils
 
             var isValidFolder = "Success";
 
-            var container = CategoryContainerName;
+            
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
             xmlBytes = DianFileManager.GetBytes(fileName);
