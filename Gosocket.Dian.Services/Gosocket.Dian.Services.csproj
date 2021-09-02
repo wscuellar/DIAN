@@ -100,6 +100,7 @@
     <Compile Include="Utils\ExchangeEmailResponse.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\Helpers\ApiHelpers.cs" />
+    <Compile Include="Utils\Helpers\AsyncHelper.cs" />
     <Compile Include="Utils\NumberRangeResponse.cs" />
     <Compile Include="Utils\NumberRangeResponseVerification.cs" />
     <Compile Include="Utils\OfeControlResponse.cs" />
