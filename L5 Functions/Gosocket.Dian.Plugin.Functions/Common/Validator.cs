@@ -6792,7 +6792,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             // Solo se podrá transmitir una única vez el número del documento para el trabajador. 
             var payroll = globalDocPayrollRegisterTableManager.globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<GlobalDocPayrollRegister>(empleadorNIT, serieAndNumber);
-            if (payroll != null)
+            if (payroll != null && payroll.Count > 0)
             {
                 responses.Clear();
                 responses.Add(new ValidateListResponse
