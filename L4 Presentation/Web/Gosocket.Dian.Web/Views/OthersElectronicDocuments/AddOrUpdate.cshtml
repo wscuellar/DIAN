@@ -125,7 +125,7 @@
                                         @Html.Partial("_form")
                                         if (!ViewBag.softwareActive)
                                         {
-                                            @if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                            if (ConfigurationManager.GetValue("Environment") != "Prod")
                                             {
                                                 <div class="panel-footer text-right">
                                                     <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
