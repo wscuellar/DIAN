@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Functions.Payroll
         private static readonly TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
         private static readonly TableManager TableManagerGlobalDocPayrollHistoric = new TableManager("GlobalDocPayrollHistoric");
         private static readonly TableManager TableManagerGlobalDocPayrollEmployees = new TableManager("GlobalDocPayrollEmployees");
+        private static readonly TableManager TableManagerGlobalDocPayrollRegister = new TableManager("GlobalDocPayrollRegister");       
 
 
         [FunctionName("RegistrateCompletedPayroll")]
@@ -59,6 +60,7 @@ namespace Gosocket.Dian.Functions.Payroll
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
+                var numeroDocumento = string.IsNullOrEmpty(docGlobalPayroll.NumeroDocumento) ? "0" : docGlobalPayroll.NumeroDocumento;
 
                 //Registra empleado solo para Nomina Individual
                 if (documentTypeId == (int)DocumentType.IndividualPayroll)
@@ -66,8 +68,8 @@ namespace Gosocket.Dian.Functions.Payroll
                     GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
                     {
                         PartitionKey = "Employee",
-                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{docGlobalPayroll.NumeroDocumento}",
-                        NumeroDocumento = docGlobalPayroll.NumeroDocumento,
+                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
+                        NumeroDocumento = numeroDocumento,
                         TipoDocumento = docGlobalPayroll.TipoDocumento,
                         NitEmpresa = docGlobalPayroll.NIT,
                         PrimerApellido = docGlobalPayroll.PrimerApellido.ToUpper(),
@@ -94,6 +96,19 @@ namespace Gosocket.Dian.Functions.Payroll
                     documentMetaAdjustment.DocumentReferencedKey = trackIdCune;
                     arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMetaAdjustment));
                 }
+
+                //Guarda el registro para validar futuras duplicidades y duplicidad en el mismo mes
+                GlobalDocPayrollRegister globalDocPayrollRegister = new GlobalDocPayrollRegister
+                {
+                    PartitionKey = docGlobalPayroll.RowKey,
+                    RowKey = docGlobalPayroll.Numero,
+                    FechaPagoFin = docGlobalPayroll.FechaPagoFin,
+                    FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
+                    NumeroDocumento = numeroDocumento,
+                    Timestamp = DateTime.Now,
+                };
+                arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
+
                 // ...
                 Task.WhenAll(arrayTasks).Wait();
             }

@@ -55,15 +55,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private readonly TableManager TableManagerGlobalDocReferenceAttorney = new TableManager("GlobalDocReferenceAttorney");
         private readonly TableManager TableManagerGlobalAttorneyFacultity = new TableManager("GlobalAttorneyFacultity");
         private readonly TableManager TableManagerGlobalRadianOperations = new TableManager("GlobalRadianOperations");
-        private readonly TableManager TableManagerGlobalDocRegisterProviderAR = new TableManager("GlobalDocRegisterProviderAR");
         private readonly TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private readonly TableManager TableManagerGlobalTaxRate = new TableManager("GlobalTaxRate");
-        private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayroll");
+        private readonly TableManager globalDocPayrollRegisterTableManager = new TableManager("GlobalDocPayrollRegister");
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
         private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
-
         XmlDocument _xmlDocument;
         XPathDocument _document;
         XPathNavigator _navigator;
@@ -911,15 +909,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Payroll
 
-        public List<ValidateListResponse> ValidateIndividualPayroll(XmlParseNomina xmlParser, DocumentParsedNomina model)
+        public List<ValidateListResponse> ValidateIndividualPayroll(DocumentParsedNomina model)
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-
+            
             responses.AddRange(this.CheckIndividualPayrollDuplicity(model.EmpleadorNIT, model.SerieAndNumber));
 
             if (Convert.ToInt32(model.DocumentTypeId) == Convert.ToInt32(DocumentType.IndividualPayroll))
             {
-                responses.AddRange(this.CheckIndividualPayrollInSameMonth(xmlParser));
+                responses.AddRange(this.CheckIndividualPayrollInSameMonth(model));
             }
 
             return responses;
@@ -6833,7 +6831,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Individual Payroll
 
-        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string companyId, string serieAndNumber)
+        private List<ValidateListResponse> CheckIndividualPayrollDuplicity(string empleadorNIT, string serieAndNumber)
         {
             DateTime startDate = DateTime.UtcNow;
 
@@ -6847,9 +6845,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            // Solo se podrá transmitir una única vez el número del documento para el trabajador.
-            var payroll = payrollTableManager.GlobalPayrollByRowKey_Number<GlobalDocPayroll>(companyId, serieAndNumber);
-            if (payroll != null)
+            // Solo se podrá transmitir una única vez el número del documento para el trabajador. 
+            var payroll = globalDocPayrollRegisterTableManager.globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<GlobalDocPayrollRegister>(empleadorNIT, serieAndNumber);
+            if (payroll != null && payroll.Count > 0)
             {
                 responses.Clear();
                 responses.Add(new ValidateListResponse
@@ -6864,13 +6862,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
         }
-
-        //private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(string companyId, string employeeId, bool novelty, DateTime startPaymentDate)
-        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(XmlParseNomina xmlParser)
+                
+        private List<ValidateListResponse> CheckIndividualPayrollInSameMonth(DocumentParsedNomina model)
         {
-            var companyId = xmlParser.globalDocPayrolls.Emp_NIT;
-            var employeeId = xmlParser.globalDocPayrolls.NumeroDocumento;
-            var novelty = xmlParser.Novelty;
+            var companyId = model.EmpleadorNIT;
+            var employeeId = model.NumeroDocumento;
+            var novelty = model.Novelty;
             
             DateTime startDate = DateTime.UtcNow;
 
@@ -6885,7 +6882,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             // Solo se podrá transmitir para cada trabajador 1 documento NominaIndividual mensual durante cada mes del año. Para el mismo Empleador.
-            var payrolls = payrollTableManager.GlobalPayrollByRowKey_DocumentNumber<GlobalDocPayroll>(companyId, employeeId);
+            var payrolls = globalDocPayrollRegisterTableManager.globalDocPayrollRegisterByPartitionKey_DocumentNumber<GlobalDocPayrollRegister>(companyId, employeeId);
             if (payrolls == null || payrolls.Count <= 0) // No exiten nóminas para el empleado...
             {
                 //Novedad XML true
@@ -6900,14 +6897,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = "Elemento Novedad con valor “true” no puede ser recibido por primera vez, " +
                         "ya que no existe una Nómina Electrónica recibida para este trabajador reportada por este Emisor durante este mes.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
+                    }); 
                     return responses;
                 }
                 else
                     return responses; // no existe para el mes actual
             }
 
-            var startPaymentDate = xmlParser.globalDocPayrolls.FechaPagoInicio.Value;
+            var startPaymentDate = Convert.ToDateTime(model.FechaPagoInicio);
 
             // Se valida contra la FechaPagoInicio...
             var payrollCurrentMonth = payrolls.FirstOrDefault(x => x.FechaPagoInicio.Value.Year == startPaymentDate.Year
@@ -6933,28 +6930,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses; // no existe para el mes actual
             }
 
-            ////Novedad XML False
-            //if (payrollCurrentMonth != null && !novelty)
-            //{
-            //    responses.Clear();
-            //    responses.Add(new ValidateListResponse
-            //    {
-            //        IsValid = false,
-            //        Mandatory = true,
-            //        ErrorCode = "NIE199",
-            //        ErrorMessage = "Únicamente pueden ser aceptados documentos “NominaIndividual” del mismo trabajador" +
-            //        " durante el Mes indicado en el documento que posean como 'True' este elemento.",
-            //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            //    });
-            //    return responses;
-            //}
-
             // Control de cambios v9.3: Se valida que el CUNENov exista y corresponda al mismo Empleador y Empleado.
             if (novelty)
             {
                 var errorCode = "NIE204a";
                 var errorMessage = "Documento a Realizar la Novedad contractual no se encuentra recibido en la Base de Datos";
-                var cune = xmlParser.globalDocPayrolls.CUNENov;
+                var cune = model.CUNENov;
 
                 var individualPayroll = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(cune, cune);
                 if (individualPayroll == null)
