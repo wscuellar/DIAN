@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Functions.Cryptography.Signer
         private readonly byte[] _certificateContent;
 
         private static readonly TableManager tableGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
         private object obj = new object();
 
@@ -39,9 +40,9 @@ namespace Gosocket.Dian.Functions.Cryptography.Signer
 
         public DocumentSigner(string certificateName, string certificatePass)
         {
-            var fileManager = new FileManager();
+            
 
-            _certificateContent = fileManager.GetBytes("dian", $"certificates/signdian/{certificateName}.pfx");
+            _certificateContent = DianFileManager.GetBytes( $"certificates/signdian/{certificateName}.pfx");
             _keyManager = new KeyManager(_certificateContent, certificatePass);
         }
 

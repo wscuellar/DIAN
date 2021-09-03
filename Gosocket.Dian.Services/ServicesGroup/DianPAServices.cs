@@ -42,9 +42,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private static readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
         private static readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
-        private readonly string blobContainer = "global";
+
         private readonly string blobContainerFolder = "batchValidator";
 
         public DianPAServices()
@@ -79,7 +80,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
             var utcNow = DateTime.UtcNow;
             var blobPath = $"{utcNow.Year}/{utcNow.Month.ToString().PadLeft(2, '0')}/{utcNow.Day.ToString().PadLeft(2, '0')}";
-            var result = fileManager.Upload(blobContainer, $"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
+            var result = GlobalFileManager.Upload($"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
             if (!result)
             {
                 responseMessages.ZipKey = "";
@@ -166,14 +167,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 dianResponse.StatusCode = "89";
                 return dianResponse;
-            }            
+            }
+            
+
             sb.AppendLine($"Zone 1 {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
             // ZONE 1
 
             // ZONE 2
             start = DateTime.UtcNow;
-            var xmlBase64 = Convert.ToBase64String(contentFileList.First().XmlBytes);            
+            var xmlBase64 = Convert.ToBase64String(contentFileList.First().XmlBytes);
+            
+            
             sb.AppendLine($"Zone 2 {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
             // ZONE 2
@@ -199,7 +204,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
 
             var documentParsed = xmlParser.Fields.ToObject<DocumentParsed>();
-            DocumentParsed.SetValues(ref documentParsed);            
+            DocumentParsed.SetValues(ref documentParsed);
+            
+            
             sb.AppendLine($"Parser {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
             // Parser
@@ -214,7 +221,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serie = documentParsed.Serie;
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
-            var eventCode = documentParsed.ResponseCode;            
+            var eventCode = documentParsed.ResponseCode;
+            
             sb.AppendLine($"Zone 3 {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
             // ZONE 3
@@ -239,32 +247,42 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     return dianResponse;
                 }
             }
-                        
+
+            
             sb.AppendLine($"3 Auth {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
+
             // Auth
 
             // Duplicity
             start = DateTime.UtcNow;
             var response = CheckDocumentDuplicity(senderCode, docTypeCode, serie, serieAndNumber, trackId, eventCode);
-            if (response != null) return response;            
+            if (response != null) return response;
+            
+            
             sb.AppendLine($"Duplicity {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
-            // Duplicity
+
+          
 
             
+
             // ZONE MAPPER
             start = DateTime.UtcNow;
             if (contentFileList.First().XmlFileName.Split('/').Count() > 1 && contentFileList.First().XmlFileName.Split('/').Last() != null)
                 contentFileList.First().XmlFileName = contentFileList.First().XmlFileName.Split('/').Last();
 
             var trackIdMapperEntity = new GlobalOseTrackIdMapper(contentFileList[0].XmlFileName, trackId);
-            TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);            
+            TableManagerDianFileMapper.InsertOrUpdate(trackIdMapperEntity);
+            
+
             sb.AppendLine($"Zone 4 Mapper {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
+
+
             // ZONE MAPPER
 
             // upload xml
             start = DateTime.UtcNow;
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            var uploadXmlResponse = AsyncHelper.RunSync(()=>ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest));
             if (!uploadXmlResponse.Success)
             {
                 dianResponse.XmlFileName = $"{fileName}";
@@ -277,7 +295,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableLoggerManagerFACELogger.InsertOrUpdate(globalTimeValidation);
                 }
                 return dianResponse;
-            }            
+            }
+            
+            
             sb.AppendLine($"5 Upload {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
             // upload xml
@@ -285,8 +305,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // send to validate document sync
             start = DateTime.UtcNow;
             var requestObjTrackId = new { trackId, draft = "false" };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
+            var validations = AsyncHelper.RunSync(() => ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId));
+            
+
             sb.AppendLine($"6 Validate {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
+
             // send to validate document sync
 
             if (validations.Count == 0)
@@ -309,6 +332,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 string message = "";
                 bool existDocument = false;
                 GlobalDocValidatorDocumentMeta documentMeta = null;
+                
+
                 
                 documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
                 //var prefix = !string.IsNullOrEmpty(serie) ? serie : string.Empty;
@@ -347,6 +372,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.ErrorMessage.AddRange(notificationList);
                 }
 
+                
 
                 var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                 dianResponse.XmlBase64Bytes = applicationResponse ?? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations);
@@ -366,19 +392,22 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     dianResponse.IsValid = false;
                     dianResponse.StatusCode = "99";
                     dianResponse.StatusDescription = "Validación contiene errores en campos mandatorios.";
-                }                
+                }
+                
+
                 sb.AppendLine($"7 Aplication SendBillSync {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
+
                 // ZONE APPLICATION
                 var application = new GlobalLogger(trackId, "timmers") { Message = sb.ToString() };
-
                 // LAST ZONE
                 start = DateTime.UtcNow;
 
-                TableLoggerManagerFACELogger.InsertOrUpdate(application);
 
+                TableManagerGlobalLogger.InsertOrUpdate(application);
+                    
+               
                 if (dianResponse.IsValid && !existDocument)
                     TableManagerGlobalDocValidatorDocument.InsertOrUpdate(validatorDocument);
-
 
                 //Task.WhenAll(arrayTasks);
 
@@ -400,7 +429,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (contributor == null)
                 return new ExchangeEmailResponse { StatusCode = "89", Success = false, Message = $"NIT {authCode} no autorizado para consultar correos de recepción de facturas.", CsvBase64Bytes = null };
 
-            var bytes = fileManager.GetBytes("dian", $"exchange/emails.csv");
+            var bytes = DianFileManager.GetBytes( $"exchange/emails.csv");
             var response = new ExchangeEmailResponse { StatusCode = "0", Success = true, CsvBase64Bytes = bytes };
             return response;
         }
@@ -430,7 +459,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var resultsEntities = TableManagerGlobalBatchFileResult.FindByPartition<GlobalBatchFileResult>(trackId);
             if (resultsEntities.Count == 1) return GetStatusZip(trackId);
 
-            var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
+            var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{trackId}.zip");
             if (!exist)
             {
                 responses.Add(new DianResponse
@@ -443,7 +472,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             if (exist)
             {
-                var zipBytes = fileManager.GetBytes(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
+                var zipBytes = GlobalFileManager.GetBytes($"{blobContainerFolder}/applicationResponses/{trackId}.zip");
                 if (zipBytes != null)
                 {
                     responses.Add(new DianResponse { IsValid = true, StatusCode = "00", StatusDescription = "Procesado Correctamente.", XmlBase64Bytes = zipBytes });
@@ -480,13 +509,76 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     //bool existNsu = false;
                     var validations = new List<GlobalDocValidatorTracking>();
                     
+
+
+                   
                     documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
                     if (!string.IsNullOrEmpty(documentMeta.Identifier))
                         existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                     applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
-                    
+                   
+
                     validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
                     
+
+                    
+                    
+                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
+                    });
+
+                    Task fourLocalRun = Task.Run(() =>
+                    {
+                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+                    });
+
+                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(secondLocalRun);
+                    arrayTasks.Add(fourLocalRun);
+                    Task.WhenAll(arrayTasks).Wait();
+
+                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
+                    });
+
+                    Task fourLocalRun = Task.Run(() =>
+                    {
+                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+                    });
+
+                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(secondLocalRun);
+                    arrayTasks.Add(fourLocalRun);
+                    Task.WhenAll(arrayTasks).Wait();
+
+                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
+                    });
+
+                    Task fourLocalRun = Task.Run(() =>
+                    {
+                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+                    });
+
+                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(secondLocalRun);
+                    arrayTasks.Add(fourLocalRun);
+                    Task.WhenAll(arrayTasks).Wait();
+
+                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
+                    });
+
+                    Task fourLocalRun = Task.Run(() =>
+                    {
+                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
+                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+                    });
+
+                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(secondLocalRun);
+                    arrayTasks.Add(fourLocalRun);
+                    Task.WhenAll(arrayTasks).Wait();
+
                     var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                     response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
 
@@ -1690,17 +1782,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         public static byte[] GetXmlFromStorage(string trackId)
         {
-            var tableManager = new TableManager("GlobalDocValidatorRuntime");
-            var documentStatusValidation = tableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            
+            var documentStatusValidation = TableManagerGlobalDocValidatorRuntime.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = fileManager.GetBytes(container, fileName);
+            var xmlBytes = GlobalFileManager.GetBytes(fileName);
 
-            tableManager = null;
+            
             return xmlBytes;
         }
 

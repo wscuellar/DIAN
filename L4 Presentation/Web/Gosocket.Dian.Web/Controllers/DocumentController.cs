@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
@@ -906,8 +907,8 @@ namespace Gosocket.Dian.Web.Controllers
 
         private byte[] DownloadExportedFile(string pk, string rk)
         {
-            FileManager fileManager = new FileManager();
-            return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
+            
+            return GlobalFileManager.GetBytes( $"export/{pk}/{rk}.xlsx");
         }
 
         private byte[] DownloadXml(string trackId)

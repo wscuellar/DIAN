@@ -1002,6 +1002,83 @@ namespace Gosocket.Dian.Application.Cosmos
                 return new Guid(hashBytes);
             }
         }
+
+        public async Task<int> CountDocumentsAsync(DateTime? from,
+                                                    DateTime? to,
+                                                    int status,
+                                                    string documentTypeId,
+                                                    string senderCode,
+                                                    string serieAndNumber,
+                                                    string receiverCode,
+                                                    string providerCode,                                                                                                        
+                                                    string referenceType,
+                                                    List<string> pks = null)
+        {
+
+            if (!from.HasValue || !to.HasValue)
+            {
+                from = to.Value.AddMonths(-1);
+                to = DateTime.Now.Date;
+            }
+
+            int fromNumber = int.Parse(from.Value.ToString("yyyyMMdd"));
+            int toNumber = int.Parse(to.Value.ToString("yyyyMMdd"));
+            string documentTypeOption1 = "";
+            string documentTypeOption2 = "";
+
+            switch (documentTypeId)
+            {
+                case "01": documentTypeOption1 = "1"; documentTypeOption2 = "1"; break;
+                case "02": documentTypeOption1 = "2"; documentTypeOption2 = "2"; break;
+                case "03": documentTypeOption1 = "3"; documentTypeOption2 = "3"; break;
+                case "07": documentTypeOption1 = "7"; documentTypeOption2 = "91"; break;
+                case "08": documentTypeOption1 = "8"; documentTypeOption2 = "92"; break;
+            }
+
+            string referenceTypeOption1 = "";
+            string referenceTypeOption2 = "";
+
+            switch (referenceType)
+            {
+                case "07": referenceTypeOption1 = "7"; referenceTypeOption2 = "91"; break;
+                case "08": referenceTypeOption1 = "8"; referenceTypeOption2 = "92"; break;
+            }
+
+            string collectionName = GetCollectionName(to.Value);
+            string collectionLink = collections[collectionName].SelfLink;
+
+            FeedOptions options = new FeedOptions()
+            {
+                
+                EnableCrossPartitionQuery = true
+                
+            };
+
+
+            List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+
+            var query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink,options)
+            .Where(
+                e => partitionKeys.Contains(e.PartitionKey)
+                && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
+                && (status == 0 || e.ValidationResultInfo.Status == status)
+                && (documentTypeId == "00"
+                    || e.DocumentTypeId == documentTypeId
+                    || e.DocumentTypeId == documentTypeOption1
+                    || e.DocumentTypeId == documentTypeOption2)
+                && (referenceType == "00"
+                    || e.References.Any(r => r.DocumentTypeId == referenceType)
+                    || e.References.Any(r => r.DocumentTypeId == referenceTypeOption1)
+                    || e.References.Any(r => r.DocumentTypeId == referenceTypeOption2))
+                && (senderCode == null || e.SenderCode == senderCode)
+                && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
+                && (receiverCode == null || e.ReceiverCode == receiverCode)
+                && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
+            );
+            int res = await query.CountAsync();
+            
+            return res;
+        }
     }
 
     #region Models

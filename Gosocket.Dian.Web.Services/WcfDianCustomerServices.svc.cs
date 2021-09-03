@@ -82,10 +82,10 @@ namespace Gosocket.Dian.Web.Services
                 {
                     var start = DateTime.UtcNow;
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                    var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
                     if (exist)
                     {
-                        var previusResult = fileManager.GetText(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                        var previusResult = GlobalFileManager.GetText($"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
 
                         if (!string.IsNullOrEmpty(previusResult))
                         {
@@ -380,9 +380,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = customerDianPa.UploadDocumentSync(fileName, contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        GlobalFileManager.Upload($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -515,9 +515,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = customerDianPa.SendEventUpdateStatus(contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        GlobalFileManager.Upload($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -598,9 +598,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = customerNomina.SendNominaUpdateStatusAsync(contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        GlobalFileManager.Upload($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerNomina = null;
 

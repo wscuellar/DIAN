@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Application
         private static readonly XNamespace ds = "http://www.w3.org/2000/09/xmldsig#";
 
         private static readonly XNamespace sts = "dian:gov:co:facturaelectronica:Structures-2-1";
-
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
 
         private static object obj = new object();
@@ -706,7 +706,7 @@ namespace Gosocket.Dian.Application
 
         {
 
-            var fileManager = new FileManager();
+            
 
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
 
@@ -714,16 +714,16 @@ namespace Gosocket.Dian.Application
 
 
 
-            var container = "dian";
+            
 
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-            var exist = fileManager.Exists(container, fileName);
+            var exist = DianFileManager.Exists(fileName);
 
             if (!exist)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-                exist = fileManager.Exists(container, fileName);
+                exist = DianFileManager.Exists( fileName);
             }
             return exist;
         }
@@ -734,7 +734,7 @@ namespace Gosocket.Dian.Application
 
             byte[] responseBytes = null;
 
-            var fileManager = new FileManager();
+            
 
 
 
@@ -750,13 +750,13 @@ namespace Gosocket.Dian.Application
 
 
 
-            var container = CategoryContainerName;
+            
 
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
 
 
-            xmlBytes = fileManager.GetBytes(container, fileName);
+            xmlBytes = DianFileManager.GetBytes( fileName);
 
             if (xmlBytes == null)
 
@@ -764,13 +764,13 @@ namespace Gosocket.Dian.Application
 
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-                xmlBytes = fileManager.GetBytes("dian", fileName);
+                xmlBytes = DianFileManager.GetBytes(fileName);
 
             }
 
             if (xmlBytes != null) responseBytes = xmlBytes;
 
-            fileManager = null;
+            
 
             return responseBytes;
 

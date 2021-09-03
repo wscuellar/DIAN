@@ -15,9 +15,9 @@ namespace Gosocket.Dian.Functions.Export
 {
     public static class ExportExecutionTimeValidationToCsv
     {
-        private static readonly string blobContainer = "global";
+        
         private static readonly string blobContainerFolder = "export";
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
         private static readonly TableManager globalDocValidatorRuntimeTableManager = new TableManager("GlobalDocValidatorRuntime");
 
         [FunctionName("ExportExecutionTimeValidationToCsv")]
@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Functions.Export
 
                 var utcNow = DateTime.UtcNow;
                 var path = $"execution time validations";
-                var result = await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/execution time validations/result.csv", csvBytes);
+                var result = await GlobalFileManager.UploadAsync( $"{blobContainerFolder}/execution time validations/result.csv", csvBytes);
                 if (!result)
                     throw new Exception("Error al almacenar archivo en el storage.");
 

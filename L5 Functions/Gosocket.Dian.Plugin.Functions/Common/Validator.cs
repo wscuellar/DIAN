@@ -39,8 +39,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 {
     public class Validator
     {
+        private static FileManager GlobalFileManager = new FileManager("global");
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly TableManager TableManagerGlobalDocValidatorRuntime = new TableManager("GlobalDocValidatorRuntime");
 
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
@@ -7359,15 +7361,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
-            var TableManager = new TableManager("GlobalDocValidatorRuntime");
-            var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            
+            var documentStatusValidation = TableManagerGlobalDocValidatorRuntime.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }

@@ -17,6 +17,7 @@ namespace Gosocket.Dian.Application
 {
     public class RadianContributorService : IRadianContributorService
     {
+        private static readonly FileManager RadianContributorFilesFileManager = new FileManager("radiancontributor-files");
         private readonly IContributorService _contributorService;
         private readonly IRadianContributorRepository _radianContributorRepository;
         private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
@@ -510,8 +511,8 @@ namespace Gosocket.Dian.Application
         {
             string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
             //var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-            var fileManager = new FileManager();
-            return fileManager.GetBytes("radiancontributor-files", fileNameURL, out contentType);
+            
+            return RadianContributorFilesFileManager.GetBytes(fileNameURL, out contentType);
         }
 
         #endregion

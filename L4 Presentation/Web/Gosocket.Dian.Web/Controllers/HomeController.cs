@@ -178,51 +178,23 @@ namespace Gosocket.Dian.Web.Controllers
 
         public async Task<JsonResult> GetEmittedAndreceivedTotal()
         {
-            int totalDocumentsEmitted = 0;
-            int totalDocumentsReceived = 0;
+            int totalDocumentsEmitted;
+            int totalDocumentsReceived;
             var contributorCode = User.ContributorCode();
             try
             {
                 var utcNow = DateTime.UtcNow;
-                var emmited = new List<GlobalDataDocument>();
-                bool hasMoreResults = true;
-                var ct = "";
-                //do
-                //{
-                //    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, null, 1000, null, "00");
-                //    hasMoreResults = result.Item1;
-                //    ct = result.Item2;
-                //    emmited.AddRange(result.Item3);
-                //} while (hasMoreResults && emmited.Count() < 10000);
-                //totalDocumentsEmitted = emmited.Count();
-
-
-                //TODO Analizar después
-
-                totalDocumentsEmitted = 0;
-
-                var received = new List<GlobalDataDocument>();
-                hasMoreResults = true;
-                ct = "";
-                //do
-                //{
-                //    var result = await CosmosDBService.Instance(utcNow).ReadDocumentsAsync(ct, utcNow.AddDays(-30), utcNow, 0, "00", null, null, contributorCode, null, 1000, null, "00");
-                //    hasMoreResults = result.Item1;
-                //    ct = result.Item2;
-                //    received.AddRange(result.Item3);
-                //} while (hasMoreResults && received.Count() < 10000);
-                //totalDocumentsReceived = received.Count();
-
-                totalDocumentsReceived = 0;
-
+                totalDocumentsEmitted = await CosmosDBService.Instance(utcNow).CountDocumentsAsync(utcNow.AddDays(-30), utcNow, 0, "00", contributorCode, null, null, null, "00");
+                totalDocumentsReceived = await CosmosDBService.Instance(utcNow).CountDocumentsAsync(utcNow.AddDays(-30), utcNow, 0, "00", null,null, contributorCode, null, "00");
+             
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new
                 {
                     success = false,
-                    emitted = totalDocumentsEmitted == 10000 ? $"+ { totalDocumentsEmitted}" : $"{totalDocumentsEmitted}",
-                    received = totalDocumentsReceived == 10000 ? $"+ { totalDocumentsReceived}" : $"{totalDocumentsReceived}",
+                    emitted = 0,
+                    received = 0,
                 }, JsonRequestBehavior.AllowGet);
             }
 

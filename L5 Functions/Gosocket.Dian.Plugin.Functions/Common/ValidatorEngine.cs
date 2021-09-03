@@ -48,6 +48,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public static ValidatorEngine Instance => _instance ?? (_instance = new ValidatorEngine());
 
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
+
         public async Task<List<ValidateListResponse>> StartContingencyValidationAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
@@ -821,21 +823,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }
 
 
         public async Task<byte[]> GetXmlPayrollDocumentAsync(string file)
-        {
-            var fileManager = new FileManager();
-            var container = "global";
+        {            
             var fileName = $"schemes/schemes/new-nomina-1.0/01/{file}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }

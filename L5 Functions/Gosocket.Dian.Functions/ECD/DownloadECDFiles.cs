@@ -18,10 +18,13 @@ namespace Gosocket.Dian.Functions.ECD
 {
     public static class DownloadECDFiles
     {
-        static readonly FileManager fileManager = new FileManager();
+        //static readonly FileManager fileManager = new FileManager();
         //static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");        
         static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
+        
+        //static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly FileManager ConfigurationsFileManager = new FileManager("configurations");
 
         static string Extension { get; set; }
         static readonly string[] extensionsAllowed = { "crl", "crt" };
@@ -61,6 +64,9 @@ namespace Gosocket.Dian.Functions.ECD
         {
             try
             {
+                //TODO mandarlo a static
+                FileManager fileManager = new FileManager(configuration.Container);
+
                 UriBuilder downloadUriBuilder = new UriBuilder(configuration.Url);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(downloadUriBuilder.Uri);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -68,7 +74,7 @@ namespace Gosocket.Dian.Functions.ECD
                 if(responseStream.Length > 0)
                 {
                     var fileBytes = Utils.Utils.ConvertStreamToBytes(responseStream);
-                    fileManager.Upload(configuration.Container, configuration.FileName, fileBytes);
+                    fileManager.Upload(configuration.FileName, fileBytes);
                 }
             }
             catch (Exception ex)
@@ -107,7 +113,7 @@ namespace Gosocket.Dian.Functions.ECD
         /// <returns></returns>
         private static async Task<List<ECDDownloadConfiguration>> GetECDConfigurations()
         {
-            var result = await fileManager.GetTextAsync("configurations", "ECDConfiguration.json");
+            var result = await ConfigurationsFileManager.GetTextAsync("ECDConfiguration.json");
             var configurations = JsonConvert.DeserializeObject<List<ECDDownloadConfiguration>>(result);
             configurations = configurations.Where(_ => _.Active && _.Extension == Extension && (_.Url.EndsWith(".crl") || _.Url.EndsWith(".crt"))).ToList();
             return configurations;

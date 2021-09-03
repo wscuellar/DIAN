@@ -22,6 +22,7 @@ namespace Gosocket.Dian.Services.Utils.Signer
         private readonly X509Certificate2 _certificate;
 
         private readonly byte[] _certificateContent;
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
         public DocumentSigner()
         {
@@ -33,9 +34,9 @@ namespace Gosocket.Dian.Services.Utils.Signer
 
         public DocumentSigner(string certificateName, string certificatePass)
         {
-            var fileManager = new FileManager();
+            
 
-            _certificateContent = fileManager.GetBytes("dian", $"certificates/signdian/{certificateName}.pfx");
+            _certificateContent = DianFileManager.GetBytes($"certificates/signdian/{certificateName}.pfx");
             //_keyManager = new KeyManager(_certificateContent, certificatePass);
         }
 

@@ -23,7 +23,8 @@ namespace Gosocket.Dian.Services.Utils
 
         private static object obj = new object();
 
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager DianFileManager = new FileManager("dian");
+
         private static readonly FirmaElectronica signer = new FirmaElectronica();
 
         public static byte[] GenerateApplicationResponseBytes(string trackId,
@@ -75,10 +76,10 @@ namespace Gosocket.Dian.Services.Utils
             if (!mandatoryInvalid)
             {
                 var folder = "Success";
-                var container = $"{CategoryContainerName}";
+                
                 var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
                 var fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{folder}/{documentMeta.SenderCode}/{docTypeCode}/{serieFolder}/{number}/{trackId}.xml";
-                fileManager.Upload(container, fileName, responseBytes);
+                DianFileManager.Upload(fileName, responseBytes);
             }
 
             return responseBytes;
@@ -355,18 +356,18 @@ namespace Gosocket.Dian.Services.Utils
 
         public static bool ApplicationResponseExist(GlobalDocValidatorDocumentMeta documentMeta)
         {
-            var fileManager2 = new FileManager(); 
+            
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
             var isValidFolder = "Success";
 
-            var container = "dian";
+            
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-            var exist = fileManager2.Exists(container, fileName);
+            var exist = DianFileManager.Exists(fileName);
 
             if (!exist)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-                exist = fileManager2.Exists(container, fileName);
+                exist = DianFileManager.Exists(fileName);
             }
             return exist;
         }
@@ -374,7 +375,7 @@ namespace Gosocket.Dian.Services.Utils
         public static byte[] GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
         {
             byte[] responseBytes = null;
-            var fileManager2 = new FileManager();
+            
 
             byte[] xmlBytes = null;
              
@@ -383,14 +384,14 @@ namespace Gosocket.Dian.Services.Utils
 
             var isValidFolder = "Success";
 
-            var container = CategoryContainerName;
+            
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-            xmlBytes = fileManager2.GetBytes(container, fileName);
+            xmlBytes = DianFileManager.GetBytes(fileName);
             if (xmlBytes == null)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
-                xmlBytes = fileManager2.GetBytes("dian", fileName);
+                xmlBytes = DianFileManager.GetBytes(fileName);
             }
             if (xmlBytes != null) responseBytes = xmlBytes;
 
