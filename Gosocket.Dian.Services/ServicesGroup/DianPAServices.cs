@@ -403,7 +403,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 start = DateTime.UtcNow;
 
 
-                TableManagerGlobalLogger.InsertOrUpdate(application);
+                TableLoggerManagerFACELogger.InsertOrUpdate(application);
                     
                
                 if (dianResponse.IsValid && !existDocument)
@@ -519,65 +519,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
                    
 
                     validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                    
-
-                    
-                    
-                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
-                    });
-
-                    Task fourLocalRun = Task.Run(() =>
-                    {
-                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-                    });
-
-                    //arrayTasks.Add(firstLocalRun);
-                    arrayTasks.Add(secondLocalRun);
-                    arrayTasks.Add(fourLocalRun);
-                    Task.WhenAll(arrayTasks).Wait();
-
-                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
-                    });
-
-                    Task fourLocalRun = Task.Run(() =>
-                    {
-                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-                    });
-
-                    //arrayTasks.Add(firstLocalRun);
-                    arrayTasks.Add(secondLocalRun);
-                    arrayTasks.Add(fourLocalRun);
-                    Task.WhenAll(arrayTasks).Wait();
-
-                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
-                    });
-
-                    Task fourLocalRun = Task.Run(() =>
-                    {
-                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-                    });
-
-                    //arrayTasks.Add(firstLocalRun);
-                    arrayTasks.Add(secondLocalRun);
-                    arrayTasks.Add(fourLocalRun);
-                    Task.WhenAll(arrayTasks).Wait();
-
-                        applicationResponseExist = XmlUtil.ApplicationResponseExist(documentMeta);
-                    });
-
-                    Task fourLocalRun = Task.Run(() =>
-                    {
-                        validations = TableManagerGlobalDocValidatorTracking.FindByPartition<GlobalDocValidatorTracking>(trackId);
-                        //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-                    });
-
-                    //arrayTasks.Add(firstLocalRun);
-                    arrayTasks.Add(secondLocalRun);
-                    arrayTasks.Add(fourLocalRun);
-                    Task.WhenAll(arrayTasks).Wait();
 
                     var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
                     response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
