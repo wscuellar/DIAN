@@ -1623,7 +1623,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Comparar ValorFEV-TV contra el valor total de la FE
             if (xmlParserCude.ValorOriginalTV != null)
             {
-                if (xmlParserCude.ValorOriginalTV == totalInvoice)
+                var valorOriginlTV = double.Parse(xmlParserCude.ValorOriginalTV, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture).ToString();
+                var totalInvoiceParam = double.Parse(totalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture).ToString();
+                if (valorOriginlTV == totalInvoiceParam)
                 {
                     responses.Add(new ValidateListResponse
                     {

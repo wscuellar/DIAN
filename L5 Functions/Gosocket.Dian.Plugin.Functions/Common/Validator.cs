@@ -7129,7 +7129,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
 
-                    if (string.IsNullOrEmpty(documentMeta.PartitionKey))
+                    if (!string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
                         signingTimeAvailability = documentMeta.SigningTimeStamp;
                     }
