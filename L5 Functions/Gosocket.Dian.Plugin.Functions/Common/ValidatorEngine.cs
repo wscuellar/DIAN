@@ -105,9 +105,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser));
+            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser, _ns));
 
             return validateResponses;
         }

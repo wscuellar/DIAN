@@ -139,7 +139,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateTaxWithHolding
-        public List<ValidateListResponse> ValidateTaxWithHolding(XmlParser xmlParser)
+        public List<ValidateListResponse> ValidateTaxWithHolding(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -156,13 +156,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
-            XmlNodeList invoiceWithholdingListResponseId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");            
+            ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+            ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+
+            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice[1]/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID");
+            XmlNodeList invoiceWithholdingListResponseId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID");            
 
             for (int i = 0; i < invoiceWithholdingListResponseId.Count; i++)
             {
-                xmlID = invoiceWithholdingListResponseId.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
-                xmlPercent = invoiceWithholdingListResponseId.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(i)?.InnerText.ToString().Trim();
+                xmlID = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID").Item(i)?.InnerText.ToString().Trim();
+                xmlPercent = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent").Item(i)?.InnerText.ToString().Trim();
 
                 var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
                 if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
@@ -188,7 +191,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int[] arraywithholding = new int[withholdingListResponse.Count];
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
-                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='WithholdingTaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID").Item(i)?.InnerText.ToString().Trim();
                 arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);            
             }
 
