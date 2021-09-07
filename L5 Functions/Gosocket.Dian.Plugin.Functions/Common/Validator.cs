@@ -211,7 +211,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
         #region ValidateTaxCategory
-        public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser)
+        public List<ValidateListResponse> ValidateTaxCategory(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();                      
@@ -227,7 +227,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+            ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+            ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+
+            XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID",ns);
           
             var isErrorConsecutiveInvoice = false;
             int[] arrayInvoiceListResponse = new int[invoiceLineListResponse.Count];
@@ -238,7 +241,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 bool validTax = true;
                 indexInvoiceLine += 1;
-                var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                var value = invoiceLineListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
                 // cuando no llega valor, se asume -1
                 var xmlIDInvoice = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
 
@@ -260,12 +263,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (validTax)
                 {
                     int indexTaxCategory = 0;
-                    XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']");
+                    XmlNodeList taxCategoryListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"/sig:Invoice/cac:InvoiceLine[{indexInvoiceLine}]/cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns);
                     for (int j = 0; j < taxCategoryListResponse.Count; j++)
                     {
                         indexTaxCategory += 1;
-                        xmlID = taxCategoryListResponse.Item(j).SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal'][{indexTaxCategory}]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
-                        xmlPercent = taxCategoryListResponse.Item(j).SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='TaxTotal'][{indexTaxCategory}]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='Percent']").Item(0)?.InnerText.ToString();
+                        xmlID = taxCategoryListResponse.Item(j).SelectNodes($"/sig:Invoice/cac:InvoiceLine[{indexInvoiceLine}]/cac:TaxTotal[{indexTaxCategory}]/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns).Item(0)?.InnerText.ToString();
+                        xmlPercent = taxCategoryListResponse.Item(j).SelectNodes($"/sig:Invoice/cac:InvoiceLine[{indexInvoiceLine}]/cac:TaxTotal[{indexTaxCategory}]/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent", ns).Item(0)?.InnerText.ToString();
 
                         var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
                         if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
