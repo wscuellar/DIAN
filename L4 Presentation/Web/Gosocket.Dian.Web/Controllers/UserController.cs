@@ -72,6 +72,7 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult List(string type)
         {
+            /*
             var model = new UserTableViewModel();
             var users = userService.GetUsers(null, -1, model.Page, model.Length);
             model.Users = users.Select(u => new UserViewModel
@@ -84,7 +85,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.SearchFinished = true;
             ViewBag.CurrentPage = Navigation.NavigationEnum.LegalRepresentative;
-            return View(model);
+            return View(model);*/
+            return View();
         }
 
         [HttpPost]

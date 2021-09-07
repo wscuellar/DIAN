@@ -21,11 +21,12 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         public ActionResult Index()
-        {
+        {/*
             if (User.IsInAnyRole("Administrador", "Super"))
                 return RedirectToAction(nameof(ReviewRequests));
 
-            return RedirectToAction(nameof(RequestAuthorization));
+            return RedirectToAction(nameof(RequestAuthorization));*/
+            return View();
         }
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]

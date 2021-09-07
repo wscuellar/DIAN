@@ -145,7 +145,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult List()
-        {
+        {/*
             var contributors = contributorService.GetContributors((int)Domain.Common.ContributorType.Provider, (int)ContributorStatus.Enabled);
 
             List<ContributorViewModel> initialContributor = new List<ContributorViewModel>() { new ContributorViewModel { Id = -1, Name = "Seleccione..." } };
@@ -179,6 +179,8 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
             ViewBag.CurrentPage = Navigation.NavigationEnum.Software;
             return View(model);
+            */
+            return View();
         }
 
         [HttpPost]
