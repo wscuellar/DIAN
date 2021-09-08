@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Web.Controllers
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager,
+                                  IRadianSupportDocument radianSupportDocument, 
                                   IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService,
                                   IAssociateDocuments associateDocuments)
         {
@@ -93,8 +93,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianPdfCreationService = radianPdfCreationService;
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
-            _queryAssociatedEventsService = queryAssociatedEventsService;
-            _fileManager = fileManager;
+            _queryAssociatedEventsService = queryAssociatedEventsService;            
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
             _associateDocuments = associateDocuments;
         }
