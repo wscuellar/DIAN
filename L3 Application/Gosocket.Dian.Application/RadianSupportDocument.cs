@@ -30,15 +30,15 @@ namespace Gosocket.Dian.Application
 
         #region Properties
 
-        private readonly FileManager _fileManager;
+        
 
         #endregion
 
         #region Constructor
 
-        public RadianSupportDocument(FileManager fileManager)
+        public RadianSupportDocument()
         {
-            _fileManager = fileManager;
+            
         }
 
         #endregion

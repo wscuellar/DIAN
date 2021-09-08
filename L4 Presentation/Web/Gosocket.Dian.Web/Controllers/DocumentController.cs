@@ -91,7 +91,6 @@ namespace Gosocket.Dian.Web.Controllers
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
-            _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
             _queryAssociatedEventsService = queryAssociatedEventsService;            
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
