@@ -44,7 +44,7 @@ namespace Gosocket.Dian.Functions.Batch
         private const string queueName = "global-process-batch-zip-input%Slot%";
 
         [FunctionName("ProcessBatchDocumentsZipFile")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalQueue")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;
