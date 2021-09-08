@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         public ActionResult ElectronicInvoiceView()
         {
-            return View();
+            return Index();
         }
 
         /// <summary>
@@ -91,23 +91,8 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TotalCount = radianAdmin.RowCount,
                 CurrentPage = radianAdmin.CurrentPage,
-                RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
-                {
-                    Id = c.Id,
-                    Code = c.Code,
-                    RadianContributorTypeId = c.RadianContributorTypeId,
-                    TradeName = c.TradeName,
-                    BusinessName = c.BusinessName,
-                    AcceptanceStatusName = c.AcceptanceStatusName,
-                    RadianState = c.RadianState
-
-                }).ToList(),
-                RadianType = radianAdmin.Types.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-
-                }).ToList(),
+                RadianContributors = new List<RadianContributorsViewModel>(),
+                RadianType = new List<SelectListItem>(),
                 SearchFinished = true
             };
 

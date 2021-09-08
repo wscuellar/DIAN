@@ -500,62 +500,15 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Administrador, Proveedor, Super")]
         public ActionResult List(string type)
         {
-            /*
-            SetView(type);
+            if (string.IsNullOrEmpty(type))
+            {
+                type = "-1";
+            }
             var model = new ContributorTableViewModel
             {
                 Type = type
             };
-            int.TryParse(type, out int contributorType);
-            if (string.IsNullOrEmpty(type) || contributorType == 0)
-            {
-                contributorType = -1;
-                model.Type = "-1";
-            }
-            var contributors = new List<Contributor>();
-            if (User.ContributorTypeId() == (int)Domain.Common.ContributorType.Provider || User.ContributorTypeId() == (int)Domain.Common.ContributorType.AuthorizedProvider)
-            {
-                var operations = contributorOperationsService.GetContributorOperations(int.Parse(User.ContributorId().ToString()), null);
-                contributors = operations.Where(o => !o.Deleted).Select(c => new Contributor
-                {
-                    Id = c.Contributor.Id,
-                    Code = c.Contributor.Code,
-                    Name = c.Contributor.Name,
-                    BusinessName = c.Contributor.BusinessName,
-                    Status = c.Contributor.Status,
-                    StartDate = c.Contributor.StartDate,
-                    EndDate = c.Contributor.EndDate,
-                    AcceptanceStatusId = c.Contributor.AcceptanceStatusId,
-                    AcceptanceStatus = c.Contributor.AcceptanceStatus,
-                }).ToList();
-            }
-            else
-            {
-                //if (contributorType == (int)Domain.Common.ContributorType.Biller)
-                //    contributors = contributorService.GetBillerContributors(model.Page, model.Length);
-                //if (contributorType == (int)Domain.Common.ContributorType.Provider)
-                //    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
-                if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider)
-                    contributors = contributorService.GetContributors(contributorType, model.Page, model.Length);
-                else if (contributorType == -1)
-                    contributors = contributorService.GetParticipantContributors(model.Page, model.Length);
-            }
-            model.Contributors = contributors.Select(c => new ContributorViewModel
-            {
-                Id = c.Id,
-                Code = c.Code,
-                Name = c.Name,
-                BusinessName = c.BusinessName,
-                Status = c.Status,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                AcceptanceStatusId = c.AcceptanceStatusId,
-                AcceptanceStatusName = c.AcceptanceStatus.Name,
-            }).ToList();
-
-            model.SearchFinished = true;
-            return View(model);*/
-            return View();
+            return View(model);
         }
 
         [HttpPost]

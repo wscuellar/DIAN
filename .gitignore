@@ -11,3 +11,4 @@ obj
 .vs
 packages
 *.suo
+/L4 Presentation/Web/Gosocket.Dian.Web/Properties/ServiceDependencies

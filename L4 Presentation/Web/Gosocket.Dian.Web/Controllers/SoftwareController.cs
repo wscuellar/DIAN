@@ -145,42 +145,9 @@ namespace Gosocket.Dian.Web.Controllers
 
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult List()
-        {/*
-            var contributors = contributorService.GetContributors((int)Domain.Common.ContributorType.Provider, (int)ContributorStatus.Enabled);
-
-            List<ContributorViewModel> initialContributor = new List<ContributorViewModel>() { new ContributorViewModel { Id = -1, Name = "Seleccione..." } };
-            initialContributor.AddRange(contributors.Select(p => new ContributorViewModel
-            {
-                Id = p.Id,
-                Name = p.Name
-
-            }).ToList());
-            var model = new SoftwareTableViewModel
-            {
-                Contributors = initialContributor
-            };
-            int? contributorId = null;
-            if (User.IsInAnyRole("Administrador", "Super"))
-                contributorId = User.ContributorId();
-            var softwares = softwareService.GetSoftwares(null, contributorId, model.Page, model.Length);
-            model.Softwares = softwares.Where(s => !s.Deleted).Select(s => new SoftwareViewModel
-            {
-                Deleted = s.Deleted,
-                Id = s.Id,
-                Name = s.Name,
-                Pin = s.Pin,
-                Date = s.SoftwareDate,
-                SoftwareUser = s.SoftwareUser,
-                Timestamp = s.Timestamp,
-                Url = s.Url,
-                CreatedBy = s.CreatedBy,
-                AcceptanceStatusSoftwareId = s.AcceptanceStatusSoftwareId,
-                ContributorCode = s.Contributor.Code
-            }).ToList();
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Software;
+        {
+            var model = new SoftwareTableViewModel { };
             return View(model);
-            */
-            return View();
         }
 
         [HttpPost]
