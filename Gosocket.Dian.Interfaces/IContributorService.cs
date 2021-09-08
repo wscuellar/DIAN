@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Interfaces
         List<ContributorFileStatus> GetContributorFileStatuses();
         IEnumerable<Contributor> GetContributors(int contributorTypeId);
         IEnumerable<Contributor> GetContributors(int contributorTypeId, int statusId);
-        List<Contributor> GetContributors(int type, int page, int length);
+        List<Contributor> GetContributors(int type, int acceptanceStatusId, DateTime start, DateTime end, int page, int length);
         List<Contributor> GetContributors(string code, int status, int page, int length, int? contributorType);
         List<Contributor> GetContributorsByAcceptanceStatusesId(int[] statuses, string connectionString = null);
         List<Contributor> GetContributorsByAcceptanceStatusId(int status);
