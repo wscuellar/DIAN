@@ -25,7 +25,9 @@ namespace Gosocket.Dian.Web.Services
         //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
         
-        private static readonly FileManager fileManager = new FileManager();
+        //private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
+
         private static readonly string blobContainer = "global";
         private static readonly string blobContainerFolder = "syncValidator";
         private static readonly string zipMimeType = "application/x-zip-compressed";
