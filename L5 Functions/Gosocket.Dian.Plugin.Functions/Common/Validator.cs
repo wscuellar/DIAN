@@ -304,7 +304,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateInvoiceLine
-        public List<ValidateListResponse> ValidateInvoiceLine(XmlParser xmlParser)
+        public List<ValidateListResponse> ValidateInvoiceLine(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -317,6 +317,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ErrorMessage = "Evento ValidateInvoiceLine referenciado correctamente",
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
+
+            ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+            ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
 
             //Validacion Documento soporte
             string documentTypeId = xmlParser.Fields["DocumentTypeId"].ToString();
