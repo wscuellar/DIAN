@@ -500,6 +500,7 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Administrador, Proveedor, Super")]
         public ActionResult List(string type)
         {
+            /*
             SetView(type);
             var model = new ContributorTableViewModel
             {
@@ -553,7 +554,8 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
 
             model.SearchFinished = true;
-            return View(model);
+            return View(model);*/
+            return View();
         }
 
         [HttpPost]

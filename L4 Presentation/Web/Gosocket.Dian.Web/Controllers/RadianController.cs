@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         public ActionResult ElectronicInvoiceView()
         {
-            return Index();
+            return View();
         }
 
         /// <summary>
