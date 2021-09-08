@@ -159,13 +159,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
             ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
 
-            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice[1]/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID");
-            XmlNodeList invoiceWithholdingListResponseId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID");            
+            XmlNodeList withholdingListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice[1]/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns);
+            XmlNodeList invoiceWithholdingListResponseId = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns);            
 
             for (int i = 0; i < invoiceWithholdingListResponseId.Count; i++)
             {
-                xmlID = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID").Item(i)?.InnerText.ToString().Trim();
-                xmlPercent = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent").Item(i)?.InnerText.ToString().Trim();
+                xmlID = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
+                xmlPercent = invoiceWithholdingListResponseId.Item(i).SelectNodes("/sig:Invoice/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent", ns).Item(i)?.InnerText.ToString().Trim();
 
                 var taxShemeIDparameterized = ConfigurationManager.GetValue("TaxShemeID").Split('|');
                 if (taxShemeIDparameterized.Contains(xmlID)) validTax = true;
@@ -191,7 +191,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             int[] arraywithholding = new int[withholdingListResponse.Count];
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
-                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID").Item(i)?.InnerText.ToString().Trim();
+                var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
                 arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);            
             }
 
@@ -326,9 +326,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             #region Documento Soporte
             if (Convert.ToInt32(documentTypeId) == (int)DocumentType.DocumentSupportInvoice)
             {
-                XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
-                XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
-                XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='DeliveryTerms']/*[local-name()='ID']");              
+                XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns);
+                XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:AllowanceCharge/cbc:ID", ns);
+                XmlNodeList deliveryTermsListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:DeliveryTerms/cbc:ID", ns);              
 
                 int tempID = 0;
                 var isErrorConsecutiveDelivery = false;
@@ -343,7 +343,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 for (int i = 0; i < invoiceLineListResponse.Count; i++)
                 {
                     indexInvoiceLine += 1;
-                    var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var value = invoiceLineListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
                     // cuando no llega valor, se asume -1
                     var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
 
@@ -365,13 +365,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     #region AllowanceCharge
                     if (!isErrorConsecutiveInvoiceLineAllowanceCharge)
                     {
-                        XmlNodeList invoiceLineAllowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                        XmlNodeList invoiceLineAllowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"/sig:Invoice/cac:InvoiceLine[{indexInvoiceLine}]/cac:AllowanceCharge/cbc:ID", ns);
                         int[] arrayAllowanceChargeListResponse = new int[invoiceLineAllowanceChargeListResponse.Count];
 
                         int tempIDAllowanceCharge = 0;
                         for (int k = 0; k < invoiceLineAllowanceChargeListResponse.Count; k++)
                         {
-                            var valueAllowance = invoiceLineAllowanceChargeListResponse.Item(k).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(k)?.InnerText.ToString().Trim();
+                            var valueAllowance = invoiceLineAllowanceChargeListResponse.Item(k).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:AllowanceCharge/cbc:ID", ns).Item(k)?.InnerText.ToString().Trim();
                             // cuando no llega valor, se asume -1
                             var xmlIDAllowance = !string.IsNullOrWhiteSpace(valueAllowance) ? Convert.ToInt32(valueAllowance) : -1;
 
@@ -421,7 +421,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Consecutivo regla DSBC02
                 for (int i = 0; i < deliveryTermsListResponse.Count; i++)
                 {                    
-                    var xmlID = deliveryTermsListResponse.Item(i).SelectNodes("//*[local-name()='DeliveryTerms']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var xmlID = deliveryTermsListResponse.Item(i).SelectNodes("/sig:Invoice/cac:DeliveryTerms/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
 
                     int number1 = 0;
                     bool valNumber = int.TryParse(xmlID, out number1);
@@ -464,7 +464,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Consecutivo regla DSAQ02
                 for (int i = 0; i < allowanceChargeListResponse.Count; i++)
                 {
-                    var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//cac:AllowanceCharge/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
 
                     if(string.IsNullOrWhiteSpace(xmlID))
                     {
@@ -516,34 +516,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
 
                 //Validacion documento de impotacion 
-                XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice'][1]/*[local-name()='UBLExtensions']/*[local-name()='UBLExtension']/*[local-name()='ExtensionContent']/*[local-name()='Lines']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
-                XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']");
+                XmlNodeList invoiceListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:Lines/sts:InvoiceLine/cbc:ID", ns);
+                XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns);
                 
                 int[] arrayInvoiceLine = new int[invoiceListResponse.Count];
                 int[] arrayInvoiceListResponse = new int[invoiceLineListResponse.Count];
                 var isErrorConsecutive = false;
                 var isErrorConsecutiveInvoice = false;
                 var isErrorConsecutiveAllowanceCharge = false;
-
-                //bool paresAllowanceCharge = arrayAllowanceChargeListResponse.Distinct().Count() == arrayAllowanceChargeListResponse.Length;
-                //if (!paresAllowanceCharge || arrayAllowanceChargeListResponse.Contains(-1))
-                //{
-                //    responses.Add(new ValidateListResponse
-                //    {
-                //        IsValid = false,
-                //        Mandatory = false,
-                //        ErrorCode = "DIAV02a",
-                //        ErrorMessage = "Más de un grupo conteniendo el elemento /de:Invoice/de:InvoiceLine/cbc:ID con la misma información o no existe ningún valor",
-                //        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                //    });
-                //}
-
                 int tempIDInvoice = 0;
                 int indexInvoiceLine = 0;
+
                 for (int i = 0; i < invoiceLineListResponse.Count; i++)
                 {
                     indexInvoiceLine += 1;
-                    var value = invoiceLineListResponse.Item(i).SelectNodes("//*[local-name()='Invoice']/*[local-name()='InvoiceLine']/*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var value = invoiceLineListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
                     // cuando no llega valor, se asume -1
                     var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
 
@@ -565,13 +552,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     #region AllowanceCharge
                     if (!isErrorConsecutiveAllowanceCharge)
                     {
-                        XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='Invoice']/*[local-name()='InvoiceLine'][{indexInvoiceLine}]/*[local-name()='AllowanceCharge']/*[local-name()='ID']");
+                        XmlNodeList allowanceChargeListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes($"/sig:Invoice/cac:InvoiceLine[{indexInvoiceLine}]/cac:AllowanceCharge/cbc:ID", ns);
                         int[] arrayAllowanceChargeListResponse = new int[allowanceChargeListResponse.Count];
 
                         int tempIDAllowanceCharge = 0;
                         for (int k = 0; k < allowanceChargeListResponse.Count; k++)
                         {
-                            var valueAllowance = allowanceChargeListResponse.Item(k).SelectNodes("//*[local-name()='InvoiceLine']/*[local-name()='AllowanceCharge']/*[local-name()='ID']").Item(k)?.InnerText.ToString().Trim();
+                            var valueAllowance = allowanceChargeListResponse.Item(k).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:AllowanceCharge/cbc:ID", ns).Item(k)?.InnerText.ToString().Trim();
                             // cuando no llega valor, se asume -1
                             var xmlIDAllowance = !string.IsNullOrWhiteSpace(valueAllowance) ? Convert.ToInt32(valueAllowance) : -1;
 
@@ -634,7 +621,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 int tempID = 0;               
                 for (int i = 0; i < invoiceListResponse.Count; i++)
                 {
-                    var value = invoiceListResponse.Item(i).SelectNodes("//*[local-name()='ID']").Item(i)?.InnerText.ToString().Trim();
+                    var value = invoiceListResponse.Item(i).SelectNodes("//cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
                     // cuando no llega valor, se asume -1
                     var xmlID = !string.IsNullOrWhiteSpace(value) ? Convert.ToInt32(value) : -1;
 
