@@ -16,7 +16,9 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
 {
     public static class ValidateDocumentReference
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
 
         [FunctionName("ValidateDocumentReference")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -44,7 +46,7 @@ namespace Gosocket.Dian.Plugin.Functions.Cufe
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"VALIDATEDOCUMENTREFERENCECUFEPLGNS-{DateTime.UtcNow:yyyyMMdd}-Cufe {data.TrackId}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
                 
                 var validateResponses = new List<ValidateListResponse>
                 {

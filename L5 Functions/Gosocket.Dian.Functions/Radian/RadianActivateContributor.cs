@@ -13,7 +13,9 @@ namespace Gosocket.Dian.Functions.Radian
 {
     public static class RadianActivateContributor
     {
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly SoftwareService softwareService = new SoftwareService();
         private static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
@@ -25,7 +27,7 @@ namespace Gosocket.Dian.Functions.Radian
         private const string queueName = "activate-radian-operation-input";
 
         [FunctionName("ActivateRadianOperation")]
-        public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
+        public static void Run([QueueTrigger(queueName, Connection = "GlobalQueue")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
@@ -290,7 +292,7 @@ namespace Gosocket.Dian.Functions.Radian
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
     }

@@ -50,7 +50,9 @@ namespace Gosocket.Dian.Web.Services.Filters
 
     public class MessageInspector : IDispatchMessageInspector
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
         readonly List<string> targetOperations = new List<string>();
 
         public MessageInspector() { }
@@ -95,7 +97,7 @@ namespace Gosocket.Dian.Web.Services.Filters
                 requestAction = requestAction.Substring(requestAction.LastIndexOf("/"));
 
                 var logger = new GlobalLogger($"InvalidOperation-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = requestAction, Message = $"IP: {ip}" };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
             }
             catch{}
 

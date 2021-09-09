@@ -16,7 +16,8 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
 {
     public static class ValidateSigningTime
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateSigningTime")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -48,7 +49,7 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"VALIDATESIGNINGTIMEPLGNS -{DateTime.UtcNow:yyyyMMdd}-Evento {data.DocumentTypeId}", data.TrackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                 var error = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
                 var validateResponses = new List<ValidateListResponse>
                 {

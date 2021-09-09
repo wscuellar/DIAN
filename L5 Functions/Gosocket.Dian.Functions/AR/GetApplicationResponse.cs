@@ -21,7 +21,8 @@ namespace Gosocket.Dian.Functions.AR
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
         private static readonly TableManager tableManagerDocumentTracking = new TableManager("GlobalDocValidatorTracking");
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
         //private static readonly TableManager tableManagerDianNsuControl = new TableManager("DianNsuControl");
 
         [FunctionName("GetApplicationResponse")]
@@ -60,7 +61,7 @@ namespace Gosocket.Dian.Functions.AR
                     double seconds1 = ms1 / 1000;
                     stopwatch1 = null;
                     var step1 = new GlobalLogger(trackId, "(1)GetApplicationResponse") { Message = seconds1.ToString(), Action = "(1)GetValidations" };
-                    logsArrayTasks.Add(tableManagerGlobalLogger.InsertOrUpdateAsync(step1));
+                    logsArrayTasks.Add(TableLoggerManagerFACELogger.InsertOrUpdateAsync(step1));
                     log.Info($"1. Time GlobalDocValidatorTracking: {seconds1}");
                 });
 
@@ -81,7 +82,7 @@ namespace Gosocket.Dian.Functions.AR
                     double seconds2 = ms2 / 1000;
                     stopwatch2 = null;
                     var step2 = new GlobalLogger(trackId, "(2)GetApplicationResponse") { Message = seconds2.ToString(), Action = "(2)Get 2 entities objects" };
-                    logsArrayTasks.Add(tableManagerGlobalLogger.InsertOrUpdateAsync(step2));
+                    logsArrayTasks.Add(TableLoggerManagerFACELogger.InsertOrUpdateAsync(step2));
                     log.Info($"2. Time secondLocalRun: {seconds2}");
                 });
 
@@ -99,7 +100,7 @@ namespace Gosocket.Dian.Functions.AR
                 double seconds3 = ms3 / 1000;
                 stopwatch3 = null;
                 var step3 = new GlobalLogger(trackId, "(3)GetApplicationResponse") { Message = seconds3.ToString(), Action = $"(3)GetApplicationResponseIfExist" };
-                logsArrayTasks.Add(tableManagerGlobalLogger.InsertOrUpdateAsync(step3));
+                logsArrayTasks.Add(TableLoggerManagerFACELogger.InsertOrUpdateAsync(step3));
                 log.Info($"3. Time GetApplicationResponseIfExist: {seconds3}");
                 if (applicationResponse != null) xmlBytes = applicationResponse;
                 else
@@ -118,7 +119,7 @@ namespace Gosocket.Dian.Functions.AR
                     double seconds4 = ms4 / 1000;
                     stopwatch4 = null;
                     var step4 = new GlobalLogger(trackId, "(4)GetApplicationResponse") { Message = seconds4.ToString(), Action = "(4)GenerateApplicationResponseBytes" };
-                    logsArrayTasks.Add(tableManagerGlobalLogger.InsertOrUpdateAsync(step4));
+                    logsArrayTasks.Add(TableLoggerManagerFACELogger.InsertOrUpdateAsync(step4));
                     log.Info($"4. Time GenerateApplicationResponseBytes: {seconds4}");
                 }
 
@@ -145,7 +146,7 @@ namespace Gosocket.Dian.Functions.AR
             double seconds0 = ms0 / 1000;
             stopwatch0 = null;
             var step0 = new GlobalLogger(trackId, "(5)GetApplicationResponse") { Message = seconds0.ToString(), Action = "(5)End" };
-            logsArrayTasks.Add(tableManagerGlobalLogger.InsertOrUpdateAsync(step0));
+            logsArrayTasks.Add(TableLoggerManagerFACELogger.InsertOrUpdateAsync(step0));
             await Task.WhenAll(logsArrayTasks);
 
             log.Info($"5. End function: {seconds0}");

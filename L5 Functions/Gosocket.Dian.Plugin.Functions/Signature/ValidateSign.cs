@@ -17,7 +17,8 @@ namespace Gosocket.Dian.Plugin.Functions.Signature
 {
     public static class ValidateSign
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateSign")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -43,7 +44,7 @@ namespace Gosocket.Dian.Plugin.Functions.Signature
                     {
                         var validation = validateResponses.FirstOrDefault(_ => _.ErrorCode == "ZD05" && !_.IsValid);
                         var logger = new GlobalLogger("ZD05", trackId) { Action = "ValidateSign", Message = validation.ErrorMessage };
-                        await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                        await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
                     }
                 }
                 catch { }
@@ -54,7 +55,7 @@ namespace Gosocket.Dian.Plugin.Functions.Signature
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"SIGNPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

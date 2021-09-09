@@ -67,18 +67,7 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         public ActionResult RequestAuthorization()
         {
-            var contributorCode = User.ContributorCode();
-            var contributorName = User.ContributorName();
-            var requestAutorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(contributorCode, contributorCode);
-            var model = new RequestAuthorizationBigContributorViewModel
-            {
-                ContributorCode = contributorCode,
-                ContributorName = contributorName
-            };
-
-            GetAuthorizationRequest(ref model);
-
-            ViewBag.CurrentPage = Navigation.NavigationEnum.BigContributors;
+            var model = new RequestAuthorizationBigContributorViewModel {};
             return View(model);
         }
 
@@ -134,10 +123,6 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult ReviewRequests()
         {
             var model = new RequestAuthorizationBigContributorTableViewModel { };
-
-            GetAuthorizationRequests(ref model);
-
-            ViewBag.CurrentPage = Navigation.NavigationEnum.BigContributors;
             return View(model);
         }
 

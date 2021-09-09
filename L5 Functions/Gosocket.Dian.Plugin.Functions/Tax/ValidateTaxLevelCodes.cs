@@ -15,8 +15,9 @@ using System.Threading.Tasks;
 namespace Gosocket.Dian.Plugin.Functions.Tax
 {
     public static class ValidateTaxLevelCodes
-    {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+    {        
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
 
         [FunctionName("ValidateTaxLevelCodes")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Plugin.Functions.Tax
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"TAXPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                await tableManagerGlobalLogger.InsertOrUpdateAsync(logger);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

@@ -20,7 +20,9 @@ namespace Gosocket.Dian.Functions.Radian
     public static class SendToActivateRadianOperation
     {
 
-        private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
         private static readonly ContributorService contributorService = new ContributorService();
         private static readonly TableManager globalTestSetResultTableManager = new TableManager("RadianTestSetResult");
         private static readonly GlobalRadianOperationService globalRadianOperationService = new GlobalRadianOperationService();
@@ -46,7 +48,7 @@ namespace Gosocket.Dian.Functions.Radian
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "Start SendToActivateRadianOperation"
                 };
-                await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateRadian);
+                await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startSendToActivateRadian);
 
 
                 //Se obtiene el participante radian para habilitacion.
@@ -63,7 +65,7 @@ namespace Gosocket.Dian.Functions.Radian
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "startSendContributorId ContributorId: " + data.ContributorId
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendContributorId);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startSendContributorId);
 
                     if (data.ContributorId == 0)
                         throw new Exception("Please pass a contributor ud in the request body.");
@@ -113,7 +115,7 @@ namespace Gosocket.Dian.Functions.Radian
                         " SoftwareId: " + data.SoftwareId +
                         " SoftwareType: " + data.SoftwareType
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(startRadianContributor);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(startRadianContributor);
 
                     //Se habilita el contribuyente en BD
                     contributorService.SetToEnabledRadian(
@@ -153,7 +155,7 @@ namespace Gosocket.Dian.Functions.Radian
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                         Action = "finish SendToActivateRadianOperation"
                     };
-                    await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
+                    await TableLoggerManagerFACELogger.InsertOrUpdateAsync(finishSendContributorId);
 
                 }
                 catch (Exception ex)
@@ -295,7 +297,7 @@ namespace Gosocket.Dian.Functions.Radian
             else
                 lastZone = new GlobalLogger(keyUnique, keyUnique) { Message = Step + " --> " + resultJson + " -- Msg --" + msg };
 
-            TableManagerGlobalLogger.InsertOrUpdate(lastZone);
+            TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
         }
 
 

@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Functions.Others
 
         [FunctionName("RegisterRejectedDocument")]
         [return: Table("GlobalRejectedDocument", Connection = "GlobalStorage")]
-        public static GlobalRejectedDocument Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static GlobalRejectedDocument Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

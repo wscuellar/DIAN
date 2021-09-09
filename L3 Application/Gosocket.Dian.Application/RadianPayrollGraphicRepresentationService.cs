@@ -14,8 +14,7 @@ namespace Gosocket.Dian.Application
 
         #region [ properties ]
 
-        protected IQueryAssociatedEventsService _queryAssociatedEventsService;
-        private readonly FileManager _fileManager;
+        protected IQueryAssociatedEventsService _queryAssociatedEventsService;        
         private readonly TableManager _countryTableManager = new TableManager("Country", ConfigurationManager.GetValue("GlobalBillerStorage"));
         private readonly TableManager _departmentByCodeTableManager = new TableManager("DepartmentByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
         private readonly TableManager _municipalityByCodeTableManager = new TableManager("MunicipalityByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
@@ -24,10 +23,9 @@ namespace Gosocket.Dian.Application
 
         #region [ constructor ]
 
-        public RadianPayrollGraphicRepresentationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPayrollGraphicRepresentationService(IQueryAssociatedEventsService queryAssociatedEventsService)
         {
-            this._queryAssociatedEventsService = queryAssociatedEventsService;
-            this._fileManager = fileManager;
+            this._queryAssociatedEventsService = queryAssociatedEventsService;            
         }
 
         #endregion
@@ -411,7 +409,7 @@ namespace Gosocket.Dian.Application
             else
             {
                 // Load template
-                template.Append(_fileManager.GetText("RepresentacionGraficaNomina.html"));
+                template.Append(RadianTemplatesFileManager.GetText("RepresentacionGraficaNomina.html"));
                 // Mapping Labels common data
                 template = this.IndividualPayrollDataTemplateMapping(template, payrollModel);
             }

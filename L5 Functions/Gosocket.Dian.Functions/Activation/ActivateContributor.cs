@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Functions.Activation
         private const string queueName = "activate-contributor-input%Slot%";
 
         [FunctionName("ActivateContributor")]
-        public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static void Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             if (ConfigurationManager.GetValue("Environment") == "Prod")

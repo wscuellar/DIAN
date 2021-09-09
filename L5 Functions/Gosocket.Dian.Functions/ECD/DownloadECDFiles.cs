@@ -18,8 +18,12 @@ namespace Gosocket.Dian.Functions.ECD
 {
     public static class DownloadECDFiles
     {
+        //static readonly FileManager fileManager = new FileManager();
+        //static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");        
+        static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+
         
-        static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly FileManager ConfigurationsFileManager = new FileManager("configurations");
 
         static string Extension { get; set; }
@@ -77,7 +81,7 @@ namespace Gosocket.Dian.Functions.ECD
             {
                 Debug.WriteLine(ex.Message);
                 var logger = new GlobalLogger("DonwloadECDFiles", configuration.Name) { Action = "DonwloadECDFiles", Message = ex.Message, RouteData = JsonConvert.SerializeObject(configuration) };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
             }
         }
 

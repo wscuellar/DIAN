@@ -16,7 +16,9 @@ namespace Gosocket.Dian.Plugin.Functions.Contingency
 {
     public static class ValidateContingency
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
+        
 
         [FunctionName("ValidateContingency")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -43,7 +45,7 @@ namespace Gosocket.Dian.Plugin.Functions.Contingency
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
                 var logger = new GlobalLogger($"CONTINGNECYPLGNS-{DateTime.UtcNow.ToString("yyyyMMdd")}", trackId) { Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(logger);
+                TableLoggerManagerFACELogger.InsertOrUpdate(logger);
 
                 var validateResponses = new List<ValidateListResponse>
                 {

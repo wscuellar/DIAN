@@ -73,17 +73,6 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult List(string type)
         {
             var model = new UserTableViewModel();
-            var users = userService.GetUsers(null, -1, model.Page, model.Length);
-            model.Users = users.Select(u => new UserViewModel
-            {
-                Id = u.Id,
-                Code = u.Code,
-                Name = u.Name,
-                Email = u.Email
-            }).ToList();
-
-            model.SearchFinished = true;
-            ViewBag.CurrentPage = Navigation.NavigationEnum.LegalRepresentative;
             return View(model);
         }
 

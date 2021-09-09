@@ -22,10 +22,13 @@ namespace Gosocket.Dian.Web.Services
     [ServiceBehavior(Namespace = "http://wcf.dian.colombia", InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class WcfDianCustomerServices : IWcfDianCustomerServices
     {
-        private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        //private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
+        private static readonly TableLoggerManager TableLoggerManagerFACELogger = new TableLoggerManager("FACELogger");
         
+        //private static readonly FileManager fileManager = new FileManager();
         private static readonly FileManager GlobalFileManager = new FileManager("global");
-        
+
+        private static readonly string blobContainer = "global";
         private static readonly string blobContainerFolder = "syncValidator";
         private static readonly string zipMimeType = "application/x-zip-compressed";
 
@@ -57,7 +60,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log("GetExchangeEmails", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"GetExchangeEmails-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetExchangeEmails", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new ExchangeEmailResponse { StatusCode = "500", Success = false, Message = "Ha ocurrido un error. Por favor inténtentelo de nuevo.", CsvBase64Bytes = null };
             }
         }
@@ -117,7 +120,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(trackId, (int)InsightsLogType.Error, "GetStatus");
                 var exception = new GlobalLogger($"GetStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatus, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
             }
         }
@@ -151,7 +154,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(trackId, (int)InsightsLogType.Error, "GetStatusZip");
                 var exception = new GlobalLogger($"GetStatusZipException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusZip, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var result = new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
                 var response = new List<DianResponse> { result };
                 return response;
@@ -197,7 +200,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(trackId, (int)InsightsLogType.Error, "GetStatusEvent");
                 var exception = new GlobalLogger($"GetStatusEventException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusEvent, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
             }
         }
@@ -257,7 +260,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(fileName, (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"SendBillAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendBillAsync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Ha ocurrido un error. Por favor inténtentelo nuevamente.", Success = false };
                 return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
             }
@@ -332,7 +335,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(fileName, (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"SendTestSetAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendTestSetAsync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Ha ocurrido un error. Por favor inténtentelo nuevamente.", Success = false };
                 return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
             }
@@ -393,14 +396,14 @@ namespace Gosocket.Dian.Web.Services
                     if (seconds >= 10)
                     {
                         var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendBillSync" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     //Logged if response do not have AR
                     if (result?.XmlBase64Bytes == null)
                     {
                         var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendBillSync" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     return result;
@@ -410,7 +413,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(fileName, (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"SendBillSyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendBillSync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", XmlFileName = fileName, IsValid = false };
             }
         }
@@ -471,7 +474,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log(fileName, (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger("SendBillAttachmentAsyncException", Guid.NewGuid().ToString()) { Action = $"SendBillAttachmentAsync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Ha ocurrido un error. Por favor inténtentelo nuevamente.", Success = false };
                 return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
             }
@@ -528,14 +531,14 @@ namespace Gosocket.Dian.Web.Services
                     if (seconds >= 10)
                     {
                         var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     //Logged if response do not have AR
                     if (result?.XmlBase64Bytes == null)
                     {
                         var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     return result;
@@ -547,7 +550,7 @@ namespace Gosocket.Dian.Web.Services
                 Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
                 { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
 
                 return new DianResponse
                 {
@@ -611,14 +614,14 @@ namespace Gosocket.Dian.Web.Services
                     if (seconds >= 10)
                     {
                         var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result?.XmlDocumentKey) { Message = seconds.ToString(), Action = "SendEventUpdateStatus" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     //Logged if response do not have AR
                     if (result?.XmlBase64Bytes == null)
                     {
                         var logger = new GlobalLogger($"RESPONSEWITHOUTAR-{DateTime.UtcNow.ToString("yyyyMMdd")}", result?.XmlDocumentKey) { Message = "Response without AR", Action = "SendEventUpdateStatus" };
-                        tableManagerGlobalLogger.InsertOrUpdate(logger);
+                        TableLoggerManagerFACELogger.InsertOrUpdate(logger);
                     }
 
                     return result;
@@ -630,7 +633,7 @@ namespace Gosocket.Dian.Web.Services
                 Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
                 { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
 
                 return new DianResponse
                 {
@@ -670,7 +673,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log("GetNumberingRange", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"GetNumberingRangeException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetNumberingRange, accountCode: {accountCode}, accountCodeT: {accountCodeT}, softwareCode: {softwareCode}", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 throw new FaultException(ex.Message, new FaultCode("Client"));
             }
         }
@@ -702,7 +705,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log("GetXmlByDocumentKey", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"GetXmlByDocumentKeyException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetXmlByDocumentKey", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new EventResponse { Code = "500", Message = $"Ha ocurrido un error. Por favor inténtentelo de nuevo." };
             }
         }
@@ -742,7 +745,7 @@ namespace Gosocket.Dian.Web.Services
             {
                 Log("GetDocIdentifierWithEvents", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"GetDocIdentifierWithEvents-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetDocIdentifierWithEvents", Message = ex.Message, StackTrace = ex.StackTrace };
-                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DocIdentifierWithEventsResponse { StatusCode = "500", Success = false, Message = "Ha ocurrido un error. Por favor inténtentelo de nuevo.", CsvBase64Bytes = null };
             }
         }
