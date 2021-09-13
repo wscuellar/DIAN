@@ -14,17 +14,20 @@ using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Interfaces.Repositories;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
         private readonly IRadianContributorService _radianContributorService;
+        private readonly IRadianContributorTypeRepository _radianContributorTypeRepository;
         private readonly UserService userService = new UserService();
 
-        public RadianController(IRadianContributorService radianContributorService)
+        public RadianController(IRadianContributorService radianContributorService, IRadianContributorTypeRepository radianContributorTypeRepository)
         {
             _radianContributorService = radianContributorService;
+            _radianContributorTypeRepository = radianContributorTypeRepository;
         }
 
 
@@ -84,17 +87,25 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns>Modelo con la informacion para graficar la vista de Habilitacion</returns>
         public ActionResult AdminRadianView()
         {
-            int page = 1, size = 10;
-            RadianAdmin radianAdmin = _radianContributorService.ListParticipants(page, size);
+
 
             AdminRadianViewModel model = new AdminRadianViewModel()
             {
-                TotalCount = radianAdmin.RowCount,
-                CurrentPage = radianAdmin.CurrentPage,
+                TotalCount = 0,
+                CurrentPage = 0,
                 RadianContributors = new List<RadianContributorsViewModel>(),
-                RadianType = new List<SelectListItem>(),
+                RadianType = _radianContributorTypeRepository.List(c => true).Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+
+                }).ToList(),
                 SearchFinished = true
+               
             };
+
+            
+
 
             ViewBag.CurrentPage = Navigation.NavigationEnum.AdminRadian;
 
@@ -135,7 +146,7 @@ namespace Gosocket.Dian.Web.Controllers
                     AcceptanceStatusName = c.AcceptanceStatusName,
                     RadianState = c.RadianState
                 }).ToList(),
-                RadianType = radianAdmin.Types.Select(c => new SelectListItem
+                RadianType = _radianContributorTypeRepository.List(c => true).Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
                     Text = c.Name
