@@ -12,7 +12,21 @@ namespace Gosocket.Dian.Web.Models
             Page = 0;
             Length = 10;
             Contributors = new List<ContributorViewModel>();
+            StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); ;
+            EndDate = DateTime.Now;
         }
+        [Display(Name = "Estado de aprobación")]
+        public int AcceptanceStatusId { get; set; }
+
+        [Display(Name = "Fecha inicio consulta")]
+        public DateTime StartDate { get; set; }
+
+        [Display(Name = "Fecha término consulta")]
+        public DateTime EndDate { get; set; }
+
+        public List<ContributorAcceptanceStatusViewModel> AcceptanceStatuses { get; set; }
+
+
         public int Page { get; set; }
         public int Length { get; set; }
 
@@ -20,8 +34,7 @@ namespace Gosocket.Dian.Web.Models
         public List<ContributorViewModel> Contributors { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "NIT empresa")]
-        [Required(ErrorMessage = "NIT empresa es requerido.")]
+        [Display(Name = "NIT empresa")]        
         public string Code { get; set; }
         public string Type { get; set; }
     }

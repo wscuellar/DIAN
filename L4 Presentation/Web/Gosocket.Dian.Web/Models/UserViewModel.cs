@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Web.Models
 
         [DataType(DataType.Text)]
         [Display(Name = "NIT representante legal")]
+        [Required(ErrorMessage ="Requerido ingresar NIT")]
         public string Code { get; set; }
 
         [DataType(DataType.Text)]

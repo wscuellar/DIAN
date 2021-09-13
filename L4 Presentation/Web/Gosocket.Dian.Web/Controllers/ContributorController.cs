@@ -506,8 +506,11 @@ namespace Gosocket.Dian.Web.Controllers
             }
             var model = new ContributorTableViewModel
             {
-                Type = type
-            };
+                Type = type, 
+                AcceptanceStatuses = GetAcceptanceStatuses()
+            
+                
+            };           
             return View(model);
         }
 
@@ -547,8 +550,9 @@ namespace Gosocket.Dian.Web.Controllers
                     //    contributors = contributorService.GetBillerContributors(model.Page, model.Length);
                     //if (contributorType == (int)Domain.Common.ContributorType.Provider)
                     //    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
-                    if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider)
-                        contributors = contributorService.GetContributors(contributorType, model.Page, model.Length);
+                    if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider
+                        ||contributorType ==(int) Domain.Common.ContributorType.AuthorizedProvider)
+                            contributors = contributorService.GetContributors(contributorType, model.AcceptanceStatusId, model.StartDate, model.EndDate, model.Page, model.Length);                        
                     else if (contributorType == -1)
                         contributors = contributorService.GetParticipantContributors(model.Page, model.Length);
                 }
@@ -578,6 +582,7 @@ namespace Gosocket.Dian.Web.Controllers
             }).ToList();
 
             model.SearchFinished = true;
+            model.AcceptanceStatuses = GetAcceptanceStatuses();
             return View(model);
         }
 
@@ -1805,6 +1810,16 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
         #endregion
+
+        public List<ContributorAcceptanceStatusViewModel> GetAcceptanceStatuses()
+        {
+            return contributorService.GetAcceptanceStatuses().Select(s => new ContributorAcceptanceStatusViewModel
+            {
+                Id = s.Id,
+                Code = s.Code,
+                Name = s.Name
+            }).ToList();
+        }
 
     }
 }

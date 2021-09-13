@@ -62,6 +62,9 @@
                             @Html.HiddenFor(m => m.Page)
                             @Html.HiddenFor(m => m.Type)
 
+                            <input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
+                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />
+
                             <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                 <div class="col-md-12 padding-horizontal-0">
                                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
@@ -73,6 +76,25 @@
                                                         @Html.LabelFor(m => m.Code, new { @class = "control-label" })
                                                         @Html.TextBoxFor(m => m.Code, defaultHtmlAttr)
                                                         @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.AcceptanceStatusId, new SelectList(Model.AcceptanceStatuses, "Code", "Name"), new { @class = "form-control selectpicker" })
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-3 padding-xs-0">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Rango de fechas</label>
+                                                        <div class="form-group">
+                                                            <div class="btn btn-default col-sm-12" id="dashboard-report-range">
+                                                                <i class="icon-calendar"></i>&nbsp;
+                                                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                                <i class="fa fa-angle-down"></i>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -145,6 +167,10 @@
 @section Scripts
 {
     <script>
+        var startDate;
+        var endDate;
+
+
         $(document).ready(function () {
 
             var form = $('#contributors-form');
@@ -198,5 +224,71 @@
                 $this.tooltip('show');
             }
         });
+        startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
+        endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
+
+        startDate.locale('es');
+        endDate.locale('es');
+
+        $('#dashboard-report-range').daterangepicker({
+            "buttonClasses": "btn btn-block btn-default",
+            "startDate": startDate,
+            "endDate": endDate,
+            "maxDate": moment().endOf('month'),
+            "applyClass": "btn-hover-gosocket",
+            "cancelClass": "btn-hover-gosocket",
+            "ranges": {
+                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+            },
+            "locale": {
+                "format": "YYYY/MM/DD",
+                "separator": " - ",
+                "applyLabel": "Aceptar",
+                "cancelLabel": "Cancelar",
+                "fromLabel": "Desde",
+                "toLabel": "Hasta",
+                "customRangeLabel": "Rango de Fechas",
+                "daysOfWeek": [
+                    "Do",
+                    "Lu",
+                    "Ma",
+                    "Mi",
+                    "Ju",
+                    "Vi",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre"
+                ],
+                "firstDay": 1
+            },
+            opens: ('left'),
+        }, function (start, end, label) {
+                $('#dashboard-report-range span').html(capitalizeMonth(start.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(end.format('YYYY/MM/DD')));
+            startDate = start;
+            endDate = end;
+                $('#startDate').val(startDate.format('YYYY/MM/DD'));
+                $('#endDate').val(endDate.format('YYYY/MM/DD'));
+        });
+        $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(endDate.format('YYYY/MM/DD')));
+        $('#dashboard-report-range').show();
+
+        function capitalizeMonth(date) {
+            return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);
+        }
     </script>
 }
