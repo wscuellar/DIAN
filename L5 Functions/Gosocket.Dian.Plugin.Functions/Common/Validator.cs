@@ -423,6 +423,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {                    
                     var xmlID = deliveryTermsListResponse.Item(i).SelectNodes("/sig:Invoice/cac:DeliveryTerms/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
 
+                    if (string.IsNullOrEmpty(xmlID))
+                    {
+                        isErrorConsecutiveDelivery = true;
+                        break;
+                    }
+
                     int number1 = 0;
                     bool valNumber = int.TryParse(xmlID, out number1);
                     if (valNumber)
@@ -446,6 +452,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             else
                                 tempID = Convert.ToInt32(number1);
                         }
+                    } 
+                    else
+                    {
+                        isErrorConsecutiveDelivery = true;
+                        break;
                     }                   
                 }
 
@@ -454,7 +465,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
-                        Mandatory = true,
+                        Mandatory = false,
                         ErrorCode = "DSBC02",
                         ErrorMessage = "Valida que los números de línea del documento sean consecutivo",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
