@@ -192,7 +192,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 0; i < withholdingListResponse.Count; i++)
             {
                 var xmlTaxSchemeID = withholdingListResponse.Item(i).SelectNodes("/sig:Invoice/cac:InvoiceLine/cac:WithholdingTaxTotal/cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
-                arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);            
+
+                if (!string.IsNullOrEmpty(xmlTaxSchemeID))
+                {
+                    arraywithholding[i] = Convert.ToInt32(xmlTaxSchemeID);
+                }                            
             }
 
             bool pares = arraywithholding.Distinct().Count() == arraywithholding.Length;
