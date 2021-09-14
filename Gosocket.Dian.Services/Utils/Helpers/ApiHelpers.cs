@@ -11,73 +11,70 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 {
     public class ApiHelpers
     {
-
-        private static ConcurrentDictionary<Guid, HttpClient> httpClients = new ConcurrentDictionary<Guid, HttpClient>();
+        private static HttpClient _client = new HttpClient();
+        private static ConcurrentDictionary<Guid, HttpClient> _httpClients = new ConcurrentDictionary<Guid, HttpClient>();
 
         private static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
         {
-            if (!httpClients.ContainsKey(ToGuid(url)))
+            if (!_httpClients.ContainsKey(ToGuid(url)))
             {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
+                _client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                if (!httpClients.ContainsKey(ToGuid(url)))
-                    httpClients[ToGuid(url)] = client;
+                if (!_httpClients.ContainsKey(ToGuid(url)))
+                    _httpClients[ToGuid(url)] = _client;
 
 
-                return await client.PostAsync(url, byteContent);
+                return await _client.PostAsync(url, byteContent);
             }
             else
             {
-                var client = httpClients[ToGuid(url)];
+                _client = _httpClients[ToGuid(url)];
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                return await client.PostAsync(url, byteContent);
+                return await _client.PostAsync(url, byteContent);
             }
         }
 
         private static HttpResponseMessage ConsumeApi<T>(string url, T requestObj)
         {
-            if (!httpClients.ContainsKey(ToGuid(url)))
+            if (!_httpClients.ContainsKey(ToGuid(url)))
             {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
+                _client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                if (!httpClients.ContainsKey(ToGuid(url)))
-                    httpClients[ToGuid(url)] = client;
+                if (!_httpClients.ContainsKey(ToGuid(url)))
+                    _httpClients[ToGuid(url)] = _client;
 
-                return client.PostAsync(url, byteContent).Result;
+                return _client.PostAsync(url, byteContent).Result;
             }
             else
             {
-                var client = httpClients[ToGuid(url)];
+                _client = _httpClients[ToGuid(url)];
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                return client.PostAsync(url, byteContent).Result;
+                return _client.PostAsync(url, byteContent).Result;
             }
 
         }
 
         private static async Task<HttpResponseMessage> ConsumeApiWithHeaderAsync<T>(string url, T requestObj, Dictionary<string, string> headers)
         {
-            if (!httpClients.ContainsKey(ToGuid(url)))
+            if (!_httpClients.ContainsKey(ToGuid(url)))
             {
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
+                _client.DefaultRequestHeaders.Connection.Add("Keep-Alive");
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
@@ -85,36 +82,36 @@ namespace Gosocket.Dian.Services.Utils.Helpers
 
                 if (headers != null)
                     foreach (var header in headers)
-                        client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                        _client.DefaultRequestHeaders.Add(header.Key, header.Value);
 
-                if (!httpClients.ContainsKey(ToGuid(url)))
-                    httpClients[ToGuid(url)] = client;
+                if (!_httpClients.ContainsKey(ToGuid(url)))
+                    _httpClients[ToGuid(url)] = _client;
 
-                return await client.PostAsync(url, byteContent);
+                return await _client.PostAsync(url, byteContent);
             }
             else
             {
-                var client = httpClients[ToGuid(url)];
+                _client = _httpClients[ToGuid(url)];
 
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                return await client.PostAsync(url, byteContent);
+                return await _client.PostAsync(url, byteContent);
             }
         }
 
         private static HttpResponseMessage ConsumeApiWithHeader<T>(string url, T requestObj, Dictionary<string, string> headers)
         {
-            using (var client = new HttpClient())
+            using (_client)
             {
                 var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 if (headers != null)
                     foreach (var header in headers)
-                        client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                        _client.DefaultRequestHeaders.Add(header.Key, header.Value);
 
-                return client.PostAsync(url, byteContent).Result;
+                return _client.PostAsync(url, byteContent).Result;
             }
         }
 
