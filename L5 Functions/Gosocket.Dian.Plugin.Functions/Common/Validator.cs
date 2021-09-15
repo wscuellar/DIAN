@@ -7035,7 +7035,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         existDisponibilizaExpresa = true;
                         data.TrackId = documentMeta.PartitionKey;
                     }
-                }               
+                }
 
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
