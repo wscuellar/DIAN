@@ -7025,16 +7025,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (InvoiceWrapper.Any())
                 {
-                    //trackIdEvent
-                    documentMeta = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
-                                        && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta;
+                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
+
+                    documentMeta = trackIdEvent != null ? trackIdEvent.DocumentMeta : new GlobalDocValidatorDocumentMeta();
 
                     if (!string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
                         existDisponibilizaExpresa = true;
                         data.TrackId = documentMeta.PartitionKey;
                     }
-                }               
+                }
 
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
@@ -7092,7 +7093,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }                
             }
 
-            if (string.IsNullOrEmpty(documentMeta.PartitionKey))
+            if (documentMeta == null || string.IsNullOrEmpty(documentMeta.PartitionKey))
             {
                     documentMeta = documentMetaRef;
             }
