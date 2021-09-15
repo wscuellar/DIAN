@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Infrastructure
         bool Delete(DynamicTableEntity entity);
         bool Delete(TableEntity entity);
         bool Exist<T>(string PartitionKey, string RowKey) where T : ITableEntity, new();
-        T ExistTarifa<T>(string rowkey, string tarifa) where T : ITableEntity, new();
+        T ExistTarifa<T>(string partitionKey, string tarifa) where T : ITableEntity, new();
         DynamicTableEntity Find(string partitionKey, string rowKey);
         T Find<T>(string partitionKey, string rowKey) where T : ITableEntity, new();
         IEnumerable<T> FindAll<T>() where T : ITableEntity, new();

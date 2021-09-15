@@ -90,9 +90,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateInvoiceLine(xmlParser));
+            validateResponses.AddRange(validator.ValidateInvoiceLine(xmlParser, _ns));
 
             return validateResponses;
         }
@@ -106,9 +108,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser));
+            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser, _ns));
 
             return validateResponses;
         }
@@ -122,9 +126,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateTaxCategory(xmlParser));
+            validateResponses.AddRange(validator.ValidateTaxCategory(xmlParser, _ns));
 
             return validateResponses;
         }

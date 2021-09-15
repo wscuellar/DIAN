@@ -252,14 +252,14 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public T ExistTarifa<T>(string rowkey, string tarifa) where T : ITableEntity, new()
+        public T ExistTarifa<T>(string partitionKey, string tarifa) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
+                TableQuery.GenerateFilterCondition("PartitionKey",
                     QueryComparisons.Equal,
-                    rowkey),
+                    partitionKey),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("Tarifa",
                     QueryComparisons.Equal,
