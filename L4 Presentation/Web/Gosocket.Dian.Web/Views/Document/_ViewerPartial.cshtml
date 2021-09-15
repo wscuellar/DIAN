@@ -183,7 +183,7 @@
             <div style="display:inline-flex">
                 @if (Model.Document.DocumentTypeId == "01")
                 {
-                    if (Model.IconsData != null)
+                    if (Model.IconsData != null && Model.IconsData.Any())
                     {
                         var iconList = Model.IconsData.OrderBy(s => s.Key).ToList();
                         int minIndex = iconList[0].Key;
