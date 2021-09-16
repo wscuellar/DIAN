@@ -252,14 +252,14 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public T ExistTarifa<T>(string rowkey, string tarifa) where T : ITableEntity, new()
+        public T ExistTarifa<T>(string partitionKey, string tarifa) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
+                TableQuery.GenerateFilterCondition("PartitionKey",
                     QueryComparisons.Equal,
-                    rowkey),
+                    partitionKey),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("Tarifa",
                     QueryComparisons.Equal,
@@ -933,13 +933,13 @@ namespace Gosocket.Dian.Infrastructure
             var query = new TableQuery();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
-                    QueryComparisons.Equal,
-                    rowKey),
-                TableOperators.And,
                 TableQuery.GenerateFilterCondition("PartitionKey",
                     QueryComparisons.Equal,
-                    partitionKey));
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey));
 
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
@@ -1263,37 +1263,38 @@ namespace Gosocket.Dian.Infrastructure
             return CloudTable.ExecuteQuery(query).FirstOrDefault();
         }
 
-        public T GlobalPayrollByRowKey_Number<T>(string rowkey, string number) where T : ITableEntity, new()
+        public List<T> globalDocPayrollRegisterByPartitionKey_DocumentNumber<T>(string partitionKey, string numeroDocumento) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
 
             var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
+                TableQuery.GenerateFilterCondition("PartitionKey",
                     QueryComparisons.Equal,
-                    rowkey),
-                TableOperators.And,
-                TableQuery.GenerateFilterCondition("Numero",
-                    QueryComparisons.Equal,
-                    number));
-
-            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).FirstOrDefault();
-        }
-
-        public List<T> GlobalPayrollByRowKey_DocumentNumber<T>(string rowkey, string documentNumber) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>();
-
-            var prefixCondition = TableQuery.CombineFilters(
-                TableQuery.GenerateFilterCondition("RowKey",
-                    QueryComparisons.Equal,
-                    rowkey),
+                    partitionKey),
                 TableOperators.And,
                 TableQuery.GenerateFilterCondition("NumeroDocumento",
                     QueryComparisons.Equal,
-                    documentNumber));
+                    numeroDocumento));
 
             return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
         }
+
+        public List<T> globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<T>(string partitionKey, string serieAndNumnber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    serieAndNumnber));
+
+            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
+        }
+
         // FindDocumentReferenceAttorneyList
         public List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new()
         {

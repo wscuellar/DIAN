@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Infrastructure
         bool Delete(DynamicTableEntity entity);
         bool Delete(TableEntity entity);
         bool Exist<T>(string PartitionKey, string RowKey) where T : ITableEntity, new();
-        T ExistTarifa<T>(string rowkey, string tarifa) where T : ITableEntity, new();
+        T ExistTarifa<T>(string partitionKey, string tarifa) where T : ITableEntity, new();
         DynamicTableEntity Find(string partitionKey, string rowKey);
         T Find<T>(string partitionKey, string rowKey) where T : ITableEntity, new();
         IEnumerable<T> FindAll<T>() where T : ITableEntity, new();
@@ -64,8 +64,9 @@ namespace Gosocket.Dian.Infrastructure
         Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(int take, TableContinuationToken continuationToken) where T : ITableEntity, new();
         Tuple<IEnumerable<T>, TableContinuationToken> GetRangeRows<T>(string PartitionKey, int take, TableContinuationToken continuationToken) where T : ITableEntity, new();
         IEnumerable<T> GetRowsContainsInPartitionKeys<T>(IEnumerable<string> partitionKeys) where T : ITableEntity, new();
-        List<T> GlobalPayrollByRowKey_DocumentNumber<T>(string rowkey, string documentNumber) where T : ITableEntity, new();
-        T GlobalPayrollByRowKey_Number<T>(string rowkey, string number) where T : ITableEntity, new();
+        List<T> globalDocPayrollRegisterByPartitionKey_DocumentNumber<T>(string partitionKey, string numeroDocumento) where T : ITableEntity, new();
+        List<T> globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<T>(string partitionKey, string serieAndNumnber) where T : ITableEntity, new();
+
         bool Insert(DynamicTableEntity entity);
         bool Insert(DynamicTableEntity entity, string rowKey2);
         bool Insert(DynamicTableEntity[] entitys, string partitionKey = null);
