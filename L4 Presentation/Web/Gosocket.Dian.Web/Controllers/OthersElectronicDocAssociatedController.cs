@@ -618,10 +618,40 @@ namespace Gosocket.Dian.Web.Controllers
                 //TODO afinar filtro
                 OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(softwareId));
 
+                if (software == null) {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró el softwareid {softwareId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se pudo localizar el Software con el id {softwareId}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
                 var pk = code.ToString();
                 var rk = contributorTypeId.ToString() + "|" + software.SoftwareId;
                 GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
+
+                if (testSetResult == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró el testSetResult pk {pk} - rk {rk} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró el testSetResult pk {pk} - rk {rk} "
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
                 var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), software.SoftwareId);
+
+                if (globalRadianOperations == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.SoftwareId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró operación para el softwareid {software.SoftwareId}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
 
                 var data = new RadianActivationRequest();
                 data.Code = code.ToString();
@@ -657,6 +687,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
+                telemetry.TrackTrace($"Error Sincronizando el Code {code}");
                 telemetry.TrackException(ex);
                 return Json(new
                 {
