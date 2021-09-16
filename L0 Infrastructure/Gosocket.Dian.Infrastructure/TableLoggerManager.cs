@@ -1294,6 +1294,40 @@ namespace Gosocket.Dian.Infrastructure
 
             return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
         }
+
+        public List<T> globalDocPayrollRegisterByPartitionKey_DocumentNumber<T>(string partitionKey, string numeroDocumento) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("NumeroDocumento",
+                    QueryComparisons.Equal,
+                    numeroDocumento));
+
+            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
+        }
+
+        public List<T> globalDocPayrollRegisterByPartitionKey_SerieAndNumnber<T>(string partitionKey, string serieAndNumnber) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    serieAndNumnber));
+
+            return CloudTable.ExecuteQuery(query.Where(prefixCondition)).ToList();
+        }
+
+
         // FindDocumentReferenceAttorneyList
         public List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new()
         {
