@@ -90,9 +90,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateInvoiceLine(xmlParser));
+            validateResponses.AddRange(validator.ValidateInvoiceLine(xmlParser, _ns));
 
             return validateResponses;
         }
@@ -106,9 +108,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser));
+            validateResponses.AddRange(validator.ValidateTaxWithHolding(xmlParser, _ns));
 
             return validateResponses;
         }
@@ -122,9 +126,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
+            validatorDocumentNameSpaces(xmlBytes);
+
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateTaxCategory(xmlParser));
+            validateResponses.AddRange(validator.ValidateTaxCategory(xmlParser, _ns));
 
             return validateResponses;
         }
@@ -755,18 +761,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartValidateIndividualPayroll(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
+            var documentParsed = new DocumentParsedNomina();
 
-            var xmlBytes = await GetXmlFromStorageAsync(trackId);
-            var xmlParser = new XmlParseNomina(xmlBytes);
-            if (!xmlParser.Parser())
-                throw new Exception(xmlParser.ParserError);
+            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+                        
+            documentParsed.EmpleadorNIT = documentMeta.SenderCode;
+            documentParsed.SerieAndNumber = documentMeta.SerieAndNumber;
+            documentParsed.DocumentTypeId = documentMeta.DocumentTypeId;
+            documentParsed.NumeroDocumento = documentMeta.ReceiverCode;
+            documentParsed.Novelty = (bool)documentMeta.Novelty;
+            documentParsed.CUNENov = documentMeta.CUNENov;
+            documentParsed.FechaPagoInicio = documentMeta.FechaPagoNominaInicio;
 
-            var documentParsed = xmlParser.Fields.ToObject<DocumentParsedNomina>();
             DocumentParsedNomina.SetValues(ref documentParsed);
 
             // Validator instance
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateIndividualPayroll(xmlParser, documentParsed));
+            validateResponses.AddRange(validator.ValidateIndividualPayroll(documentParsed));
             return validateResponses;
         }
 

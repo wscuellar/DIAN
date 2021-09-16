@@ -16,6 +16,9 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string EmpleadorNIT { get; set; }
         public string NumeroDocumento { get; set; }
         public string TipoNota { get; set; }
+        public bool Novelty { get; set; }
+        public string FechaPagoInicio { get; set; }
+        public string CUNENov { get; set; }
 
         public static void SetValues (ref DocumentParsedNomina documentParsedNomina)
         {
@@ -26,9 +29,10 @@ namespace Gosocket.Dian.Services.Utils.Common
             documentParsedNomina.ProveedorNIT = documentParsedNomina?.ProveedorNIT;
             documentParsedNomina.ProveedorDV = documentParsedNomina?.ProveedorDV;
             documentParsedNomina.ProveedorSoftwareID = documentParsedNomina?.ProveedorSoftwareID;
-            documentParsedNomina.ProveedorSoftwareSC = documentParsedNomina?.ProveedorSoftwareSC.ToString()?.ToLower();
+            documentParsedNomina.ProveedorSoftwareSC = documentParsedNomina?.ProveedorSoftwareSC?.ToString()?.ToLower();
             documentParsedNomina.SerieAndNumber = documentParsedNomina?.SerieAndNumber.ToString()?.ToUpper();
             documentParsedNomina.TipoNota = documentParsedNomina?.TipoNota;
+            documentParsedNomina.Novelty = (bool)documentParsedNomina?.Novelty;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure;
 
 @model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
 
@@ -77,14 +78,16 @@
 
                     @if (Model.OperationModeId == (int)OtherDocElecOperationMode.OwnSoftware)
                     {
-                        
+
                     }
 
                 </div>
-                    </div>
+            </div>
             <div class="panel-footer-grey text-right">
-                @*<button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar</button>*@
-                <button type="button"  name="Submit" id="save-operation-mode" class="btn btn-radian-success"  >Adicionar</button>
+                @if (ConfigurationManager.GetValue("Environment") != "Prod")
+                {
+                    <button type="button" name="Submit" id="save-operation-mode" class="btn btn-radian-success">Adicionar</button>
+                }
             </div>
 
         </div>

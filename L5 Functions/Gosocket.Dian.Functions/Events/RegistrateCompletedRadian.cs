@@ -54,20 +54,20 @@ namespace Gosocket.Dian.Functions.Events
                 GlobalDocValidatorDocumentMeta documentMeta = null;
                 byte[] xmlBytes = null;
                 List<GlobalDocValidatorTracking> validations = TableManagerDocumentTracking.FindByPartition<GlobalDocValidatorTracking>(trackIdCude);
-                documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);
-                xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
-
-                if (xmlBytes == null)
-                {
-                    response.Code = ((int)EventValidationMessage.Error).ToString();
-                    response.Message = "No se pudo generar application response.";
-                }
-                else                               
-                    response.XmlBytesBase64 = Convert.ToBase64String(xmlBytes);                    
+                documentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdCude, trackIdCude);                           
                 
                 if (documentMeta != null)
                 {
-                  
+                    xmlBytes = XmlUtil.GenerateApplicationResponseBytes(trackIdCude, documentMeta, validations);
+
+                    if (xmlBytes == null)
+                    {
+                        response.Code = ((int)EventValidationMessage.Error).ToString();
+                        response.Message = "No se pudo generar application response.";
+                    }
+                    else
+                        response.XmlBytesBase64 = Convert.ToBase64String(xmlBytes);
+
                     //Registra Mandato
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato)
                     {
@@ -123,12 +123,9 @@ namespace Gosocket.Dian.Functions.Events
                     //Obtiene XML Invoice CUFE solo si no es mandadato abierto
                     if(Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                     {
-                        var xmlBytesCufe = await Utils.Utils.GetXmlFromStorageAsync(documentMeta.DocumentReferencedKey);
-                        var xmlParserCufe = new XmlParser(xmlBytesCufe);
-                        if (!xmlParserCufe.Parser())
-                            throw new Exception(xmlParserCufe.ParserError);
-
-                        InsertDocQueryRegisteredInvoice(documentMeta, xmlParserCufe);
+                        var documentMetaCufe = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
+                        if(documentMetaCufe != null)
+                            InsertDocQueryRegisteredInvoice(documentMeta, documentMetaCufe);
 
                     }
 
@@ -325,7 +322,7 @@ namespace Gosocket.Dian.Functions.Events
         #endregion
 
         #region insert GlobalDocQueryRegisteredInvoice    
-        private static void InsertDocQueryRegisteredInvoice(GlobalDocValidatorDocumentMeta documentMeta, XmlParser xmlParserCufe)
+        private static void InsertDocQueryRegisteredInvoice(GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCufe)
         {
             var arrayTasks = new List<Task>();
             var failedList = new List<string>();          
@@ -335,9 +332,12 @@ namespace Gosocket.Dian.Functions.Events
             string accountingSupplierParty = string.Empty;
             string accountingCustomerParty = string.Empty;
             string techProviderCode = documentMeta.TechProviderCode;
-           
-            accountingSupplierParty = xmlParserCufe.Fields["SenderCode"].ToString();
-            accountingCustomerParty = xmlParserCufe.Fields["ReceiverCode"].ToString();
+
+            accountingSupplierParty = documentMetaCufe.SenderCode.ToString();
+            accountingCustomerParty = documentMetaCufe.ReceiverCode.ToString();
+
+            //accountingSupplierParty = xmlParserCufe.Fields["SenderCode"].ToString();
+            //accountingCustomerParty = xmlParserCufe.Fields["ReceiverCode"].ToString();
 
             failedList.Add(startDate + "|" + accountingSupplierParty);
             failedList.Add(startDate + "|" + accountingCustomerParty);
