@@ -11,8 +11,7 @@ namespace Gosocket.Dian.Infrastructure
     {
         private static Microsoft.Azure.EventHubs.EventHubClient _eventHubClient;
 
-        private const string EventHubConnectionString =
-            "Endpoint=sb://colombia-eventhub-validadordian.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=oRcNGCeYWHuW3hBUgv0bXiAVYuWC1THGli90Xh67Tx0=";
+        private static readonly string EventHubConnectionString = ConfigurationManager.GetValue("EventHubConnectionString");
         public static async Task SendMessagesToEventHub(string eventHubName, dynamic obj)
         {
             try
