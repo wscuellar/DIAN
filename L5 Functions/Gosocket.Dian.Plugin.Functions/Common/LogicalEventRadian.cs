@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         static readonly TableManager documentValidatorTableManager = new TableManager("GlobalDocValidatorDocument");
         static readonly TableManager documentAttorneyTableManager = new TableManager("GlobalDocReferenceAttorney");
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
-        static 
+        static readonly TableManager documentMetaTableManager = new TableManager("GlobalDocValidatorDocumentMeta");
 
         private readonly string successfulMessage = "Evento ValidateEmitionEventPrev referenciado correctamente";
         #endregion
@@ -466,8 +466,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Obtiene legitimo tenedor               
             LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
-            GlobalDocValidatorDocumentMeta documentMetaCude = documentMeta.Where(w => w.PartitionKey == eventPrev.TrackIdCude).FirstOrDefault();
-            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, documentMetaCude.TechProviderCode);
+            GlobalDocValidatorDocumentMeta documentMetaCude = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventPrev.TrackIdCude, eventPrev.TrackIdCude);
+            HolderExchangeModel responseHolderExchange = logicalEventRadianRejected.RetrieveSenderHolderExchange(documentMeta.FirstOrDefault().DocumentReferencedKey, documentMetaCude.TechProviderCode.ToString());
             if (responseHolderExchange != null)
                 senderCode = !string.IsNullOrWhiteSpace(responseHolderExchange.PartyLegalEntity) ? responseHolderExchange.PartyLegalEntity : string.Empty;
 
@@ -1623,7 +1623,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Comparar ValorFEV-TV contra el valor total de la FE
             if (xmlParserCude.ValorOriginalTV != null)
             {
-                if (xmlParserCude.ValorOriginalTV == totalInvoice)
+                var valorOriginlTV = double.Parse(xmlParserCude.ValorOriginalTV, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture).ToString();
+                var totalInvoiceParam = double.Parse(totalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture).ToString();
+                if (valorOriginlTV == totalInvoiceParam)
                 {
                     responses.Add(new ValidateListResponse
                     {
