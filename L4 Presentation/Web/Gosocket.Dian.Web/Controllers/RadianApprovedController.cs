@@ -535,10 +535,38 @@ namespace Gosocket.Dian.Web.Controllers
             try
             {
                 Software software = _radianAprovedService.SoftwareByContributor(contributorId);
+                if (software == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró software para el contributorid {contributorId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se pudo localizar el Software"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
                 var pk = code.ToString();
                 var rk = contributorTypeId.ToString() + "|" + software.Id;
                 RadianTestSetResult testSetResult = _radianTestSetResultService.GetTestSetResult(pk, rk);
+                if (testSetResult == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró el testSetResult pk {pk} - rk {rk} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró el testSetResult pk {pk} - rk {rk} "
+                    }, JsonRequestBehavior.AllowGet);
+                }
                 var globalRadianOperations = _globalRadianOperationService.GetOperation(code.ToString(), software.Id);
+                if (globalRadianOperations == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.Id} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró operación para el softwareid {software.Id}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
 
                 var data = new RadianActivationRequest();
                 data.Code = code.ToString();
