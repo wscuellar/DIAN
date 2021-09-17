@@ -611,7 +611,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId, string softwareIdBase)
+        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase)
         {
             try
             {
@@ -627,8 +627,21 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
+                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), Guid.Parse(softwareIdBase));
+
+                if (globalRadianOperations == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.SoftwareId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró operación para el softwareid {software.SoftwareId}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+
                 var pk = code.ToString();
-                var rk = contributorTypeId.ToString() + "|" + software.SoftwareId;
+                var rk = globalRadianOperations.OperationModeId + "|" + softwareIdBase;
                 GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
 
                 if (testSetResult == null)
@@ -641,17 +654,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), software.SoftwareId);
-
-                if (globalRadianOperations == null)
-                {
-                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.SoftwareId} ", SeverityLevel.Warning);
-                    return Json(new
-                    {
-                        success = false,
-                        message = $"No se encontró operación para el softwareid {software.SoftwareId}"
-                    }, JsonRequestBehavior.AllowGet);
-                }
+                
 
                 var data = new RadianActivationRequest();
                 data.Code = code.ToString();

@@ -465,7 +465,7 @@
                             label: "Aceptar",
                             className: "btn-gosocket",
                             callback: function () {
-                                syncToProduction(@Model.Nit, @Model.ContributorTypeId, @Model.ContributorId,"@Model.SoftwareId","@Model.SoftwareIdBase")
+                                syncToProduction(@Model.Nit, @Model.ContributorId,"@Model.SoftwareId","@Model.SoftwareIdBase")
                             }
                         },
                     }
@@ -490,7 +490,7 @@
              }
 
              
-            syncToProduction = (code, contributorTypeId, contributorId, softwareId, softwareIdBase) => {
+            syncToProduction = (code, contributorId, softwareId, softwareIdBase) => {
             showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
             var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
             $.ajax({
@@ -498,8 +498,7 @@
                 method: "Post",
                 data: {
                     __RequestVerificationToken: __RequestVerificationToken,
-                    code: code,
-                    contributorTypeId: contributorTypeId,
+                    code: code,                    
                     contributorId: contributorId,
                     softwareId:softwareId,
                     softwareIdBase:softwareIdBase
