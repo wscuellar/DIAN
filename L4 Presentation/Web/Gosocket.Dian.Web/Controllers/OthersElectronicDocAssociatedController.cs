@@ -611,17 +611,52 @@ namespace Gosocket.Dian.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId, string softwareId, string softwareIdBase)
+        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase)
         {
             try
             {
                 //TODO afinar filtro
                 OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(softwareId));
 
+                if (software == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró el softwareid {softwareId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se pudo localizar el Software con el id {softwareId}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), Guid.Parse(softwareIdBase));
+
+                if (globalRadianOperations == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.SoftwareId} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró operación para el softwareid {software.SoftwareId}"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+
                 var pk = code.ToString();
-                var rk = contributorTypeId.ToString() + "|" + software.SoftwareId;
+                var rk = globalRadianOperations.OperationModeId + "|" + softwareIdBase;
                 GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
-                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), software.SoftwareId);
+
+                if (testSetResult == null)
+                {
+                    telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró el testSetResult pk {pk} - rk {rk} ", SeverityLevel.Warning);
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"No se encontró el testSetResult pk {pk} - rk {rk} "
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+
+
 
                 var data = new RadianActivationRequest();
                 data.Code = code.ToString();
