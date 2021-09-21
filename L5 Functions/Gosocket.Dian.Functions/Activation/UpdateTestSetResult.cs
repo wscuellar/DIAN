@@ -39,8 +39,8 @@ namespace Gosocket.Dian.Functions.Activation
         // Set queue name 
         private const string queueName = "global-test-set-tracking-input%Slot%";
 
-        [FunctionName("UpdateTestSetResult")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalQueue")] string myQueueItem, TraceWriter log)
+        [FunctionName("UpdateTestSetResult")]        
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var testSetId = string.Empty;

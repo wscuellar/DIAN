@@ -23,8 +23,8 @@ namespace Gosocket.Dian.Functions.Documents
         // Set queue name
         private const string queueName = "global-check-document-validation-input%Slot%";
 
-        [FunctionName("CheckDocumentValidations")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
+        [FunctionName("CheckDocumentValidations")]        
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

@@ -15,8 +15,8 @@ namespace Gosocket.Dian.Infrastructure
         public static CloudBlobClient blobClient => lazyClient.Value;
 
         private static CloudBlobClient InitializeBlobClient()
-        {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalBlob"));
+        {            
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
             var blobClient = account.CreateCloudBlobClient();
             return blobClient;
         }

@@ -26,8 +26,8 @@ namespace Gosocket.Dian.Functions.Radian
         // Set queue name
         private const string queueName = "activate-radian-operation-input";
 
-        [FunctionName("ActivateRadianOperation")]
-        public static void Run([QueueTrigger(queueName, Connection = "GlobalQueue")] string myQueueItem, TraceWriter log)
+        [FunctionName("ActivateRadianOperation")]        
+        public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

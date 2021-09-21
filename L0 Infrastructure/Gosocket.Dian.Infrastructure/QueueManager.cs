@@ -12,7 +12,7 @@ namespace Gosocket.Dian.Infrastructure
 
         private static CloudQueueClient InitializeQueueClient()
         {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalQueue"));
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
             var tableClient = account.CreateCloudQueueClient();
             return tableClient;
         }

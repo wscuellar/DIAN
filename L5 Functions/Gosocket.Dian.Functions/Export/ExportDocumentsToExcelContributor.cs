@@ -27,8 +27,8 @@ namespace Gosocket.Dian.Functions.Export
         // Set queue name
         private const string queueName = "global-export-documents-to-excel-contributor-input%Slot%";
 
-        [FunctionName("ExportDocumentsToExcelContributor")]
-        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
+        [FunctionName("ExportDocumentsToExcelContributor")]        
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             var eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);

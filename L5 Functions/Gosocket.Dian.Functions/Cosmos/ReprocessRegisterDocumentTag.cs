@@ -10,8 +10,8 @@ namespace Gosocket.Dian.Functions.Cosmos
 {
     public static class ReprocessRegisterDocumentTag
     {
-        //[FunctionName("ReprocessRegisterDocumentTag")]
-        public static async Task Run([QueueTrigger("global-document-tag-input-poison", Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
+        //[FunctionName("ReprocessRegisterDocumentTag")]        
+        public static async Task Run([QueueTrigger("global-document-tag-input-poison", Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             try
             {

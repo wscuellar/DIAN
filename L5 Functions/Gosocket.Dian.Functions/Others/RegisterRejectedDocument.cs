@@ -16,8 +16,8 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager tableManager = new TableManager("GlobalRejectedDocument");
 
         [FunctionName("RegisterRejectedDocument")]
-        [return: Table("GlobalRejectedDocument", Connection = "GlobalStorage")]
-        public static GlobalRejectedDocument Run([QueueTrigger(queueName, Connection = "GlobalQueue")]string myQueueItem, TraceWriter log)
+        [return: Table("GlobalRejectedDocument", Connection = "GlobalStorage")]        
+        public static GlobalRejectedDocument Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 
