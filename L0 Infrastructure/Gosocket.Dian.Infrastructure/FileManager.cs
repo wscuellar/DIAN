@@ -28,8 +28,8 @@ namespace Gosocket.Dian.Infrastructure
         private string ContainerName;
 
         private static CloudBlobClient InitializeBlobClient()
-        {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
+        {            
+            var account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("GlobalBlob"));            
             var blobClient = account.CreateCloudBlobClient();
             return blobClient;
         }
