@@ -100,6 +100,7 @@ namespace Gosocket.Dian.Functions.Others
                         if (IsProduction)
                             otherDocContributorId = contributorService.AddOrUpdateOtherDocContributor(otherDocElecContributor);
 
+                        otherDocContributorId = otherDocElecContributor.Id;
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
 
@@ -189,9 +190,9 @@ namespace Gosocket.Dian.Functions.Others
                     }
 
                     //--1. COnsultar previo por si ya existe
-                    GlobalOtherDocElecOperation globalOtherDocElecOperation = TableManagerOtherDocElecOperation.FindSoftwareId<GlobalOtherDocElecOperation>(requestObject.Code, requestObject.SoftwareId);
+                    GlobalOtherDocElecOperation globalOtherDocElecOperation = TableManagerOtherDocElecOperation.FindSoftwareId<GlobalOtherDocElecOperation>(requestObject.Code, requestObject.SoftwareProvider);
                     if (globalOtherDocElecOperation == null)
-                        globalOtherDocElecOperation = new GlobalOtherDocElecOperation(requestObject.Code, requestObject.SoftwareId);
+                        globalOtherDocElecOperation = new GlobalOtherDocElecOperation(requestObject.Code, requestObject.SoftwareProvider);
 
                     //--2. si existe solo actualizar lo que llega
                     if (otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider)
@@ -201,6 +202,10 @@ namespace Gosocket.Dian.Functions.Others
                     globalOtherDocElecOperation.ContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId;
                     globalOtherDocElecOperation.State = Domain.Common.OtherDocElecState.Habilitado.GetDescription();
                     globalOtherDocElecOperation.OperationModeId = Convert.ToInt32(requestObject.SoftwareType);
+                    globalOtherDocElecOperation.SoftwareId = requestObject.SoftwareId;
+                    globalOtherDocElecOperation.OtherDocElecContributorId = otherDocContributorId;
+                    globalOtherDocElecOperation.ElectronicDocumentId = requestObject.ElectronicDocumentId;
+                    globalOtherDocElecOperation.Transmitter = true;
 
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
                     if (IsProduction)
