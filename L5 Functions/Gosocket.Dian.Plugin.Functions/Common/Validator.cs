@@ -7028,7 +7028,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
 
-                    documentMeta = trackIdEvent != null ? trackIdEvent.DocumentMeta : new GlobalDocValidatorDocumentMeta();
+                    documentMeta = trackIdEvent != null? trackIdEvent.DocumentMeta : new GlobalDocValidatorDocumentMeta();
 
                     if (!string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
