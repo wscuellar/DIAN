@@ -364,6 +364,12 @@ namespace Gosocket.Dian.Web.Controllers
                     return Json(new ResponseMessage(TextResources.UserExistingDoc, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
+            var companyCode = User.ContributorCode();
+            if (companyCode.Equals("0"))
+            {
+                return Json(new ResponseMessage(TextResources.SessionExpired, TextResources.alertType, (int)HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
             //Crea el registro del nuevo usuario
             IdentityResult identification = userManager.Create(user, model.Password);
 
