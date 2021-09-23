@@ -18,6 +18,7 @@ using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Newtonsoft.Json;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -658,19 +659,20 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-                var data = new RadianActivationRequest();
+                var data = new OtherDocumentActivateContributorRequestObject();
                 data.Code = code.ToString();
                 data.ContributorId = contributorId;
-                data.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
+                data.OtherDocContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
                 data.Pin = software.Pin;
-                data.SoftwareId = softwareIdBase;
+                data.SoftwareId = softwareId;
                 data.SoftwareName = software.Name;
                 data.SoftwarePassword = software.SoftwarePassword;
                 data.SoftwareType = globalRadianOperations.OperationModeId.ToString();
-                data.SoftwareUser = software.SoftwareUser;
-                data.TestSetId = testSetResult.Id;
+                data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;
-                data.Enabled = true;
+                data.SoftwareProvider = softwareIdBase;
+                data.ElectronicDocumentId = globalRadianOperations.ElectronicDocumentId;
+                data.ProviderId = software.ProviderId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
@@ -702,5 +704,55 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
     
+    }
+    class OtherDocumentActivateContributorRequestObject
+    {
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "contributorId")]
+        public int ContributorId { get; set; }
+
+        [JsonProperty(PropertyName = "otherDocContributorTypeId")]
+        public int OtherDocContributorTypeId { get; set; }
+
+        [JsonProperty(PropertyName = "otherDocOperationModeId")]
+        public int OtherDocOperationModeId { get; set; }
+
+        [JsonProperty(PropertyName = "createdBy")]
+        public string CreatedBy { get; set; }
+
+        [JsonProperty(PropertyName = "softwareType")]
+        public string SoftwareType { get; set; }
+
+        [JsonProperty(PropertyName = "softwareId")]
+        public string SoftwareId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareName")]
+        public string SoftwareName { get; set; }
+
+        [JsonProperty(PropertyName = "pin")]
+        public string Pin { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "softwareUser")]
+        public string SoftwareUser { get; set; }
+
+        [JsonProperty(PropertyName = "softwarePassword")]
+        public string SoftwarePassword { get; set; }
+
+        [JsonProperty(PropertyName = "electronicDocumentId")]
+        public int ElectronicDocumentId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareProvider")]
+        public string SoftwareProvider { get; set; }
+
+        [JsonProperty(PropertyName = "providerId")]
+        public int ProviderId { get; set; }
+
+        [JsonProperty(PropertyName = "testSetOthersDocumentsResult")]
+        public GlobalTestSetOthersDocumentsResult TestSetOthersDocumentsResultObj { get; set; }
     }
 }
