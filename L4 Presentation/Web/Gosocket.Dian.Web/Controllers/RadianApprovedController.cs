@@ -567,6 +567,7 @@ namespace Gosocket.Dian.Web.Controllers
                         message = $"No se encontró operación para el softwareid {software.Id}"
                     }, JsonRequestBehavior.AllowGet);
                 }
+
                 var data = new RadianActivationRequest();
                 data.Code = code.ToString();
                 data.ContributorId = contributorId;

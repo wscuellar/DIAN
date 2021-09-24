@@ -67,6 +67,6 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string PaymentDueDate { get; set; }
     public string FechaPagoNominaInicio { get; set; }
     public string FechaPagoNominaFin { get; set; }
-    public string CUNENov { get; set; }
+    public string CuneNovedad { get; set; }
 
 }
