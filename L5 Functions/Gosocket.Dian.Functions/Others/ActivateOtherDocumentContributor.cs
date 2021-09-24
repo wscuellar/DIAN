@@ -112,7 +112,7 @@ namespace Gosocket.Dian.Functions.Others
                     };
                     var resultOtherDocSW = TableManagerGlobalLogger.InsertOrUpdateAsync(OtherDocSW);
 
-                    OtherDocElecSoftware otherDocElecSoftware = softwareService.GetOtherDocSoftware(new Guid(requestObject.SoftwareId));
+                    OtherDocElecSoftware otherDocElecSoftware = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
 
                     if (otherDocElecSoftware == null)
                     {
@@ -141,8 +141,7 @@ namespace Gosocket.Dian.Functions.Others
                     }                    
 
                     // Crear Software en TableSTorage
-                    var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
-                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
+                    GlobalSoftware globalSoftware = new GlobalSoftware(otherDocElecSoftware.SoftwareId.ToString(), otherDocElecSoftware.SoftwareId.ToString())
                     {
                         Id = new Guid(requestObject.SoftwareId),
                         Deleted = false,
