@@ -404,13 +404,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                 sb.AppendLine($"7 Aplication SendBillSync {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
-                // ZONE APPLICATION
-                var application = new GlobalLogger(trackId, "timers") { Message = sb.ToString() };
+                
                 // LAST ZONE
                 start = DateTime.UtcNow;
 
 
-                TableLoggerManagerFACELogger.InsertOrUpdate(application);
+                
 
                 bool existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
 
@@ -418,10 +417,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     TableManagerGlobalDocValidatorDocument.InsertOrUpdate(validatorDocument);
 
                 //Task.WhenAll(arrayTasks);
+                sb.AppendLine($"Last Zone {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
 
-                var lastZone = new GlobalLogger(trackId, "Last Zone") { Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString() };
-                TableLoggerManagerFACELogger.InsertOrUpdate(lastZone);
-                // LAST ZONE
+
+                // ZONE APPLICATION
+                var application = new GlobalLogger(trackId, "timers") { Message = sb.ToString() };
+                TableLoggerManagerFACELogger.InsertOrUpdate(application);
+
+                
 
                 return dianResponse;
             }
