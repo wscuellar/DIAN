@@ -105,18 +105,18 @@ namespace Gosocket.Dian.Functions.Others
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
 
-                    //si el software No Existe  OtherDocElecSoftware
-                    if (Convert.ToInt32(requestObject.SoftwareType) == (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware)
+                    start = DateTime.UtcNow;
+                    var OtherDocSW = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-05.1")
                     {
-                        start = DateTime.UtcNow;
-                        var OtherDocSW = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-05.1")
-                        {
-                            Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                            Action = " otherDocContributorId " + otherDocContributorId
-                        };
-                        var resultOtherDocSW = TableLoggerManagerFACELogger.InsertOrUpdateAsync(OtherDocSW);
+                        Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                        Action = " otherDocContributorId " + otherDocContributorId
+                    };
+                    var resultOtherDocSW = TableLoggerManagerFACELogger.InsertOrUpdateAsync(OtherDocSW);
 
+                    OtherDocElecSoftware otherDocElecSoftware = softwareService.GetOtherDocSoftware(new Guid(requestObject.SoftwareId));
 
+                    if (otherDocElecSoftware == null)
+                    {
                         OtherDocElecSoftware newSoftware = new OtherDocElecSoftware()
                         {
                             Id = new Guid(requestObject.SoftwareId),
@@ -126,7 +126,7 @@ namespace Gosocket.Dian.Functions.Others
                             SoftwareDate = DateTime.Now,
                             SoftwareUser = requestObject.SoftwareUser,
                             SoftwarePassword = requestObject.SoftwarePassword,
-                            Status = true,                            
+                            Status = true,
                             OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted,
                             Url = requestObject.Url,
                             CreatedBy = requestObject.CreatedBy,
@@ -139,23 +139,23 @@ namespace Gosocket.Dian.Functions.Others
                             softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
 
                         SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
-
-                        // Crear Software en TableSTorage
-                        var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
-                        GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
-                        {
-                            Id = new Guid(requestObject.SoftwareId),
-                            Deleted = false,
-                            Pin = requestObject.Pin,
-                            StatusId = (int)Domain.Common.SoftwareStatus.Production
-                        };
-
-                        if (IsProduction)
-                            softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
-
-                        SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
                     }
 
+                    // Crear Software en TableSTorage
+                    var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
+                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
+                    {
+                        Id = new Guid(requestObject.SoftwareId),
+                        Deleted = false,
+                        Pin = requestObject.Pin,
+                        StatusId = (int)Domain.Common.SoftwareStatus.Production
+                    };
+
+                    if (IsProduction)
+                        softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
+
+                    SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
+                    
                     //--1. se busac operation por radiancontributorid y software 
                     OtherDocElecContributorOperations OtherDocOperation = contributorService.GetOtherDocOperations(otherDocContributorId, requestObject.SoftwareId);
 
