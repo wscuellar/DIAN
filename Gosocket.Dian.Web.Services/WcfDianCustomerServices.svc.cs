@@ -881,12 +881,22 @@ namespace Gosocket.Dian.Web.Services
 
             if (string.IsNullOrEmpty(trackId))
             {
-                Log($"{authCode} {email} GetStatus", (int)InsightsLogType.Error, $"TrackId es nulo o vacío.");
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    };
+                Log($"{authCode} {email} GetStatus", (int)InsightsLogType.Error, $"TrackId es nulo o vacío.",properties);
                 responses.Add(new DianResponse { StatusCode = "89", StatusDescription = "TrackId es nulo o vacío." });
             }
             else if (trackId.Length < 20)
             {
-                Log($"{authCode} {email}, trackId: '{trackId}'", (int)InsightsLogType.Error, $"TrackId inválido (Length).");
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    };
+                Log($"{authCode} {email}, trackId: '{trackId}'", (int)InsightsLogType.Error, $"TrackId inválido (Length).",properties);
                 responses.Add(new DianResponse { StatusCode = "89", StatusDescription = "TrackId inválido (Length)." });
             }
 
