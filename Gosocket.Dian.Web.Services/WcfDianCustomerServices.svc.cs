@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.ServiceModel;
@@ -38,10 +39,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public ExchangeEmailResponse GetExchangeEmails()
         {
+            string authCode = "";
+            string email = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 DianPAServices customerDianPa = new DianPAServices();
                 {
@@ -58,7 +61,12 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("GetExchangeEmails", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name}
+                };
+                LogException(ex, properties);                
                 var exception = new GlobalLogger($"GetExchangeEmails-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetExchangeEmails", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new ExchangeEmailResponse { StatusCode = "500", Success = false, Message = "Ha ocurrido un error. Por favor inténtentelo de nuevo.", CsvBase64Bytes = null };
@@ -72,10 +80,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse GetStatus(string trackId)
         {
+            string authCode = "";
+            string email = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 var check = CheckTrackIdFormat(trackId, authCode, email);
                 if (check.Any()) return check.FirstOrDefault();
@@ -118,7 +128,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(trackId, (int)InsightsLogType.Error, "GetStatus");
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "trackId", trackId}
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatus, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
@@ -132,10 +148,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public List<DianResponse> GetStatusZip(string trackId)
         {
+            string authCode = "";
+            string email = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 var response = CheckTrackIdFormat(trackId, authCode, email, true);
                 if (response.Any()) return response;
@@ -152,7 +170,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(trackId, (int)InsightsLogType.Error, "GetStatusZip");
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "trackId", trackId}
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetStatusZipException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusZip, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var result = new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
@@ -169,10 +193,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse GetStatusEvent(string trackId)
         {
+            string email = "";
+            string authCode = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 var check = CheckTrackIdFormat(trackId, authCode, email);
                 if (check.Any()) return check.FirstOrDefault();
@@ -198,7 +224,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(trackId, (int)InsightsLogType.Error, "GetStatusEvent");
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "trackId", trackId}
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetStatusEventException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusEvent, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
@@ -213,10 +245,13 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public UploadDocumentResponse SendBillAsync(string fileName, byte[] contentFile)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 if (string.IsNullOrEmpty(authCode))
                 {
@@ -258,7 +293,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(fileName, (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "fileName", fileName }
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"SendBillAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendBillAsync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Ha ocurrido un error. Por favor inténtentelo nuevamente.", Success = false };
@@ -275,6 +316,9 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public UploadDocumentResponse SendTestSetAsync(string fileName, byte[] contentFile, string testSetId)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
                 if (ConfigurationManager.GetValue("Environment") == "Prod")
@@ -289,8 +333,8 @@ namespace Gosocket.Dian.Web.Services
                     return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
                 }
 
-                var email = GetAuthEmail();
-                var authCode = GetAuthCode();
+                email = GetAuthEmail();
+                authCode = GetAuthCode();
 
                 if (string.IsNullOrEmpty(authCode))
                 {
@@ -333,7 +377,14 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(fileName, (int)InsightsLogType.Error, ex.Message);
+
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "fileName", fileName }
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"SendTestSetAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendTestSetAsync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = $"Ha ocurrido un error. Por favor inténtentelo nuevamente.", Success = false };
@@ -349,10 +400,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse SendBillSync(string fileName, byte[] contentFile)
         {
+            string authCode = "";
+            string email = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 if (string.IsNullOrEmpty(authCode))
                     return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
@@ -411,7 +464,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log(fileName, (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "fileName", fileName }
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"SendBillSyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"SendBillSync, fileName: {fileName}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", XmlFileName = fileName, IsValid = false };
@@ -487,10 +546,13 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse SendEventUpdateStatus(byte[] contentFile)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 if (contentFile == null)
                 {
@@ -547,7 +609,12 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name}
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
                 { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
@@ -570,10 +637,13 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse SendNominaSync(byte[] contentFile)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 if (contentFile == null)
                 {
@@ -630,7 +700,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                };
+                LogException(ex, properties);
+                
                 var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
                 { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
@@ -654,15 +730,19 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public NumberRangeResponseList GetNumberingRange(string accountCode, string accountCodeT, string softwareCode)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
-                var authCode = GetAuthCode();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
                 if (string.IsNullOrEmpty(authCode))
                     return new NumberRangeResponseList { OperationCode = "89", OperationDescription = "NIT de la empresa no informado en el certificado." };
 
                 DianPAServices customerDianPa = new DianPAServices();
                 {
-                    var email = GetAuthEmail();
+                    email = GetAuthEmail();
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetNumberingRange");
                     var result = customerDianPa.GetNumberingRange(accountCode, accountCodeT, softwareCode, authCode);
                     customerDianPa = null;
@@ -671,7 +751,12 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("GetNumberingRange", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetNumberingRangeException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetNumberingRange, accountCode: {accountCode}, accountCodeT: {accountCodeT}, softwareCode: {softwareCode}", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 throw new FaultException(ex.Message, new FaultCode("Client"));
@@ -685,10 +770,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public EventResponse GetXmlByDocumentKey(string trackId)
         {
+            string email = "";
+            string authCode = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 var check = CheckTrackIdFormat(trackId, authCode, email);
                 if (check.Any()) return new EventResponse { Code = check.FirstOrDefault().StatusCode, Message = check.FirstOrDefault().StatusDescription };
@@ -703,7 +790,13 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("GetXmlByDocumentKey", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    { "trackId", trackId}
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetXmlByDocumentKeyException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetXmlByDocumentKey", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new EventResponse { Code = "500", Message = $"Ha ocurrido un error. Por favor inténtentelo de nuevo." };
@@ -718,10 +811,12 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber)
         {
+            string email = "";
+            string authCode = "";
             try
             {
-                var authCode = GetAuthCode();
-                var email = GetAuthEmail();
+                authCode = GetAuthCode();
+                email = GetAuthEmail();
 
                 if(string.IsNullOrWhiteSpace(contributorCode))
                 {
@@ -743,7 +838,12 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("GetDocIdentifierWithEvents", (int)InsightsLogType.Error, ex.Message);
+                var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                };
+                LogException(ex, properties);
                 var exception = new GlobalLogger($"GetDocIdentifierWithEvents-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetDocIdentifierWithEvents", Message = ex.Message, StackTrace = ex.StackTrace };
                 TableLoggerManagerFACELogger.InsertOrUpdate(exception);
                 return new DocIdentifierWithEventsResponse { StatusCode = "500", Success = false, Message = "Ha ocurrido un error. Por favor inténtentelo de nuevo.", CsvBase64Bytes = null };

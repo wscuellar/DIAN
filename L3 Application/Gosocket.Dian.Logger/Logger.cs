@@ -26,10 +26,14 @@ namespace Gosocket.Dian.Logger
                 Exception = error,
                 SeverityLevel = (SeverityLevel)logType,
                 Message = logMessage,
-                ProblemId = serviceId,
+                ProblemId = serviceId                
             };
-
+            
             clientTelemetry.TrackException(exceptionTelemetry);
+        }
+        public static void LogException(Exception e, IDictionary<string, string> properties)
+        {
+            clientTelemetry.TrackException(e, properties);
         }
 
         public static void Log(Exception ex)
