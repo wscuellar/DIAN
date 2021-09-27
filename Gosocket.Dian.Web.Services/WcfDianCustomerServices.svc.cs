@@ -867,9 +867,14 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Guid.Parse(trackId);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Log($"{authCode} {email}, trackId: '{trackId}' GetStatusZip", (int)InsightsLogType.Error, "Formato trackId inválido.");
+                    var properties = new Dictionary<string, string>{
+                    { "authCode",authCode },
+                    { "email",email },
+                    { "method", MethodBase.GetCurrentMethod().Name},
+                    };
+                    LogException(ex, properties);                    
                     responses.Add(new DianResponse { StatusCode = "89", StatusDescription = $"Formato trackId inválido." });
                 }
             }
