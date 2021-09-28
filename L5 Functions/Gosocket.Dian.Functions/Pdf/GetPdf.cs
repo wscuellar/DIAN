@@ -138,6 +138,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
             catch (System.Exception ex)
             {
+                log.Error("No podemos generar el PDF en este momento debido al siguiente error", ex);
                 //return req.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.BadRequest);
                 result.Content = new StringContent("No podemos generar el PDF en este momento debido al siguiente error: " + ex.Message);
