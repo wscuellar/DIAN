@@ -293,6 +293,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
+                Active = 1,
                 //PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
             model.Password = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
