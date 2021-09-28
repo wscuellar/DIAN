@@ -125,19 +125,19 @@
         $(document).ready(function () {
             $("#RadianState option[value='0']").remove();
             var form = $('#radian-contributors-form');
-            $('input[name="DateInterval"]').on('apply.daterangepicker', function (ev, picker) {
+            $('input[name="dashboard-report-range"]').on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('DD-MMMM-yyyy') + ' al ' + picker.endDate.format('DD-MMMM-yyyy'));
             });
-            $('input[name="DateInterval"]').on('cancel.daterangepicker', function (ev, picker) {
+            $('input[name="dashboard-report-range"]').on('cancel.daterangepicker', function (ev, picker) {
                 $(this).val('');
             });
 
              $('.btn-search').click(function () {
                 if (form.valid()) {
-                    var dateRange = $("#DateInterval").val();
+                    //var dateRange = $("#dashboard-report-range").val();
                     var radianType = $("#RadianType").val();
-                    $('#StartDate').val(dateRange.split("al")[0]);
-                    $('#EndDate').val(dateRange.split("al")[1]);
+                    //$('#StartDate').val(dateRange.split("al")[0]);
+                    //$('#EndDate').val(dateRange.split("al")[1]);
                     $('#Page').val(1);
                     $('#Type').val(radianType);
                     showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
@@ -216,8 +216,8 @@
         $('#dashboard-report-range span').html(capitalizeMonth(start.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(end.format('YYYY/MM/DD')));
         startDate = start;
         endDate = end;
-        $('#startDate').val(startDate.format('YYYY/MM/DD'));
-        $('#endDate').val(endDate.format('YYYY/MM/DD'));
+        $('#StartDate').val(startDate.format('YYYY/MM/DD'));
+        $('#EndDate').val(endDate.format('YYYY/MM/DD'));
     });
     $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(endDate.format('YYYY/MM/DD')));
     $('#dashboard-report-range').show();
