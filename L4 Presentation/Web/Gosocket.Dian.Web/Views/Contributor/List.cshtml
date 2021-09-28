@@ -81,7 +81,7 @@
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.AcceptanceStatusId, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.AcceptanceStatusId, new SelectList(Model.AcceptanceStatuses, "Code", "Name"), new { @class = "form-control selectpicker" })
+                                                        @Html.DropDownListFor(m => m.AcceptanceStatusId, new SelectList(Model.AcceptanceStatuses, "Id", "Name"), new { @class = "form-control selectpicker" })
 
                                                     </div>
                                                 </div>

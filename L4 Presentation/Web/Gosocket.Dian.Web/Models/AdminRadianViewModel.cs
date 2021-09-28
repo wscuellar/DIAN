@@ -14,6 +14,8 @@ namespace Gosocket.Dian.Web.Models
             RadianContributors = new List<RadianContributorsViewModel>();
             Page = 1;
             Length = 10;
+            StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); ;
+            EndDate = DateTime.Now;
         }
         public List<RadianContributorsViewModel> RadianContributors { get; set; }
 
@@ -28,8 +30,8 @@ namespace Gosocket.Dian.Web.Models
 
         [Display(Name = "Tipo de participante")]        
         public int Type { get; set; }
-        public string StartDate { get; set;  }
-        public string EndDate { get; set; }
+        public DateTime StartDate { get; set;  }
+        public DateTime EndDate { get; set; }
         [Display(Name = "Estado")]
         public List<RadianContributorStateViewModel> State { get; set; }
 
@@ -47,7 +49,7 @@ namespace Gosocket.Dian.Web.Models
         
         public IEnumerable<SelectListItem> RadianType { get; set; }
         [Display(Name = "Estado")]
-        [Required(AllowEmptyStrings =false, ErrorMessage ="Debe Seleccionar un Estado")]        
+        [Required(ErrorMessage = "Debe Seleccionar un Estado")]        
         
         public Domain.Common.RadianState? RadianState { get; set; }
 

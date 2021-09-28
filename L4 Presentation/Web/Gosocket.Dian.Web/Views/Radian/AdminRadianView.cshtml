@@ -40,8 +40,14 @@
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.DateInterval, new { @class = "control-label" })
-                                                        @Html.TextBoxFor(m => m.DateInterval, new { @class = "form-control input-general", @readonly = true })
+                                                        <label class="control-label">Rango de fechas</label>
+                                                        <div class="form-group">
+                                                            <div class="btn btn-default col-sm-12" id="dashboard-report-range">
+                                                                <i class="icon-calendar"></i>&nbsp;
+                                                                <span class="thin uppercase hidden-xs"></span>&nbsp;
+                                                                <i class="fa fa-angle-down"></i>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
@@ -111,7 +117,11 @@
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
-    <script>
+<script>
+    var startDate;
+    var endDate;
+
+
         $(document).ready(function () {
             $("#RadianState option[value='0']").remove();
             var form = $('#radian-contributors-form');
@@ -121,39 +131,8 @@
             $('input[name="DateInterval"]').on('cancel.daterangepicker', function (ev, picker) {
                 $(this).val('');
             });
-            $('#DateInterval').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    applyLabel: "Aplicar",
-                    cancelLabel: "Cancelar",
-                    format: 'DD-MMMM-yyyy',
-                    monthNames: [
-                        "Enero",
-                        "Febrero",
-                        "Marzo",
-                        "Abril",
-                        "Mayo",
-                        "Junio",
-                        "Julio",
-                        "Agosto",
-                        "Septiembre",
-                        "Octubre",
-                        "Noviembre",
-                        "Diciembre"
-                    ],
-                    separator: " al ",
-                }
 
-            });
-
-
-             $("#Code").focus();
-
-            if (@Model.RadianContributors.Count == 0) {
-                $('.table-responsive').css('display', 'none');
-            }
-
-            $('.btn-search').click(function () {
+             $('.btn-search').click(function () {
                 if (form.valid()) {
                     var dateRange = $("#DateInterval").val();
                     var radianType = $("#RadianType").val();
@@ -180,8 +159,80 @@
                 $("#Page").val(@Model.Page - 1);
                 form.submit();
             })
+            });
 
-        })
+            startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
+            endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
+            startDate.locale('es');
+    endDate.locale('es');
+    $('#dashboard-report-range').daterangepicker({
+        "buttonClasses": "btn btn-block btn-default",
+        "startDate": startDate,
+        "endDate": endDate,
+        "maxDate": moment().endOf('month'),
+        "applyClass": "btn-hover-gosocket",
+        "cancelClass": "btn-hover-gosocket",
+        "ranges": {
+            'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+            'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+            'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+            'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+        },
+        "locale": {
+            "format": "YYYY/MM/DD",
+            "separator": " - ",
+            "applyLabel": "Aceptar",
+            "cancelLabel": "Cancelar",
+            "fromLabel": "Desde",
+            "toLabel": "Hasta",
+            "customRangeLabel": "Rango de Fechas",
+            "daysOfWeek": [
+                "Do",
+                "Lu",
+                "Ma",
+                "Mi",
+                "Ju",
+                "Vi",
+                "Sa"
+            ],
+            "monthNames": [
+                "Enero",
+                "Febrero",
+                "Marzo",
+                "Abril",
+                "Mayo",
+                "Junio",
+                "Julio",
+                "Agosto",
+                "Septiembre",
+                "Octubre",
+                "Noviembre",
+                "Diciembre"
+            ],
+            "firstDay": 1
+        },
+        opens: ('left'),
+    }, function (start, end, label) {
+        $('#dashboard-report-range span').html(capitalizeMonth(start.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(end.format('YYYY/MM/DD')));
+        startDate = start;
+        endDate = end;
+        $('#startDate').val(startDate.format('YYYY/MM/DD'));
+        $('#endDate').val(endDate.format('YYYY/MM/DD'));
+    });
+    $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(endDate.format('YYYY/MM/DD')));
+    $('#dashboard-report-range').show();
+
+             $("#Code").focus();
+
+            if (@Model.RadianContributors.Count == 0) {
+                $('.table-responsive').css('display', 'none');
+            }
+
+
+    function capitalizeMonth(date) {
+        return date.substring(0, 3) + date.charAt(3).toUpperCase() + date.slice(4);
+    }
+
 
         //$(document).on('mouseenter', ".iffyTip", function () {
         //    var $this = $(this);
@@ -194,5 +245,5 @@
         //        $this.tooltip('show');
         //    }
         //});
-    </script>
+</script>
 }

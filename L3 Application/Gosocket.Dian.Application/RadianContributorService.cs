@@ -147,8 +147,8 @@ namespace Gosocket.Dian.Application
         {
             string cancelState = filter.RadianState == null ? RadianState.Cancelado.GetDescription() : string.Empty;
             string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState;
-            DateTime? startDate = string.IsNullOrEmpty(filter.StartDate) ? null : (DateTime?)Convert.ToDateTime(filter.StartDate).Date;
-            DateTime? endDate = string.IsNullOrEmpty(filter.EndDate) ? null : (DateTime?)Convert.ToDateTime(filter.EndDate).Date;
+            DateTime? startDate = filter.StartDate;
+            DateTime? endDate = filter.EndDate;
 
             PagedResult<RadianContributor> radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
