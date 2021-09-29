@@ -47,12 +47,19 @@ namespace Gosocket.Dian.Web.Models
         [Display(Name = "Tipo de participante")]
         [Required( ErrorMessage = "Debe Seleccionar un Tipo")]
         
-        public IEnumerable<SelectListItem> RadianType { get; set; }
+        public IEnumerable<RadianTypeViewModel> RadianTypes { get; set; }
         [Display(Name = "Estado")]
         [Required(ErrorMessage = "Debe Seleccionar un Estado")]        
         
         public Domain.Common.RadianState? RadianState { get; set; }
 
+    }
+
+    public class RadianTypeViewModel
+    {
+        public int Id { get; set; }
+        
+        public string Name { get; set; }
     }
 
     public class RadianContributorsViewModel

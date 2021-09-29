@@ -20,8 +20,7 @@
                         @using (Html.BeginForm("AdminRadianView", "Radian", FormMethod.Post, new { id = "radian-contributors-form" }))
                         {
                             @Html.HiddenFor(m => m.Page)
-                            @Html.HiddenFor(m => m.Length)
-                            @Html.HiddenFor(m => m.Type)
+                            @Html.HiddenFor(m => m.Length)                            
                             @Html.HiddenFor(m => m.StartDate)
                             @Html.HiddenFor(m => m.EndDate)
 
@@ -52,15 +51,15 @@
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
-                                                        @Html.LabelFor(m => m.RadianType, new { @class = "control-label" })
-                                                        @Html.DropDownListFor(m => m.RadianType, Model.RadianType, "", new { @class = "form-control input-general", type = "text" })
-                                                        @Html.ValidationMessageFor(m => m.RadianType, "", new { @class = "text-danger" })
+                                                        @Html.LabelFor(m => m.Type, new { @class = "control-label" })
+                                                        @Html.DropDownListFor(m => m.Type, new SelectList(Model.RadianTypes,"Id","Name"),"", new { @class = "form-control selectpicker" })
+                                                        @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 padding-xs-0">
                                                     <div class="form-group">
                                                         @Html.LabelFor(m => m.RadianState, new { @class = "control-label" })
-                                                        @Html.EnumDropDownListFor(m => m.RadianState, new { @class = "form-control input-general", type = "text" })
+                                                        @Html.EnumDropDownListFor(m => m.RadianState,  new { @class = "form-control selectpicker" })
                                                         @Html.ValidationMessageFor(m => m.RadianState, "", new { @class = "text-danger" })
                                                     </div>
                                                 </div>
@@ -133,13 +132,8 @@
             });
 
              $('.btn-search').click(function () {
-                if (form.valid()) {
-                    //var dateRange = $("#dashboard-report-range").val();
-                    var radianType = $("#RadianType").val();
-                    //$('#StartDate').val(dateRange.split("al")[0]);
-                    //$('#EndDate').val(dateRange.split("al")[1]);
-                    $('#Page').val(1);
-                    $('#Type').val(radianType);
+                if (form.valid()) {                    
+                    $('#Page').val(1);                    
                     showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
                     $(this).attr('disabled', 'disabled');
                     $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');

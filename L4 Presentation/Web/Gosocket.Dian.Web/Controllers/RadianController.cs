@@ -94,11 +94,10 @@ namespace Gosocket.Dian.Web.Controllers
                 TotalCount = 0,
                 CurrentPage = 0,
                 RadianContributors = new List<RadianContributorsViewModel>(),
-                RadianType = _radianContributorTypeRepository.List(c => true).Select(c => new SelectListItem
+                RadianTypes = _radianContributorTypeRepository.List(c => true).Select(c => new RadianTypeViewModel
                 {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-
+                    Id = c.Id,
+                    Name=c.Name
                 }).ToList(),
                 SearchFinished = true
                
@@ -136,6 +135,8 @@ namespace Gosocket.Dian.Web.Controllers
                 TotalCount = radianAdmin.RowCount,
                 CurrentPage = radianAdmin.CurrentPage,
                 Page = model.Page,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
                 RadianContributors = radianAdmin.Contributors.Select(c => new RadianContributorsViewModel()
                 {
                     Id = c.RadianContributorId,
@@ -146,10 +147,10 @@ namespace Gosocket.Dian.Web.Controllers
                     AcceptanceStatusName = c.AcceptanceStatusName,
                     RadianState = c.RadianState
                 }).ToList(),
-                RadianType = _radianContributorTypeRepository.List(c => true).Select(c => new SelectListItem
+                RadianTypes = _radianContributorTypeRepository.List(c => true).Select(c => new RadianTypeViewModel
                 {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
+                    Id=c.Id,
+                    Name=c.Name
 
                 }).ToList(),
                 SearchFinished = true
