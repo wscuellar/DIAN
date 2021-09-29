@@ -1,5 +1,8 @@
 ﻿using Gosocket.Dian.Application.Common;
 using Gosocket.Dian.Infrastructure;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Org.BouncyCastle.X509;
 using System;
 using System.Collections.Generic;
@@ -18,6 +21,8 @@ namespace Gosocket.Dian.Web.Services.Validator
         private static readonly FileManager CertificatesFileManager = new FileManager("certificates");
         private static List<string> revoked = new List<string>();
         private static List<string> untrusted = new List<string>();
+        private static readonly TelemetryConfiguration config=TelemetryConfiguration.CreateDefault();
+        private static readonly TelemetryClient telemetry=new TelemetryClient(config);
 
         public override void Validate(X509Certificate2 certificate)
         {
@@ -29,9 +34,15 @@ namespace Gosocket.Dian.Web.Services.Validator
 
             ////Valida vigencia
             if (DateTime.Now < certificate.NotBefore)
+            {
+                telemetry.TrackTrace($"Certificado aún no se encuentra vigente. FriendlyName: {certificate.FriendlyName} - SubjectName: {certificate.SubjectName}",SeverityLevel.Error);
                 throw new FaultException("Certificado aún no se encuentra vigente.", new FaultCode("Client"));
+            }
             if (DateTime.Now > certificate.NotAfter)
+            {
+                telemetry.TrackTrace($"Certificado se encuentra expirado.  FriendlyName: {certificate.FriendlyName} - SubjectName: {certificate.SubjectName}", SeverityLevel.Error);
                 throw new FaultException("Certificado se encuentra expirado.", new FaultCode("Client"));
+            }
 
             // Get all crt certificates
             var crts = Manager.CertificateManager.Instance.GetRootCertificates();
@@ -52,7 +63,10 @@ namespace Gosocket.Dian.Web.Services.Validator
                         CertificatesFileManager.Upload($"untrusted/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
-                catch { }
+                catch (Exception e) {
+                    telemetry.TrackException(e);
+                }
+                telemetry.TrackTrace($"Certificado no es de confianza. FriendlyName: {certificate.FriendlyName} - SubjectName: {certificate.SubjectName}", SeverityLevel.Error);
                 throw new FaultException(ConfigurationManager.GetValue("UnTrustedCertificateMessage"), new FaultCode("Client"));
             }
 
@@ -67,7 +81,10 @@ namespace Gosocket.Dian.Web.Services.Validator
                         CertificatesFileManager.Upload($"revoked/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
-                catch { }
+                catch (Exception e) {
+                    telemetry.TrackException(e);
+                }
+                telemetry.TrackTrace($"Certificado se encuentra revocado. FriendlyName: {certificate.FriendlyName} - SubjectName: {certificate.SubjectName}", SeverityLevel.Error);
                 throw new FaultException("Certificado se encuentra revocado.", new FaultCode("Client"));
             }
         }
