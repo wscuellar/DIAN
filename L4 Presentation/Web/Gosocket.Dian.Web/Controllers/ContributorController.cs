@@ -554,7 +554,7 @@ namespace Gosocket.Dian.Web.Controllers
                         ||contributorType ==(int) Domain.Common.ContributorType.AuthorizedProvider)
                             contributors = contributorService.GetContributors(contributorType, model.AcceptanceStatusId, model.StartDate, model.EndDate, model.Page, model.Length);                        
                     else if (contributorType == -1)
-                        contributors = contributorService.GetParticipantContributors(model.Page, model.Length);
+                        contributors = contributorService.GetParticipantContributors(model.AcceptanceStatusId, model.StartDate, model.EndDate, model.Page, model.Length);
                 }
                 else
                 {

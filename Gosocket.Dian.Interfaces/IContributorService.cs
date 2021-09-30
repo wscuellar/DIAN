@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Interfaces
         List<ContributorFileType> GetMandatoryContributorFileTypes();
         List<ContributorFileType> GetNotRequiredContributorFileTypes();
         OperationMode GetOperationMode(int id);
-        List<Contributor> GetParticipantContributors(int page, int length);
+        List<Contributor> GetParticipantContributors(int acceptanceStatusId, DateTime start, DateTime end, int page, int length);
         List<Contributor> GetProviderContributors(int page, int length);
         List<UserContributors> GetUserContributors(int id);
         Contributor ObsoleteGet(int id);
