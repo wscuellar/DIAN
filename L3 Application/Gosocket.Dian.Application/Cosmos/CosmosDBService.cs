@@ -242,9 +242,17 @@ namespace Gosocket.Dian.Application.Cosmos
                 documents.AddRange(result.ToList());
 
                 var queryString = query.ToString();
+
+                //hay limites en tamaño en appinsithgs
+                List<string> lstQuerys = GetChunks(queryString, 8100);
+
+                int k = 1;
+                foreach(var queryPart in lstQuerys) {
+                    operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+                }
                 operation.Telemetry.Type = "Cost";
                 operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-                operation.Telemetry.Properties.Add("Query", queryString);
+                
                 operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
                 telemetryClient.StopOperation(operation);
@@ -276,9 +284,17 @@ namespace Gosocket.Dian.Application.Cosmos
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
 
             var queryString = query.ToString();
+
+            //hay limites en tamaño en appinsithgs
+            List<string> lstQuerys = GetChunks(queryString, 8100);
+
+            int k = 1;
+            foreach (var queryPart in lstQuerys)
+            {
+                operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+            }
             operation.Telemetry.Type = "Cost";
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-            operation.Telemetry.Properties.Add("Query", queryString);
             operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
@@ -339,9 +355,17 @@ namespace Gosocket.Dian.Application.Cosmos
                 ct = result.ResponseContinuation;
 
                 var queryString = query.ToString();
+
+                //hay limites en tamaño en appinsithgs
+                List<string> lstQuerys = GetChunks(queryString, 8100);
+
+                int k = 1;
+                foreach (var queryPart in lstQuerys)
+                {
+                    operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+                }
                 operation.Telemetry.Type = "Cost";
                 operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-                operation.Telemetry.Properties.Add("Query", queryString);
                 operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
                 telemetryClient.StopOperation(operation);
@@ -524,9 +548,17 @@ namespace Gosocket.Dian.Application.Cosmos
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
 
             var queryString = query.ToString();
+
+            //hay limites en tamaño en appinsithgs
+            List<string> lstQuerys = GetChunks(queryString, 8100);
+
+            int k = 1;
+            foreach (var queryPart in lstQuerys)
+            {
+                operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+            }
             operation.Telemetry.Type = "Cost";
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-            operation.Telemetry.Properties.Add("Query", queryString);
             operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
@@ -889,10 +921,19 @@ namespace Gosocket.Dian.Application.Cosmos
             query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();            
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+
             var queryString = query.ToString();
-            operation.Telemetry.Type = "Cost";                     
+
+            //hay limites en tamaño en appinsithgs
+            List<string> lstQuerys = GetChunks(queryString, 8100);
+
+            int k = 1;
+            foreach (var queryPart in lstQuerys)
+            {
+                operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+            }
+            operation.Telemetry.Type = "Cost";
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-            operation.Telemetry.Properties.Add("Query", queryString);
             operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
@@ -1017,9 +1058,17 @@ namespace Gosocket.Dian.Application.Cosmos
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
 
             var queryString = query.ToString();
+
+            //hay limites en tamaño en appinsithgs
+            List<string> lstQuerys = GetChunks(queryString, 8100);
+
+            int k = 1;
+            foreach (var queryPart in lstQuerys)
+            {
+                operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+            }
             operation.Telemetry.Type = "Cost";
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-            operation.Telemetry.Properties.Add("Query", queryString);
             operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
@@ -1158,12 +1207,27 @@ namespace Gosocket.Dian.Application.Cosmos
             int res = await query.CountAsync();
 
             var queryString = query.ToString();
+
+            //hay limites en tamaño en appinsithgs
+            List<string> lstQuerys = GetChunks(queryString, 8100);
+
+            int k = 1;
+            foreach (var queryPart in lstQuerys)
+            {
+                operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+            }
             operation.Telemetry.Type = "Cost";
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-            operation.Telemetry.Properties.Add("Query", queryString);
             //operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
+            return res;
+        }
+        private static List<string> GetChunks(string value, int chunkLength)
+        {
+            var res = new List<string>();
+            int count = (value.Length / chunkLength) + (value.Length % chunkLength > 0 ? 1 : 0);
+            Enumerable.Range(0, count).ToList().ForEach(f => res.Add(value.Skip(f * chunkLength).Take(chunkLength).Select(z => z.ToString()).Aggregate((a, b) => a + b)));
             return res;
         }
     }
