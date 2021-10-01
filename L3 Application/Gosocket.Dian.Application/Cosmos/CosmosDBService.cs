@@ -231,11 +231,23 @@ namespace Gosocket.Dian.Application.Cosmos
 
             do
             {
+                var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_1");
+                var start = DateTime.UtcNow;
+
+
                 query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                         .Where(e => partitionKeys.Contains(e.PartitionKey) && e.GenerationTimeStamp >= model.LastDateTimeUpdate).AsDocumentQuery();
                 var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
                 options.RequestContinuation = result.ResponseContinuation;
                 documents.AddRange(result.ToList());
+
+                var queryString = query.ToString();
+                operation.Telemetry.Type = "Cost";
+                operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+                operation.Telemetry.Properties.Add("Query", queryString);
+                operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+                telemetryClient.StopOperation(operation);
 
             } while (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults);
             return documents;
@@ -254,11 +266,23 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_2");
+            var start = DateTime.UtcNow;
+
             query = (IOrderedQueryable<GlobalDataDocument>)
                  client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                  .Where(e => e.PartitionKey == partitionKey
                  && e.DocumentKey == documentKey).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+
+            var queryString = query.ToString();
+            operation.Telemetry.Type = "Cost";
+            operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+            operation.Telemetry.Properties.Add("Query", queryString);
+            operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+            telemetryClient.StopOperation(operation);
+
             return result.FirstOrDefault();
         }
 
@@ -306,9 +330,21 @@ namespace Gosocket.Dian.Application.Cosmos
             var resultDocs = new List<GlobalDataDocument>();
             while (query.AsDocumentQuery().HasMoreResults)
             {
+                var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_3");
+                var start = DateTime.UtcNow;
+
+
                 var result = query.AsDocumentQuery().ExecuteNextAsync<GlobalDataDocument>().Result;
                 resultDocs.AddRange(SaveRest(result.GetEnumerator()));
                 ct = result.ResponseContinuation;
+
+                var queryString = query.ToString();
+                operation.Telemetry.Type = "Cost";
+                operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+                operation.Telemetry.Properties.Add("Query", queryString);
+                operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+                telemetryClient.StopOperation(operation);
             }
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, ct, resultDocs.ToList());
@@ -450,6 +486,9 @@ namespace Gosocket.Dian.Application.Cosmos
             };
 
             IOrderedQueryable<GlobalDataDocument> query = null;
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_4");
+            var start = DateTime.UtcNow;
+
 
             if (pks != null && !string.IsNullOrEmpty(documentKey))
             {
@@ -483,6 +522,15 @@ namespace Gosocket.Dian.Application.Cosmos
             }
 
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+
+            var queryString = query.ToString();
+            operation.Telemetry.Type = "Cost";
+            operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+            operation.Telemetry.Properties.Add("Query", queryString);
+            operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+            telemetryClient.StopOperation(operation);
+
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
 
@@ -835,7 +883,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 if (radianStatusFilter != null)
                     predicate = predicate.And(g => g.Events.Any(e => radianStatusFilter.Contains(e.Code)));
             }
-            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery");
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_0");
             var start = DateTime.UtcNow;
 
             query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
@@ -958,11 +1006,24 @@ namespace Gosocket.Dian.Application.Cosmos
             };
 
             IOrderedQueryable<GlobalDataDocument> query = null;
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_5");
+            var start = DateTime.UtcNow;
+
+
 
             query = (IOrderedQueryable<GlobalDataDocument>)
                  client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                  .Where(e => e.ReceiverCode == receiverCode).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+
+            var queryString = query.ToString();
+            operation.Telemetry.Type = "Cost";
+            operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+            operation.Telemetry.Properties.Add("Query", queryString);
+            operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+            telemetryClient.StopOperation(operation);
+
             return result.ToList<GlobalDataDocument>();
         }
 
@@ -1073,6 +1134,9 @@ namespace Gosocket.Dian.Application.Cosmos
 
             List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
 
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_6");
+            var start = DateTime.UtcNow;
+
             var query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink,options)
             .Where(
                 e => partitionKeys.Contains(e.PartitionKey)
@@ -1090,9 +1154,16 @@ namespace Gosocket.Dian.Application.Cosmos
                 && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
                 && (receiverCode == null || e.ReceiverCode == receiverCode)
                 && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
-            );
+            );            
             int res = await query.CountAsync();
-            
+
+            var queryString = query.ToString();
+            operation.Telemetry.Type = "Cost";
+            operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+            operation.Telemetry.Properties.Add("Query", queryString);
+            //operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
+
+            telemetryClient.StopOperation(operation);
             return res;
         }
     }
