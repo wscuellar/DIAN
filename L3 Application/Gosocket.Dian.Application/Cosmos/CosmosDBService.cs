@@ -2,6 +2,9 @@
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
 using LinqKit;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
@@ -35,6 +38,9 @@ namespace Gosocket.Dian.Application.Cosmos
 
         private static Dictionary<string, CosmosDBService> instances = new Dictionary<string, CosmosDBService>();
         private static Dictionary<string, DocumentCollection> collections = new Dictionary<string, DocumentCollection>();
+
+        private static readonly TelemetryConfiguration config=TelemetryConfiguration.CreateDefault();
+        private static readonly TelemetryClient telemetryClient = new TelemetryClient(config);
 
         // table manager instance
         private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -829,10 +835,20 @@ namespace Gosocket.Dian.Application.Cosmos
                 if (radianStatusFilter != null)
                     predicate = predicate.And(g => g.Events.Any(e => radianStatusFilter.Contains(e.Code)));
             }
+            var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery");
+            var start = DateTime.UtcNow;
 
             query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                    .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
+                    .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();            
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            var queryString = query.ToString();
+            operation.Telemetry.Type = "Cost";
+            operation.Telemetry.Data = result.RequestCharge.ToString();            
+            operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+            operation.Telemetry.Properties.Add("Query", queryString);
+
+            telemetryClient.StopOperation(operation);
+
             List<GlobalDataDocument> globalDocuments = result.ToList();
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
