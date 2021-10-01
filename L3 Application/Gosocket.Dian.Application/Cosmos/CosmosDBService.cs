@@ -842,10 +842,10 @@ namespace Gosocket.Dian.Application.Cosmos
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();            
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             var queryString = query.ToString();
-            operation.Telemetry.Type = "Cost";
-            operation.Telemetry.Data = result.RequestCharge.ToString();            
+            operation.Telemetry.Type = "Cost";                     
             operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
             operation.Telemetry.Properties.Add("Query", queryString);
+            operation.Telemetry.Properties.Add("RUs", result.RequestCharge.ToString());
 
             telemetryClient.StopOperation(operation);
 
