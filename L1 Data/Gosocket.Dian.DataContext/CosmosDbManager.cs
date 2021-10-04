@@ -46,12 +46,24 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var options = new FeedOptions()
+                FeedOptions options;
+                if (string.IsNullOrEmpty(continuationToken))
                 {
-                    MaxItemCount = maxItemCount,
-                    EnableCrossPartitionQuery = true,
-                    RequestContinuation = continuationToken
-                };
+                    options = new FeedOptions()
+                    {
+                        MaxItemCount = maxItemCount,
+                        EnableCrossPartitionQuery = true
+                    };
+                }
+                else
+                {
+                    options = new FeedOptions()
+                    {
+                        MaxItemCount = maxItemCount,
+                        EnableCrossPartitionQuery = true,
+                        RequestContinuation = continuationToken
+                    };
+                }
 
                 string documentTypeOption1 = "";
                 string documentTypeOption2 = "";
@@ -108,12 +120,25 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var options = new FeedOptions()
+                FeedOptions options;
+                if (string.IsNullOrEmpty(continuationToken))
                 {
-                    MaxItemCount = maxItemCount,
-                    EnableCrossPartitionQuery = true,
-                    RequestContinuation = continuationToken
-                };
+                    options = new FeedOptions()
+                    {
+                        MaxItemCount = maxItemCount,
+                        EnableCrossPartitionQuery = true                        
+                    };
+                }
+                else
+                {
+                    options = new FeedOptions()
+                    {
+                        MaxItemCount = maxItemCount,
+                        EnableCrossPartitionQuery = true,
+                        RequestContinuation = continuationToken
+                    };
+                }
+                
 
                 var optionsSubQuery = new FeedOptions()
                 {

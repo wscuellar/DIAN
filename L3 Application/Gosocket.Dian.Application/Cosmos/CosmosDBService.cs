@@ -222,8 +222,7 @@ namespace Gosocket.Dian.Application.Cosmos
             var options = new FeedOptions()
             {
                 MaxItemCount = 1000,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = null
+                EnableCrossPartitionQuery = true                
             };
 
             var partitionKeys = GeneratePartitionKeys(model.LastDateTimeUpdate, model.UtcNow);
@@ -314,13 +313,24 @@ namespace Gosocket.Dian.Application.Cosmos
             {
                 filter.ContinuationToken = null;
             }
-
-            var options = new FeedOptions()
+            FeedOptions options;
+            if (string.IsNullOrEmpty(filter.ContinuationToken))
             {
-                MaxItemCount = filter.ResultMaxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = filter.ContinuationToken,
-            };
+                options = new FeedOptions()
+                {
+                    MaxItemCount = filter.ResultMaxItemCount,
+                    EnableCrossPartitionQuery = true
+                };
+            }
+            else
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = filter.ResultMaxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = filter.ContinuationToken
+                };
+            }           
 
             var predicate = PredicateBuilder.New<GlobalDataDocument>();
 
@@ -382,8 +392,7 @@ namespace Gosocket.Dian.Application.Cosmos
             var options = new FeedOptions()
             {
                 MaxItemCount = -1,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = null
+                EnableCrossPartitionQuery = true                
             };
 
             var partitionKeys = GeneratePartitionKeys(filter.RFrom, filter.RTo);
@@ -502,12 +511,24 @@ namespace Gosocket.Dian.Application.Cosmos
             string collectionName = GetCollectionName(to.Value);
             string collectionLink = collections[collectionName].SelfLink;
 
-            FeedOptions options = new FeedOptions()
+            FeedOptions options;
+            if (string.IsNullOrEmpty(continuationToken))
             {
-                MaxItemCount = maxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = continuationToken
-            };
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true
+                };
+            }
+            else
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = continuationToken
+                };
+            }
 
             IOrderedQueryable<GlobalDataDocument> query = null;
             var operation = telemetryClient.StartOperation<DependencyTelemetry>("FACELCosmosQuery_4");
@@ -582,12 +603,27 @@ namespace Gosocket.Dian.Application.Cosmos
                                                List<string> pks = null,
                                                int radianStatus = 0)
         {
-            FeedOptions options = new FeedOptions()
+            FeedOptions options;
+
+            if (string.IsNullOrEmpty(continuationToken))
             {
-                MaxItemCount = maxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = continuationToken
-            };
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true
+                    
+                };
+            }
+            else {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = continuationToken
+                };
+            }
+
+            
 
             string collectionName = GetCollectionName(to.Value);
             string collectionLink = collections[collectionName].SelfLink;
