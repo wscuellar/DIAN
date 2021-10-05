@@ -605,6 +605,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach (var itemLimitacionCirculacion in limitacionCirculacion)
                     {
+                        //Valida si existe terminacion limitacion de circulacion 
+                        var terminacionLimitacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)).ToList();
+
+                        if (terminacionLimitacion != null)
+                        {
+                            if (terminacionLimitacion.Where(x => x.CancelElectronicEvent.Equals(itemLimitacionCirculacion.PartitionKey)).Any())
+                            {
+                                break;
+                            }
+                        }
+
                         var documentCirculacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemLimitacionCirculacion.Identifier, itemLimitacionCirculacion.Identifier, itemLimitacionCirculacion.PartitionKey);
                         if (documentCirculacion != null)
                         {
@@ -644,6 +655,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     if (documentDisponibiliza != null)
                                     {
                                         //Valida fecha endoso en propiedad es mayor a fecha disponibilizacion  
+                                        senderCode = string.IsNullOrEmpty(senderCode) ? itemListDisponibilizacion.SenderCode : senderCode;
+
                                         if (Convert.ToDateTime(itemEndosoPropiedad.SigningTimeStamp) > Convert.ToDateTime(itemListDisponibilizacion.SigningTimeStamp)
                                             && itemEndosoPropiedad.SenderCode == senderCode)
                                         {
