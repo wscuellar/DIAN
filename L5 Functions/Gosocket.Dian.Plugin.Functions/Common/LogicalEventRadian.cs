@@ -644,6 +644,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     if (documentDisponibiliza != null)
                                     {
                                         //Valida fecha endoso en propiedad es mayor a fecha disponibilizacion  
+                                        senderCode = string.IsNullOrEmpty(senderCode) ? itemListDisponibilizacion.SenderCode : senderCode;
+
                                         if (Convert.ToDateTime(itemEndosoPropiedad.SigningTimeStamp) > Convert.ToDateTime(itemListDisponibilizacion.SigningTimeStamp)
                                             && itemEndosoPropiedad.SenderCode == senderCode)
                                         {
