@@ -1,5 +1,6 @@
 ﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Collections.Generic;
 
@@ -8,10 +9,12 @@ namespace Gosocket.Dian.Logger
     public class Logger
     {
         private static readonly TelemetryClient clientTelemetry;
+        private static readonly TelemetryConfiguration conf=TelemetryConfiguration.CreateDefault();
+
 
         static Logger()
         {
-            clientTelemetry = new TelemetryClient();
+            clientTelemetry = new TelemetryClient(conf);
         }
 
         public static void Log(string serviceId, int logType, string logMessage, Dictionary<string, string> fields = null)
