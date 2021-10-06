@@ -285,6 +285,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatorNit = uCompany.Code,
                 IdentificationTypeId = model.IdentificationTypeId,
                 IdentificationId = model.IdentificationId,
+                Code = model.IdentificationId,
                 Name = model.Names,
                 Email = model.Email,
                 UserName = model.Email,
@@ -292,6 +293,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreationDate = DateTime.Now,
                 UpdatedBy = User.Identity.Name,
                 LastUpdated = DateTime.Now,
+                Active = 1,
                 //PasswordHash = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0])
             };
             model.Password = UserManager.PasswordHasher.HashPassword(model.Email.Split('@')[0]);
@@ -336,6 +338,16 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
                     return View(model);
+                }
+                else
+                {
+                    vUserDB = userService.GetByCodeAndIdentificationTyte(model.IdentificationId, model.IdentificationTypeId);
+
+                    if (vUserDB != null)
+                    {
+                        ModelState.AddModelError("", "Ya existe un Usuario con el Tipo de Documento y Documento suministrados");
+                        return View(model);
+                    }
                 }
 
                 result = await UserManager.CreateAsync(user, model.Password);
