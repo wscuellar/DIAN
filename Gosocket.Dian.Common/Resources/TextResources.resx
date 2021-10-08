@@ -319,4 +319,7 @@
   <data name="ReportQRCode" xml:space="preserve">
     <value>/document/searchqr?documentkey={CUFE}</value>
   </data>
+  <data name="SessionExpired" xml:space="preserve">
+    <value>Por favor inicie sesión nuevamente e intente de nuevo</value>
+  </data>
 </root>
