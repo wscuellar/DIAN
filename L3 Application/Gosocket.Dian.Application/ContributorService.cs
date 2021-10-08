@@ -486,12 +486,9 @@ namespace Gosocket.Dian.Application
                     otherDocElec.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
-                    //Si es software propio lo habilita.
-                    if (otherDocElec.OtherDocElecOperationModeId == (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware)
-                    {
-                        OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
-                        soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
-                    }
+                    
+                    OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
+                    soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
 
                     //Se ubica la operacion del participante para habilitarla
                     OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(

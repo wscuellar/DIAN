@@ -770,7 +770,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             documentParsed.DocumentTypeId = documentMeta.DocumentTypeId;
             documentParsed.NumeroDocumento = documentMeta.ReceiverCode;
             documentParsed.Novelty = (bool)documentMeta.Novelty;
-            documentParsed.CUNENov = documentMeta.CUNENov;
+            documentParsed.CUNENov = documentMeta.CuneNovedad;
             documentParsed.FechaPagoInicio = documentMeta.FechaPagoNominaInicio;
 
             DocumentParsedNomina.SetValues(ref documentParsed);
