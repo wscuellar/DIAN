@@ -22,6 +22,7 @@
     "GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
     "BindingRedirects": "[ { \"ShortName\": \"System.Buffers\", \"RedirectToVersion\": \"4.0.3.0\", \"PublicKeyToken\": \"cc7b13ffcd2ddd51\" } ]",
     "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "LogStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "GlobalQueue": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "GlobalBlob": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",

@@ -629,9 +629,9 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                var globalRadianOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), Guid.Parse(softwareIdBase));
+                var otherDocElecOperations = _globalOtherDocElecOperationService.GetOperation(code.ToString(), Guid.Parse(softwareIdBase));
 
-                if (globalRadianOperations == null)
+                if (otherDocElecOperations == null)
                 {
                     telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: No se encontró operación. code: {code} - softwareid {software.SoftwareId} ", SeverityLevel.Warning);
                     return Json(new
@@ -643,7 +643,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
                 var pk = code.ToString();
-                var rk = globalRadianOperations.OperationModeId + "|" + softwareIdBase;
+                var rk = otherDocElecOperations.OperationModeId + "|" + softwareIdBase;
                 GlobalTestSetOthersDocumentsResult testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(pk, rk);
 
                 if (testSetResult == null)
@@ -667,7 +667,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareId = softwareIdBase;
                 data.SoftwareName = software.Name;
                 data.SoftwarePassword = software.SoftwarePassword;
-                data.SoftwareType = globalRadianOperations.OperationModeId.ToString();
+                data.SoftwareType = otherDocElecOperations.OperationModeId.ToString();
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
