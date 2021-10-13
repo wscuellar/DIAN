@@ -443,6 +443,7 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction(nameof(HomeController.Dashboard), "Home");
         }
 
+
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
         [ValidateAntiForgeryToken]
@@ -539,7 +540,7 @@ namespace Gosocket.Dian.Web.Controllers
                         RouteData = "",
                         StackTrace = ex.StackTrace
                     };
-                    
+
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
                     return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -552,16 +553,17 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.currentTab = "confirmed";
             if (ConfigurationManager.GetValue("Environment") == "Dev" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test")
             {
-                Session["Url"] = accessUrl; 
+                Session["Url"] = accessUrl;
             }
             return Json(new ResponseMessage("LoginConfirmed", "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
         }
+
 
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult LoginConfirmed(UserLoginViewModel model, string returnUrl)
         {
             if (ConfigurationManager.GetValue("Environment") == "Dev" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test")
-            { 
+            {
                 ViewBag.url = Session["Url"];
             }
 
@@ -673,7 +675,7 @@ namespace Gosocket.Dian.Web.Controllers
                         RouteData = "",
                         StackTrace = ex.StackTrace
                     };
-                    
+
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
                     return View("CompanyLogin", model);
@@ -779,7 +781,7 @@ namespace Gosocket.Dian.Web.Controllers
                     catch (Exception ex)
                     {
                         var logger = new GlobalLogger("ZD05-WEB", model.CompanyCode) { Action = "CertificateLogin", Controller = "UserController", Message = ex.Message };
-                        
+
                         tableManager.InsertOrUpdate(logger);
 
                         ModelState.AddModelError($"CertificateLoginFailed", ex.Message);
@@ -812,6 +814,48 @@ namespace Gosocket.Dian.Web.Controllers
                 IdentificationType = (int)Domain.Common.IdentificationType.CC
             };
             return View("CompanyLogin", model);
+        }
+        
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult NotObligedInvoice(string returnUrl)
+        {
+            if (ConfigurationManager.GetValue("LoginType") == "Certificate")
+                return RedirectToAction(nameof(CertificateLogin));
+
+            ViewBag.ReturnUrl = returnUrl;
+
+            UserLoginViewModel model = new UserLoginViewModel
+            {
+                IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
+                IdentificationType = (int)Domain.Common.IdentificationType.CC
+            };
+
+            return View("NotObligedInvoice",model);
+        }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public ActionResult NotObligedInvoiceCompany(string returnUrl)
+        {
+            if (ConfigurationManager.GetValue("LoginType") == "Certificate")
+                return RedirectToAction(nameof(CertificateLogin));
+
+            ViewBag.ReturnUrl = returnUrl;
+
+            UserLoginViewModel model = new UserLoginViewModel
+            {
+                IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList(),
+                IdentificationType = (int)Domain.Common.IdentificationType.CC
+            };
+
+            return View("NotObligedInvoiceCompany", model);
+        }
+
+
+
+        [ChildActionOnly]
+        public ActionResult _companyLoginInvoice()
+        {
+            return PartialView("_companyLoginInvoice","User");
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1311,6 +1355,137 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new ResponseMessage(redirectUrl, "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
 
         }
+
+        [HttpPost]
+        [ExcludeFilter(typeof(Authorization))]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CompanyAuthenticationInvoice(UserLoginViewModel modelInvoice, string returnUrlInvoice)
+        {
+            modelInvoice.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel
+            {
+                Id = x.Id,
+                Description = x.Description
+            }).ToList();
+
+            ClearUnnecessariesModelStateErrorsForAuthentication(false);
+
+            var recaptchaValidationInvoice = IsValidCaptcha(modelInvoice.RecaptchaToken);
+            if (!recaptchaValidationInvoice.Item1)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidationInvoice.Item2);
+                return Json(new ResponseMessage("Captcha invalido", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+            if (!ModelState.IsValid)
+                return Json(new ResponseMessage("informacion invalida", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+            var pkInvoice = $"{modelInvoice.IdentificationType}|{modelInvoice.UserCode}";
+            var rkInvoice = $"{modelInvoice.CompanyCode}";
+
+            var userInvoice = userService.GetByCodeAndIdentificationTyte(modelInvoice.UserCode, modelInvoice.IdentificationType);
+            if (userInvoice == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y tipo de identificación no coinciden.");
+                return Json(new ResponseMessage("Número de documento y tipo de identificación no coinciden.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            var contributorInvoice = userInvoice.Contributors.FirstOrDefault(c => c.Code == modelInvoice.CompanyCode);
+            if (contributorInvoice == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
+                return Json(new ResponseMessage("Empresa no asociada a representante legal.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            if (contributorInvoice.StatusRut == (int)StatusRut.Cancelled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
+                return Json(new ResponseMessage("Contribuyente tiene RUT en estado cancelado.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributorInvoice.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
+                return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            if(contributorInvoice.ContributorTypeId == '1')
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
+                return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            if(contributorInvoice.Name == null || contributorInvoice.BusinessName == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "La empresa no se encuentre registrada en el Rut.");
+                return Json(new ResponseMessage("La empresa no se encuentre registrada en el Rut.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+
+            var authInvoice = dianAuthTableManager.Find<AuthToken>(pkInvoice, rkInvoice);
+            if (authInvoice == null)
+            {
+                authInvoice = new AuthToken(pkInvoice, rkInvoice) { UserId = userInvoice.Id, Email = userInvoice.Email, ContributorId = contributorInvoice.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                dianAuthTableManager.InsertOrUpdate(authInvoice);
+            }
+            else
+            {
+                TimeSpan timeSpan = DateTime.UtcNow.Subtract(authInvoice.Timestamp.DateTime);
+                if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(authInvoice.Token))
+                {
+                    authInvoice.UserId = userInvoice.Id;
+                    authInvoice.Email = userInvoice.Email;
+                    authInvoice.ContributorId = contributorInvoice.Id;
+                    authInvoice.Type = AuthType.Company.GetDescription();
+                    authInvoice.Token = Guid.NewGuid().ToString();
+                    authInvoice.Status = true;
+                    dianAuthTableManager.InsertOrUpdate(authInvoice);
+                }
+            }
+
+            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={authInvoice.PartitionKey}&rk={authInvoice.RowKey}&token={authInvoice.Token}";
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                try
+                {
+                    authInvoice.Email = userInvoice.Email;
+                    var emailSenderResponse = await EmailUtil.SendEmailAsync(authInvoice, accessUrl);
+                    if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
+                    {
+                        ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
+                        return Json(new ResponseMessage("Autenticación correcta, su solicitud está siendo procesada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var requestIdInvoice = Guid.NewGuid();
+                    var loggerInvoice = new GlobalLogger(requestIdInvoice.ToString(), requestIdInvoice.ToString())
+                    {
+                        Action = "SendEmailAsync",
+                        Controller = "User",
+                        Message = ex.Message,
+                        RouteData = "",
+                        StackTrace = ex.StackTrace
+                    };
+
+                    tableManager.InsertOrUpdate(loggerInvoice);
+                    ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestIdInvoice}");
+                    return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestIdInvoice}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+                }
+            }
+
+            ViewBag.UserEmail = HideUserEmailParts(authInvoice.Email);
+            ViewBag.Url = accessUrl;
+            ViewBag.currentTab = "confirmed";
+            if (ConfigurationManager.GetValue("Environment") == "Dev" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test")
+            {
+                Session["Url"] = accessUrl;
+            }
+            return Json(new ResponseMessage("LoginConfirmed", "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+        }
+
+
+
+
 
         #endregion
 
