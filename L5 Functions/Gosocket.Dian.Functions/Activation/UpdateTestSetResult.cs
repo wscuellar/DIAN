@@ -552,7 +552,7 @@ namespace Gosocket.Dian.Functions.Activation
                                     Success = true,
                                     ContributorCode = isPartipantActiveOtherDoc.PartitionKey,
                                     ContributorTypeId = isPartipantActiveOtherDoc.ContributorTypeId,
-                                    OperationModeId = Convert.ToInt32(isPartipantActiveOtherDoc.SoftwareId),
+                                    OperationModeId = Convert.ToInt32(isPartipantActiveOtherDoc.OperationModeId),
                                     OperationModeName = "OTHERDOCUMENTS",
                                     SentToActivateBy = "Function",
                                     SoftwareId = isPartipantActiveOtherDoc.RowKey,

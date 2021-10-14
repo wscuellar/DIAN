@@ -204,7 +204,11 @@ namespace Gosocket.Dian.Functions.Others
                     globalOtherDocElecOperation.SoftwareId = requestObject.SoftwareId;
                     globalOtherDocElecOperation.OtherDocElecContributorId = otherDocContributorId;
                     globalOtherDocElecOperation.ElectronicDocumentId = requestObject.ElectronicDocumentId;
-                    globalOtherDocElecOperation.Transmitter = true;
+
+                    if (otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.Transmitter)
+                        globalOtherDocElecOperation.Transmitter = true;
+                    if (otherDocElecContributor.OtherDocElecContributorTypeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
+                        globalOtherDocElecOperation.TecnologicalSupplier = true;
 
                     //--3. Si no existe si se crea.    //-----Razon los estados deben mantenerse en la actualizacion. mismo nit y software pueden usar diferentes modos.
                     if (IsProduction)
