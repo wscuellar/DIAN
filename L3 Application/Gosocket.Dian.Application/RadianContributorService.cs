@@ -161,8 +161,7 @@ namespace Gosocket.Dian.Application
             }
             else
             {
-                radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
-                                                                             (t.RadianContributorTypeId == filter.Type || filter.Type == 0),
+                radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null),
             page, size);
             }
 
