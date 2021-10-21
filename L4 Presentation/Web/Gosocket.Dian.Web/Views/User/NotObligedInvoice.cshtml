@@ -5,6 +5,7 @@
 @model UserLoginViewModel
 
 @{
+    ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
     RecoverPasswordModel recoverPasswordModel = new RecoverPasswordModel();
     recoverPasswordModel.IdentificationTypesRecover = Model.IdentificationTypes;
@@ -45,7 +46,7 @@
                 </a>
 
                 <!-- company -->
-                <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center active">
+                <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center">
                     <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
                 </a>
 
@@ -60,7 +61,7 @@
                 </a>
 
                 <!-- Not obliged to invoice -->
-                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
+                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center active">
                     <h4 class="glyphicon glyphicon-apple"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
                 </a>
 
@@ -84,7 +85,7 @@
                             <img class="RadianimgSvg" src="~/Content/images/Svg/RepresentanteLegal.svg" />
                         </div>
                         <div class="card-body">
-                            <p class="RadianTittleCard">Representante legal</p>
+                            <p class="RadianTittleCard">Empresa</p>
                         </div>
                     </div>
                 </div>
@@ -94,20 +95,15 @@
                             <img class="RadianimgSvg" src="~/Content/images/Svg/UsuarioAutorizado.svg" />
                         </div>
                         <div class="card-body">
-                            <p class="RadianTittleCard">Usuario Autorizado</p>
+                            <p class="RadianTittleCard">Persona</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- company section -->
-            <div class="companyLogin pxLogin">
 
-                @Html.Partial("_companyLogin")
-            </div>
-            <!-- company section -->
             <div class="userExLogin pxLogin">
-
-                @Html.Partial("_userexLogin")
+                <!-- company section -->
+                @Html.Partial("_notObligedInvoicePerson")
             </div>
 
         </div>
@@ -124,10 +120,6 @@
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
     <script src="~/Content/js/user/exHandlerLogin.js"></script>
     <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
-
-
-
-
     <script>
 
         $(document).ready(function () {
@@ -141,7 +133,7 @@
                 hideLoading("#panel-forma");
             }
             else {
-                debugger;  
+
                     $(".pxLogin").hide();
 
                     $('.cCompany').click(function () {
@@ -150,9 +142,9 @@
                     });
 
                     $('#legalRepresentative').click(function () {
-                        $("#panel-form-login").hide();
-                        $(".companyLogin").show();
-                        cleanFields();
+                        //$("#panel-form-login").hide();
+                        //$(".companyLogin").show();
+                        window.location = '@Url.Action("NotObligedInvoiceCompany", "User")';
                     });
 
                     $('#authorizedUser').click(function () {

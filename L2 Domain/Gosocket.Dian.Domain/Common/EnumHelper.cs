@@ -421,6 +421,9 @@ namespace Gosocket.Dian.Domain.Common
         Person = 3,
         [Description("Usuario Registrado")]
         ExternalUser = 4,
+        [Description("No obligados a Facturar")]
+        NotObligedInvoice = 5,
+
     }
 
     public enum NumberRangeState
