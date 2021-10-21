@@ -84,19 +84,7 @@
                                                         @Html.DropDownListFor(m => m.AcceptanceStatusId, new SelectList(Model.AcceptanceStatuses, "Id", "Name"),"", new { @class = "form-control selectpicker" })
 
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-3 padding-xs-0">
-                                                    <div class="form-group">
-                                                        <label class="control-label">Rango de fechas</label>
-                                                        <div class="form-group">
-                                                            <div class="btn btn-default col-sm-12" id="dashboard-report-range">
-                                                                <i class="icon-calendar"></i>&nbsp;
-                                                                <span class="thin uppercase hidden-xs"></span>&nbsp;
-                                                                <i class="fa fa-angle-down"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                </div>                                                
                                             </div>
                                         </div>
 
@@ -167,8 +155,7 @@
 @section Scripts
 {
     <script>
-        var startDate;
-        var endDate;
+        
 
 
         $(document).ready(function () {
@@ -191,13 +178,15 @@
             });
 
             $('.btn-search').click(function () {
-                $('#Page').val(0);
-                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
-                $(this).attr('disabled', 'disabled');
-                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
-                $('.table-pagination').css('display', 'none');
-                $('.table-responsive').css('display', 'none');
-                form.submit();
+                if (form.valid()) {
+                    $('#Page').val(0);
+                    showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                    $(this).attr('disabled', 'disabled');
+                    $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                    $('.table-pagination').css('display', 'none');
+                    $('.table-responsive').css('display', 'none');
+                    form.submit();
+                }
             });
 
             // Pagination
@@ -224,71 +213,6 @@
                 $this.tooltip('show');
             }
         });
-        startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
-        endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
-
-        startDate.locale('es');
-        endDate.locale('es');
-
-        $('#dashboard-report-range').daterangepicker({
-            "buttonClasses": "btn btn-block btn-default",
-            "startDate": startDate,
-            "endDate": endDate,
-            "maxDate": moment().endOf('month'),
-            "applyClass": "btn-hover-gosocket",
-            "cancelClass": "btn-hover-gosocket",
-            "ranges": {
-                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
-                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
-                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
-            },
-            "locale": {
-                "format": "YYYY/MM/DD",
-                "separator": " - ",
-                "applyLabel": "Aceptar",
-                "cancelLabel": "Cancelar",
-                "fromLabel": "Desde",
-                "toLabel": "Hasta",
-                "customRangeLabel": "Rango de Fechas",
-                "daysOfWeek": [
-                    "Do",
-                    "Lu",
-                    "Ma",
-                    "Mi",
-                    "Ju",
-                    "Vi",
-                    "Sa"
-                ],
-                "monthNames": [
-                    "Enero",
-                    "Febrero",
-                    "Marzo",
-                    "Abril",
-                    "Mayo",
-                    "Junio",
-                    "Julio",
-                    "Agosto",
-                    "Septiembre",
-                    "Octubre",
-                    "Noviembre",
-                    "Diciembre"
-                ],
-                "firstDay": 1
-            },
-            opens: ('left'),
-        }, function (start, end, label) {
-                $('#dashboard-report-range span').html(capitalizeMonth(start.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(end.format('YYYY/MM/DD')));
-            startDate = start;
-            endDate = end;
-                $('#startDate').val(startDate.format('YYYY/MM/DD'));
-                $('#endDate').val(endDate.format('YYYY/MM/DD'));
-        });
-        $('#dashboard-report-range span').html(capitalizeMonth(startDate.format('YYYY/MM/DD')) + ' al ' + capitalizeMonth(endDate.format('YYYY/MM/DD')));
-        $('#dashboard-report-range').show();
-
-        function capitalizeMonth(date) {
-            return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);
-        }
+        
     </script>
 }

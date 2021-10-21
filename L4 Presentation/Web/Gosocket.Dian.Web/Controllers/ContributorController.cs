@@ -552,9 +552,9 @@ namespace Gosocket.Dian.Web.Controllers
                     //    contributors = contributorService.GetProviderContributors(model.Page, model.Length);
                     if (contributorType == (int)Domain.Common.ContributorType.Biller || contributorType == (int)Domain.Common.ContributorType.Provider
                         ||contributorType ==(int) Domain.Common.ContributorType.AuthorizedProvider)
-                            contributors = contributorService.GetContributors(contributorType, model.AcceptanceStatusId, model.StartDate, model.EndDate, model.Page, model.Length);                        
+                            contributors = contributorService.GetContributors(contributorType, model.AcceptanceStatusId, model.Page, model.Length);                        
                     else if (contributorType == -1)
-                        contributors = contributorService.GetParticipantContributors(model.AcceptanceStatusId, model.StartDate, model.EndDate, model.Page, model.Length);
+                        contributors = contributorService.GetParticipantContributors(model.AcceptanceStatusId, model.Page, model.Length);
                 }
                 else
                 {

@@ -149,13 +149,24 @@ namespace Gosocket.Dian.Application
             string stateDescriptionFilter = filter.RadianState == null ? string.Empty : filter.RadianState;
             DateTime? startDate = filter.StartDate;
             DateTime? endDate = filter.EndDate;
-
-            PagedResult<RadianContributor> radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+            PagedResult<RadianContributor> radianContributors;
+            if (string.IsNullOrEmpty(filter.Code))
+            {
+                radianContributors = _radianContributorRepository.ListByDateDesc(t => 
                                                                              (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
                                                                              ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
                                                                              (DbFunctions.TruncateTime(t.Update) >= startDate || !startDate.HasValue) &&
                                                                              (DbFunctions.TruncateTime(t.Update) <= endDate || !endDate.HasValue),
             page, size);
+            }
+            else
+            {
+                radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null) &&
+                                                                             (t.RadianContributorTypeId == filter.Type || filter.Type == 0),
+            page, size);
+            }
+
+            
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
             {

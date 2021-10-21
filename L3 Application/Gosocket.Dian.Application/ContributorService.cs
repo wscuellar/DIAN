@@ -36,16 +36,17 @@ namespace Gosocket.Dian.Application
             return query.ToList();
         }
 
-        public List<Contributor> GetParticipantContributors(int acceptanceStatusId, DateTime start, DateTime end, int page, int length)
+        public List<Contributor> GetParticipantContributors(int acceptanceStatusId, int page, int length)
         {
-            var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId==acceptanceStatusId && (c.Updated >= start && c.Updated <= end)).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
+            var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId==acceptanceStatusId)
+                .OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
             return query.ToList();
         }
 
-        public List<Contributor> GetContributors(int type, int acceptanceStatusId, DateTime start, DateTime end, int page, int length)
+        public List<Contributor> GetContributors(int type, int acceptanceStatusId, int page, int length)
         {
-            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId
-           &&(c.Updated>=start && c.Updated <= end)).OrderBy(c => c.StartDate)
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId)
+                .OrderBy(c => c.StartDate)
                 .Skip(page * length).Take(length);
             return query.ToList();
         }
