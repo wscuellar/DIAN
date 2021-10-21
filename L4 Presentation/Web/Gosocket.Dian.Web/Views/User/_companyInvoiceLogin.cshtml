@@ -5,7 +5,7 @@
     <center>
         <a href="@Url.Action("NotObligedInvoice", "User")" ><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
 
-        @using (Ajax.BeginForm("CompanyAuthentication", "User", new AjaxOptions()
+        @using (Ajax.BeginForm("CompanyAuthenticationInvoice", "User", new AjaxOptions()
         {
             HttpMethod = "POST",
             OnBegin = "OnBeginAjax",
