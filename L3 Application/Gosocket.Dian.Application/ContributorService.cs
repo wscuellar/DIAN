@@ -24,57 +24,42 @@ namespace Gosocket.Dian.Application
 
         public List<Contributor> GetBillerContributors(int page, int length)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == (int)Domain.Common.ContributorType.Biller).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
-                //var filtered = query.ToList().Where(c => !c.Deleted);
-                return query.ToList();
-            }
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == (int)Domain.Common.ContributorType.Biller).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
+            //var filtered = query.ToList().Where(c => !c.Deleted);
+            return query.ToList();
         }
 
         public List<Contributor> GetProviderContributors(int page, int length)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == (int)Domain.Common.ContributorType.Provider).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
-                //var filtered = query.ToList().Where(c => !c.Deleted);
-                return query.ToList();
-            }
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == (int)Domain.Common.ContributorType.Provider).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
+            //var filtered = query.ToList().Where(c => !c.Deleted);
+            return query.ToList();
         }
 
         public List<Contributor> GetParticipantContributors(int acceptanceStatusId, int page, int length)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId == acceptanceStatusId)
+            var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId == acceptanceStatusId)
                 .OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
-                return query.ToList();
-            }
+            return query.ToList();
         }
 
         public List<Contributor> GetContributors(int type, int acceptanceStatusId, int page, int length)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId)
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId)
                 .OrderBy(c => c.StartDate)
                 .Skip(page * length).Take(length);
-                return query.ToList();
-            }
+            return query.ToList();
         }
 
         public List<Contributor> GetContributors(string code, int status, int page, int length, int? contributorType)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                var query = sqlDBContext.Contributors.Where(c => !c.Deleted
+            var query = sqlDBContext.Contributors.Where(c => !c.Deleted
                          && (string.IsNullOrEmpty(code) || c.Code == code)
                          && (status == -1 || c.AcceptanceStatusId == status)
                          && (contributorType == -1 || c.ContributorTypeId == contributorType)
                          ).OrderByDescending(c => c.Code).Skip(page * length).Take(length);
 
-                return query.ToList();
-            }
+            return query.ToList();
         }
 
         public List<Contributor> GetContributorsByType(int contributorType)
@@ -88,31 +73,27 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<Contributor> GetContributorsByIds(List<int> ids)
         {
-            
             return sqlDBContext.Contributors.Where(c => !c.Deleted
                          && ids.Contains(c.Id));
-            
         }
 
         public IEnumerable<Contributor> GetContributors(int contributorTypeId)
         {
-           
-                return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId);
-           
+            return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId);
         }
 
         public IEnumerable<Contributor> GetContributors(int contributorTypeId, int statusId)
         {
-           
-                return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId && c.AcceptanceStatusId == statusId).OrderBy(c => c.AcceptanceStatusId);
+            return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId && c.AcceptanceStatusId == statusId).OrderBy(c => c.AcceptanceStatusId);
         }
 
         public Contributor Get(int id)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
-            }            
+            return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
+            //using (var context = new SqlDBContext())
+            //{
+            //    return context.Contributors.FirstOrDefault(x => x.Id == id);
+            //}
         }
 
         public Contributor Get(int id, string connectionString)
@@ -168,28 +149,22 @@ namespace Gosocket.Dian.Application
 
         public Contributor GetByCode(string code)
         {
-            using (var sqlDBContext = new SqlDBContext())
+            using (var context = new SqlDBContext())
             {
-                return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
+                return context.Contributors.FirstOrDefault(p => p.Code == code);
             }
         }
 
         public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                Guid SoftId = new Guid(softwareId);
-                return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId);
-            }
+            Guid SoftId = new Guid(softwareId);
+            return sqlDBContext.RadianContributorOperations.FirstOrDefault(p => p.RadianContributorId == radianContributorId && p.SoftwareId == SoftId);
         }
 
         public OtherDocElecContributorOperations GetOtherDocOperations(int OtherDocContributorId, string softwareId)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                Guid SoftId = new Guid(softwareId);
-                return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
-            }
+            Guid SoftId = new Guid(softwareId);
+            return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
         }
 
         public Contributor GetByCode(string code, string connectionString)
@@ -202,18 +177,12 @@ namespace Gosocket.Dian.Application
 
         public List<Contributor> GetByCodes(string[] codes)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.Contributors.Where(p => codes.Contains(p.Code)).ToList();
-            }
+            return sqlDBContext.Contributors.Where(p => codes.Contains(p.Code)).ToList();
         }
 
         public Contributor GetByCode(string code, int type)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code && p.ContributorTypeId == type && p.Status);
-            }
+            return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code && p.ContributorTypeId == type && p.Status);
         }
 
         public object GetContributorByEmail(string email)
@@ -353,12 +322,9 @@ namespace Gosocket.Dian.Application
 
         public void RemoveUserContributor(UserContributors userContributors)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                UserContributors uc = sqlDBContext.UserContributors.FirstOrDefault(x => x.UserId == userContributors.UserId && x.ContributorId == userContributors.ContributorId);
-                sqlDBContext.UserContributors.Remove(uc);
-                sqlDBContext.SaveChanges();
-            }
+            UserContributors uc = sqlDBContext.UserContributors.FirstOrDefault(x => x.UserId == userContributors.UserId && x.ContributorId == userContributors.ContributorId);
+            sqlDBContext.UserContributors.Remove(uc);
+            sqlDBContext.SaveChanges();
         }
 
         public void AddUserContributor(UserContributors userContributor)
@@ -380,9 +346,7 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<AcceptanceStatus> GetAcceptanceStatuses()
         {
-            
             return sqlDBContext.AcceptanceStatuses;
-            
         }
 
         public OperationMode GetOperationMode(int id)
@@ -435,10 +399,7 @@ namespace Gosocket.Dian.Application
 
         public ContributorFile GetContributorFile(Guid id)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.ContributorFiles.FirstOrDefault(x => x.Id == id);
-            }
+            return sqlDBContext.ContributorFiles.FirstOrDefault(x => x.Id == id);
         }
 
         public void AddContributorFileHistory(ContributorFileHistory contributorFileHistory)
@@ -452,9 +413,7 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<ContributorFileHistory> GetContributorFileHistories(Guid id)
         {
-            
             return sqlDBContext.ContributorFileHistories.Include("ContributorFileStatus").Where(p => p.ContributorFileId == id);
-            
         }
 
         public List<ContributorFileType> GetMandatoryContributorFileTypes()
@@ -485,7 +444,7 @@ namespace Gosocket.Dian.Application
 
         private void RegisterException(GlobalLogger logger)
         {
-            
+
             tableManager.InsertOrUpdate(logger);
         }
 
@@ -533,7 +492,7 @@ namespace Gosocket.Dian.Application
                     otherDocElec.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
-                    
+
                     OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
                     soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
 
@@ -584,7 +543,7 @@ namespace Gosocket.Dian.Application
                                                  && t.SoftwareType == softwareType
                                                  && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
                                                  && t.OperationStatusId == (int)Domain.Common.RadianState.Test
-                                                 && !t.Deleted 
+                                                 && !t.Deleted
                                                  );
                     if (radianOperation != null)
                         radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado; //Aceptada la operacion.
@@ -661,7 +620,7 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId 
+                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
                 && rc.OtherDocElecContributorTypeId == contributorTypeId
                 && rc.OtherDocElecOperationModeId == operationModeId);
             }
@@ -852,50 +811,47 @@ namespace Gosocket.Dian.Application
                 return true;
             }
         }
-       
+
         #endregion
 
         public Contributor GetContributorById(int Id, int contributorTypeId)
         {
-            using (var sqlDBContext = new SqlDBContext())
+            Contributor contributor = null;
+            var re = (from c in sqlDBContext.Contributors
+                      where c.Id == Id
+                      select c).FirstOrDefault();
+
+            if (re != null)
             {
-                Contributor contributor = null;
-                var re = (from c in sqlDBContext.Contributors
-                          where c.Id == Id
-                          select c).FirstOrDefault();
-
-                if (re != null)
+                contributor = new Contributor()
                 {
-                    contributor = new Contributor()
-                    {
-                        Id = re.Id,
-                        Code = re.Code,
-                        Name = re.Name,
-                        BusinessName = re.BusinessName,
-                        Email = re.Email,
-                        StartDate = re.StartDate,
-                        EndDate = re.EndDate,
-                        StartDateNumber = re.StartDateNumber,
-                        AcceptanceStatus = re.AcceptanceStatus,
-                        Status = re.Status,
-                        Deleted = re.Deleted,
-                        Timestamp = re.Timestamp,
-                        Updated = re.Updated,
-                        CreatedBy = re.CreatedBy,
-                        ContributorTypeId = re.ContributorTypeId,
-                        OperationModeId = re.OperationModeId,
-                        ProviderId = re.ProviderId,
-                        PrincipalActivityCode = re.PrincipalActivityCode,
-                        PersonType = re.PersonType,
-                        HabilitationDate = re.HabilitationDate,
-                        ProductionDate = re.ProductionDate,
-                        StatusRut = re.StatusRut,
-                        ExchangeEmail = re.ExchangeEmail
-                    };
-                }
-
-                return contributor;
+                    Id = re.Id,
+                    Code = re.Code,
+                    Name = re.Name,
+                    BusinessName = re.BusinessName,
+                    Email = re.Email,
+                    StartDate = re.StartDate,
+                    EndDate = re.EndDate,
+                    StartDateNumber = re.StartDateNumber,
+                    AcceptanceStatus = re.AcceptanceStatus,
+                    Status = re.Status,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    Updated = re.Updated,
+                    CreatedBy = re.CreatedBy,
+                    ContributorTypeId = re.ContributorTypeId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    PrincipalActivityCode = re.PrincipalActivityCode,
+                    PersonType = re.PersonType,
+                    HabilitationDate = re.HabilitationDate,
+                    ProductionDate = re.ProductionDate,
+                    StatusRut = re.StatusRut,
+                    ExchangeEmail = re.ExchangeEmail
+                };
             }
+
+            return contributor;
         }
 
     }
