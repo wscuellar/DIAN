@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             };
             AdminRadianViewModel model = new AdminRadianViewModel()
             { 
-                Id = 1, Code = "2", StartDate =DateTime.Now.ToString(), EndDate=DateTime.Now.ToString(), Type=2, RadianState= Domain.Common.RadianState.Habilitado, Page=1,Length=1 
+                Id = 1, Code = "2", StartDate =DateTime.Now, EndDate=DateTime.Now, Type=2, RadianState= Domain.Common.RadianState.Habilitado, Page=1,Length=1 
             };
             _radianContributorService.Setup(t => t.ListParticipantsFilter(It.IsAny<AdminRadianFilter>(),model.Page, model.Length)).Returns(radianAdmin);
 

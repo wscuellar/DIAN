@@ -6,6 +6,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Models.RadianApproved;
+using Microsoft.ApplicationInsights;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -26,11 +27,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IRadianApprovedService> _radianAprovedService = new Mock<IRadianApprovedService>();
         private readonly Mock<IRadianTestSetResultService> _radianTestSetResultService = new Mock<IRadianTestSetResultService>();
         private readonly Mock<IRadianTestSetAppliedService> _radianTestSetAppliedService = new Mock<IRadianTestSetAppliedService>();
+        private readonly Mock<TelemetryClient> _telemetry= new Mock<TelemetryClient>();
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _current = new RadianApprovedController(_radianContributorService.Object, _radianTestSetService.Object, _radianAprovedService.Object, _radianTestSetResultService.Object, _radianTestSetAppliedService.Object);
+            _current = new RadianApprovedController(_radianContributorService.Object, _radianTestSetService.Object, _radianAprovedService.Object, _radianTestSetResultService.Object, _radianTestSetAppliedService.Object, _telemetry.Object);
         }
 
         [TestMethod()]

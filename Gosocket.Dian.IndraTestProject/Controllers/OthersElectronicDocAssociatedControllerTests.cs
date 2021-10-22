@@ -33,7 +33,9 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 _othersElectronicDocumentsService.Object,
                 _testSetOthersDocumentsResultService.Object,
                 _othersDocsElecSoftwareService.Object,
-                _globalOtherDocElecOperationService.Object);
+                _globalOtherDocElecOperationService.Object,
+                null
+                );
         }
 
 

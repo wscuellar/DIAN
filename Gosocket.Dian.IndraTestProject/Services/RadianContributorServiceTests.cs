@@ -197,8 +197,8 @@ namespace Gosocket.Dian.Application.Tests
             {
                 case 2:
                     filter.RadianState = "Registrado";
-                    filter.StartDate = System.DateTime.Now.ToString();
-                    filter.EndDate = System.DateTime.Now.ToString();
+                    filter.StartDate = System.DateTime.Now;
+                    filter.EndDate = System.DateTime.Now;
                     break;
             }
 
