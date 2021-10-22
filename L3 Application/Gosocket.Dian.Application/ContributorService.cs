@@ -12,13 +12,14 @@ namespace Gosocket.Dian.Application
 {
     public class ContributorService : IContributorService
     {
-        
+        SqlDBContext sqlDBContext;
         private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         //private static StackExchange.Redis.IDatabase cache;
 
         public ContributorService()
         {
-            
+            if (sqlDBContext == null)
+                sqlDBContext = new SqlDBContext();
         }
 
         public List<Contributor> GetBillerContributors(int page, int length)
@@ -87,27 +88,23 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<Contributor> GetContributorsByIds(List<int> ids)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.Contributors.Where(c => !c.Deleted
+            
+            return sqlDBContext.Contributors.Where(c => !c.Deleted
                          && ids.Contains(c.Id));
-            }
+            
         }
 
         public IEnumerable<Contributor> GetContributors(int contributorTypeId)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
+           
                 return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId);
-            }
+           
         }
 
         public IEnumerable<Contributor> GetContributors(int contributorTypeId, int statusId)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
+           
                 return sqlDBContext.Contributors.Where(c => !c.Deleted && c.ContributorTypeId == contributorTypeId && c.AcceptanceStatusId == statusId).OrderBy(c => c.AcceptanceStatusId);
-            }
         }
 
         public Contributor Get(int id)
@@ -383,10 +380,9 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<AcceptanceStatus> GetAcceptanceStatuses()
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.AcceptanceStatuses;
-            }
+            
+            return sqlDBContext.AcceptanceStatuses;
+            
         }
 
         public OperationMode GetOperationMode(int id)
@@ -456,10 +452,9 @@ namespace Gosocket.Dian.Application
 
         public IEnumerable<ContributorFileHistory> GetContributorFileHistories(Guid id)
         {
-            using (var sqlDBContext = new SqlDBContext())
-            {
-                return sqlDBContext.ContributorFileHistories.Include("ContributorFileStatus").Where(p => p.ContributorFileId == id);
-            }
+            
+            return sqlDBContext.ContributorFileHistories.Include("ContributorFileStatus").Where(p => p.ContributorFileId == id);
+            
         }
 
         public List<ContributorFileType> GetMandatoryContributorFileTypes()
