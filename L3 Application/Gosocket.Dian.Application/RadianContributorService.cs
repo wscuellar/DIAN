@@ -150,21 +150,13 @@ namespace Gosocket.Dian.Application
             DateTime? startDate = filter.StartDate;
             DateTime? endDate = filter.EndDate;
             PagedResult<RadianContributor> radianContributors;
-            if (string.IsNullOrEmpty(filter.Code))
-            {
-                radianContributors = _radianContributorRepository.ListByDateDesc(t => 
-                                                                             (t.RadianContributorTypeId == filter.Type || filter.Type == 0) &&
-                                                                             ((filter.RadianState == null && t.RadianState != cancelState) || t.RadianState == stateDescriptionFilter) &&
-                                                                             (DbFunctions.TruncateTime(t.Update) >= startDate || !startDate.HasValue) &&
-                                                                             (DbFunctions.TruncateTime(t.Update) <= endDate || !endDate.HasValue),
-            page, size);
-            }
-            else
-            {
-                radianContributors = _radianContributorRepository.ListByDateDesc(t => (t.Contributor.Code == filter.Code || filter.Code == null),
-            page, size);
-            }
 
+            radianContributors = _radianContributorRepository.ListByDateDesc(t => (string.IsNullOrEmpty(filter.Code) || t.Contributor.Code==filter.Code) &&
+             (!filter.Type.HasValue || t.RadianContributorTypeId == filter.Type.Value) &&
+             (string.IsNullOrEmpty(filter.RadianState) || (t.RadianState== filter.RadianState && t.RadianState!= cancelState))&&
+             (!startDate.HasValue || DbFunctions.TruncateTime(t.Update) >= startDate) &&
+             (!endDate.HasValue || DbFunctions.TruncateTime(t.Update) <= endDate),
+            page, size);
             
             List<Domain.RadianContributorType> radianContributorType = _radianContributorTypeRepository.List(t => true);
             RadianAdmin radianAdmin = new RadianAdmin()
