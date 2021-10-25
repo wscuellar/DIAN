@@ -5589,24 +5589,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                    
                     break;
                 case (int)EventStatus.NegotiatedInvoice:
-                    //Valida eventos previos Limitacion de Circulacion
-                    if(documentMeta != null)
+                    //Valida eventos previos Limitacion de Circulacion                    
+                    LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
+                    var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
+                    if (eventRadianNegotiatedInvoice != null)
                     {
-                        LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
-                        var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
-                        if (eventRadianNegotiatedInvoice != null)
+                        foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
                         {
-                            foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianNegotiatedInvoice.IsValid,
-                                    Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
-                                    ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
-                                    ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                IsValid = itemEventRadianNegotiatedInvoice.IsValid,
+                                Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
+                                ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
+                                ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
                    
@@ -7479,10 +7476,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
-                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
-
-                    responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
-                    validateResponses.AddRange(responses);
+                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);                    
 
                     responses = RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
                     foreach (var itemResponsesTacita in responses)
@@ -7490,13 +7484,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
                             || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC38")
+                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38")
                             validEventPrev = false;
                     }
-                    validateResponses.AddRange(responses);
+                    validateResponses.AddRange(responses);                    
 
                     if (validEventPrev && validateEventApproveCufe)
                     {
+                        responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
+                        validateResponses.AddRange(responses);
+
                         responses = RequestValidateSigningTime(signingTime, documentMetaRef);                      
                         validateResponses.AddRange(responses);
                     }
