@@ -7377,6 +7377,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 bool validEventRadian = true;
                 bool validEventPrev = true;
+                bool validateEventApproveCufe = true;
                 bool validEventReference = true;
                 string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");                
                 RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
@@ -7430,6 +7431,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);                   
                     responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    foreach (var itemEventAproveCufe in responses)
+                    {
+                        if (!itemEventAproveCufe.IsValid)
+                            validateEventApproveCufe = false;
+                    }
+
                     validateResponses.AddRange(responses);
                 }
 
@@ -7489,7 +7496,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
 
-                    if (validEventPrev)
+                    if (validEventPrev && validateEventApproveCufe)
                     {
                         responses = RequestValidateSigningTime(signingTime, documentMetaRef);                      
                         validateResponses.AddRange(responses);
