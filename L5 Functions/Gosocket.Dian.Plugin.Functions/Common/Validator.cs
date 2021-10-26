@@ -5805,6 +5805,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
+            bool eventTV = false;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             ValidatorEngine validatorEngine = new ValidatorEngine();
 
@@ -5817,13 +5818,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-                      
+            //Valida eventos titulo valor
+            eventTV = ( Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Received 
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Rejected
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Receipt
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Accepted
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.AceptacionTacita);
+
             //List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
-            if(validatorDocumentMeta != null)
+            if(validatorDocumentMeta != null )
             {
                 //Valida FE se constituye como TV
-                if (!validatorDocumentMeta.IsInvoiceTV)
+                if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -5832,8 +5839,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorCode = "LGC21",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    //return responses;
+                    });                    
                 }
 
                 //Valida si FE es contado no permite realizar la primera incripción
