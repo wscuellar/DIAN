@@ -131,7 +131,7 @@
     <script>
 
         $(document).ready(function () {
-            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordFormInvoice", recoverPasswordModel).ToString().Trim('"'))));
             $(".cardsLogin").show();
             if (location.href.indexOf('tlogin=1') > 0) {
                 showLoading("#panel-forma", "Validando datos", "Por favor esperar");
@@ -178,7 +178,7 @@
                 $('input[name="UserCode"]').val('');
                 $('#Password').val('');
             };
-            rememberPassword(htmlPartial, '@Url.Action("RecoveryPassword", "User")');
+            rememberPassword(htmlPartial, '@Url.Action("RecoveryPasswordInvoice", "User")');
             grecaptcha.ready(function () {
                 grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
                     $(".RecaptchaToken").val(token);

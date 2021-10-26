@@ -131,7 +131,7 @@
     <script>
 
         $(document).ready(function () {
-            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordFormInvoice", recoverPasswordModel).ToString().Trim('"'))));
             $(".cardsLogin").show();
             if (location.href.indexOf('tlogin=1') > 0) {
                 showLoading("#panel-forma", "Validando datos", "Por favor esperar");

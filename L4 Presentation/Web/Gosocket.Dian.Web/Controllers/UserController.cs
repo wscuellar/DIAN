@@ -1408,13 +1408,13 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            //if(contributorInvoice.ContributorTypeId == '1' || contributorInvoice.ContributorTypeId == 1)
-            //{
-            //    ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
-            //    return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-            //}
+            if (contributorInvoice.ContributorTypeId == '1' || contributorInvoice.ContributorTypeId == 1)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
+                return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
 
-            if(contributorInvoice.BusinessName == null)
+            if (contributorInvoice.BusinessName == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "La empresa no se encuentre registrada en el Rut.");
                 return Json(new ResponseMessage("La empresa no se encuentre registrada en el Rut.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1450,7 +1450,7 @@ namespace Gosocket.Dian.Web.Controllers
             var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={authInvoice.PartitionKey}&rk={authInvoice.RowKey}&token={authInvoice.Token}";
 
             var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
-            var reportFromEmailRange = ConfigurationManager.GetValue("reportFromEmail");
+            var reportFromEmailRange = authInvoice.Email;
             var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
             var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
             var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
@@ -1464,7 +1464,7 @@ namespace Gosocket.Dian.Web.Controllers
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                 message.From = new System.Net.Mail.MailAddress(reportToEmailRange, "Token Acceso DIAN");//correo remitente
-                message.To.Add(new System.Net.Mail.MailAddress(authInvoice.Email));//correo destinatarios
+                message.To.Add(new System.Net.Mail.MailAddress(reportFromEmailRange));//correo destinatarios
                 message.Subject = "Estimado (a)," + reportFromEmailRange;//asunto
                 message.IsBodyHtml = true; //to make message body as html
                 message.Body = msgRange;//mensaje
@@ -1536,11 +1536,11 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("NotObligedInvoice", model);
             }
 
-            //if (contributor.ContributorTypeId == '1' || contributor.ContributorTypeId == 1)
-            //{
-            //    ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
-            //    return Json(new ResponseMessage("No es posible el ingreso la persona ya se encuentra habilitada como facturador.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-            //}
+            if (contributor.ContributorTypeId == '1' || contributor.ContributorTypeId == 1)
+            {
+                ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
+                return Json(new ResponseMessage("No es posible el ingreso la persona ya se encuentra habilitada como facturador.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
 
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
             {
@@ -1582,7 +1582,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.currentTab = "confirmed";
 
            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
-           var reportFromEmailRange = ConfigurationManager.GetValue("reportFromEmail");
+           var reportFromEmailRange = auth.Email;
            var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
            var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
            var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
@@ -1596,7 +1596,7 @@ namespace Gosocket.Dian.Web.Controllers
                 System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                 message.From = new System.Net.Mail.MailAddress(reportToEmailRange, "Token Acceso DIAN");//correo remitente
-                message.To.Add(new System.Net.Mail.MailAddress(auth.Email));//correo destinatarios
+                message.To.Add(new System.Net.Mail.MailAddress(reportFromEmailRange));//correo destinatarios
                 message.Subject = "Estimado (a),"+ reportFromEmailRange;//asunto
                 message.IsBodyHtml = true; //to make message body as html
                 message.Body = msgRange;//mensaje
@@ -1720,7 +1720,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.currentTab = "confirmed";
 
            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
-           var reportFromEmailRange = ConfigurationManager.GetValue(auth.Email);
+           var reportFromEmailRange = auth.Email;
            var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
            var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
            var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
@@ -1808,7 +1808,52 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
-        #endregion
+        [HttpGet]
+        [ExcludeFilter(typeof(Authorization))]
+        public JsonResult RecoveryPasswordInvoice(int documentType, string code, string email)
+        {
+            ApplicationUser user = userService.FindUserByEmail(string.Empty, email);
+            UsersFreeBillerProfile userExisting = user != null ? userService.GetUserFreeBillerProfile(t => t.UserId == user.Id) : null;
+
+            // Encuentra al usuario con su correo electrónico
+            if (userExisting == null)
+            {
+                Response.StatusCode = 400;
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            ApplicationUser userCode = userService.GetByCode(code);
+
+            if (userCode == null || userCode.Id != userExisting.UserId || userCode.IdentificationTypeId != documentType)
+            {
+                Response.StatusCode = 400;
+                return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.alertType, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
+
+            // Actualiza el password del usuario
+            string password = CreateStringPassword(user);
+
+            _ = UserManager.RemovePassword(user.Id);
+            var result = UserManager.AddPassword(user.Id, password);
+            if (result.Succeeded)
+            {
+                var resultEmail = SendMailRecoveryPasswordInvoice(email, password);
+                if(resultEmail == true)
+                {
+                    return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
+                }
+                else if (resultEmail == false)
+                {
+                    Response.StatusCode = 400;
+                    return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
+                }
+                
+            }
+            Response.StatusCode = 400;
+            return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
+        }
+
+       #endregion
 
         #region SendMailRecoveryPassword
 
@@ -1820,9 +1865,10 @@ namespace Gosocket.Dian.Web.Controllers
         private bool SendMailRecoveryPassword(string email, string password)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
+           
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
-
+            
             message.Append("<span><b>Comunicación de servicio</b></span><br>");
             message.Append("<br> <span><b>Su contraseña para ingresar al sistema es: </b></span><br>");
             message.AppendFormat("<br> Contraseña: {0}", password);
@@ -1835,6 +1881,60 @@ namespace Gosocket.Dian.Web.Controllers
             emailService.SendEmail(email, "DIAN - Edición de Usuario Registrado", dic);
 
             return true;
+        }
+
+        /// <summary>
+        /// Enviar notificacion email para creacion de usuario externo.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private bool SendMailRecoveryPasswordInvoice(string email, string password)
+        {
+         
+            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
+            //ConfigurationManager.GetValue("reportFromEmail");
+            var reportFromEmailRange = email;
+            var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
+            var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
+            var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
+            var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
+
+            string msgRange = "<span><b>Comunicación de servicio</b></span><br>" +
+                               "<br> <span><b>Su contraseña para ingresar al sistema es: </b></span><br>" +
+                               "<br> Saludos Cordiales," +
+                               "<br> Contraseña: " + password +
+                               "<br> <span style='font-size:10px;'>Te recordamos que esta dirección de correo electrónico es utilizada solamente con fines informativos. Por favor no respondas con consultas, ya que estas no podrán ser atendidas. Así mismo, los trámites y consultas en línea que ofrece la entidad se deben realizar únicamente a través del portal www.dian.gov.co</span>";
+            try
+            {
+                System.Net.Mail.MailMessage message = new System.Net.Mail.MailMessage();
+                System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
+                message.From = new System.Net.Mail.MailAddress(reportToEmailRange, "DIAN - Edición de Usuario Registrado");//correo remitente
+                message.To.Add(new System.Net.Mail.MailAddress(reportFromEmailRange));//correo destinatarios
+                message.Subject = "Estimado (a)," + reportFromEmailRange;//asunto
+                message.IsBodyHtml = true; //to make message body as html
+                message.Body = msgRange;//mensaje
+                smtp.Port = reportPortSmtpRange;
+                smtp.Host = reportHostSmtpRange; //for gmail host
+                smtp.EnableSsl = true;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new System.Net.NetworkCredential(reportUserSmtpRange, reportPasswordSmtpRange);
+                smtp.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+                smtp.Send(message);
+            }
+            catch (Exception ex)
+            {
+                var requestId = Guid.NewGuid();
+                var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
+                {
+                    Action = "SendEmailAsync",
+                    Controller = "User",
+                    Message = ex.Message,
+                    RouteData = "",
+                    StackTrace = ex.StackTrace
+                };
+                return false;
+            }
+                return true;
         }
 
         #endregion
