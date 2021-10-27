@@ -5451,27 +5451,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.Avales:
-                    //Valida eventos previos Aval
-                    if(documentMeta != null)
+                    //Valida eventos previos Aval                
+                    LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
+                    var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, totalInvoice, xmlParserCude);
+                    if (eventRadianAval != null)
                     {
-                        LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
-                        var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, totalInvoice, xmlParserCude);
-                        if (eventRadianAval != null)
+                        foreach (var itemEventRadianAval in eventRadianAval)
                         {
-                            foreach (var itemEventRadianAval in eventRadianAval)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianAval.IsValid,
-                                    Mandatory = itemEventRadianAval.Mandatory,
-                                    ErrorCode = itemEventRadianAval.ErrorCode,
-                                    ErrorMessage = itemEventRadianAval.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                IsValid = itemEventRadianAval.IsValid,
+                                Mandatory = itemEventRadianAval.Mandatory,
+                                ErrorCode = itemEventRadianAval.ErrorCode,
+                                ErrorMessage = itemEventRadianAval.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
-                    
+                                        
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     //Valida eventos previos Solicitud Disponibilizacion
