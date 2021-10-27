@@ -1291,7 +1291,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
-            var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
+            var listDisponibilizacion = documentMeta != null ? documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList() : null;
+            
             if (listDisponibilizacion != null && listDisponibilizacion.Count() > 0)
             {
                 bool validForItem = false;
