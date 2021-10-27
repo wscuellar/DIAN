@@ -193,15 +193,23 @@ namespace Gosocket.Dian.Functions.Documents
                 case "7":
                 case "91":
                     documentTagMessage = new DocumentTagMessage { Code = "REFCN", Date = referencedDocumentMeta.EmissionDate, Description = "Nota de crédito electrónica", DocumentKey = referencedDocumentMeta.DocumentKey, Value = globalDataDocument.DocumentKey, Timestamp = DateTime.UtcNow };
+                    SendMessage(documentTagMessage);
                     break;
                 case "8":
                 case "92":
                     documentTagMessage = new DocumentTagMessage { Code = "REFDN", Date = referencedDocumentMeta.EmissionDate, Description = "Nota de débito electrónica", DocumentKey = referencedDocumentMeta.DocumentKey, Value = globalDataDocument.DocumentKey, Timestamp = DateTime.UtcNow };
+                    SendMessage(documentTagMessage);
                     break;
                 default:
                     break;
             }
 
+            
+        }
+
+
+        private static async void SendMessage(DocumentTagMessage documentTagMessage)
+        {
             List<EventGridEvent> eventsList = new List<EventGridEvent>
             {
                 new EventGridEvent()
