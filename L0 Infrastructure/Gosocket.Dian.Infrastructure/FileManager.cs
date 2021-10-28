@@ -25,6 +25,8 @@ namespace Gosocket.Dian.Infrastructure
         private static Lazy<CloudBlobClient> lazyClient = new Lazy<CloudBlobClient>(InitializeBlobClient);
         public static CloudBlobClient BlobClient => lazyClient.Value;
 
+        public CloudBlobClient BlobClientBiller;
+
         private static CloudBlobClient InitializeBlobClient()
         {
             var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue("GlobalStorage"));
@@ -37,7 +39,12 @@ namespace Gosocket.Dian.Infrastructure
             
         }
 
-        
+        public FileManager(string blobBiller)
+        {
+            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue(blobBiller));
+            var blobClient = account.CreateCloudBlobClient();
+            BlobClientBiller = blobClient;
+        }
 
         public static FileManager Instance => _instance ?? (_instance = new FileManager());
 
@@ -434,6 +441,28 @@ namespace Gosocket.Dian.Infrastructure
             var blobContainer = BlobClient.GetContainerReference(container);
             var blobDirectory = blobContainer.GetDirectoryReference(directory);
             return blobDirectory.ListBlobs();
+        }
+
+        public byte[] GetBytesBiller(string container, string name)
+        {
+            try
+            {
+                var blobContainer = BlobClientBiller.GetContainerReference(container);
+                var blob = blobContainer.GetBlockBlobReference(name);
+
+                byte[] bytes;
+                using (var ms = new MemoryStream())
+                {
+                    blob.DownloadToStream(ms);
+                    bytes = ms.ToArray();
+                }
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message;
+                return null;
+            }
         }
     }
 }
