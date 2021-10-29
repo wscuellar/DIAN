@@ -1382,11 +1382,11 @@ namespace Gosocket.Dian.Web.Controllers
             var rkInvoice = $"{modelInvoice.CompanyCode}";
 
             var userInvoice = userService.GetByCodeAndIdentificationTyte(modelInvoice.UserCode, modelInvoice.IdentificationType);
-            //if (userInvoice == null)
-            //{
-            //    ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y tipo de identificación no coinciden.");
-            //    return Json(new ResponseMessage("Número de documento y tipo de identificación no coinciden.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-            //}
+            if (userInvoice == null)
+            {
+                ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y/o tipo de identificación no coinciden.");
+                return Json(new ResponseMessage("Número de documento y/o tipo de identificación no coinciden.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            }
 
             var contributorInvoice = userInvoice.Contributors.FirstOrDefault(c => c.Code == modelInvoice.CompanyCode);
             
@@ -1646,10 +1646,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             if (!ModelState.IsValid)
                 return Json(new ResponseMessage(TextResources.IncompleteForm, TextResources.ModelError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-
-            var pk = $"{model.IdentificationType}|{model.UserCode}";
-            var rk = $"{model.CompanyCode}";
-
+            
             var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
 
             if (user == null)
@@ -1657,6 +1654,8 @@ namespace Gosocket.Dian.Web.Controllers
                 ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.UserDoesntExist);
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
+            
+            
 
             var result = SignInManager.PasswordSignIn(user.Email, model.Password, true, shouldLockout: true);
 
@@ -1693,6 +1692,9 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(TextResources.DisabledCompany, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
+            var pk = $"{model.IdentificationType}|{model.UserCode}";
+            var rk = $"{model.CompanyCode}";
+
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
@@ -1713,10 +1715,13 @@ namespace Gosocket.Dian.Web.Controllers
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
-            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
 
+            UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
+         
+            var redirectUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+           
             ViewBag.UserEmail = HideUserEmailParts(auth.Email);
-            ViewBag.Url = accessUrl;
+            ViewBag.Url = redirectUrl;
             ViewBag.currentTab = "confirmed";
 
            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
@@ -1727,7 +1732,7 @@ namespace Gosocket.Dian.Web.Controllers
            var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
 
             string msgRange = "Acceda a la plataforma mediante el siguiente link generado <br>" +
-                               "<br> Acceder: " + accessUrl + " <br>" +
+                               "<br> Acceder: " + redirectUrl + " <br>" +
                                "<br> Saludos Cordiales,";
             try
             {
