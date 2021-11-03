@@ -1223,7 +1223,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ExcludeFilter(typeof(Authorization))]
-        public JsonResult ContributorUserLogin(UserLoginViewModel model)
+        public async Task<ActionResult> ContributorUserLogin(UserLoginViewModel model)
         {
             model.IdentificationTypes = identificationTypeService.List().Select(x => new IdentificationTypeListViewModel { Id = x.Id, Description = x.Description }).ToList();
             ClearUnnecessariesModelStateErrorsForAuthentication(false);
@@ -1304,9 +1304,57 @@ namespace Gosocket.Dian.Web.Controllers
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
-            UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
-            var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
-            return Json(new ResponseMessage(redirectUrl, "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+            //UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
+
+            //user.ContributorCode = rk;
+
+            //SignInManager.SignInAsync(user, true, false);
+
+            //return RedirectToAction(nameof(HomeController.Dashboard), "Home");
+
+            //var redirectUrl = ConfigurationManager.GetValue("BillerAuthUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            //return Json(new ResponseMessage(redirectUrl, "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+
+            var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                try
+                {
+                    auth.Email = user.Email;
+                    var emailSenderResponse = await EmailUtil.SendEmailAsync(auth, accessUrl);
+                    if (emailSenderResponse.ErrorType != ErrorTypes.NoError)
+                    {
+                        ModelState.AddModelError($"CompanyLoginFailed", "Autenticación correcta, su solicitud está siendo procesada.");
+                        return Json(new ResponseMessage("Autenticación correcta, su solicitud está siendo procesada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Guid.NewGuid();
+                    var logger = new GlobalLogger(requestId.ToString(), requestId.ToString())
+                    {
+                        Action = "SendEmailAsync",
+                        Controller = "User",
+                        Message = ex.Message,
+                        RouteData = "",
+                        StackTrace = ex.StackTrace
+                    };
+                    var tableManager = new TableManager("GlobalLogger");
+                    tableManager.InsertOrUpdate(logger);
+                    ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
+                    return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+
+                }
+            }
+
+            ViewBag.UserEmail = HideUserEmailParts(auth.Email);
+            ViewBag.Url = accessUrl;
+            ViewBag.currentTab = "confirmed";
+            if (ConfigurationManager.GetValue("Environment") == "Dev" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test")
+            {
+                Session["Url"] = accessUrl;
+            }
+            return Json(new ResponseMessage("LoginConfirmed", "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
 
         }
 
