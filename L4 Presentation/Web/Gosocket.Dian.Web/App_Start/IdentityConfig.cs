@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
@@ -110,6 +111,7 @@ namespace Gosocket.Dian.Web
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
     {
         private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        private ContributorService contributorService = new ContributorService();
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base(userManager, authenticationManager)
         {
@@ -126,10 +128,17 @@ namespace Gosocket.Dian.Web
             if (string.IsNullOrEmpty(user.ContributorCode))
                 return current;
 
-            
             var auth = dianAuthTableManager.Find<AuthToken>(user.Code, user.ContributorCode);
 
-            Contributor currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
+            if (user.Contributors.Count < 1)
+            {
+                var contributorCode = user.ContributorCode;
+                var contributor = contributorService.GetByCode((contributorCode));
+                user.Contributors.Add(contributor);
+            }
+            
+            var currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
+            
             // Contributor claims
             current.AddClaim(new Claim(CustomClaimTypes.ContributorAcceptanceStatusId, currentContributor.AcceptanceStatusId.ToString()));
             current.AddClaim(new Claim(CustomClaimTypes.ContributorId, currentContributor.Id.ToString()));
