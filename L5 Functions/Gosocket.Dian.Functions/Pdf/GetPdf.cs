@@ -71,7 +71,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 var fileManager = new FileManager();
 
                 //var storageBiller = "DefaultEndpointsProtocol=https;AccountName=gtpabillerstoragetest;AccountKey=JAuJKjEWIsOU0e4VhpuY2VH5gk5CEfZyFp3xm3NffTZug7HzUNdJdX4DT+4/UIdE0qfrwG9asG730Zv6QBVFcA==";
-                var fileManagerBiller = new FileManager();
+                var fileManagerBiller = new FileManager("GlobalStorageBiller");
 
 
                 // Transformar **XML** to **HTML**
@@ -85,7 +85,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
                 var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
 
-                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytes("logo", $"{documentMetaEntity.SenderCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller("logo", $"{documentMetaEntity.SenderCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
                 string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 

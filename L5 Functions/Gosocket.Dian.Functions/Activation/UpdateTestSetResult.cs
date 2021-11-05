@@ -550,9 +550,9 @@ namespace Gosocket.Dian.Functions.Activation
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
                                 {
                                     Success = true,
-                                    ContributorCode = isPartipantActiveOtherDoc.PartitionKey,
-                                    ContributorTypeId = isPartipantActiveOtherDoc.ContributorTypeId,
-                                    OperationModeId = Convert.ToInt32(isPartipantActiveOtherDoc.SoftwareId),
+                                    ContributorCode = Convert.ToString(isPartipantActiveOtherDoc.OtherDocElecContributorId),
+                                    ContributorTypeId = Convert.ToInt32(isPartipantActiveOtherDoc.ContributorTypeId),
+                                    OperationModeId = Convert.ToInt32(isPartipantActiveOtherDoc.OperationModeId),
                                     OperationModeName = "OTHERDOCUMENTS",
                                     SentToActivateBy = "Function",
                                     SoftwareId = isPartipantActiveOtherDoc.RowKey,
