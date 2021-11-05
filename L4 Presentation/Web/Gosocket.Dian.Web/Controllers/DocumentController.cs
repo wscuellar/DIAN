@@ -263,8 +263,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-
-        [ExcludeFilter(typeof(Authorization))]
+        
+        [CustomRoleAuthorization(CustomRoles = "Administrador")]
         public async Task<ActionResult> Payroll()
         {
             var model = new PayrollViewModel();
@@ -286,8 +286,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-
-        [ExcludeFilter(typeof(Authorization))]
+      
+        [CustomRoleAuthorization(CustomRoles = "Administrador")]
         [HttpPost]
         public async Task<ActionResult> Payroll(PayrollViewModel model)
         {

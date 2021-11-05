@@ -5508,27 +5508,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     break;
                 case (int)EventStatus.Avales:
-                    //Valida eventos previos Aval
-                    if(documentMeta != null)
+                    //Valida eventos previos Aval                
+                    LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
+                    var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, totalInvoice, xmlParserCude);
+                    if (eventRadianAval != null)
                     {
-                        LogicalEventRadian logicalEventRadianAval = new LogicalEventRadian();
-                        var eventRadianAval = logicalEventRadianAval.ValidateEndorsementEventPrev(documentMeta, totalInvoice, xmlParserCude);
-                        if (eventRadianAval != null)
+                        foreach (var itemEventRadianAval in eventRadianAval)
                         {
-                            foreach (var itemEventRadianAval in eventRadianAval)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianAval.IsValid,
-                                    Mandatory = itemEventRadianAval.Mandatory,
-                                    ErrorCode = itemEventRadianAval.ErrorCode,
-                                    ErrorMessage = itemEventRadianAval.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                IsValid = itemEventRadianAval.IsValid,
+                                Mandatory = itemEventRadianAval.Mandatory,
+                                ErrorCode = itemEventRadianAval.ErrorCode,
+                                ErrorMessage = itemEventRadianAval.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
-                    
+                                        
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     //Valida eventos previos Solicitud Disponibilizacion
@@ -5646,24 +5643,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                    
                     break;
                 case (int)EventStatus.NegotiatedInvoice:
-                    //Valida eventos previos Limitacion de Circulacion
-                    if(documentMeta != null)
+                    //Valida eventos previos Limitacion de Circulacion                    
+                    LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
+                    var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
+                    if (eventRadianNegotiatedInvoice != null)
                     {
-                        LogicalEventRadian logicalEventRadianNegotiatedInvoice = new LogicalEventRadian();
-                        var eventRadianNegotiatedInvoice = logicalEventRadianNegotiatedInvoice.ValidateNegotiatedInvoice(documentMeta);
-                        if (eventRadianNegotiatedInvoice != null)
+                        foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
                         {
-                            foreach (var itemEventRadianNegotiatedInvoice in eventRadianNegotiatedInvoice)
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianNegotiatedInvoice.IsValid,
-                                    Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
-                                    ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
-                                    ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
+                                IsValid = itemEventRadianNegotiatedInvoice.IsValid,
+                                Mandatory = itemEventRadianNegotiatedInvoice.Mandatory,
+                                ErrorCode = itemEventRadianNegotiatedInvoice.ErrorCode,
+                                ErrorMessage = itemEventRadianNegotiatedInvoice.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
                         }
                     }
                    
@@ -5865,7 +5859,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();          
+            bool eventTV = false;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            ValidatorEngine validatorEngine = new ValidatorEngine();
 
             responses.Add(new ValidateListResponse
             {
@@ -5876,19 +5872,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
             });
 
-            List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
-            if (invoiceWrapper.Any() && !invoiceWrapper[0].Invoice.IsInvoiceTV)
-            {               
+            //Valida eventos titulo valor
+            eventTV = ( Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Received 
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Rejected
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Receipt
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Accepted
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.AceptacionTacita);
+
+            //List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
+            GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
+            if(validatorDocumentMeta != null )
+            {
+                //Valida FE se constituye como TV
+                if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "LGC21",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });                    
+                }
+
+                //Valida si FE es contado no permite realizar la primera incripción
+                if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                {
+                    var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    if (!xmlParser.Parser())
+                        throw new Exception(xmlParser.ParserError);
+
+                    if (xmlParser.PaymentMeansID == "1")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC62",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                }
+            }
+            else
+            {
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "LGC21",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
+                    ErrorCode = "AAH07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
-
-                return responses;
             }
                    
             return responses;
@@ -7434,6 +7472,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 bool validEventRadian = true;
                 bool validEventPrev = true;
+                bool validateEventApproveCufe = true;
                 bool validEventReference = true;
                 string signingTimeStamp = documentMeta.SigningTimeStamp.ToString("dd MMMM yyyy hh:mm:ss tt");                
                 RequestObjectEventApproveCufe eventApproveCufe = new RequestObjectEventApproveCufe();
@@ -7483,12 +7522,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses = ValidateSerieAndNumber(nitModel, documentMeta);
                 validateResponses.AddRange(responses);
 
-                if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                //Valida FE Activa como Titulo Valor y que exista la UUID
+                EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);                   
+                responses = EventApproveCufe(nitModel, eventApproveCufe);
+                foreach (var itemEventAproveCufe in responses)
                 {
-                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);                   
-                    responses = EventApproveCufe(nitModel, eventApproveCufe);
-                    validateResponses.AddRange(responses);
+                    if (!itemEventAproveCufe.IsValid)
+                        validateEventApproveCufe = false;
                 }
+                validateResponses.AddRange(responses);
+               
 
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
@@ -7530,10 +7573,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
-                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
-
-                    responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
-                    validateResponses.AddRange(responses);
+                    EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);                    
 
                     responses = RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
                     foreach (var itemResponsesTacita in responses)
@@ -7541,13 +7581,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
                             || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC38")
+                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38")
                             validEventPrev = false;
                     }
-                    validateResponses.AddRange(responses);
+                    validateResponses.AddRange(responses);                    
 
-                    if (validEventPrev)
+                    if (validEventPrev && validateEventApproveCufe)
                     {
+                        responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
+                        validateResponses.AddRange(responses);
+
                         responses = RequestValidateSigningTime(signingTime, documentMetaRef);                      
                         validateResponses.AddRange(responses);
                     }

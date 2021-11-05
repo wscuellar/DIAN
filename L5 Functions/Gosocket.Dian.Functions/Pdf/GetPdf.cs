@@ -1,4 +1,4 @@
-using Gosocket.Dian.Domain.Domain;
+ï»¿using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Functions.Utils;
 using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.WebJobs;
@@ -26,12 +26,12 @@ namespace Gosocket.Dian.Functions.Pdf
         {
             try
             {
-                // Definir contenedor de parámetro
+                // Definir contenedor de parï¿½metro
                 string trackId = req.GetQueryNameValuePairs()
                     .FirstOrDefault(q => string.Compare(q.Key, "trackId", true) == 0)
                     .Value;
 
-                // Obtener parámetros de consulta
+                // Obtener parï¿½metros de consulta
                 dynamic data = await req.Content.ReadAsAsync<object>();
 
                 // Establecer nombre para consultar la cadena o los datos del cuerpo
@@ -63,7 +63,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 // Diccionario para construir Pdf
                 var dictionary = new Dictionary<string, string>
                 {
-                    {"documentTypeName", "Factura Electrónica"},
+                    {"documentTypeName", "Factura Electrï¿½nica"},
                     {"accountAvatar", null},
                     {"isMontoPeriodo", "0"},
                     {"showRefButton", "0"},
@@ -88,22 +88,22 @@ namespace Gosocket.Dian.Functions.Pdf
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
 
-                // Obtener la Cadena para Construir el **CÓDIGO QR**
+                // Obtener la Cadena para Construir el **Cï¿½DIGO QR**
                 var dataToEncode = htmlGDoc.GetQRNote();
 
-                // Construir Objeto Bitmap para Código QR - Convertir a Base 64 Image
+                // Construir Objeto Bitmap para Cï¿½digo QR - Convertir a Base 64 Image
                 var image = Utils.Utils.GetQRCode(dataToEncode);
                 string qrStringBase64 = Utils.Utils.ConvertImageToBase64String(image, System.Drawing.Imaging.ImageFormat.Jpeg);
                 var qrBase64 = $@"data:image/png;base64,{qrStringBase64}";
 
                 //-------------------------------------------------------------------------------------------------------------------------
 
-                // Sustuir en el HTML la ruta de LOGO y CÓDIGO QR para colocar imágenes
+                // Sustuir en el HTML la ruta de LOGO y Cï¿½DIGO QR para colocar imï¿½genes
                 Html_Content = Html_Content.Replace("#123logoDian", logoDianBase64);
                 Html_Content = Html_Content.Replace("#123logo", logoBase64);
                 Html_Content = Html_Content.Replace("#1qrcode", qrBase64);
 
-                // Sustituir en el HTML la respuesta de la validación del documento y SigningTime
+                // Sustituir en el HTML la respuesta de la validaciï¿½n del documento y SigningTime
                 var documentApplication = htmlGDoc.GetDocumentResponse();
                 var documentSigningTime = htmlGDoc.GetSigningTime();
 
@@ -121,7 +121,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 //-------------------------------------------------------------------------------------------------------------------------
 
-                // Salvar HTML como fichero físico en PC
+                // Salvar HTML como fichero fï¿½sico en PC
                 // File.WriteAllText(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.html", Html_Content);
 
                 // Salvar PDF generado de HTML en el Storage
