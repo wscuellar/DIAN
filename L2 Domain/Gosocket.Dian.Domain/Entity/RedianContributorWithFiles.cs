@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public DateTime EndDate { get; set; }
 
-        public int Type { get; set; }
+        public int? Type { get; set; }
 
         public string RadianState { get; set; }
 

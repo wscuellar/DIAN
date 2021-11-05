@@ -27,7 +27,7 @@ namespace Gosocket.Dian.Interfaces
         List<ContributorFileStatus> GetContributorFileStatuses();
         IEnumerable<Contributor> GetContributors(int contributorTypeId);
         IEnumerable<Contributor> GetContributors(int contributorTypeId, int statusId);
-        List<Contributor> GetContributors(int type, int acceptanceStatusId, DateTime start, DateTime end, int page, int length);
+        List<Contributor> GetContributors(int type, int acceptanceStatusId, int page, int length);
         List<Contributor> GetContributors(string code, int status, int page, int length, int? contributorType);
         List<Contributor> GetContributorsByAcceptanceStatusesId(int[] statuses, string connectionString = null);
         List<Contributor> GetContributorsByAcceptanceStatusId(int status);
@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Interfaces
         List<ContributorFileType> GetMandatoryContributorFileTypes();
         List<ContributorFileType> GetNotRequiredContributorFileTypes();
         OperationMode GetOperationMode(int id);
-        List<Contributor> GetParticipantContributors(int acceptanceStatusId, DateTime start, DateTime end, int page, int length);
+        List<Contributor> GetParticipantContributors(int acceptanceStatusId, int page, int length);
         List<Contributor> GetProviderContributors(int page, int length);
         List<UserContributors> GetUserContributors(int id);
         Contributor ObsoleteGet(int id);

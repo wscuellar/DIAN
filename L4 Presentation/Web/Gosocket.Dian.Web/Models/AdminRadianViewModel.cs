@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Web.Models
         public DateTime? DateInterval { get; set; }
 
         [Display(Name = "Tipo de participante")]        
-        public int Type { get; set; }
+        public int? Type { get; set; }
         public DateTime StartDate { get; set;  }
         public DateTime EndDate { get; set; }
         [Display(Name = "Estado")]
@@ -44,13 +44,11 @@ namespace Gosocket.Dian.Web.Models
 
         public int Id { get; set; }
         public bool SearchFinished { set; get; }
-        [Display(Name = "Tipo de participante")]
-        [Required( ErrorMessage = "Debe Seleccionar un Tipo")]
-        
+
+        [Display(Name = "Tipo de participante")]        
         public IEnumerable<RadianTypeViewModel> RadianTypes { get; set; }
+
         [Display(Name = "Estado")]
-        [Required(ErrorMessage = "Debe Seleccionar un Estado")]        
-        
         public Domain.Common.RadianState? RadianState { get; set; }
 
     }

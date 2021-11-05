@@ -36,16 +36,17 @@ namespace Gosocket.Dian.Application
             return query.ToList();
         }
 
-        public List<Contributor> GetParticipantContributors(int acceptanceStatusId, DateTime start, DateTime end, int page, int length)
+        public List<Contributor> GetParticipantContributors(int acceptanceStatusId, int page, int length)
         {
-            var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId==acceptanceStatusId && (c.Updated >= start && c.Updated <= end)).OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
+            var query = sqlDBContext.Contributors.Where(c => c.AcceptanceStatusId == acceptanceStatusId)
+                .OrderBy(c => c.AcceptanceStatusId).Skip(page * length).Take(length);
             return query.ToList();
         }
 
-        public List<Contributor> GetContributors(int type, int acceptanceStatusId, DateTime start, DateTime end, int page, int length)
+        public List<Contributor> GetContributors(int type, int acceptanceStatusId, int page, int length)
         {
-            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId
-           &&(c.Updated>=start && c.Updated <= end)).OrderBy(c => c.StartDate)
+            var query = sqlDBContext.Contributors.Where(c => c.ContributorTypeId == type && c.AcceptanceStatusId == acceptanceStatusId)
+                .OrderBy(c => c.StartDate)
                 .Skip(page * length).Take(length);
             return query.ToList();
         }
@@ -148,7 +149,10 @@ namespace Gosocket.Dian.Application
 
         public Contributor GetByCode(string code)
         {
-            return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.FirstOrDefault(p => p.Code == code);
+            }
         }
 
         public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
@@ -440,7 +444,7 @@ namespace Gosocket.Dian.Application
 
         private void RegisterException(GlobalLogger logger)
         {
-            
+
             tableManager.InsertOrUpdate(logger);
         }
 
@@ -488,7 +492,7 @@ namespace Gosocket.Dian.Application
                     otherDocElec.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
-                    
+
                     OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
                     soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
 
@@ -539,7 +543,7 @@ namespace Gosocket.Dian.Application
                                                  && t.SoftwareType == softwareType
                                                  && t.SoftwareId.ToString().Trim().ToLower().Equals(softId.ToString().Trim().ToLower(), StringComparison.OrdinalIgnoreCase)
                                                  && t.OperationStatusId == (int)Domain.Common.RadianState.Test
-                                                 && !t.Deleted 
+                                                 && !t.Deleted
                                                  );
                     if (radianOperation != null)
                         radianOperation.OperationStatusId = (int)Domain.Common.RadianState.Habilitado; //Aceptada la operacion.
@@ -616,7 +620,7 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId 
+                return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
                 && rc.OtherDocElecContributorTypeId == contributorTypeId
                 && rc.OtherDocElecOperationModeId == operationModeId);
             }
@@ -807,7 +811,7 @@ namespace Gosocket.Dian.Application
                 return true;
             }
         }
-       
+
         #endregion
 
         public Contributor GetContributorById(int Id, int contributorTypeId)
