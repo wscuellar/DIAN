@@ -146,7 +146,10 @@ namespace Gosocket.Dian.Application
 
         public Contributor GetByCode(string code)
         {
-            return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.FirstOrDefault(p => p.Code == code);
+            }
         }
 
         public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
