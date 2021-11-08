@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Infrastructure
 
         public FileManager(string blobBiller, string container)
         {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue(blobBiller));
+            var account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(blobBiller));
             var blobClient = account.CreateCloudBlobClient();
             BlobContainer = blobClient.GetContainerReference(container);
             
