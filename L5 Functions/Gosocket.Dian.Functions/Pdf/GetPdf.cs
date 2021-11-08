@@ -19,7 +19,7 @@ namespace Gosocket.Dian.Functions.Pdf
     {
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly FileManager RadianLogosFileManager = new FileManager("radian-dian-logos");
-        private static readonly FileManager LogosFileManager = new FileManager("logo");
+        private static readonly FileManager LogosFileManager = new FileManager("GlobalStorageBiller","logo");
 
         [FunctionName("GetPdf")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
