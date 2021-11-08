@@ -103,7 +103,7 @@ namespace Gosocket.Dian.Functions.Others
                         otherDocContributorId = otherDocElecContributor.Id;
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
-                                        
+
                     start = DateTime.UtcNow;
                     var OtherDocSW = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-05.1")
                     {
@@ -112,7 +112,7 @@ namespace Gosocket.Dian.Functions.Others
                     };
                     var resultOtherDocSW = TableManagerGlobalLogger.InsertOrUpdateAsync(OtherDocSW);
 
-                    OtherDocElecSoftware otherDocElecSoftware = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
+                    OtherDocElecSoftware otherDocElecSoftware = softwareService.GetOtherDocSoftware(new Guid(requestObject.SoftwareId));
 
                     if (otherDocElecSoftware == null)
                     {
@@ -138,10 +138,11 @@ namespace Gosocket.Dian.Functions.Others
                             softwareService.AddOrUpdateOtherDocSoftware(newSoftware);
 
                         SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
-                    }                    
+                    }
 
                     // Crear Software en TableSTorage
-                    GlobalSoftware globalSoftware = new GlobalSoftware(otherDocElecSoftware.SoftwareId.ToString(), otherDocElecSoftware.SoftwareId.ToString())
+                    var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
+                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
                     {
                         Id = new Guid(requestObject.SoftwareId),
                         Deleted = false,
@@ -153,7 +154,7 @@ namespace Gosocket.Dian.Functions.Others
                         softwareTableManager.InsertOrUpdateAsync(globalSoftware).Wait();
 
                     SetLogger(globalSoftware, "Step OtherDoc-6", " -- softwareTableManager.InsertOrUpdateAsync -- ", "ACT-07");
-
+                    
                     //--1. se busac operation por radiancontributorid y software 
                     OtherDocElecContributorOperations OtherDocOperation = contributorService.GetOtherDocOperations(otherDocContributorId, requestObject.SoftwareId);
 
