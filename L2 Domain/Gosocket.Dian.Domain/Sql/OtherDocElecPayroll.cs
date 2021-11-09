@@ -15,7 +15,7 @@ namespace Gosocket.Dian.Domain.Sql
         [Key]
 		public Guid Id { get; set; }
 		public string CUNE { get; set; }
-		public int CompanyNIT { get; set; }
+		public long CompanyNIT { get; set; }
 		public DateTime? CreateDate { get; set; }
 		public bool HighPensionRisk { get; set; }
 		public int Environment { get; set; }
@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public DateTime? AdmissionDate { get; set; }
 		public DateTime? EndPaymentDate { get; set; }
 		public DateTime? StartPaymentDate { get; set; }
-		public DateTime? PaymentDate { get; set; }
+		public string PaymentDate { get; set; }
 		public string Shape { get; set; }
 		public string HED { get; set; }
 		public string HEDDF { get; set; }
@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string PlaceWorkCountry { get; set; }
 		public string Method { get; set; }
 		public string CityMunicipality { get; set; }
-		public int? NIT { get; set; }
+		public long? NIT { get; set; }
 		public bool? Novelty { get; set; }
 		public string SerialNumber { get; set; }
 		public string AccountNumber { get; set; }
@@ -92,7 +92,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string DocumentType { get; set; }
 		public string CurrencyType { get; set; }
 		public string WorkerType { get; set; }
-		public string TipoXML { get; set; }
+		public string XMLType { get; set; }
 		public string JobCodeWorker { get; set; }
 		public string Version { get; set; }
 		public string S_Deduction { get; set; }
