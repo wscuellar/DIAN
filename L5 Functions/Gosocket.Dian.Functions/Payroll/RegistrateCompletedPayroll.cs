@@ -61,10 +61,6 @@ namespace Gosocket.Dian.Functions.Payroll
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
-                OtherDocElecPayroll otherDocElecPayroll = new OtherDocElecPayroll();
-
-                otherDocElecPayroll = otherDocElecPayrollService.CreatePayroll(otherDocElecPayroll);
-
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
                 var numeroDocumento = string.IsNullOrEmpty(docGlobalPayroll.NumeroDocumento) ? "0" : docGlobalPayroll.NumeroDocumento;
 
@@ -117,6 +113,10 @@ namespace Gosocket.Dian.Functions.Payroll
 
                 // ...
                 Task.WhenAll(arrayTasks).Wait();
+
+                OtherDocElecPayroll otherDocElecPayroll = DocumentParsedNomina.SetGlobalDocPayrollToOtherDocElecPayroll(docGlobalPayroll);
+
+                otherDocElecPayroll = otherDocElecPayrollService.CreateOtherDocElecPayroll(otherDocElecPayroll);
             }
             catch (Exception ex)
             {
