@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Interfaces.Services
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
+        PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
         /// <summary>

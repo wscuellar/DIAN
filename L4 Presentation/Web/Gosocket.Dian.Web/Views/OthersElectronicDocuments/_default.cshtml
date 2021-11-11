@@ -17,58 +17,113 @@
 </div>
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Datos de empresa y software</strong></h4>
-    <hr class="margin-5" />
+	<h4 class="panel-title-radian padding-0"><strong>Datos de empresa y software</strong></h4>
+	<hr class="margin-5" />
 
-    @if (Model.OperationModeId == 2)
-    {
-        @Html.HiddenFor(m => m.SoftwareName)
-        @Html.HiddenFor(m => m.PinSW)
+	@*@if (Model.OperationModeId == 2)
+	{
+		@Html.HiddenFor(m => m.SoftwareName)
+		@Html.HiddenFor(m => m.PinSW)
 
-        <div class="col-sm-6 col-md-3 padding-xs-0">
-            <div class="form-group">
-                @Html.Label("ProviderId", "Nombre empresa proveedora", new { @class = "control-label" })
-                @Html.DropDownListFor(m => m.ProviderId, (SelectList)ViewBag.ListTechnoProviders, "Seleccione...", new { @class = "form-control selectpicker" })
-                @Html.ValidationMessageFor(m => m.ProviderId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-5 col-md-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                @Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
-                @Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
-            </div>
-        </div>
-    }
-    else
-    {
-        @Html.HiddenFor(m => m.SoftwareId)
+		<div class="col-sm-6 col-md-3 padding-xs-0">
+			<div class="form-group">
+				@Html.Label("ProviderId", "Nombre empresa proveedora", new { @class = "control-label" })
+				@Html.DropDownListFor(m => m.ProviderId, (SelectList)ViewBag.ListTechnoProviders, "Seleccione...", new { @class = "form-control selectpicker" })
+				@Html.ValidationMessageFor(m => m.ProviderId, "", new { @class = "text-danger" })
+			</div>
+		</div>
+		<div class="col-sm-5 col-md-3 padding-xs-0">
+			<div class="form-group">
+				@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+				@Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
+				@Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
+			</div>
+		</div>
+	}
+	else if (Model.OperationModeId != 0)
+	{
 
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.ContributorName, new { @class = "form-control input-general", disabled = "disabled" })
-            </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
-                @Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.PinSW, new { @class = "form-control input-general" })
-                @Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
-                @Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.SoftwareId, new { @class = "form-control input-general", disabled = "disabled" })
-            </div>
-        </div>
-    }
-</div>
+		@Html.HiddenFor(m => m.SoftwareId)
+
+		<div class="col-sm-3 padding-xs-0">
+			<div class="form-group">
+				@Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
+				@Html.TextBoxFor(m => m.ContributorName, new { @class = "form-control input-general", disabled = "disabled" })
+			</div>
+		</div>
+		<div class="col-sm-3 padding-xs-0">
+			<div class="form-group">
+				@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+				@Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
+				@Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
+			</div>
+		</div>
+		<div class="col-sm-3 padding-xs-0">
+			<div class="form-group">
+				@Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
+				@Html.TextBoxFor(m => m.PinSW, new { @class = "form-control input-general" })
+				@Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
+			</div>
+		</div>
+		<div class="col-sm-3 padding-xs-0">
+			<div class="form-group">
+				@Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
+				@Html.TextBoxFor(m => m.SoftwareId, new { @class = "form-control input-general", disabled = "disabled" })
+			</div>
+		</div>
+
+	}
+	else
+	{*@
+		<div style="display:none" id="FormPropio">
+			@*@Html.HiddenFor(m => m.SoftwareId)*@
+
+			<div class="col-sm-3 padding-xs-0">
+				<div class="form-group">
+					@Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
+					@Html.TextBoxFor(m => m.ContributorName, new { @class = "form-control input-general", disabled = "disabled" })
+				</div>
+			</div>
+			<div class="col-sm-3 padding-xs-0">
+				<div class="form-group">
+					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+					@Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
+					@Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
+				</div>
+			</div>
+			<div class="col-sm-3 padding-xs-0" id="DivPin">
+				<div class="form-group">
+					@Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
+					@Html.TextBoxFor(m => m.PinSW, new { @class = "form-control input-general" })
+					@Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
+				</div>
+			</div>
+			<div class="col-sm-3 padding-xs-0"  id="DivSoftwareId">
+				<div class="form-group">
+					@Html.LabelFor(m => m.SoftwareIdPr, new { @class = "control-label" })
+					@Html.TextBoxFor(m => m.SoftwareIdPr, new { @class = "form-control input-general", disabled = "disabled" })
+				</div>
+			</div>
+		</div>
+		<div style="display:none" id="FormPt">
+			@Html.HiddenFor(m => m.SoftwareName)
+			@Html.HiddenFor(m => m.PinSW)
+
+			<div class="col-sm-6 col-md-3 padding-xs-0">
+				<div class="form-group">
+					@Html.Label("ProviderId", "Nombre empresa proveedora", new { @class = "control-label" })
+					@Html.DropDownListFor(m => m.ProviderId, (SelectList)ViewBag.ListTechnoProviders, "Seleccione...", new { @class = "form-control selectpicker" })
+					@Html.ValidationMessageFor(m => m.ProviderId, "", new { @class = "text-danger" })
+				</div>
+			</div>
+			<div class="col-sm-5 col-md-3 padding-xs-0">
+				<div class="form-group">
+					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+					@Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
+					@Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
+				</div>
+			</div>
+		</div>
+			@*}*@
+
+		</div>
