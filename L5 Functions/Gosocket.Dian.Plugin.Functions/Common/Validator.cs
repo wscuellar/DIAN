@@ -5826,37 +5826,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
             if(validatorDocumentMeta != null )
             {
-                //Valida FE se constituye como TV
-                if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
+                //Esto aplica solo para FE
+                if (Convert.ToInt32(validatorDocumentMeta.DocumentTypeId) == (int)DocumentType.Invoice)
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "LGC21",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });                    
-                }
-
-                //Valida si FE es contado no permite realizar la primera incripción
-                if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
-                {
-                    var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
-                    if (!xmlParser.Parser())
-                        throw new Exception(xmlParser.ParserError);
-
-                    if (xmlParser.PaymentMeansID == "1")
+                    //Valida FE se constituye como TV
+                    if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "LGC62",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62"),
+                            ErrorCode = "LGC21",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                        });                    
+                    }
+
+                    //Valida si FE es contado no permite realizar la primera incripción
+                    if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                    {
+                        var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                        var xmlParser = new XmlParser(xmlBytes.Result);
+                        if (!xmlParser.Parser())
+                            throw new Exception(xmlParser.ParserError);
+
+                        if (xmlParser.PaymentMeansID == "1")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC62",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
                 }
             }
