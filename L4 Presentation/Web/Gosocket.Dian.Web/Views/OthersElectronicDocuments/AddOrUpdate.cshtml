@@ -111,6 +111,7 @@
 			&nbsp;<a href="@Url.Action("Index", "OthersElectronicDocuments")" class="btnBackTop">Volver</a>
 		</div>
 	</div>
+
 	<div class="row margin-horizontal-0" style="margin-top: 15px;">
 		<div class="tab-base">
 			<div class="tab-content padding-0">
@@ -177,6 +178,7 @@
 															<td class="text-center" style="width:70px">
 																@*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
 																<a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Ver detalle"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+																<a onclick="EliminarRegistro(@item.Id)" title="Ver detalle"><i class="fa fa-trash" style="font-size: 22px;color: #348441;"></i></a>
 															</td>
 														</tr>
 													}
@@ -197,7 +199,7 @@
 			</div>
 		</div>
 
-		<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+		@*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -212,6 +214,27 @@
 						</div>
 					</div><div class="modal-footer">
 						<button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+					</div>
+				</div>
+			</div>
+		</div>*@
+		<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+						<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
+					</div>
+					<div class="modal-body">
+						<div class="bootbox-body">
+							<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
+							<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+									  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+
+						</div>
+					</div><div class="modal-footer">
+						<button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
 					</div>
 				</div>
 			</div>
@@ -272,9 +295,36 @@
                 $("#dialogcancelarregistro").modal('show');
             });
 
-            $(".savecancel-register").click(function () {
 
-                if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
+
+
+
+
+			$('select[name=OperationModeSelectedId]').val(0);
+			$('.selectpicker').selectpicker('refresh');
+		});//ready
+
+
+
+
+		function EliminarRegistro(id) {
+			debugger;
+			$("#dialogcancelarregistro").modal('show');
+
+
+			("#Btnsavecancel")[0].onclick = null;
+			$("#Btnsavecancel").click(function () {
+				ElimnarOp(id)
+
+			});
+		}
+
+
+
+
+		function ElimnarOp(id)
+			{
+				 if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
                     $('#lbldangercancelregister').addClass("text-danger  text-bold");
                     return;
                 }
@@ -284,9 +334,9 @@
                         function () {
 
                             $.ajax({
-                            url: "@Url.Action("CancelRegister")",
+                           url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
                             type: "POST",
-                                data: { id: @Convert.ToInt32(Model.OtherDocElecContributorId), description: $("#txtCancelRegistro").val() },
+                                data: { id: id, description: $("#txtCancelRegistro").val() },
                             datatype: "json",
                             success: function (result) {
 
@@ -321,14 +371,15 @@
 
                      }
                     , "", () => hideLoading('#panel-form')));
-			});
-			$('select[name=OperationModeSelectedId]').val(0);
-			$('.selectpicker').selectpicker('refresh');
-        });//ready
+
+			}
+
+
+
 
 		$('#OperationModeSelectedId').change(function ()
 		{
-		
+
             if ($('#OperationModeSelectedId').val() == 1) {
 				$('#FormPt').fadeOut()
 				$('#FormPropio').fadeIn()
