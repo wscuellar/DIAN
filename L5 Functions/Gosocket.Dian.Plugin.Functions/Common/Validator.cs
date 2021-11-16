@@ -5708,30 +5708,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if(documentMeta != null)
             {
-                foreach (var documentIdentifier in documentMeta)
+                //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
+                if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
                 {
-                    document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
-
-                    if (documentMeta.Count >= 2)
+                    foreach (var documentIdentifier in documentMeta)
                     {
-                        //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                        if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
+                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
+
+                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey && string.IsNullOrEmpty(documentIdentifier.TestSetId))
                         {
-                            if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
-                            && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
-                            ))
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "LGC01",
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-                    }                    
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC01",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }                        
+                    }
                 }
             }
            
