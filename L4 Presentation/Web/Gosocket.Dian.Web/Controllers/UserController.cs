@@ -1384,8 +1384,8 @@ namespace Gosocket.Dian.Web.Controllers
             var userInvoice = userService.GetByCodeAndIdentificationTyte(modelInvoice.UserCode, modelInvoice.IdentificationType);
             if (userInvoice == null)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Número de documento y/o tipo de identificación no coinciden.");
-                return Json(new ResponseMessage("Número de documento y/o tipo de identificación no coinciden.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                ModelState.AddModelError($"CompanyLoginFailed", "El representante legal no se encuentre registrado en el Sistema");
+                return Json(new ResponseMessage("El representante legal no se encuentre registrado en el Sistema.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var contributorInvoice = userInvoice.Contributors.FirstOrDefault(c => c.Code == modelInvoice.CompanyCode);
