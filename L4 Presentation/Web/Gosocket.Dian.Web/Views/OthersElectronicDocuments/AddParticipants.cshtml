@@ -173,14 +173,15 @@
                     CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                         function (param) {
                             // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
-                            if (ContributorIdType == 1) {
+							if (ContributorIdType == 1 || ContributorIdType == 2) {
                                 hideLoading('#panel-form');
                               //  $("#dialogModeOperation").modal('show');
 
 								CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModelEmisor,
                                     function (param) {
                                         // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
-                                        if (ContributorIdType == 1) {
+										if (ContributorIdType == 1 || ContributorIdType == 2)
+                                        {
                                             hideLoading('#panel-form');
 
                                            var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"

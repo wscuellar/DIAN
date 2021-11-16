@@ -294,14 +294,14 @@
                 $('#lbldangercancelregister').removeClass("text-danger text-bold");
                 $("#dialogcancelarregistro").modal('show');
             });
-
-
-
-
-
-
-			$('select[name=OperationModeSelectedId]').val(0);
+			if (@Model.ContributorIdType == 2) {
+				$('select[name=OperationModeSelectedId]').val(1);				
+			}
+			else {
+				$('select[name=OperationModeSelectedId]').val(0);
+			}			
 			$('.selectpicker').selectpicker('refresh');
+			$('#OperationModeSelectedId').change();
 		});//ready
 
 
