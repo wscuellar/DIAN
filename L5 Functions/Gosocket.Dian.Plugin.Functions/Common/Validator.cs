@@ -5011,7 +5011,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                        if (documentMeta.ReceiverName != issuerPartyName)
+                        if (documentMeta.ReceiverName.Replace("&amp;", "&") != issuerPartyName.Replace("&amp;", "&"))
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -5230,7 +5230,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                        if (documentMetaRef.ReceiverName != documentMeta.IssuerPartyName)
+                        if (documentMetaRef.ReceiverName.Replace("&amp;","&") != documentMeta.IssuerPartyName.Replace("&amp;", "&"))
                         {
                             responses.Add(new ValidateListResponse
                             {
