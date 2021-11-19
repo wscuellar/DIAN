@@ -43,6 +43,7 @@ namespace Gosocket.Dian.Functions.Activation
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
+            string uniqueKey = Guid.NewGuid().ToString();
             var testSetId = string.Empty;
             try
             {               
@@ -67,8 +68,8 @@ namespace Gosocket.Dian.Functions.Activation
 
                 //Se busca el set de pruebas procesado para el testsetid en curso
                 RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
-                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, "UPDATE-01");
+                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId, uniqueKey);
+                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, uniqueKey);
 
                 start = DateTime.UtcNow;
                 var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")
@@ -92,32 +93,32 @@ namespace Gosocket.Dian.Functions.Activation
                     await TableLoggerManagerFACELogger.InsertOrUpdateAsync(validateRadian);
 
                     // traigo los datos de RadianTestSetResult
-                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", "UPDATE-02");
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", uniqueKey);
 
                     // Ubico con el servicio si RadianOperation esta activo y no continua el proceso.
                     string code = radianTesSetResult.PartitionKey;
-                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN");
-                    SetLogger(null, "Step 2.1", code, "UPT_Code");
-                    SetLogger(null, "Step 2.2", globalTestSetTracking.SoftwareId, "UPT_SofwareID");
+                    SetLogger(radianTesSetResult, "Step 2", "Ingreso a proceso RADIAN", uniqueKey);
+                    SetLogger(null, "Step 2.1", code, uniqueKey);
+                    SetLogger(null, "Step 2.2", globalTestSetTracking.SoftwareId, uniqueKey);
 
                     // Se verifica si la operacion para el cliente y el software que usa esta habilitada en RADIAn
                     bool isActive = globalRadianOperationService.IsActive(code, new Guid(globalTestSetTracking.SoftwareId));
-                    SetLogger(null, "Step 2.3", isActive.ToString(), "UPT_IsActive");
+                    SetLogger(null, "Step 2.3", isActive.ToString(), uniqueKey);
                     if (isActive)
                         return;
-                    SetLogger(null, "Step 3", "No esta Activo El RadianContributor");
+                    SetLogger(null, "Step 3", "No esta Activo El RadianContributor", uniqueKey);
 
                     //Ajustamos los documentType para sean los eventos de la factura
-                    SetLogger(null, "Step 3.1", allGlobalTestSetTracking.Count.ToString(), "GTS-count");
+                    SetLogger(null, "Step 3.1", allGlobalTestSetTracking.Count.ToString(), uniqueKey);
                     foreach (GlobalTestSetTracking item in allGlobalTestSetTracking)
                     {
                         //Consigue informacion del CUDE
                         GlobalDocValidatorDocumentMeta validatorDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(item.TrackId, item.TrackId);
                         item.DocumentTypeId = validatorDocumentMeta.EventCode;
-                        SetLogger(null, "Step 3.2", item.DocumentTypeId, "GTS-count-3.2");
-                        SetLogger(null, "Step 3.3", item.IsValid.ToString(), "GTS-count-3.3");
+                        SetLogger(null, "Step 3.2", item.DocumentTypeId, uniqueKey);
+                        SetLogger(null, "Step 3.3", item.IsValid.ToString(), uniqueKey);
                     }
-                    SetLogger(null, "Step 3.4", allGlobalTestSetTracking[0].DocumentTypeId, "GTS-count-3.4");
+                    SetLogger(null, "Step 3.4", allGlobalTestSetTracking[0].DocumentTypeId, uniqueKey);
 
                     //Total de los documentos
                     radianTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
@@ -130,11 +131,11 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ReceiptNoticeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ReceiptNoticeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 3", "Acuse de recibo", "AR_001");
-                    SetLogger(null, "Step 3.0", tipo.ToString(), "AR_001.1");
-                    SetLogger(null, "Step 3.1", radianTesSetResult.TotalReceiptNoticeSent.ToString(), "AR_002");
-                    SetLogger(null, "Step 3.2", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_003");
-                    SetLogger(null, "Step 3.6", radianTesSetResult.ReceiptNoticeRejected.ToString(), "AR_004");
+                    SetLogger(null, "Step 3", "Acuse de recibo", uniqueKey);
+                    SetLogger(null, "Step 3.0", tipo.ToString(), uniqueKey);
+                    SetLogger(null, "Step 3.1", radianTesSetResult.TotalReceiptNoticeSent.ToString(), uniqueKey);
+                    SetLogger(null, "Step 3.2", radianTesSetResult.ReceiptNoticeAccepted.ToString(), uniqueKey);
+                    SetLogger(null, "Step 3.6", radianTesSetResult.ReceiptNoticeRejected.ToString(), uniqueKey);
 
                     // Recibo del Bien
                     tipo = (int)EventStatus.Receipt;
@@ -142,11 +143,11 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ReceiptServiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ReceiptServiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 4", "Recibo del bien", "RB_001");
-                    SetLogger(null, "Step 4.0", tipo.ToString(), "RB_001.1");
-                    SetLogger(null, "Step 4.1", radianTesSetResult.TotalReceiptServiceSent.ToString(), "RB_002");
-                    SetLogger(null, "Step 4.2", radianTesSetResult.ReceiptServiceAccepted.ToString(), "RB_003");
-                    SetLogger(null, "Step 4.3", radianTesSetResult.ReceiptServiceRejected.ToString(), "RB_004");
+                    SetLogger(null, "Step 4", "Recibo del bien", uniqueKey);
+                    SetLogger(null, "Step 4.0", tipo.ToString(), uniqueKey);
+                    SetLogger(null, "Step 4.1", radianTesSetResult.TotalReceiptServiceSent.ToString(), uniqueKey);
+                    SetLogger(null, "Step 4.2", radianTesSetResult.ReceiptServiceAccepted.ToString(), uniqueKey);
+                    SetLogger(null, "Step 4.3", radianTesSetResult.ReceiptServiceRejected.ToString(), uniqueKey);
 
                     ////  Aceptación expresa
                     tipo = (int)EventStatus.Accepted;
@@ -154,11 +155,11 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ExpressAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ExpressAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 5", "Aceptacion Expresa", "AE_001");
-                    SetLogger(null, "Step 5.0", tipo.ToString(), "AE_001.1");
-                    SetLogger(null, "Step 5.1", radianTesSetResult.TotalExpressAcceptanceSent.ToString(), "AE_002");
-                    SetLogger(null, "Step 5.2", radianTesSetResult.ExpressAcceptanceAccepted.ToString(), "AE_003");
-                    SetLogger(null, "Step 5.3", radianTesSetResult.ExpressAcceptanceRejected.ToString(), "AE_004");
+                    SetLogger(null, "Step 5", "Aceptacion Expresa", uniqueKey);
+                    SetLogger(null, "Step 5.0", tipo.ToString(), uniqueKey);
+                    SetLogger(null, "Step 5.1", radianTesSetResult.TotalExpressAcceptanceSent.ToString(), uniqueKey);
+                    SetLogger(null, "Step 5.2", radianTesSetResult.ExpressAcceptanceAccepted.ToString(), uniqueKey);
+                    SetLogger(null, "Step 5.3", radianTesSetResult.ExpressAcceptanceRejected.ToString(), uniqueKey);
 
 
                     //// Manifestación de aceptación
@@ -167,11 +168,11 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.AutomaticAcceptanceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.AutomaticAcceptanceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 6", "Manifectacion de aceptacion", "MA_001");
-                    SetLogger(null, "Step 6.0", tipo.ToString(), "MA_001.1");
-                    SetLogger(null, "Step 6.1", radianTesSetResult.TotalAutomaticAcceptanceSent.ToString(), "MA_002");
-                    SetLogger(null, "Step 6.2", radianTesSetResult.AutomaticAcceptanceAccepted.ToString(), "MA_003");
-                    SetLogger(null, "Step 6.3", radianTesSetResult.AutomaticAcceptanceRejected.ToString(), "MA_004");
+                    SetLogger(null, "Step 6", "Manifectacion de aceptacion", uniqueKey);
+                    SetLogger(null, "Step 6.0", tipo.ToString(), uniqueKey);
+                    SetLogger(null, "Step 6.1", radianTesSetResult.TotalAutomaticAcceptanceSent.ToString(), uniqueKey);
+                    SetLogger(null, "Step 6.2", radianTesSetResult.AutomaticAcceptanceAccepted.ToString(), uniqueKey);
+                    SetLogger(null, "Step 6.3", radianTesSetResult.AutomaticAcceptanceRejected.ToString(), uniqueKey);
 
                     //// Rechazo factura electrónica
                     tipo = (int)EventStatus.Rejected;
@@ -179,7 +180,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.RejectInvoiceAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.RejectInvoiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 7", "Rechazo factura electrónica");
+                    SetLogger(null, "Step 7", "Rechazo factura electrónica", uniqueKey);
 
                     //// Solicitud disponibilización
                     tipo = (int)EventStatus.SolicitudDisponibilizacion;
@@ -187,7 +188,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ApplicationAvailableAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ApplicationAvailableRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 8", "Solicitud disponibilización");
+                    SetLogger(null, "Step 8", "Solicitud disponibilización", uniqueKey);
 
                     //// Endoso de propiedad 
                     tipo = (int)EventStatus.EndosoPropiedad;
@@ -195,7 +196,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndorsementPropertyAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndorsementPropertyRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 9", "Endoso de propiedad");
+                    SetLogger(null, "Step 9", "Endoso de propiedad", uniqueKey);
 
                     //// Endoso de Garantia 
                     tipo = (int)EventStatus.EndosoGarantia;
@@ -203,7 +204,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndorsementGuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndorsementGuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 10", "Endoso de Garantia");
+                    SetLogger(null, "Step 10", "Endoso de Garantia", uniqueKey);
 
                     //// Endoso de Procuracion 
                     tipo = (int)EventStatus.EndosoProcuracion;
@@ -211,7 +212,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndorsementProcurementAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndorsementProcurementRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 11", "Endoso de Procuracion");
+                    SetLogger(null, "Step 11", "Endoso de Procuracion", uniqueKey);
 
                     //// Cancelación de endoso 
                     tipo = (int)EventStatus.InvoiceOfferedForNegotiation;
@@ -219,7 +220,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndorsementCancellationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndorsementCancellationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 12", "Cancelación de endoso");
+                    SetLogger(null, "Step 12", "Cancelación de endoso", uniqueKey);
 
                     //// Avales
                     tipo = (int)EventStatus.Avales;
@@ -227,7 +228,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.GuaranteeAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.GuaranteeRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 13", "Avales");
+                    SetLogger(null, "Step 13", "Avales", uniqueKey);
 
 
                     //// Mandato electrónico
@@ -236,7 +237,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ElectronicMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ElectronicMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 14", "Mandato electrónico");
+                    SetLogger(null, "Step 14", "Mandato electrónico", uniqueKey);
 
 
                     //// Terminación mandato
@@ -245,7 +246,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndMandateAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndMandateRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 15", "Terminación mandato");
+                    SetLogger(null, "Step 15", "Terminación mandato", uniqueKey);
 
                     //// Notificación de pago
                     tipo = (int)EventStatus.NotificacionPagoTotalParcial;
@@ -253,7 +254,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.PaymentNotificationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.PaymentNotificationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 16", "Notificación de pago");
+                    SetLogger(null, "Step 16", "Notificación de pago", uniqueKey);
 
 
                     //// Limitación de circulación     
@@ -262,7 +263,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.CirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.CirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 17", "Limitación de circulación");
+                    SetLogger(null, "Step 17", "Limitación de circulación", uniqueKey);
 
                     //// Terminación limitación  
                     tipo = (int)EventStatus.AnulacionLimitacionCirculacion;
@@ -270,7 +271,7 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.EndCirculationLimitationAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.EndCirculationLimitationRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 18", "Terminación limitación");
+                    SetLogger(null, "Step 18", "Terminación limitación", uniqueKey);
 
                     //// Informe para el pago  
                     tipo = (int)EventStatus.ValInfoPago;
@@ -278,10 +279,10 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ReportForPaymentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
                     radianTesSetResult.ReportForPaymentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
-                    SetLogger(null, "Step 19", "Informe para el pago");
+                    SetLogger(null, "Step 19", "Informe para el pago", uniqueKey);
 
-                    SetLogger(null, "Step 19.a", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_005");
-                    SetLogger(null, "Step 19.b", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_006");
+                    SetLogger(null, "Step 19.a", radianTesSetResult.ReceiptNoticeAccepted.ToString(), uniqueKey);
+                    SetLogger(null, "Step 19.b", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), uniqueKey);
 
                     Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
                     GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
@@ -313,9 +314,9 @@ namespace Gosocket.Dian.Functions.Activation
                     }
 
 
-                    SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
-                    SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), "AR_008");
-                    SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), "AR_009");
+                    SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), uniqueKey);
+                    SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), uniqueKey);
+                    SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), uniqueKey);
                     // Determinamos si rechazamos el set de pruebas del cliente
                     if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired)||
                         radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
@@ -334,13 +335,13 @@ namespace Gosocket.Dian.Functions.Activation
                         radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired) ||
                         radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired))
                     {
-                        SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_010");
+                        SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), uniqueKey);
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
 
                     }
-                    SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status, "AR_011");
+                    SetLogger(null, "Step 19 New", " radianTesSetResult.Status " + radianTesSetResult.Status, uniqueKey);
 
                     // Actualizo el registro del set de pruebas del cliente
                     await radianTestSetResultTableManager.InsertOrUpdateAsync(radianTesSetResult);
@@ -348,7 +349,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (radianTesSetResult.Status == (int)TestSetStatus.Accepted)
                     {
-                        SetLogger(null, "Step 19.1", "Fui aceptado", "1111111111");
+                        SetLogger(null, "Step 19.1", "Fui aceptado", uniqueKey);
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -356,7 +357,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                             try
                             {
-                                SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
+                                SetLogger(null, "Step 19.2", "Estoy en habilitacion", uniqueKey);
 
                                 #region Proceso Radian Habilitacion
 
@@ -392,10 +393,10 @@ namespace Gosocket.Dian.Functions.Activation
 
                                 //Enviamos la habilitacion para el usuario
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
-                                SetLogger(null, "Funciton Path", functionPath, "6333333");
-                                SetLogger(requestObject, "Funciton Path", functionPath, "7333333");
+                                SetLogger(null, "Funciton Path", functionPath, uniqueKey);
+                                SetLogger(requestObject, "Funciton Path", functionPath, uniqueKey);
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
-                                SetLogger(activation, "Step 21", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
+                                SetLogger(activation, "Step 21", activation == null ? "Estoy vacio" : " functionPath " + functionPath, uniqueKey);
 
                                 //Dejamos un registro en la globalradiancontributoractivation.
                                 string guid = Guid.NewGuid().ToString();
@@ -414,13 +415,13 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
-                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync ");
+                                SetLogger(contributorActivation, "Step 22", " contributorActivationTableManager.InsertOrUpdateAsync ", uniqueKey);
 
                                 #endregion
                             }
                             catch (Exception ex)
                             {
-                                SetLogger(null, "Error", ex.Message, "Error123");
+                                SetLogger(null, "Error", ex.Message, uniqueKey);
                                 log.Error($"Error al enviar a activar RADIAN contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
@@ -439,16 +440,16 @@ namespace Gosocket.Dian.Functions.Activation
 
                     string[] tempSoftwareID = setResultOther.RowKey.Split('|');
 
-                    SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL Software ID: " + tempSoftwareID[1], "UPDATE-03");
+                    SetLogger(null, "Step 2 - Nomina", "setResultOther dieferente de NULL Software ID: " + tempSoftwareID[1], uniqueKey);
                     // traigo los datos de RadianTestSetResult
 
                     // Se verifica si la operacion para el cliente y el software que usa esta habilitada para otros documentos
                     bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(tempSoftwareID[1]));
-                    SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
+                    SetLogger(null, "Step 2.3", isActive.ToString(), uniqueKey);
                     if (isActive)
                         return;               
 
-                    SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");
+                    SetLogger(null, "Step 2 - Nomina", "estado en prueba ", uniqueKey);
 
                     string[] nomina = { "103" };
                     string[] otherDocument = { "102" };
@@ -474,7 +475,7 @@ namespace Gosocket.Dian.Functions.Activation
                         && setResultOther.OthersDocumentsAccepted >= setResultOther.OthersDocumentsAcceptedRequired
                         && setResultOther.Status == (int)TestSetStatus.InProcess)
                     {
-                        SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina", "UPDATE-03.3");
+                        SetLogger(null, "Step 3 - Validacion Nomina", "Paso Validacion de nomina", uniqueKey);
                         setResultOther.Status = (int)TestSetStatus.Accepted;
                         setResultOther.StatusDescription = TestSetStatus.Accepted.GetDescription();
                         setResultOther.State = TestSetStatus.Accepted.GetDescription();
@@ -485,14 +486,14 @@ namespace Gosocket.Dian.Functions.Activation
                     if (isPartipantActiveOtherDoc == null)
                         return;
 
-                    SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation ", "UPDATE-03.9");
+                    SetLogger(isPartipantActiveOtherDoc, "Step 7", " isPartipantActive.GlobalOtherDocElecOperation ", uniqueKey);
 
 
                     //Validacion Total Nomina rechazados 
                     if (setResultOther.TotalDocumentsRejected > (setResultOther.TotalDocumentRequired - setResultOther.TotalDocumentAcceptedRequired)                        
                         && setResultOther.Status == (int)TestSetStatus.InProcess)
                     {
-                        SetLogger(isPartipantActiveOtherDoc, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", "UPDATE-03.5");
+                        SetLogger(isPartipantActiveOtherDoc, "Step 5 - Validacion Nomina Reject", "Paso Validacion de Nomina Reject", uniqueKey);
                         setResultOther.Status = (int)TestSetStatus.Rejected;
                         setResultOther.StatusDescription = TestSetStatus.Rejected.GetDescription();
                         setResultOther.State = TestSetStatus.Rejected.GetDescription();
@@ -505,21 +506,21 @@ namespace Gosocket.Dian.Functions.Activation
                     // Si es aceptado el set de pruebas se activa el contributor en el ambiente de habilitacion
                     if (setResultOther.Status == (int)TestSetStatus.Accepted)
                     {
-                        SetLogger(null, "Step 6.1", "Aceptado", "UPDATE-03.7");                      
+                        SetLogger(null, "Step 6.1", "Aceptado", uniqueKey);                      
 
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
                             try
                             {
-                                SetLogger(null, "Step 6.2", "Estoy en habilitacion", "UPDATE-03.8");
+                                SetLogger(null, "Step 6.2", "Estoy en habilitacion", uniqueKey);
 
                                 //--Traemos la informacion del software
                                 //string softwareId = globalTestSetTracking.SoftwareId;
                                 string softwareId = tempSoftwareID[1];
                                 OtherDocElecSoftware software = softwareService.GetByOtherDoc(Guid.Parse(softwareId));
 
-                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, "UPDATE-03.11");
+                                SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, uniqueKey);
                             
                                 #region migracion SQL
 
@@ -539,12 +540,12 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
-                                SetLogger(null, "Funciton Path", functionPath, "63333334");
-                                SetLogger(requestObject, "Funciton Path", functionPath, "73333334");
+                                SetLogger(null, "Funciton Path", functionPath, uniqueKey);
+                                SetLogger(requestObject, "Funciton Path", functionPath, uniqueKey);
 
                                 var activation = await ApiHelpers.ExecuteRequestAsync<SendToActivateContributorResponse>(functionPath, requestObject);
 
-                                SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
+                                SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, uniqueKey);
                                 //SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
 
                                 var guid = Guid.NewGuid().ToString();
@@ -563,13 +564,13 @@ namespace Gosocket.Dian.Functions.Activation
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
-                                SetLogger(contributorActivation, "Step 9", " contributorActivationTableManager.InsertOrUpdateAsync ");
+                                SetLogger(contributorActivation, "Step 9", " contributorActivationTableManager.InsertOrUpdateAsync ", uniqueKey);
 
                                 #endregion
                             }
                             catch (Exception ex)
                             {
-                                SetLogger(null, "Error", ex.Message, "Error123456");
+                                SetLogger(null, "Error", ex.Message, uniqueKey);
                                 log.Error($"Error al enviar a activar Nomina/OtherDocument contribuyente con id {globalTestSetTracking.SenderCode} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                                 throw;
                             }
