@@ -80,13 +80,19 @@ namespace Gosocket.Dian.Application
 
         public Software Get(Guid id)
         {
-            return sqlDBContext.Softwares.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.Softwares.AsNoTracking().Include("Contributor").Include("AcceptanceStatusSoftware").FirstOrDefault(x => x.Id == id);
+            }
         }
 
 
         public RadianSoftware GetByRadian(Guid id)
         {
-            return sqlDBContext.RadianSoftwares.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.RadianSoftwares.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            }
         }
 
 
