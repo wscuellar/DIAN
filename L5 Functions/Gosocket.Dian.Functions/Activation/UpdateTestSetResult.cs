@@ -559,7 +559,7 @@ namespace Gosocket.Dian.Functions.Activation
                                     SentToActivateBy = "Function",
                                     SoftwareId = isPartipantActiveOtherDoc.RowKey,
                                     SendDate = DateTime.UtcNow,
-                                    TestSetId = radianTesSetResult.Id,
+                                    TestSetId = setResultOther.Id,
                                     Request = JsonConvert.SerializeObject(requestObject)
                                 };
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
