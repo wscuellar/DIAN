@@ -59,6 +59,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
         private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
+        private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
         XmlDocument _xmlDocument;
         XPathDocument _document;
         XPathNavigator _navigator;
@@ -2097,6 +2098,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
+            var isValidateAttorney = false;
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
             string receiverCode = nitModel.ReceiverCode;
@@ -2114,33 +2116,64 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Is Radian
             var isRadian = false;
 
+            GlobalRadianOperations globalRadianOperations = GlobalRadianOperationsTableManager.Find<GlobalRadianOperations>(documentMetaCude.TechProviderCode, documentMetaCude.SoftwareId);
+
             var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
             if (docEvent != null)
                 isRadian = docEvent.IsRadian;
 
-            //valida si existe los permisos del mandatario
             if (party.SenderParty != documentMetaCude.TechProviderCode
                 && documentMetaCude.TechProviderCode != "800197268"
-                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
-                && !party.SendTestSet
-                && isRadian)
+                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato 
+                && Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato
+                )
             {
-                var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
-                if (responseVal != null)
+                //Valida mandato PT y eventos RADIAN
+                if (globalRadianOperations.TecnologicalSupplier && isRadian)
                 {
-                    foreach (var item in responseVal)
+                    //valida si existe los permisos del mandatario
+                    var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
+                    if (responseVal != null)
                     {
-                        responses.Add(new ValidateListResponse
+                        foreach (var item in responseVal)
                         {
-                            IsValid = item.IsValid,
-                            Mandatory = item.Mandatory,
-                            ErrorCode = item.ErrorCode,
-                            ErrorMessage = item.ErrorMessage,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = item.IsValid,
+                                Mandatory = item.Mandatory,
+                                ErrorCode = item.ErrorCode,
+                                ErrorMessage = item.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+
+                            isValidateAttorney = true;
+                        }
                     }
                 }
-            }
+
+                //Valida mandato SNE y Factor
+                if ( (globalRadianOperations.Factor || globalRadianOperations.NegotiationSystem) 
+                    && !isValidateAttorney && !globalRadianOperations.TecnologicalSupplier)
+                {
+                    //valida si existe los permisos del mandatario
+                    var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
+                    if (responseVal != null)
+                    {
+                        foreach (var item in responseVal)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = item.IsValid,
+                                Mandatory = item.Mandatory,
+                                ErrorCode = item.ErrorCode,
+                                ErrorMessage = item.ErrorMessage,
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
+                }
+            }                    
 
             switch (Convert.ToInt16(party.ResponseCode))
             {
