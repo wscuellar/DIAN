@@ -268,10 +268,54 @@
 
                 var form = $('#frmOthersElectronicDocuments');
                 console.log(form);
-                console.log(form.valid());
-                if (form.valid()) {
-                    form.submit();
-                }
+				console.log(form.valid());
+				if ($('#OperationModeSelectedId').val() == 1) {
+					$('#ErrorSoftwareName').hide()
+					$('#ErrorPinSW').hide()
+					if ($('#SoftwareName').val().trim() == '') {
+						$('#ErrorSoftwareName').show()
+					}
+					else {
+						if ($('#PinSW').val().trim() == '') {
+							$('#ErrorPinSW').show()
+						}
+						else {
+							$('#ErrorSoftwareName').hide()
+							$('#ErrorPinSW').hide()
+							form.submit();
+						}
+
+					}
+				}
+				else {
+					$('#ErrorProviderId').hide()
+					$('#ErrorSoftwareId').hide()
+					if ($('#OperationModeSelectedId').val() == 2) {
+						if ($('#ProviderId').val() == '') {
+							$('#ErrorProviderId').show()
+						}
+						else {
+							if ($('#SoftwareId').val() == '') {
+								$('#ErrorSoftwareId').show()
+							}
+							else {
+								$('#ErrorProviderId').hide()
+								$('#ErrorSoftwareId').hide()
+								form.submit();
+							}
+
+						}
+					}
+					else
+					{
+						if ($('#OperationModeSelectedId').val() == 2)
+						{
+							form.submit();
+						}
+					}
+				}
+
+              
             });
 
             $('#ProviderId').change(function () {
@@ -303,7 +347,6 @@
 			$('.selectpicker').selectpicker('refresh');
 			$('#OperationModeSelectedId').change();
 		});//ready
-
 
 
 
@@ -385,6 +428,9 @@
 				$('#FormPropio').fadeIn()
 				$('#DivSoftwareId').fadeIn()
 				$('#DivPin').fadeIn()
+				$('#SoftwareName').removeAttr('disabled')
+				$('#ContributorName').val('@Model.ContributorName');
+				$('#SoftwareName').val('');
             }
             else if ($('#OperationModeSelectedId').val() == 2) {
 				$('#FormPt').fadeIn()

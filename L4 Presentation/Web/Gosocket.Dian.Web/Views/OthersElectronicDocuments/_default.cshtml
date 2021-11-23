@@ -88,14 +88,14 @@
 				<div class="form-group">
 					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
 					@Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
-					@Html.ValidationMessageFor(m => m.SoftwareName, "", new { @class = "text-danger" })
+					<span id="ErrorSoftwareName" style="display:none" class="text-danger">Nombre de Software es requerido</span>
 				</div>
 			</div>
 			<div class="col-sm-3 padding-xs-0" id="DivPin">
 				<div class="form-group">
 					@Html.LabelFor(m => m.PinSW, new { @class = "control-label" })
 					@Html.TextBoxFor(m => m.PinSW, new { @class = "form-control input-general" })
-					@Html.ValidationMessageFor(m => m.PinSW, "", new { @class = "text-danger" })
+					<span id="ErrorPinSW" style="display:none"  class="text-danger">PIN del Software es requerido</span>
 				</div>
 			</div>
 			<div class="col-sm-3 padding-xs-0"  id="DivSoftwareId">
@@ -113,14 +113,14 @@
 				<div class="form-group">
 					@Html.Label("ProviderId", "Nombre empresa proveedora", new { @class = "control-label" })
 					@Html.DropDownListFor(m => m.ProviderId, (SelectList)ViewBag.ListTechnoProviders, "Seleccione...", new { @class = "form-control selectpicker" })
-					@Html.ValidationMessageFor(m => m.ProviderId, "", new { @class = "text-danger" })
+					<span id="ErrorProviderId" style="display:none" class="text-danger">Nombre de empresa proveedora es requerido</span>
 				</div>
 			</div>
 			<div class="col-sm-5 col-md-3 padding-xs-0">
 				<div class="form-group">
 					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
 					@Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
-					@Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })
+					<span id="ErrorSoftwareId" style="display:none" class="text-danger">Nombre de software es requerido</span>
 				</div>
 			</div>
 		</div>
