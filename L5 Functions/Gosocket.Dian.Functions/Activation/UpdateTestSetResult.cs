@@ -521,7 +521,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 SetLogger(isPartipantActiveOtherDoc, "Step 7.1", " softwareId.GlobalOtherDocElecOperation " + softwareId, "UPDATE-03.11");
                             
                                 #region migracion SQL
-
                                 var requestObject = new
                                 {
                                     code = isPartipantActiveOtherDoc.PartitionKey,
@@ -563,7 +562,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 await contributorActivationTableManager.InsertOrUpdateAsync(contributorActivation);
 
                                 SetLogger(contributorActivation, "Step 9", " contributorActivationTableManager.InsertOrUpdateAsync ");
-
                                 #endregion
                             }
                             catch (Exception ex)
