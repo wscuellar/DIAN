@@ -2122,14 +2122,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (docEvent != null)
                 isRadian = docEvent.IsRadian;
 
-            if (party.SenderParty != documentMetaCude.TechProviderCode
-                && documentMetaCude.TechProviderCode != "800197268"
+            if (documentMetaCude.TechProviderCode != "800197268"
                 && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato 
                 && Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato
                 )
             {
                 //Valida mandato PT y eventos RADIAN
-                if (globalRadianOperations.TecnologicalSupplier && isRadian)
+                if (globalRadianOperations.TecnologicalSupplier && isRadian
+                    || party.SenderParty != documentMetaCude.TechProviderCode)
                 {
                     //valida si existe los permisos del mandatario
                     var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
@@ -2153,7 +2153,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida mandato SNE y Factor
                 if ( (globalRadianOperations.Factor || globalRadianOperations.NegotiationSystem) 
-                    && !isValidateAttorney && !globalRadianOperations.TecnologicalSupplier)
+                    && !isValidateAttorney && !globalRadianOperations.TecnologicalSupplier
+                     && party.SenderParty != documentMetaCude.TechProviderCode)
                 {
                     //valida si existe los permisos del mandatario
                     var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
