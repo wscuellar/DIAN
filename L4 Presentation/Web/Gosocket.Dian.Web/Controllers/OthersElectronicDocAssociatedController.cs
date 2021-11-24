@@ -352,6 +352,8 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 operationModesList.Add(new SelectListItem { Value = ((int)Domain.Common.OtherDocElecOperationMode.OwnSoftware).ToString(), Text = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
                 operationModesList.Add(new SelectListItem { Value = ((int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider).ToString(), Text = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider.GetDescription() });
+                var OperationsModes = _othersDocsElecContributorService.GetOperationModes().Where(x => x.Id == 3).FirstOrDefault();
+                operationModesList.Add(new SelectListItem { Value = OperationsModes.Id.ToString(), Text = OperationsModes.Name });
             }
             else
             {
@@ -375,7 +377,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.OperationModeList = operationModesList;
             model.ContributorType = entity.ContributorType;
             model.ContributorTypeId = entity.ContributorTypeId;
-            model.SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl");
+            model.SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrlEvent");
+            //model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrlEvent");
             model.SoftwareId = Guid.NewGuid();
             model.SoftwareIdBase = entity.SoftwareIdBase;
             model.ProviderId = entity.ProviderId;
@@ -418,6 +421,14 @@ namespace Gosocket.Dian.Web.Controllers
             if (_othersDocsElecContributorService.ValidateSoftwareActive(User.ContributorId(), (int)model.ContributorTypeId, (int)model.OperationModeId, (int)OtherDocElecSoftwaresStatus.InProcess))
                 return Json(new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
+
+            if (model.OperationModeId == 3)
+            {
+                model.SoftwarePin = "0000";
+                
+            }
+
+
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(User.ContributorId(),
                                               OtherDocElecState.Registrado,
                                               model.ContributorTypeId,
@@ -443,8 +454,8 @@ namespace Gosocket.Dian.Web.Controllers
                 OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess,
                 SoftwareDate = now,
                 Timestamp = now,
-                Updated = now,
-                SoftwareId = model.SoftwareId,
+                Updated = now,                
+                SoftwareId = model.OperationModeId != 3 ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 
