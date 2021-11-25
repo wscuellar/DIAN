@@ -122,7 +122,7 @@ namespace Gosocket.Dian.Web.Controllers
 						//    softwareActive = true;
 						//}
 
-						softwareActive = true;
+						softwareActive = false;
 					}
 					else
 					{
@@ -224,11 +224,13 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 			}
-			if (model.OperationModeId == 3)
+			if (model.OperationModeSelectedId == "3")
 			{
 				model.PinSW = "0000";
 				Guid g = Guid.NewGuid();
 				model.SoftwareId = g.ToString();
+
+				model.OperationModeId = 3;
 			}
 			if (model.SoftwareId == null)
 			{				Guid g = Guid.NewGuid();
@@ -402,7 +404,7 @@ namespace Gosocket.Dian.Web.Controllers
 										   new
 										   {
 											   ElectronicDocumentId = 1, //ValidacionOtherDocs.ElectronicDocumentId,
-											   OperationModeId = mode.FirstOrDefault().OtherDocElecOperationModeId, //(int)ValidacionOtherDocs.OperationModeId,
+											   OperationModeId =0, //(int)ValidacionOtherDocs.OperationModeId,
 											   ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
 											   ContributorId
 										   });
