@@ -243,19 +243,31 @@
                             </div>
                         </section>*@
                         <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section class="test-redirect">
-                            @if (Model.Step == 2)
-                            {
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="text-right">
-                                            <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                            <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </section>
+						<section class="test-redirect">
+							@if (Model.Step > 0)
+							{
+								<div class="panel-body">
+									<div class="row">
+										<div class="text-right">
+											@*<button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>*@
+											<button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
+										</div>
+									</div>
+								</div>
+							}
+							@*@if (Model.State == "Rechazado")
+							{
+								<div>
+									<button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
+								</div>
+							}
+							else
+							{
+								<div>
+									<button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15 disabled">Reiniciar set de pruebas</button>
+								</div>
+							}*@
+						</section>
                         <h3></h3>
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
@@ -277,27 +289,7 @@
         </div>
 
         @*Modal*@
-        <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
 
-                    <div class="modal-header">
-                        <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @Model.ContributorType de @Model.ElectronicDoc</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="bootbox-body">
-                            <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
-                            <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-                                      maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
-
-                        </div>
-                    </div><div class="modal-footer">
-                        <button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </div>
 </div>
