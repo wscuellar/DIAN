@@ -133,9 +133,9 @@ namespace Gosocket.Dian.Application
         {
             using (var context = new SqlDBContext())
             {
-                return context.Contributors.Include("ContributorType").Include("OperationMode").Include("Provider").Include("Clients")
+                return context.Contributors.Include("ContributorType").Include("OperationMode")
                     .Include("AcceptanceStatus").Include("Softwares").Include("Softwares.AcceptanceStatusSoftware").Include("ContributorFiles")
-                    .Include("ContributorFiles.ContributorFileStatus").Include("ContributorFiles.ContributorFileType").FirstOrDefault(x => x.Id == id);
+                    .Include("ContributorFiles.ContributorFileStatus").Include("ContributorFiles.ContributorFileType").AsNoTracking().FirstOrDefault(x => x.Id == id);
             }
         }
 
