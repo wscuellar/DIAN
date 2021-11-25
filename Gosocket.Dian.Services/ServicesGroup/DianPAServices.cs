@@ -221,7 +221,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 if (authEntity == null)
                 {
                     dianResponse.XmlFileName = $"{fileName}";
-                    dianResponse.StatusCode = "89";
+                    dianResponse.StatusCode = Properties.Settings.Default.Code_89;
                     dianResponse.StatusDescription = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
                     var globalEnd = DateTime.UtcNow.Subtract(globalStart).TotalSeconds;
                     if (globalEnd >= 10)
@@ -1046,14 +1046,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // Auth
             start = DateTime.UtcNow;
-            //Mandato sin CUFES referenciados
-            bool mandato = (eventCode == "043" && listId != "3");
-            bool validaAutho = ( (eventCode == "037" || eventCode == "038" || eventCode == "039" ) && listId != "2" || mandato);
-            
+
+            //Mandato sin CUFES referenciados            
             //Si no es un endoso en blanco valida autorizacion            
-            if (validaAutho && senderCode != "01")
-            {
-                
+            if (senderCode != "01" && !String.IsNullOrWhiteSpace(senderCode))
+            {                
                 string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
 
                 var authEntity = GetAuthorization(senderCode, authCode);
