@@ -548,6 +548,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 SetLogger(activation, "Step 8", activation == null ? "Estoy vacio" : " functionPath " + functionPath, "21212121");
                                 //SetLogger(activation, "Step 21", " functionPath " + functionPath, "21212121");
 
+
                                 var guid = Guid.NewGuid().ToString();
                                 var contributorActivation = new GlobalContributorActivation(contributor.Code, guid)
                                 {
@@ -575,7 +576,6 @@ namespace Gosocket.Dian.Functions.Activation
                             }
                         }
                     }
-
                 }
                 else // Factura Electronica
                 {
