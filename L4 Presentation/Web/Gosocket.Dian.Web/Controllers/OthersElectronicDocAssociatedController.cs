@@ -377,7 +377,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.OperationModeList = operationModesList;
             model.ContributorType = entity.ContributorType;
             model.ContributorTypeId = entity.ContributorTypeId;
-            model.SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrlEvent");
+            model.SoftwareUrl = ConfigurationManager.GetValue("WebServiceUrl");
             //model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrlEvent");
             model.SoftwareId = Guid.NewGuid();
             model.SoftwareIdBase = entity.SoftwareIdBase;
