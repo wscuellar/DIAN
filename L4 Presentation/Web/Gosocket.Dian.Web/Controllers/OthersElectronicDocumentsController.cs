@@ -114,6 +114,8 @@ namespace Gosocket.Dian.Web.Controllers
 				{
 					var contributorInTestSameOperation = contributorsInTestSameOperation.FirstOrDefault(x => x.OtherDocElecContributorTypeId == (int)dataentity.ContributorIdType
 						&& x.OtherDocElecOperationModeId == (int)dataentity.OperationModeId);
+
+					//cambiar 
 					if (contributorInTestSameOperation != null)
 					{
 						//var operations = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(contributorInTestSameOperation.Id);
@@ -124,11 +126,11 @@ namespace Gosocket.Dian.Web.Controllers
 
 						softwareActive = false;
 					}
-					else
-					{
-						var msg = $"No se puede {ViewBag.Title}, ya que tiene uno en estado: \"En Proceso\"";
-						return this.RedirectToAction("AddParticipants", new { electronicDocumentId = dataentity.ElectronicDocumentId, message = msg });
-					}
+					//else
+					//{
+					//	var msg = $"No se puede {ViewBag.Title}, ya que tiene uno en estado: \"En Proceso\"";
+					//	return this.RedirectToAction("AddParticipants", new { electronicDocumentId = dataentity.ElectronicDocumentId, message = msg });
+					//}
 				}
 			}
 
