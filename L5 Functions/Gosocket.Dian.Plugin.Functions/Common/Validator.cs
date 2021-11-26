@@ -2116,63 +2116,31 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Is Radian
             var isRadian = false;
 
-            GlobalRadianOperations globalRadianOperations = GlobalRadianOperationsTableManager.Find<GlobalRadianOperations>(documentMetaCude.TechProviderCode, documentMetaCude.SoftwareId);
-
             var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
             if (docEvent != null)
                 isRadian = docEvent.IsRadian;
 
-            if (documentMetaCude.TechProviderCode != "800197268"
-                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato 
-                && Convert.ToInt32(eventCode) != (int)EventStatus.TerminacionMandato
-                )
+            //valida si existe los permisos del mandatario
+            if (party.SenderParty != documentMetaCude.TechProviderCode
+                && documentMetaCude.TechProviderCode != "800197268"
+                && Convert.ToInt32(eventCode) != (int)EventStatus.Mandato
+                && !party.SendTestSet
+                && isRadian)
             {
-                //Valida mandato PT y eventos RADIAN
-                if (globalRadianOperations.TecnologicalSupplier && isRadian
-                    || party.SenderParty != documentMetaCude.TechProviderCode)
+                var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
+                if (responseVal != null)
                 {
-                    //valida si existe los permisos del mandatario
-                    var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
-                    if (responseVal != null)
+                    foreach (var item in responseVal)
                     {
-                        foreach (var item in responseVal)
+                        responses.Add(new ValidateListResponse
                         {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = item.IsValid,
-                                Mandatory = item.Mandatory,
-                                ErrorCode = item.ErrorCode,
-                                ErrorMessage = item.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-
-                            isValidateAttorney = true;
-                        }
+                            IsValid = item.IsValid,
+                            Mandatory = item.Mandatory,
+                            ErrorCode = item.ErrorCode,
+                            ErrorMessage = item.ErrorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
                     }
-                }
-
-                //Valida mandato SNE y Factor
-                if ( (globalRadianOperations.Factor || globalRadianOperations.NegotiationSystem) 
-                    && !isValidateAttorney && !globalRadianOperations.TecnologicalSupplier
-                     && party.SenderParty != documentMetaCude.TechProviderCode)
-                {
-                    //valida si existe los permisos del mandatario
-                    var responseVal = ValidateFacultityAttorney(party, documentMetaCude.TechProviderCode, documentMetaCude.SenderCode, documentMetaCude.NoteMandato, documentMetaCude.NoteMandato2, documentMetaCude.SoftwareId);
-                    if (responseVal != null)
-                    {
-                        foreach (var item in responseVal)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = item.IsValid,
-                                Mandatory = item.Mandatory,
-                                ErrorCode = item.ErrorCode,
-                                ErrorMessage = item.ErrorMessage,
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-                    }
-
                 }
             }                    
 
