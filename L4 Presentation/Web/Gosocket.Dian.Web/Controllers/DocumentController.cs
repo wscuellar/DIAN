@@ -1347,7 +1347,8 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (GlobalDataDocument item in listGlobalDataDocument)
                 {
                     GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
-                    this.PayrollList.Add(payroll);
+                    if (payroll != null)
+                        this.PayrollList.Add(payroll);
                 }
             }
             else
