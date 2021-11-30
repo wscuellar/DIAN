@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
 
 
         // Set queue name 
@@ -42,7 +43,7 @@ namespace Gosocket.Dian.Functions.Activation
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-            var testSetId = string.Empty;
+            var testSetId = string.Empty;          
             try
             {               
                 //Obtengo informacion de la cola e insertamos el registro del tracking de envios
@@ -58,16 +59,39 @@ namespace Gosocket.Dian.Functions.Activation
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startUpdateTest);
 
-
+                RadianTestSetResult radianTesSetResult = null;
+                GlobalTestSetOthersDocumentsResult setResultOther = null;
                 testSetId = globalTestSetTracking.TestSetId;
+              
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
-                GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentTestId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
-                //Se busca el set de pruebas procesado para el testsetid en curso
-                RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
-                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, "UPDATE-01");
+                //Ajustamos teachProviderCode para el partitionKey del set de pruebas
+                SetLogger(null, "Step 1.1", allGlobalTestSetTracking.Count.ToString(), "DocumentMeta-count");
+                foreach (GlobalTestSetTracking itemMeta in allGlobalTestSetTracking)
+                {                   
+                    //ApplicationResponse
+                    if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse)
+                    {
+                        //Consigue informacion del trackId
+                        GlobalDocValidatorDocumentMeta teachProviderDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(itemMeta.TrackId, itemMeta.TrackId);
+                        radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(teachProviderDocumentMeta.TechProviderCode, globalTestSetTracking.TestSetId);
+                        if (radianTesSetResult != null) break;                     
+                    }
+                    
+                    //OtherDocument Nomina - Nomina de Ajustes
+                    if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll 
+                        || Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+                    {
+                        //Consigue informacion del trackId nomina individual y nomina de ajuste
+                        GlobalDocPayroll teachProviderPayroll = TableManagerGlobalDocPayroll.FindByPartition<GlobalDocPayroll>(itemMeta.TrackId).FirstOrDefault();
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.NIT, globalTestSetTracking.TestSetId);
+                        if (setResultOther != null) break;
+                    }                        
+                }
+               
+                SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId);
+                SetLogger(setResultOther, " Step 0 ", " Paso setResultOther " + setResultOther + " **** " + globalTestSetTracking.TestSetId, "UPDATE-01");
 
                 start = DateTime.UtcNow;
                 var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")

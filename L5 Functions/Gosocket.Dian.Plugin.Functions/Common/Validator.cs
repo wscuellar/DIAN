@@ -1256,10 +1256,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 if (documentMeta.SendTestSet)
-                {
-                    testSetId = documentMeta.TestSetId;
+                {                    
                     //Se busca el set de pruebas procesado para el testsetid en curso
-                    RadianTestSetResult radianTesSetResult = TableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+                    RadianTestSetResult radianTesSetResult = TableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(documentMeta.TechProviderCode, documentMeta.TestSetId);
                     
                     if(radianTesSetResult != null && Convert.ToInt32(radianTesSetResult.ContributorTypeId) != (int)RadianContributorType.ElectronicInvoice)
                     {
