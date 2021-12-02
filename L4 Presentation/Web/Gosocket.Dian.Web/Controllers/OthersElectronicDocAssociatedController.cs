@@ -18,6 +18,7 @@ using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Gosocket.Dian.Application;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -47,6 +48,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
         private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
+        private readonly IRadianTestSetAppliedService _radianTestSetAppliedService;
+
         private readonly TelemetryClient telemetry;
 
         public OthersElectronicDocAssociatedController(IContributorService contributorService,
@@ -54,7 +57,7 @@ namespace Gosocket.Dian.Web.Controllers
             IOthersElectronicDocumentsService othersElectronicDocumentsService,
             ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
-            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService,
+            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService, IRadianTestSetAppliedService radianTestSetAppliedService,
             TelemetryClient telemetry
             )
         {
@@ -64,6 +67,7 @@ namespace Gosocket.Dian.Web.Controllers
             _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
             _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
+            _radianTestSetAppliedService = radianTestSetAppliedService;
             this.telemetry = telemetry;
         }
 
@@ -562,7 +566,9 @@ namespace Gosocket.Dian.Web.Controllers
             //EndElectronicPayrollAjustment
 
             bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model);
-            if(isUpdate)
+
+            _radianTestSetAppliedService.ResetPreviousCounts(model.Id);
+            if (isUpdate)
             {
                 // OtherDocElecContributor
                 //var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);
