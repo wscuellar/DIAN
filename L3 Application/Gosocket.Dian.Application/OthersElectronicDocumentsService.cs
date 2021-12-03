@@ -85,6 +85,41 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
+
+        public ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation)
+        {
+            OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId);
+            GlobalTestSetOthersDocuments testSet = null;
+            testSet = _othersDocsElecContributorService.GetTestResult(Contributor.OtherDocElecOperationModeId, Contributor.ElectronicDocumentId);
+            if (testSet == null)
+                return new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500);
+
+            if (validateOperation)
+            {
+                List<OtherDocElecContributorOperations> currentOperations =
+                    _othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
+                                                                    && !t.Deleted);
+                if (currentOperations.Any())
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
+            }
+
+            OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation != null)
+                return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+
+
+            _othersDocsElecSoftwareService.CreateSoftware(software);
+            int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
+            
+
+            existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
+            // se asigna el nuevo set de pruebas...
+            ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, software);
+
+            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
+        }
         public bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description)
         {
             List<OtherDocElecContributor> contributors = _othersDocsElecContributorRepository.List(t => t.Id == contributorId

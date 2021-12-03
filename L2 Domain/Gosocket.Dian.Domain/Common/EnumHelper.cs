@@ -656,7 +656,10 @@ namespace Gosocket.Dian.Domain.Common
         OwnSoftware = 1,
         [Display(Name = "Software de un proveedor tecnológico")]
         [Description("Software de un proveedor tecnológico")]
-        SoftwareTechnologyProvider = 2
+        SoftwareTechnologyProvider = 2,
+        [Display(Name = "Software solución gratuita")]
+        [Description("Software solución gratuita")]
+        FreeBiller = 3
     }
 
     public enum EventCustomization

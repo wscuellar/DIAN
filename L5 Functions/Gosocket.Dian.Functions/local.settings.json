@@ -5,7 +5,7 @@
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "BatchThreads": 1,
     "BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
-    "Slot": "-debug",
+    "Slot": "",
 
     //Test config
     "Environment": "Test",
@@ -25,7 +25,7 @@
     "DownloadXmlUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/DownloadXml?code=yYPfSpl5Ut6EYNNSz02oVQqxN/gu16PyqUWb88C1qs0/DJki68j9IQ==",
     "GetCertificateApiUrl": "http://52.247.20.224:8080/certificate/get",
     "GetValidationsByTrackIdUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/GetValidationsByTrackId?code=jmrHRvwTg25gOjW7f9wGsuanLJQHu7xtkqEDtfzwnoqVEkSdZT4Vhw==",
-    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/GetXpathDataValues?code=DvTiOcmHjnZXKakwQL5QDgR6kODjfheEzlPBGmC07CEOAWYmJAzWRg==",
+    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
     "GetMultipleXpathDataValuesUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/GetMultipleXpathDataValues?code=MHRd32dZeWia2syQixmjhU4yShvF0vi9EihfHiz9/ileYtBNv9x0aQ==",
     "ExportCertificateUrl": "https://gtpa-function-commons-test-indra.azurewebsites.net/api/ExportCertificate?code=YUE1zpYzra9aV/IgU1LPgbP0gz0uQnKVvIIJwPQtBhvim0rbML4HeA==",
     "UploadXmlUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/UploadXml?code=3a7akajw6XoYS6ZCjHOhxmasFrLCehtIP2hsCEMBHu5aHLXVYRg3bg==",
