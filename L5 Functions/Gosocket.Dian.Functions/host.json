@@ -1,7 +1,7 @@
 {
-  //"functions": [ "DownloadECDFiles" ],
+  "functions": [ "ProcessBatchDocumentsZipFile" ],
   "queues": {
-    "batchSize": 16,
+    "batchSize": 1,
     "maxPollingInterval": 2000,
     "maxDequeueCount": 20,
     "newBatchThreshold": 8,
