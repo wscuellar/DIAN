@@ -1345,9 +1345,10 @@ namespace Gosocket.Dian.Web.Controllers
                 List<GlobalDataDocument> listGlobalDataDocument = await CosmosDBService.Instance(date).ReadDocumentByReceiverCodeAsync(model.NumeroDocumento, date);
 
                 foreach (GlobalDataDocument item in listGlobalDataDocument)
-                {
-                    GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
-                    this.PayrollList.Add(payroll);
+                {                   
+                    GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);                   
+                    if(payroll != null) 
+                        this.PayrollList.Add(payroll);
                 }
             }
             else
