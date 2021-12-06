@@ -58,6 +58,8 @@ namespace Gosocket.Dian.Functions.Batch
             var trackIdReferenceRadian = string.Empty;
             var trackIdCude = string.Empty;
             var listId = string.Empty;
+            var payrollTypeXml = string.Empty;
+            var payrollProvider = string.Empty;
 
 
             try
@@ -109,21 +111,26 @@ namespace Gosocket.Dian.Functions.Batch
                 var xpathRequest = requestObjects.FirstOrDefault();
                 var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
-                Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
+                Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);                
                 eventCodeRadian = xpathResponse.XpathsValues["AppResEventCodeXpath"];
                 trackIdReferenceRadian = xpathResponse.XpathsValues["AppResDocumentReferenceKeyXpath"];
                 listId = string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResListIDXpath"]) ? "1" : xpathResponse.XpathsValues["AppResListIDXpath"];
                 trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
 
-                var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
-
+                //Informacion documento Nomina Individual / Ajuste
+                payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
+                payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+                
                 start = DateTime.UtcNow;
                 var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
                 {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                    Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian + " trackIdCude " + trackIdCude + " listId " + listId
+                    Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian 
+                    + " trackIdCude " + trackIdCude + " listId " + listId + " payrollTypeXml " + payrollTypeXml + " payrollProvider " + payrollProvider + " testSetId " + testSetId
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
+
+                var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(payrollProvider, testSetId);
 
                 var xmlBytes = contentFileList.First().XmlBytes;               
 
@@ -601,12 +608,16 @@ namespace Gosocket.Dian.Functions.Batch
                 { "NominaCUNE", "//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@CUNE"},
                 { "NominaReceiverCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Trabajador']/@NumeroDocumento" },
                 { "NominaSenderCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Empleador']/@NIT" },
+                { "NominaProviderCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='ProveedorXML']/@NIT"},
+                { "NominaTipoXML","//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@TipoXML"},
 
                 //Xpath Nomina Individual de Ajustes
-                { "NominaAjusteCUNE", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='InformacionGeneral']/@CUNE"},
-                { "NominaAjusteCUNEPred", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='ReemplazandoPredecesor']/@CUNEPred"},
-                { "NominaAjusteReceiverCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Trabajador']/@NumeroDocumento" },
-                { "NominaAjusteSenderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Empleador']/@NIT" },
+                { "NominaAjusteCUNE", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='InformacionGeneral']/@CUNE"},
+                { "NominaAjusteCUNEPred", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='ReemplazandoPredecesor' or local-name()='EliminandoPredecesor']/@CUNEPred"},
+                { "NominaAjusteReceiverCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='Trabajador']/@NumeroDocumento" },
+                { "NominaAjusteSenderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='Empleador']/@NIT" },
+                { "NominaAjusteProviderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='ProveedorXML']/@NIT" },
+                { "NominaAjusteTipoXML","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='InformacionGeneral']/@TipoXML" },
 
             };
 
@@ -635,7 +646,7 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + issuerAttorney + " operationCode " + operationCode, "ATT-1");
 
             //Se busca el set de pruebas procesado para el testsetid en curso
-            RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+            RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(issuerAttorney, testSetId);
 
             //Evento Mandato el provider es el mandatario
             if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
