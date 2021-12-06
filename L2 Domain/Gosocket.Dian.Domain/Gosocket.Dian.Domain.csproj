@@ -146,6 +146,8 @@
     <Compile Include="Common\EnumHelper.cs" />
     <Compile Include="Cosmos\ComosDbFilterRequest.cs" />
     <Compile Include="Cosmos\GlobalDataDocument.cs" />
+    <Compile Include="Cosmos\Payroll.cs" />
+    <Compile Include="Cosmos\Payroll_All.cs" />
     <Compile Include="Domain\ResponseApplicationResponse.cs" />
     <Compile Include="Domain\ResponseAssignResponsability.cs" />
     <Compile Include="Domain\ResponseAssignResponsabilityToken.cs" />

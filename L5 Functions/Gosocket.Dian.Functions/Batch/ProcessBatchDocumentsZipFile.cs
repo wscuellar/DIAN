@@ -399,6 +399,14 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             if (validateDocumentUrl)
                             {
+                                if (softwareIdNomina == "123")
+                                {
+
+                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
+
+                                }
+
+
                                 SetLogger(null, "Step prueba nomina", " Ingresa cargue de documento NOMINA ", "PROC-04");
                                 try
                                 {
