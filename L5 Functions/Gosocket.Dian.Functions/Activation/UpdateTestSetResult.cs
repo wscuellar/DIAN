@@ -338,24 +338,27 @@ namespace Gosocket.Dian.Functions.Activation
                     SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
                     SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), "AR_008");
                     SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), "AR_009");
-                    // Determinamos si rechazamos el set de pruebas del cliente
-
-                    if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired) ||
-                        radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
-                        radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired) ||
-                        radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired) ||
-                        radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementCancellationRejected > (radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired) ||
-                        radianTesSetResult.GuaranteeRejected > (radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired) ||
-                        radianTesSetResult.ElectronicMandateRejected > (radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired) ||
-                        radianTesSetResult.EndMandateRejected > (radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired) ||
-                        radianTesSetResult.PaymentNotificationRejected > (radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired) ||
-                        radianTesSetResult.CirculationLimitationRejected > (radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired) ||
-                        radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired) ||
-                        radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired))
+                    
+                    
+                    // Determinamos si rechazamos el set de pruebas del cliente                  
+                    if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired > 0 ? radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired : radianTesSetResult.ReceiptNoticeRejected)
+                        || (radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired > 0 ? radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired : radianTesSetResult.ReceiptServiceRejected)) 
+                        || (radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired > 0 ? radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired : radianTesSetResult.ExpressAcceptanceRejected))
+                        || (radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired > 0 ? radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired : radianTesSetResult.AutomaticAcceptanceRejected))
+                        || (radianTesSetResult.RejectInvoiceRejected > (radianTesSetResult.RejectInvoiceTotalRequired > 0 ? radianTesSetResult.RejectInvoiceTotalRequired - radianTesSetResult.RejectInvoiceTotalAcceptedRequired : radianTesSetResult.RejectInvoiceRejected))
+                        || (radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired > 0 ? radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired : radianTesSetResult.ApplicationAvailableRejected))
+                        || (radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired > 0 ? radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired : radianTesSetResult.EndorsementPropertyRejected))
+                        || (radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurementTotalRequired > 0 ? radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired : radianTesSetResult.EndorsementProcurementRejected))
+                        || (radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired > 0 ? radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired : radianTesSetResult.EndorsementGuaranteeRejected))
+                        || (radianTesSetResult.EndorsementCancellationRejected > (radianTesSetResult.EndorsementCancellationTotalRequired > 0 ? radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired : radianTesSetResult.EndorsementCancellationRejected))
+                        || (radianTesSetResult.GuaranteeRejected > (radianTesSetResult.GuaranteeTotalRequired > 0 ? radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired : radianTesSetResult.GuaranteeRejected))
+                        || (radianTesSetResult.ElectronicMandateRejected > (radianTesSetResult.GuaranteeTotalRequired > 0 ? radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired : radianTesSetResult.ElectronicMandateRejected))
+                        || (radianTesSetResult.EndMandateRejected > (radianTesSetResult.EndMandateTotalRequired > 0 ? radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired : radianTesSetResult.EndMandateRejected))
+                        || (radianTesSetResult.PaymentNotificationRejected > (radianTesSetResult.PaymentNotificationTotalRequired > 0 ? radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired : radianTesSetResult.PaymentNotificationRejected))
+                        || (radianTesSetResult.CirculationLimitationRejected > (radianTesSetResult.CirculationLimitationTotalRequired > 0 ? radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired : radianTesSetResult.CirculationLimitationRejected ))
+                        || (radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected))
+                        || (radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected))                        
+                        )
                     {
                         SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_010");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
@@ -376,7 +379,6 @@ namespace Gosocket.Dian.Functions.Activation
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
-
                             try
                             {
                                 SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
@@ -605,7 +607,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                     if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
                     {
-
                         var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
 
                         if (globalTesSetResult == null)
@@ -622,7 +623,6 @@ namespace Gosocket.Dian.Functions.Activation
                         globalTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
                         globalTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                         globalTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
-
 
                         globalTesSetResult.InvoicesTotalSent = allGlobalTestSetTracking.Count(a => invoiceCodes.Contains(a.DocumentTypeId));
                         globalTesSetResult.TotalInvoicesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
@@ -664,7 +664,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
                                 await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                             }
-
 
                             // Send to activate contributor in production
                             if (ConfigurationManager.GetValue("Environment") == "Hab")
