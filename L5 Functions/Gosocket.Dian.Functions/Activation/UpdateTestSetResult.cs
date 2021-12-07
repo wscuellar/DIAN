@@ -385,12 +385,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                                 #region Proceso Radian Habilitacion
 
-                                //Traemos el contribuyente
-                               
-
-                                //Consultamos al participante en GlobalRadianOperations
-                                
-
                                 //--Traemos la informacion del software
                                 string softwareId = globalTestSetTracking.SoftwareId;
                                 RadianSoftware software = softwareService.GetByRadian(Guid.Parse(softwareId));
