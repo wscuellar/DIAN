@@ -338,8 +338,9 @@ namespace Gosocket.Dian.Functions.Activation
                     SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
                     SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), "AR_008");
                     SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), "AR_009");
-                    // Determinamos si rechazamos el set de pruebas del cliente
-                  
+                    
+                    
+                    // Determinamos si rechazamos el set de pruebas del cliente                  
                     if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired > 0 ? radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired : radianTesSetResult.ReceiptNoticeRejected)
                         || (radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired > 0 ? radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired : radianTesSetResult.ReceiptServiceRejected)) 
                         || (radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired > 0 ? radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired : radianTesSetResult.ExpressAcceptanceRejected))
@@ -378,7 +379,6 @@ namespace Gosocket.Dian.Functions.Activation
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
-
                             try
                             {
                                 SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
@@ -607,7 +607,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                     if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
                     {
-
                         var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
 
                         if (globalTesSetResult == null)
@@ -624,7 +623,6 @@ namespace Gosocket.Dian.Functions.Activation
                         globalTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
                         globalTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                         globalTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
-
 
                         globalTesSetResult.InvoicesTotalSent = allGlobalTestSetTracking.Count(a => invoiceCodes.Contains(a.DocumentTypeId));
                         globalTesSetResult.TotalInvoicesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
@@ -666,7 +664,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
                                 await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                             }
-
 
                             // Send to activate contributor in production
                             if (ConfigurationManager.GetValue("Environment") == "Hab")
