@@ -49,7 +49,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public string SubTypeDocumentName { get; set; }
 
 		[JsonProperty("DocNumberSender")]
-		public long DocNumberSender { get; set; }
+		public string DocNumberSender { get; set; }
 
 		[JsonProperty("CompositeNameSender")]
 		public string CompositeNameSender { get; set; }
@@ -61,7 +61,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public long DocTypeWorker { get; set; }
 
 		[JsonProperty("DocNumberWorker")]
-		public long DocNumberWorker { get; set; }
+		public string DocNumberWorker { get; set; }
 
 		[JsonProperty("NameDocTypeWorker")]
 		public string NameDocTypeWorker { get; set; }
@@ -82,28 +82,28 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public string CompositeNameWorker { get; set; }
 
 		[JsonProperty("GenerationDate")]
-		public DateTime GenerationDate { get; set; }
+		public string GenerationDate { get; set; }
 
 		[JsonProperty("InitialDate")]
-		public DateTime InitialDate { get; set; }
+		public string InitialDate { get; set; }
 
 		[JsonProperty("FinalDate")]
-		public DateTime FinalDate { get; set; }
+		public string FinalDate { get; set; }
 
 		[JsonProperty("Salary")]
-		public long Salary { get; set; }
+		public string Salary { get; set; }
 
 		[JsonProperty("TotalAccrued")]
-		public long TotalAccrued { get; set; }
+		public double TotalAccrued { get; set; }
 
 		[JsonProperty("TotalDiscounts")]
-		public long TotalDiscounts { get; set; }
+		public double TotalDiscounts { get; set; }
 
 		[JsonProperty("PaymentReceipt")]
-		public long PaymentReceipt { get; set; }
+		public double PaymentReceipt { get; set; }
 
 		[JsonProperty("numeration")]
-		public long Numeration { get; set; }
+		public string Numeration { get; set; }
 
 		[JsonProperty("State")]
 		public string State { get; set; }
