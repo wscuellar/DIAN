@@ -399,10 +399,10 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             if (validateDocumentUrl)
                             {
-                                if (softwareIdNomina == "123")
+                                if (softwareIdNomina == ConfigurationManager.GetValue("BillerSoftwareId"))
                                 {
 
-                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
+                                    ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegisterCompletedPayrollCosmosUrl"), new { TrackId = trackId });
 
                                 }
 
