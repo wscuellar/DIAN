@@ -41,10 +41,10 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class BasicAccruals
 	{
 		[JsonProperty("WorkedDays")]
-		public long WorkedDays { get; set; }
+		public string WorkedDays { get; set; }
 
 		[JsonProperty("SalaryPaid")]
-		public long SalaryPaid { get; set; }
+		public string SalaryPaid { get; set; }
 	}
 
 	public partial class DocumentData
@@ -54,21 +54,21 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("NoveltyCUNE")]
 		public string NoveltyCune { get; set; }
 		[JsonProperty("AdmissionDate")]
-		public DateTimeOffset AdmissionDate { get; set; }
+		public string AdmissionDate { get; set; }
 		[JsonProperty("SettlementDateStartMonth")]
-		public DateTimeOffset SettlementDateStartMonth { get; set; }
+		public string SettlementDateStartMonth { get; set; }
 		[JsonProperty("SettlementDateEndMonth")]
-		public DateTimeOffset SettlementDateEndMonth { get; set; }
+		public string SettlementDateEndMonth { get; set; }
 		[JsonProperty("TimeWorkedCompany")]
-		public long TimeWorkedCompany { get; set; }
+		public string TimeWorkedCompany { get; set; }
 		[JsonProperty("GenerationDate")]
-		public DateTimeOffset GenerationDate { get; set; }
+		public string GenerationDate { get; set; }
 		[JsonProperty("GenerationDateNumber")]
-		public long GenerationDateNumber { get; set; }
+		public string GenerationDateNumber { get; set; }
 		[JsonProperty("Language")]
 		public string Language { get; set; }
 		[JsonProperty("IdPeriodPayroll")]
-		public long IdPeriodPayroll { get; set; }
+		public string IdPeriodPayroll { get; set; }
 		[JsonProperty("NamePeriodPayroll")]
 		public string NamePeriodPayroll { get; set; }
 		[JsonProperty("TypeCoin")]
@@ -76,9 +76,9 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("CompositeNameTypeCoin")]
 		public string CompositeNameTypeCoin { get; set; }
 		[JsonProperty("TRM")]
-		public double Trm { get; set; }
+		public string Trm { get; set; }
 		[JsonProperty("Rounding")]
-		public object Rounding { get; set; }
+		public string Rounding { get; set; }
 		[JsonProperty("CodeEmployee")]
 		public string CodeEmployee { get; set; }
 		[JsonProperty("IdNumberRange")]
@@ -113,9 +113,9 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("IsBusinessName")]
 		public string IsBusinessName { get; set; }
 		[JsonProperty("NumberDocEmployeer")]
-		public long NumberDocEmployeer { get; set; }
+		public string NumberDocEmployeer { get; set; }
 		[JsonProperty("DVEmployeer")]
-		public long DvEmployeer { get; set; }
+		public string DvEmployeer { get; set; }
 		[JsonProperty("BusinessName")]
 		public string BusinessName { get; set; }
 		[JsonProperty("FirstName")]
@@ -181,13 +181,13 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("NameSubTypeWorker")]
 		public string NameSubTypeWorker { get; set; }
 		[JsonProperty("HighRiskPensionWorker")]
-		public string HighRiskPensionWorker { get; set; }
+		public bool HighRiskPensionWorker { get; set; }
 		[JsonProperty("ContractTypeWorker")]
-		public long ContractTypeWorker { get; set; }
+		public string ContractTypeWorker { get; set; }
 		[JsonProperty("NameContractTypeWorker")]
 		public string NameContractTypeWorker { get; set; }
 		[JsonProperty("SalaryIntegralWorker")]
-		public string SalaryIntegralWorker { get; set; }
+		public bool SalaryIntegralWorker { get; set; }
 		[JsonProperty("SalaryWorker")]
 		public double SalaryWorker { get; set; }
 		[JsonProperty("IdCountryWorker")]
@@ -205,11 +205,11 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("AddressWorker")]
 		public string AddressWorker { get; set; }
 		[JsonProperty("DocTypeWorker")]
-		public long DocTypeWorker { get; set; }
+		public string DocTypeWorker { get; set; }
 		[JsonProperty("NameDocTypeWorker")]
 		public string NameDocTypeWorker { get; set; }
 		[JsonProperty("NumberDocWorker")]
-		public long NumberDocWorker { get; set; }
+		public string NumberDocWorker { get; set; }
 		[JsonProperty("FirstNameWorker")]
 		public string FirstNameWorker { get; set; }
 		[JsonProperty("SecondNameWorker")]
@@ -225,6 +225,321 @@ namespace Gosocket.Dian.Domain.Cosmos
 	{
 		[JsonProperty("PaymentDate")]
 		public DateTime PaymentDate { get; set; }
+	}
+
+	public partial class Countries
+	{
+		[JsonProperty("NameCountry")]
+		public string NameCountry { get; set; }
+		
+		[JsonProperty("NameCountryISO")]
+		public string NameCountryIso { get; set; }
+		
+		[JsonProperty("CodeAlfa2")]
+		public string CodeAlfa2 { get; set; }
+
+		[JsonProperty("CodeAlfa3")]
+		public string CodeAlfa3 { get; set; }
+
+		[JsonProperty("IDContry")]
+		public string IdContry { get; set; }
+
+	    [JsonProperty("Observaciones")]
+		public string Observaciones { get; set; }
+
+		[JsonProperty("CompositeNameCountry")]
+		public string CompositeNameCountry { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class Departament
+	{
+
+		[JsonProperty("IDDepartament")]
+		// [JsonConverter(typeof(ParseStringConverter))]
+		public string IdDepartament { get; set; }
+
+		[JsonProperty("NameDepartament")]
+		public string NameDepartament { get; set; }
+
+		[JsonProperty("CodeISO")]
+		public string CodeIso { get; set; }
+
+		[JsonProperty("CompositeNameDepartament")]
+		public string CompositeNameDepartament { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class Location
+	{
+		[JsonProperty("IDDepartament")]
+		public long IdDepartament { get; set; }
+
+		[JsonProperty("IDCity")]
+		public string IdCity { get; set; }
+
+		[JsonProperty("NameDepartament")]
+		public string NameDepartament { get; set; }
+
+		[JsonProperty("NameCity")]
+		public string NameCity { get; set; }
+
+		[JsonProperty("CompositeNameCity")]
+		public string CompositeNameCity { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class CoinType
+	{
+		[JsonProperty("IDCoinType")]
+		public string IdCoinType { get; set; }
+
+		[JsonProperty("NameCoinType")]
+		public string NameCoinType { get; set; }
+
+		[JsonProperty("CompositeNameCoinType")]
+		public string CompositeNameCoinType { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class ContractType
+	{
+		[JsonProperty("IDContractType")]
+		public long IdContractType { get; set; }
+
+		[JsonProperty("NameContractType")]
+		public string NameContractType { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class DocumentTypes
+	{
+		[JsonProperty("IDDocumentType")]
+		public long IdDocumentType { get; set; }
+
+		[JsonProperty("NameDocumentType")]
+		public string NameDocumentType { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+	    [JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+
+	public partial class SubWorkerType
+	{
+		[JsonProperty("IDSubWorkerType")]
+		public long IdSubWorkerType { get; set; }
+
+		[JsonProperty("NameSubWorkerType")]
+		public string NameSubWorkerType { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+	public partial class WorkerType
+	{
+		[JsonProperty("IDWorkerType")]
+    	public long IdWorkerType { get; set; }
+
+		[JsonProperty("NameWorkerType")]
+		public string NameWorkerType { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
+
+
+	public partial class City
+	{
+		[JsonProperty("IDDepartament")]
+		public long IdDepartament { get; set; }
+
+		[JsonProperty("IDCity")]
+		public long IdCity { get; set; }
+
+		[JsonProperty("NameDepartament")]
+		public string NameDepartament { get; set; }
+
+		[JsonProperty("NameCity")]
+		public string NameCity { get; set; }
+
+		[JsonProperty("CompositeNameCity")]
+		public string CompositeNameCity { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
 	}
 
 
