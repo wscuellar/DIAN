@@ -18,11 +18,11 @@ namespace Gosocket.Dian.DataContext
         private static readonly string databaseId = ConfigurationManager.GetValue("CosmosDbDataBaseIdPayroll");
         private static readonly string collectionId = ConfigurationManager.GetValue("CosmosDbCollectionIDPayroll_all");
         private static readonly ConnectionPolicy connectionPolicy = new ConnectionPolicy { UserAgentSuffix = " samples-net/3" };
-        
+
 
         //Reusable instance of DocumentClient which represents the connection to a DocumentDB endpoint
         private static DocumentClient client = new DocumentClient(new Uri(endpointUrl), authorizationKey);
-     
+
 
         public async Task<bool> UpsertDocumentPayroll_All(Payroll_All document)
         {
@@ -240,6 +240,100 @@ namespace Gosocket.Dian.DataContext
             catch (Exception e)
             {
                 return new List<WorkerType>();
+            }
+        }
+
+        public async Task<List<PeriodPayroll>> getPeriodPayroll()
+        {
+            try
+            {
+                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+                var DepartamentData = new List<PeriodPayroll>();
+                IDocumentQuery<PeriodPayroll> DepartamentQuery = client.CreateDocumentQuery<PeriodPayroll>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "PeriodPayroll"), queryOptions).AsDocumentQuery();
+                var result = (DepartamentQuery).ExecuteNextAsync<PeriodPayroll>().Result;
+                return result.ToList();
+            }
+            catch (Exception e)
+            {
+                return new List<PeriodPayroll>();
+            }
+        }
+
+
+        public async Task<List<PaymentForm>> getPaymentForm()
+        {
+            try
+            {
+                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+                var DepartamentData = new List<PaymentForm>();
+                IDocumentQuery<PaymentForm> DepartamentQuery = client.CreateDocumentQuery<PaymentForm>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "PaymentForm"), queryOptions).AsDocumentQuery();
+                var result = (DepartamentQuery).ExecuteNextAsync<PaymentForm>().Result;
+                return result.ToList();
+            }
+            catch (Exception e)
+            {
+                return new List<PaymentForm>();
+            }
+        }
+
+        public async Task<List<PaymentMethod>> getPaymentMethod()
+        {
+            try
+            {
+                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+                var DepartamentData = new List<PaymentMethod>();
+                IDocumentQuery<PaymentMethod> DepartamentQuery = client.CreateDocumentQuery<PaymentMethod>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "PaymentMethod"), queryOptions).AsDocumentQuery();
+                var result = (DepartamentQuery).ExecuteNextAsync<PaymentMethod>().Result;
+                return result.ToList();
+            }
+            catch (Exception e)
+            {
+                return new List<PaymentMethod>();
+            }
+        }
+        public async Task<List<NumberingRange>> getNumberingRange()
+        {
+            try
+            {
+                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+                var DepartamentData = new List<NumberingRange>();
+                IDocumentQuery<NumberingRange> DepartamentQuery = client.CreateDocumentQuery<NumberingRange>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), queryOptions).AsDocumentQuery();
+                var result = (DepartamentQuery).ExecuteNextAsync<NumberingRange>().Result;
+                return result.ToList();
+            }
+            catch (Exception e)
+            {
+                return new List<NumberingRange>();
+            }
+        }
+
+        public async Task<List<NumberingRange>> GetNumberingRangeByTypeDocument(string prefijo, double range)
+        {
+            try
+            {
+
+                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+                var DepartamentData = new List<NumberingRange>();
+                IDocumentQuery<NumberingRange> DepartamentQuery = client.CreateDocumentQuery<NumberingRange>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), queryOptions).Where(x => x.Prefix == prefijo && range >= x.NumberFrom && range <= x.NumberTo).AsDocumentQuery();
+                var result = (DepartamentQuery).ExecuteNextAsync<NumberingRange>().Result;
+                return result.ToList();
+
+
+            }
+            catch (Exception e)
+            {
+                return new List<NumberingRange>();
+
             }
         }
 

@@ -10,6 +10,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -24,26 +25,26 @@ namespace Gosocket.Dian.Functions.Payroll
 
 		[FunctionName("RegisterCompletedPayrollCosmos")]
 		public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
-        {
-            log.Info("C# HTTP trigger function processed a request.");
+		{
+			log.Info("C# HTTP trigger function processed a request.");
 
-            // Get request body
-            var data = await req.Content.ReadAsAsync<RequestObject>();
+			// Get request body
+			var data = await req.Content.ReadAsAsync<RequestObject>();
 
-            if (data == null)
-                return new EventResponse { Code = "400", Message = "Request body is empty." };
+			if (data == null)
+				return new EventResponse { Code = "400", Message = "Request body is empty." };
 
-            if (string.IsNullOrEmpty(data.TrackId))
-                return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
+			if (string.IsNullOrEmpty(data.TrackId))
+				return new EventResponse { Code = "400", Message = "Please pass a trackId in the request body." };
 
-            var response = new EventResponse
-            {
-                Code = ((int)EventValidationMessage.Success).ToString(),
-                Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success),
-            };
+			var response = new EventResponse
+			{
+				Code = ((int)EventValidationMessage.Success).ToString(),
+				Message = EnumHelper.GetEnumDescription(EventValidationMessage.Success),
+			};
 
-            try
-            {
+			try
+			{
 				//var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync("8fac76af7e319f52cebb1888df17dea3326c6230a3c6d29ff3a1a886ac685ec5fce7307ede78c10c4f2a3910a8b46169");// normal(data.TrackId);
 				//var xmlParser = new XmlParseNomina(xmlBytes);
 
@@ -53,16 +54,16 @@ namespace Gosocket.Dian.Functions.Payroll
 				//var xmlBytes3 = await Utils.Utils.GetXmlFromStorageAsync("f3803f8cd0ac6bbec3424395c547dd6a83492c7d7004a9e39ce956447178be8f2bf2a1976a7f9b10baf5b76975d62f1a");//eliminar
 				//var xmlParser3 = new XmlParseNomina(xmlBytes3);
 
-                var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(data.TrackId);
-                var xmlParser = new XmlParseNomina(xmlBytes);
-                if (!xmlParser.Parser())
+				var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(data.TrackId);
+				var xmlParser = new XmlParseNomina(xmlBytes);
+				if (!xmlParser.Parser())
 					throw new Exception(xmlParser.ParserError);
-				
-				var objNomina = xmlParser.globalDocPayrolls; //ok
-				//var objNominaR = xmlParser2.globalDocPayrolls; //ok
-				//var objNomina = xmlParser3.globalDocPayrolls;
 
-				var account = await ApiHelpers.ExecuteRequestAsync<Object>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = objNomina.Emp_NIT });
+				var objNomina = xmlParser.globalDocPayrolls; //ok
+															 //var objNominaR = xmlParser2.globalDocPayrolls; //ok
+															 //var objNomina = xmlParser3.globalDocPayrolls;
+
+				var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = objNomina.Emp_NIT });
 
 				//Consultas para Nombres
 				var cosmos = new Gosocket.Dian.DataContext.CosmosDbManagerPayroll();
@@ -74,12 +75,19 @@ namespace Gosocket.Dian.Functions.Payroll
 				var DocumentType = await cosmos.getDocumentType();
 				var SubWorkerType = await cosmos.getSubWorkerType();
 				var WorkerType = await cosmos.getWorkerType();
-                
+				var PeriodPayroll = await cosmos.getPeriodPayroll();
+				var PaymentForm = await cosmos.getPaymentForm();
+				var PaymentMethod = await cosmos.getPaymentMethod();
+				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo);
+
+				//var numeric = await cosmos
+
 				#region"AgregarDataPayrollALL
-                var Insert = new Domain.Cosmos.Payroll_All()
+				var Insert = new Domain.Cosmos.Payroll_All()
 				{
+					PartitionKey = account,
 					DocumentKey = objNomina.CUNE,
-					AccountId = objNomina.CUNE,
+					AccountId = (account),
 					Cune = objNomina.CUNE,
 					PredecesorCune = objNomina.CUNEPred,
 					Prefix = objNomina.Prefijo,
@@ -94,7 +102,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					CodeEmployee = objNomina.CodigoTrabajador == null ? "" : objNomina.CodigoTrabajador,
 					DocTypeWorker = objNomina.TipoDocumento == null ? 0 : long.Parse(objNomina.TipoDocumento),
 					DocNumberWorker = objNomina.NumeroDocumento,
-					NameDocTypeWorker = "",
+					NameDocTypeWorker = DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
 					FirstNamerWorker = objNomina.PrimerNombre,
 					SecondNameWorker = objNomina.OtrosNombres,
 					LastNameWorker = objNomina.PrimerApellido,
@@ -114,11 +122,12 @@ namespace Gosocket.Dian.Functions.Payroll
 				#endregion
 
 				//NominaNormal
-				if (objNomina.TipoXML=="102") 
-                {
+				if (objNomina.TipoXML == "102")
+				{
 					//Mapeo DocumentData - SecciónDatosDocumento
 					var InsertDocumentDataPayroll = new Domain.Cosmos.DocumentData()
 					{
+
 						Novelty = objNomina.Novedad.ToString(),
 						NoveltyCune = objNomina.CUNENov,
 						AdmissionDate = objNomina.FechaIngreso.ToString() == null ? "" : objNomina.FechaIngreso.ToString(),
@@ -129,12 +138,16 @@ namespace Gosocket.Dian.Functions.Payroll
 						GenerationDateNumber = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
 						Language = objNomina.Idioma,
 						IdPeriodPayroll = objNomina.PeriodoNomina,
+						NamePeriodPayroll = PeriodPayroll.Where(x => x.IdPeriodPayroll == objNomina.PeriodoNomina).FirstOrDefault().NamePeriodPayroll,
 						//Pendiente NamePeriodPayroll
 						TypeCoin = objNomina.TipoMoneda,
+						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
 						//CompositeNameTypeCoin
 						Trm = objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
+						IdNumberRange = NumberingRange.FirstOrDefault().IdNumberingRange,
+						NameNumberRange = NumberingRange.FirstOrDefault().Current,
 						//Pendiente IdNumberRange //DatosNumeroRango
 						//Pendiente NameNumberRange//DatosNumeroRango
 						Prefix = objNomina.Prefijo,
@@ -142,8 +155,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						Number = objNomina.Numero,
 						IdGenerationCountry = objNomina.Pais,
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
+						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Peniente NameCompositeGenerationDepartament //NombreCompuestoDepartamentoGeneracion
 						IdGenerationCity = objNomina.MunicipioCiudad,
+						NameCompositeGenerationCity = City.Where(x => x.IdCity == objNomina.MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeGenerationCity //NombreCompuestoMunicipioGeneracion
 						//Pendiente Settlementdocument //DocumentoLiquidacion-Si/No
 						//Pendiente CompanyWithdrawalDate // FechaDocumentoLiquidacion-Si/No
@@ -172,8 +187,12 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdCountryEmployer = objNomina.Emp_Pais,
 						//Pendiente ContryEmployeer
 						IdDepartamentEmployer = objNomina.Emp_DepartamentoEstado,
+						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
+
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
+
+
 						//Pendiente NameCityDepartament
 
 					};
@@ -183,24 +202,30 @@ namespace Gosocket.Dian.Functions.Payroll
 					{
 						NumberDocWorker = objNomina.NumeroDocumento,
 						DocTypeWorker = objNomina.TipoDocumento,
+						NameDocTypeWorker = DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
 						LastNameWorker = objNomina.PrimerApellido,
 						SecondLastNameWorker = objNomina.SegundoApellido,
 						FirstNameWorker = objNomina.PrimerNombre,
 						SecondNameWorker = objNomina.OtrosNombres,
 						CodeWorker = objNomina.Trab_CodigoTrabajador,
 						TypeWorker = objNomina.TipoTrabajador,
+						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == Int32.Parse(objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
 						SubTypeWorker = objNomina.SubTipoTrabajador,
+						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == (objNomina.SubTipoTrabajador == "00" ? "0" : objNomina.SubTipoTrabajador)).FirstOrDefault().CompositeName,
 						//Pendiente NameSubTypeWorker
 						HighRiskPensionWorker = objNomina.AltoRiesgoPension,
 						IdCountryWorker = objNomina.LugarTrabajoPais,
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
+						NameDepartamentWorker = Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentWorker
 						IdCityWorker = objNomina.LugarTrabajoMunicipioCiudad,
+						NameCompositeWorker = City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
 						SalaryIntegralWorker = objNomina.SalarioIntegral,
 						ContractTypeWorker = objNomina.TipoContrato,
+						NameContractTypeWorker = ContractType.Where(x => x.IdContractType == objNomina.TipoContrato).FirstOrDefault().CompositeName,
 						SalaryWorker = objNomina.Sueldo,
 					};
 
@@ -209,7 +234,9 @@ namespace Gosocket.Dian.Functions.Payroll
 					{
 						PaymentForm = objNomina.Forma,
 						//Pendiente NamePaymentForm
+						NamePaymentForm = PaymentForm.Where(x => x.IdPaymentForm == objNomina.Forma).FirstOrDefault().CompositeName,
 						PaymentMethod = objNomina.Metodo,
+						NamePaymentMethod = PaymentMethod.Where(x => x.IdPaymentMethod == objNomina.Metodo).FirstOrDefault().CompositeName,
 						//Pendiente NamePaymentMethod
 						Bank = objNomina.Banco,
 						AccountType = objNomina.TipoCuenta,
@@ -229,7 +256,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Mapeo de informacion
 						PartitionKey = null,
 						DocumentKey = null,
-						//AccountId =  new Guid(),
+						AccountId = new Guid(account),
 						Cune = objNomina.CUNE,
 
 						DocumentData = InsertDocumentDataPayroll,
@@ -242,12 +269,12 @@ namespace Gosocket.Dian.Functions.Payroll
 					await cosmos.UpsertDocumentPayroll(InsertPayroll);
 				}
 				//NominaAjusteReemplazar
-				else if (objNomina.TipoXML == "103" && objNomina.TipoNota ==1)
+				else if (objNomina.TipoXML == "103" && objNomina.TipoNota == 1)
 				{
 					var InserNoteTypePayroll = new Domain.Cosmos.NoteTypeReplace()
 					{
 						NoteTypeID = (int)objNomina.TipoNota,
-						NameNoteType = "1 | Reemplazar", 
+						NameNoteType = "1 | Reemplazar",
 					};
 
 					var InserDataDocumentReplacePayroll = new Domain.Cosmos.DataDocumentReplace()
@@ -268,9 +295,9 @@ namespace Gosocket.Dian.Functions.Payroll
 						GenerationDateNumber = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
 						Language = objNomina.Idioma,
 						IdPeriodPayroll = objNomina.PeriodoNomina,
-						//Pendiente NamePeriodPayroll
+						NamePeriodPayroll = PeriodPayroll.Where(x => x.IdPeriodPayroll == objNomina.PeriodoNomina).FirstOrDefault().NamePeriodPayroll,
 						TypeCoin = objNomina.TipoMoneda,
-						//CompositeNameTypeCoin
+						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
 						Trm = objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
@@ -282,8 +309,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdGenerationCountry = objNomina.Pais,
 						//Pendiente NombrePais
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
+						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Peniente NameCompositeGenerationDepartament //NombreCompuestoDepartamentoGeneracion
 						IdGenerationCity = objNomina.MunicipioCiudad,
+						NameCompositeGenerationCity = City.Where(x => x.IdCity == objNomina.MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeGenerationCity //NombreCompuestoMunicipioGeneracion
 						//Pendiente Settlementdocument //DocumentoLiquidacion-Si/No
 						//Pendiente CompanyWithdrawalDate // FechaDocumentoLiquidacion-Si/No
@@ -310,8 +339,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdCountryEmployer = objNomina.Emp_Pais,
 						//Pendiente NombrePais
 						IdDepartamentEmployer = objNomina.Emp_DepartamentoEstado,
+						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
+						NameCompositeEmployer = City.Where(x => x.IdCity == objNomina.Emp_MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCityDepartament
 						AddressEmployer = objNomina.Emp_Direccion,
 					};
@@ -320,6 +351,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					var InsertWorkerDataPayroll = new Domain.Cosmos.WorkerDataR()
 					{
 						DocTypeWorker = objNomina.TipoDocumento,
+						NameDocTypeWorker = DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
 						//Peniente nombreTipoDocumento
 						NumberDocWorker = objNomina.NumeroDocumento,
 						FirstNameWorker = objNomina.PrimerNombre,
@@ -328,19 +360,24 @@ namespace Gosocket.Dian.Functions.Payroll
 						SecondLastNameWorker = objNomina.SegundoApellido,
 						CodeWorker = objNomina.Trab_CodigoTrabajador,
 						TypeWorker = objNomina.TipoTrabajador,
+						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == Int32.Parse(objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
 						//Pendiente TypeWorker
 						SubTypeWorker = objNomina.SubTipoTrabajador,
+						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == (objNomina.SubTipoTrabajador == "00" ? "0" : objNomina.SubTipoTrabajador)).FirstOrDefault().CompositeName,
 						//Pendiente NameSubTypeWorker
 						HighRiskPensionWorker = objNomina.AltoRiesgoPension,
 						ContractTypeWorker = objNomina.TipoContrato,
+						NameContractTypeWorker = ContractType.Where(x => x.IdContractType == objNomina.TipoContrato).FirstOrDefault().CompositeName,
 						//Pendiente NombreContrato
 						SalaryIntegralWorker = objNomina.SalarioIntegral,
 						SalaryWorker = objNomina.Sueldo,
 						IdCountryWorker = objNomina.LugarTrabajoPais,
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
+						NameDepartamentWorker = Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentWorker
 						IdCityWorker = objNomina.LugarTrabajoMunicipioCiudad,
+						NameCompositeWorker = City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
 					};
@@ -350,7 +387,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Mapeo de informacion
 						PartitionKey = null,
 						DocumentKey = null,
-						//AccountId =  new Guid(),
+						AccountId = new Guid(account),
 						Cune = objNomina.CUNE,
 
 						NoteType = InserNoteTypePayroll,
@@ -392,7 +429,9 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdGenerationCountry = objNomina.Pais,
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
 						//Peniente NameCompositeGenerationDepartament //NombreCompuestoDepartamentoGeneracion
+						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						IdGenerationCity = objNomina.MunicipioCiudad,
+						NameCompositeGenerationCity = City.Where(x => x.IdCity == objNomina.MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeGenerationCity //NombreCompuestoMunicipioGeneracion
 					};
 
@@ -411,6 +450,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						DvEmployeer = objNomina.Emp_DV,
 						BusinessName = objNomina.Emp_RazonSocial,
 						FirstName = objNomina.Emp_PrimerNombre,
+						SecondName = objNomina.Emp_OtrosNombres,
 						//Pendiente SecondName - SegundoNombre
 						NameCompositeEmployer = objNomina.Emp_OtrosNombres,
 						LastName = objNomina.Emp_PrimerApellido,
@@ -418,8 +458,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdCountryEmployer = objNomina.Emp_Pais,
 						//Pendiente ContryEmployeer
 						IdDepartamentEmployer = objNomina.Emp_DepartamentoEstado,
+						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
+
 						//Pendiente NameCityDepartament
 						AddressEmployer = objNomina.Emp_Direccion,
 					};
@@ -429,7 +471,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Mapeo de informacion
 						PartitionKey = null,
 						DocumentKey = null,
-						//AccountId =  new Guid(),
+						AccountId = new Guid(account),
 						Cune = objNomina.CUNE,
 
 						NoteTypeDelete = InserNoteTypePayroll,
@@ -445,9 +487,9 @@ namespace Gosocket.Dian.Functions.Payroll
 			catch (Exception ex)
 			{
 				log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                response.Code = ((int)EventValidationMessage.Error).ToString();
-                response.Message = ex.Message;
-            }
+				response.Code = ((int)EventValidationMessage.Error).ToString();
+				response.Message = ex.Message;
+			}
 
 			return response;
 

@@ -231,10 +231,10 @@ namespace Gosocket.Dian.Domain.Cosmos
 	{
 		[JsonProperty("NameCountry")]
 		public string NameCountry { get; set; }
-		
+
 		[JsonProperty("NameCountryISO")]
 		public string NameCountryIso { get; set; }
-		
+
 		[JsonProperty("CodeAlfa2")]
 		public string CodeAlfa2 { get; set; }
 
@@ -244,7 +244,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("IDContry")]
 		public string IdContry { get; set; }
 
-	    [JsonProperty("Observaciones")]
+		[JsonProperty("Observaciones")]
 		public string Observaciones { get; set; }
 
 		[JsonProperty("CompositeNameCountry")]
@@ -375,7 +375,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class ContractType
 	{
 		[JsonProperty("IDContractType")]
-		public long IdContractType { get; set; }
+		public string IdContractType { get; set; }
 
 		[JsonProperty("NameContractType")]
 		public string NameContractType { get; set; }
@@ -408,7 +408,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class DocumentTypes
 	{
 		[JsonProperty("IDDocumentType")]
-		public long IdDocumentType { get; set; }
+		public string IdDocumentType { get; set; }
 
 		[JsonProperty("NameDocumentType")]
 		public string NameDocumentType { get; set; }
@@ -428,7 +428,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("_self")]
 		public string Self { get; set; }
 
-	    [JsonProperty("_etag")]
+		[JsonProperty("_etag")]
 		public string Etag { get; set; }
 
 		[JsonProperty("_attachments")]
@@ -442,7 +442,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class SubWorkerType
 	{
 		[JsonProperty("IDSubWorkerType")]
-		public long IdSubWorkerType { get; set; }
+		public string IdSubWorkerType { get; set; }
 
 		[JsonProperty("NameSubWorkerType")]
 		public string NameSubWorkerType { get; set; }
@@ -475,7 +475,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class WorkerType
 	{
 		[JsonProperty("IDWorkerType")]
-    	public long IdWorkerType { get; set; }
+		public string IdWorkerType { get; set; }
 
 		[JsonProperty("NameWorkerType")]
 		public string NameWorkerType { get; set; }
@@ -512,7 +512,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public long IdDepartament { get; set; }
 
 		[JsonProperty("IDCity")]
-		public long IdCity { get; set; }
+		public string IdCity { get; set; }
 
 		[JsonProperty("NameDepartament")]
 		public string NameDepartament { get; set; }
@@ -542,5 +542,92 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public long Ts { get; set; }
 	}
 
+	public partial class PeriodPayroll
+	{
+		[JsonProperty("IDPeriodPayroll")]
+		public string IdPeriodPayroll { get; set; }
+
+		[JsonProperty("NamePeriodPayroll")]
+		public string NamePeriodPayroll { get; set; }
+
+		[JsonProperty("CompositeNamePeriodPayroll")]
+		public string CompositeNamePeriodPayroll { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+	}
+
+
+	public partial class NumberingRange
+	{
+		[JsonProperty("PartitionKey")]
+		public string PartitionKey { get; set; }
+
+		[JsonProperty("DocumentKey")]
+		public string DocumentKey { get; set; }
+
+		[JsonProperty("AccountId")]
+		public Guid AccountId { get; set; }
+
+		[JsonProperty("IDNumberingRange")]
+		public string IdNumberingRange { get; set; }
+
+		[JsonProperty("IdDocumentTypePayroll")]
+		public string IdDocumentTypePayroll { get; set; }
+
+		[JsonProperty("DocumentTypePayroll")]
+		public string DocumentTypePayroll { get; set; }
+
+		[JsonProperty("Prefix")]
+		public string Prefix { get; set; }
+
+		[JsonProperty("NumberFrom")]
+		public double NumberFrom { get; set; }
+
+		[JsonProperty("NumberTo")]
+		public double NumberTo { get; set; }
+
+		[JsonProperty("CurrentNumber")]
+		public long CurrentNumber { get; set; }
+
+		[JsonProperty("TypeXML")]
+		public string TypeXml { get; set; }
+
+		[JsonProperty("Current")]
+		public string Current { get; set; }
+
+		[JsonProperty("N102")]
+		public string N102 { get; set; }
+
+		[JsonProperty("N103")]
+		public object N103 { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+	}
+
+	public partial class PaymentForm
+	{
+		[JsonProperty("IDPaymentForm")]
+		public string IdPaymentForm { get; set; }
+
+		[JsonProperty("NamePaymentForm")]
+		public string NamePaymentForm { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+	}
+
+	public partial class PaymentMethod
+	{
+		[JsonProperty("IDPaymentMethod")]
+		public string IdPaymentMethod { get; set; }
+
+		[JsonProperty("NamePaymentMethod")]
+		public string NamePaymentMethod { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+	}
 
 }

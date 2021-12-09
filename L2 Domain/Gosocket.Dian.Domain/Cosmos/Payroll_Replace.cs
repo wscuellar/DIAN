@@ -222,7 +222,10 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("IdCityWorker")]
 		public string IdCityWorker { get; set; }
 		[JsonProperty("NameCompositeWorker")]
+		public string NameCompositeWorker { get; set; }
+		[JsonProperty("AddressWorker")]
 		public string AddressWorker { get; set; }
+
 
 
 
