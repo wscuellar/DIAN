@@ -30,7 +30,7 @@ namespace Gosocket.Dian.DataContext
             {
                 var collection = "Payroll_All";
                 Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
-                var response = await client.UpsertDocumentAsync(collectionLink, document);
+                var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
             catch (Exception ex)
@@ -46,7 +46,7 @@ namespace Gosocket.Dian.DataContext
             {
                 var collection = "Payroll";
                 Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
-                var response = await client.UpsertDocumentAsync(collectionLink, document);
+                var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
             catch (Exception ex)
@@ -62,7 +62,7 @@ namespace Gosocket.Dian.DataContext
             {
                 var collection = "Payroll_E";
                 Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
-                var response = await client.UpsertDocumentAsync(collectionLink, document);
+                var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace Gosocket.Dian.DataContext
             {
                 var collection = "Payroll_R";
                 Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
-                var response = await client.UpsertDocumentAsync(collectionLink, document);
+                var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
             catch (Exception ex)

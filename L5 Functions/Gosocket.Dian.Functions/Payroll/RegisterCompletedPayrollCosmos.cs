@@ -101,7 +101,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					CompositeNameSender = objNomina.Emp_PrimerNombre + " " + objNomina.Emp_OtrosNombres + " " + objNomina.Emp_PrimerApellido + " " + objNomina.Emp_SegundoApellido,
 					CodeEmployee = objNomina.CodigoTrabajador == null ? "" : objNomina.CodigoTrabajador,
 					DocTypeWorker = objNomina.TipoDocumento == null ? 0 : long.Parse(objNomina.TipoDocumento),
-					DocNumberWorker = objNomina.NumeroDocumento,
+					DocNumberWorker = objNomina.NumeroDocumento ==null?"": objNomina.NumeroDocumento,
 					NameDocTypeWorker = DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
 					FirstNamerWorker = objNomina.PrimerNombre,
 					SecondNameWorker = objNomina.OtrosNombres,
@@ -271,6 +271,9 @@ namespace Gosocket.Dian.Functions.Payroll
 				//NominaAjusteReemplazar
 				else if (objNomina.TipoXML == "103" && objNomina.TipoNota == 1)
 				{
+
+					var objNominaR = xmlParser.globalDocPayrolls;
+
 					var InserNoteTypePayroll = new Domain.Cosmos.NoteTypeReplace()
 					{
 						NoteTypeID = (int)objNomina.TipoNota,
@@ -297,7 +300,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdPeriodPayroll = objNomina.PeriodoNomina,
 						NamePeriodPayroll = PeriodPayroll.Where(x => x.IdPeriodPayroll == objNomina.PeriodoNomina).FirstOrDefault().NamePeriodPayroll,
 						TypeCoin = objNomina.TipoMoneda,
-						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
+						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).Count() ==0?"": CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
 						Trm = objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
