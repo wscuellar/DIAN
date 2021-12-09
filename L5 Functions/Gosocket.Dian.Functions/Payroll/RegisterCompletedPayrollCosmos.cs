@@ -254,8 +254,8 @@ namespace Gosocket.Dian.Functions.Payroll
 					var InsertPayroll = new Domain.Cosmos.Payroll()
 					{
 						//Mapeo de informacion
-						PartitionKey = null,
-						DocumentKey = null,
+						PartitionKey = account,
+						DocumentKey = objNomina.CUNE,
 						AccountId = new Guid(account),
 						Cune = objNomina.CUNE,
 
@@ -388,8 +388,8 @@ namespace Gosocket.Dian.Functions.Payroll
 					var InsertPayroll = new Domain.Cosmos.Payroll_Replace()
 					{
 						//Mapeo de informacion
-						PartitionKey = null,
-						DocumentKey = null,
+						PartitionKey = account,
+						DocumentKey = data.TrackId,
 						AccountId = new Guid(account),
 						Cune = objNomina.CUNE,
 

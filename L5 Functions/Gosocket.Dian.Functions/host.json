@@ -1,5 +1,5 @@
 {
-  "functions": [ "RegisterCompletedPayrollCosmos" ],
+  "functions": [ "RegisterCompletedPayrollCosmos", "ProcessBatchDocumentsZipFile" ],
   "queues": {
     "batchSize": 1,
     "maxPollingInterval": 2000,
