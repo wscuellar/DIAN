@@ -62,6 +62,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
         private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
+        private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
         XmlDocument _xmlDocument;
         XPathDocument _document;
         XPathNavigator _navigator;
@@ -2149,6 +2150,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             ErrorCodeMessage errorCodeMessage = getErrorCodeMessage(party.ResponseCode);
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             string eventCode = party.ResponseCode;
+            var isValidateAttorney = false;
             //Valida cambio legitimo tenedor
             string senderCode = nitModel.SenderCode;
             string receiverCode = nitModel.ReceiverCode;
@@ -2192,7 +2194,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                 }
-            }
+            }                    
 
             switch (Convert.ToInt16(party.ResponseCode))
             {
@@ -5066,7 +5068,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                        if (documentMeta.ReceiverName != issuerPartyName)
+                        if (documentMeta.ReceiverName.Replace("&amp;", "&") != issuerPartyName.Replace("&amp;", "&"))
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -5285,7 +5287,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                        if (documentMetaRef.ReceiverName != documentMeta.IssuerPartyName)
+                        if (documentMetaRef.ReceiverName.Replace("&amp;","&") != documentMeta.IssuerPartyName.Replace("&amp;", "&"))
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -5763,30 +5765,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if(documentMeta != null)
             {
-                foreach (var documentIdentifier in documentMeta)
+                //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
+                if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
                 {
-                    document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
-
-                    if (documentMeta.Count >= 2)
+                    foreach (var documentIdentifier in documentMeta)
                     {
-                        //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
-                        if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
+                        document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
+
+                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey && string.IsNullOrEmpty(documentIdentifier.TestSetId))
                         {
-                            if (documentMeta.Any(t => t.EventCode == eventPrev.EventCode
-                            && document != null && t.Identifier == document?.PartitionKey && string.IsNullOrEmpty(t.TestSetId)
-                            ))
+                            responses.Add(new ValidateListResponse
                             {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = false,
-                                    Mandatory = true,
-                                    ErrorCode = "LGC01",
-                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-                    }                    
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC01",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC01"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }                        
+                    }
                 }
             }
            
@@ -5881,37 +5879,41 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
             if(validatorDocumentMeta != null )
             {
-                //Valida FE se constituye como TV
-                if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
+                //Esto aplica solo para FE
+                if (Convert.ToInt32(validatorDocumentMeta.DocumentTypeId) == (int)DocumentType.Invoice)
                 {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "LGC21",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });                    
-                }
-
-                //Valida si FE es contado no permite realizar la primera incripción
-                if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
-                {
-                    var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
-                    if (!xmlParser.Parser())
-                        throw new Exception(xmlParser.ParserError);
-
-                    if (xmlParser.PaymentMeansID == "1")
+                    //Valida FE se constituye como TV
+                    if (!validatorDocumentMeta.IsInvoiceTV && !eventTV)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = "LGC62",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62"),
+                            ErrorCode = "LGC21",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
+                        });                    
+                    }
+
+                    //Valida si FE es contado no permite realizar la primera incripción
+                    if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
+                    {
+                        var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                        var xmlParser = new XmlParser(xmlBytes.Result);
+                        if (!xmlParser.Parser())
+                            throw new Exception(xmlParser.ParserError);
+
+                        if (xmlParser.PaymentMeansID == "1")
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC62",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
                     }
                 }
             }

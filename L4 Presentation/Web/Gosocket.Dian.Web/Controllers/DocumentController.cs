@@ -7,6 +7,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
@@ -49,6 +50,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
+        private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
@@ -1345,7 +1347,8 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (GlobalDataDocument item in listGlobalDataDocument)
                 {
                     GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
-                    this.PayrollList.Add(payroll);
+                    if (payroll != null)
+                        this.PayrollList.Add(payroll);
                 }
             }
             else
@@ -1399,12 +1402,11 @@ namespace Gosocket.Dian.Web.Controllers
                 if (model.NumeroDocumento == "00") model.NumeroDocumento = null;
 
                 if (model.Ciudad == "00") model.Ciudad = null;
-
-                this.PayrollList = payrollTableManager.FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<GlobalDocPayroll>(
-                    toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
+                                
+                var otherDocElecPayrolls = otherDocElecPayrollService.Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
 
-                //return globalDocPayroll;
+                this.PayrollList = DocumentParsedNomina.SetOtherDocElecPayrollsToGlobalDocPayrolls(otherDocElecPayrolls);
             }
         }
         private void SetViewBag_FirstSurnameData()
