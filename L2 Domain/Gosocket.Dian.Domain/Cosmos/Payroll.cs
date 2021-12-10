@@ -561,19 +561,16 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class NumberingRange
 	{
 		[JsonProperty("PartitionKey")]
-		public string PartitionKey { get; set; }
+		public long? PartitionKey { get; set; }
 
 		[JsonProperty("DocumentKey")]
-		public string DocumentKey { get; set; }
+		public Guid? DocumentKey { get; set; }
 
 		[JsonProperty("AccountId")]
 		public Guid AccountId { get; set; }
 
 		[JsonProperty("IDNumberingRange")]
-		public string IdNumberingRange { get; set; }
-
-		[JsonProperty("IdDocumentTypePayroll")]
-		public string IdDocumentTypePayroll { get; set; }
+		public long IdNumberingRange { get; set; }
 
 		[JsonProperty("DocumentTypePayroll")]
 		public string DocumentTypePayroll { get; set; }
@@ -582,16 +579,16 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public string Prefix { get; set; }
 
 		[JsonProperty("NumberFrom")]
-		public double NumberFrom { get; set; }
+		public long NumberFrom { get; set; }
 
 		[JsonProperty("NumberTo")]
-		public double NumberTo { get; set; }
+		public long NumberTo { get; set; }
 
 		[JsonProperty("CurrentNumber")]
 		public long CurrentNumber { get; set; }
 
 		[JsonProperty("TypeXML")]
-		public string TypeXml { get; set; }
+		public object TypeXml { get; set; }
 
 		[JsonProperty("Current")]
 		public string Current { get; set; }
@@ -600,10 +597,16 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public string N102 { get; set; }
 
 		[JsonProperty("N103")]
-		public object N103 { get; set; }
+		public string N103 { get; set; }
 
 		[JsonProperty("State")]
 		public long State { get; set; }
+
+		[JsonProperty("CreationDate")]
+		public DateTimeOffset CreationDate { get; set; }
+
+		[JsonProperty("id")]
+		public Guid id { get; set; }		
 	}
 
 	public partial class PaymentForm

@@ -80,6 +80,9 @@ namespace Gosocket.Dian.Functions.Payroll
 				var PaymentMethod = await cosmos.getPaymentMethod();
 				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo);
 
+				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString());
+
+
 				//var numeric = await cosmos
 
 				#region"AgregarDataPayrollALL
@@ -142,11 +145,12 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Pendiente NamePeriodPayroll
 						TypeCoin = objNomina.TipoMoneda,
 						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
+						GenerationContry = Countries.Where(x=>x.CodeAlfa2 == objNomina.Pais).FirstOrDefault().CompositeNameCountry,
 						//CompositeNameTypeCoin
 						Trm = objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
-						IdNumberRange = NumberingRange.FirstOrDefault().IdNumberingRange,
+						IdNumberRange = NumberingRange.FirstOrDefault().IdNumberingRange.ToString(),
 						NameNumberRange = NumberingRange.FirstOrDefault().Current,
 						//Pendiente IdNumberRange //DatosNumeroRango
 						//Pendiente NameNumberRange//DatosNumeroRango
@@ -189,6 +193,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						IdDepartamentEmployer = objNomina.Emp_DepartamentoEstado,
 						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
+						ContryEmployeer = Countries.Where(x => x.CodeAlfa2 == objNomina.Emp_Pais).FirstOrDefault().CompositeNameCountry,
 
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
 
@@ -215,6 +220,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Pendiente NameSubTypeWorker
 						HighRiskPensionWorker = objNomina.AltoRiesgoPension,
 						IdCountryWorker = objNomina.LugarTrabajoPais,
+						ContryWorkeer = Countries.Where(x => x.CodeAlfa2 == objNomina.LugarTrabajoPais).FirstOrDefault().CompositeNameCountry,
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
 						NameDepartamentWorker = Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
@@ -310,6 +316,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						Consecutive = objNomina.Consecutivo.ToString(),
 						Number = objNomina.Numero,
 						IdGenerationCountry = objNomina.Pais,
+						 GenerationContry=Countries.Where(x => x.CodeAlfa2 == objNomina.Pais).FirstOrDefault().CompositeNameCountry,
 						//Pendiente NombrePais
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
 						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
@@ -345,6 +352,8 @@ namespace Gosocket.Dian.Functions.Payroll
 						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
+						ContryEmployeer = Countries.Where(x => x.CodeAlfa2 == objNomina.Emp_Pais).FirstOrDefault().CompositeNameCountry,
+
 						NameCompositeEmployer = City.Where(x => x.IdCity == objNomina.Emp_MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCityDepartament
 						AddressEmployer = objNomina.Emp_Direccion,
@@ -375,6 +384,8 @@ namespace Gosocket.Dian.Functions.Payroll
 						SalaryIntegralWorker = objNomina.SalarioIntegral,
 						SalaryWorker = objNomina.Sueldo,
 						IdCountryWorker = objNomina.LugarTrabajoPais,
+						ContryWorkeer =  Countries.Where(x => x.CodeAlfa2 == objNomina.LugarTrabajoPais).FirstOrDefault().CompositeNameCountry,
+
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
 						NameDepartamentWorker = Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
@@ -430,6 +441,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						Number = objNomina.Numero,
 						//Pendiente nombrePais
 						IdGenerationCountry = objNomina.Pais,
+						GenerationContry = Countries.Where(x => x.CodeAlfa2 == objNomina.Pais).FirstOrDefault().CompositeNameCountry,
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
 						//Peniente NameCompositeGenerationDepartament //NombreCompuestoDepartamentoGeneracion
 						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
@@ -464,6 +476,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						NameDepartamentEmployeer = Departament.Where(x => x.IdDepartament == objNomina.Emp_DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentEmployeer
 						IdCityEmployer = objNomina.Emp_MunicipioCiudad,
+						ContryEmployeer = Countries.Where(x => x.CodeAlfa2 == objNomina.Emp_Pais).FirstOrDefault().CompositeNameCountry,
 
 						//Pendiente NameCityDepartament
 						AddressEmployer = objNomina.Emp_Direccion,

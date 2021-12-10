@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain.Cosmos;
 
 using Gosocket.Dian.Infrastructure;
+using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using System;
@@ -118,9 +119,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<Departament>();
-                IDocumentQuery<Departament> DepartamentQuery = client.CreateDocumentQuery<Departament>(
+                IDocumentQuery<Departament> QueryData = client.CreateDocumentQuery<Departament>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "Department"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<Departament>().Result;
+                var result = (QueryData).ExecuteNextAsync<Departament>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -140,9 +141,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<CoinType>();
-                IDocumentQuery<CoinType> DepartamentQuery = client.CreateDocumentQuery<CoinType>(
+                IDocumentQuery<CoinType> QueryData = client.CreateDocumentQuery<CoinType>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "CoinType"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<CoinType>().Result;
+                var result = (QueryData).ExecuteNextAsync<CoinType>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -160,9 +161,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<ContractType>();
-                IDocumentQuery<ContractType> DepartamentQuery = client.CreateDocumentQuery<ContractType>(
+                IDocumentQuery<ContractType> QueryData = client.CreateDocumentQuery<ContractType>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "ContractType"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<ContractType>().Result;
+                var result = (QueryData).ExecuteNextAsync<ContractType>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -178,9 +179,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<City>();
-                IDocumentQuery<City> DepartamentQuery = client.CreateDocumentQuery<City>(
+                IDocumentQuery<City> QueryData = client.CreateDocumentQuery<City>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "City"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<City>().Result;
+                var result = (QueryData).ExecuteNextAsync<City>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -196,9 +197,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<DocumentTypes>();
-                IDocumentQuery<DocumentTypes> DepartamentQuery = client.CreateDocumentQuery<DocumentTypes>(
+                IDocumentQuery<DocumentTypes> QueryData = client.CreateDocumentQuery<DocumentTypes>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "DocumentType"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<DocumentTypes>().Result;
+                var result = (QueryData).ExecuteNextAsync<DocumentTypes>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -214,9 +215,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<SubWorkerType>();
-                IDocumentQuery<SubWorkerType> DepartamentQuery = client.CreateDocumentQuery<SubWorkerType>(
+                IDocumentQuery<SubWorkerType> QueryData = client.CreateDocumentQuery<SubWorkerType>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "SubWorkerType"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<SubWorkerType>().Result;
+                var result = (QueryData).ExecuteNextAsync<SubWorkerType>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -232,9 +233,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<WorkerType>();
-                IDocumentQuery<WorkerType> DepartamentQuery = client.CreateDocumentQuery<WorkerType>(
+                IDocumentQuery<WorkerType> QueryData = client.CreateDocumentQuery<WorkerType>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "WorkerType"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<WorkerType>().Result;
+                var result = (QueryData).ExecuteNextAsync<WorkerType>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -250,9 +251,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<PeriodPayroll>();
-                IDocumentQuery<PeriodPayroll> DepartamentQuery = client.CreateDocumentQuery<PeriodPayroll>(
+                IDocumentQuery<PeriodPayroll> QueryData = client.CreateDocumentQuery<PeriodPayroll>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "PeriodPayroll"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<PeriodPayroll>().Result;
+                var result = (QueryData).ExecuteNextAsync<PeriodPayroll>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -269,9 +270,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<PaymentForm>();
-                IDocumentQuery<PaymentForm> DepartamentQuery = client.CreateDocumentQuery<PaymentForm>(
+                IDocumentQuery<PaymentForm> QueryData = client.CreateDocumentQuery<PaymentForm>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "PaymentForm"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<PaymentForm>().Result;
+                var result = (QueryData).ExecuteNextAsync<PaymentForm>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -287,9 +288,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<PaymentMethod>();
-                IDocumentQuery<PaymentMethod> DepartamentQuery = client.CreateDocumentQuery<PaymentMethod>(
+                IDocumentQuery<PaymentMethod> QueryData = client.CreateDocumentQuery<PaymentMethod>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "PaymentMethod"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<PaymentMethod>().Result;
+                var result = (QueryData).ExecuteNextAsync<PaymentMethod>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -304,9 +305,9 @@ namespace Gosocket.Dian.DataContext
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
                 var DepartamentData = new List<NumberingRange>();
-                IDocumentQuery<NumberingRange> DepartamentQuery = client.CreateDocumentQuery<NumberingRange>(
+                IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), queryOptions).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<NumberingRange>().Result;
+                var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
                 return result.ToList();
             }
             catch (Exception e)
@@ -321,11 +322,11 @@ namespace Gosocket.Dian.DataContext
             {
 
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-
+                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range + "  and c.State = 1";
                 var DepartamentData = new List<NumberingRange>();
-                IDocumentQuery<NumberingRange> DepartamentQuery = client.CreateDocumentQuery<NumberingRange>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), queryOptions).Where(x => x.Prefix == prefijo && range >= x.NumberFrom && range <= x.NumberTo).AsDocumentQuery();
-                var result = (DepartamentQuery).ExecuteNextAsync<NumberingRange>().Result;
+                IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
+                              UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
+                var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
                 return result.ToList();
 
 
@@ -335,6 +336,31 @@ namespace Gosocket.Dian.DataContext
                 return new List<NumberingRange>();
 
             }
+        }
+
+        public async Task<NumberingRange> ConsumeNumberingRange(string IdNumberingRange)
+        {
+            var ret = new List<NumberingRange>();
+            string sql = "SELECT * FROM c where  c.id='"+IdNumberingRange+"'" ;
+            FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+            IDocumentQuery<NumberingRange> query = client.CreateDocumentQuery<NumberingRange>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"),sql).AsDocumentQuery();
+
+            while (query.HasMoreResults)
+                    ret.AddRange(await query.ExecuteNextAsync<NumberingRange>());
+            if (ret.FirstOrDefault().CurrentNumber > ret.FirstOrDefault().NumberTo)
+                    return null;
+                NumberingRange result = ret.FirstOrDefault();
+                Int64 currentValue = Int64.Parse(result.CurrentNumber.ToString());
+                if (currentValue <= result.NumberTo)
+                {
+                    result.CurrentNumber= currentValue + 1;
+
+                await client.UpsertDocumentAsync(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), result);
+                    
+                    return ret.FirstOrDefault();
+                }
+            
+            return null;
         }
 
     }
