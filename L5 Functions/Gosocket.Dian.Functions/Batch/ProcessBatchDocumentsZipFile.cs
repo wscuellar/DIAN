@@ -111,21 +111,25 @@ namespace Gosocket.Dian.Functions.Batch
                 var xpathRequest = requestObjects.FirstOrDefault();
                 var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
-                Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);                
+                Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
+                Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
                 eventCodeRadian = xpathResponse.XpathsValues["AppResEventCodeXpath"];
                 trackIdReferenceRadian = xpathResponse.XpathsValues["AppResDocumentReferenceKeyXpath"];
                 listId = string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResListIDXpath"]) ? "1" : xpathResponse.XpathsValues["AppResListIDXpath"];
                 trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
 
                 //Informacion documento Nomina Individual / Ajuste
-                payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
-                payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
-                
+                if(!flagApplicationResponse && !flagInvoice)
+                {
+                    payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
+                    payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+                }
+
                 start = DateTime.UtcNow;
                 var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
                 {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                    Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian 
+                    Action = "validando consulta - flagInvoice " + flagInvoice + " flagApplicationResponse " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian 
                     + " trackIdCude " + trackIdCude + " listId " + listId + " payrollTypeXml " + payrollTypeXml + " payrollProvider " + payrollProvider + " testSetId " + testSetId
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
