@@ -561,13 +561,16 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class NumberingRange
 	{
 		[JsonProperty("PartitionKey")]
-		public long? PartitionKey { get; set; }
+		public string PartitionKey { get; set; }
 
 		[JsonProperty("DocumentKey")]
-		public Guid? DocumentKey { get; set; }
+		public string DocumentKey { get; set; }
 
 		[JsonProperty("AccountId")]
 		public Guid AccountId { get; set; }
+
+		[JsonProperty("IdDocumentTypePayroll")]
+		public string IdDocumentTypePayroll { get; set; }
 
 		[JsonProperty("IDNumberingRange")]
 		public long IdNumberingRange { get; set; }

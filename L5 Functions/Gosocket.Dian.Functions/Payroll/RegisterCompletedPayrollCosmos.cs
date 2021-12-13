@@ -78,7 +78,7 @@ namespace Gosocket.Dian.Functions.Payroll
 				var PeriodPayroll = await cosmos.getPeriodPayroll();
 				var PaymentForm = await cosmos.getPaymentForm();
 				var PaymentMethod = await cosmos.getPaymentMethod();
-				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo);
+				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo,objNomina.TipoXML);
 
 				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString());
 
@@ -86,6 +86,9 @@ namespace Gosocket.Dian.Functions.Payroll
 				//var numeric = await cosmos
 
 				#region"AgregarDataPayrollALL
+
+				var compositeNameSender = objNomina.Emp_PrimerNombre + " " + objNomina.Emp_OtrosNombres + " " + objNomina.Emp_PrimerApellido + " " + objNomina.Emp_SegundoApellido;
+				var compositeNameWorker = objNomina.PrimerNombre + " " + objNomina.OtrosNombres + " " + objNomina.PrimerApellido + " " + objNomina.SegundoApellido;
 				var Insert = new Domain.Cosmos.Payroll_All()
 				{
 					PartitionKey = account,
@@ -101,16 +104,16 @@ namespace Gosocket.Dian.Functions.Payroll
 					SubTypeDocumentId = objNomina.TipoXML == "102" ? "SN" : objNomina.TipoNota == 2 ? "E" : "R",
 					SubTypeDocumentName = objNomina.TipoXML == "102" ? "Sin Novedad" : objNomina.TipoNota == 2 ? "Nomina de ajuste" : "Reemplazar",
 					DocNumberSender = objNomina.NIT,
-					CompositeNameSender = objNomina.Emp_PrimerNombre + " " + objNomina.Emp_OtrosNombres + " " + objNomina.Emp_PrimerApellido + " " + objNomina.Emp_SegundoApellido,
+					CompositeNameSender = compositeNameSender,
 					CodeEmployee = objNomina.CodigoTrabajador == null ? "" : objNomina.CodigoTrabajador,
 					DocTypeWorker = objNomina.TipoDocumento == null ? 0 : long.Parse(objNomina.TipoDocumento),
 					DocNumberWorker = objNomina.NumeroDocumento ==null?"": objNomina.NumeroDocumento,
-					NameDocTypeWorker = DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
-					FirstNamerWorker = objNomina.PrimerNombre,
-					SecondNameWorker = objNomina.OtrosNombres,
-					LastNameWorker = objNomina.PrimerApellido,
-					SecondLastNameWorker = objNomina.SegundoApellido,
-					CompositeNameWorker = objNomina.PrimerNombre + " " + objNomina.OtrosNombres + " " + objNomina.PrimerApellido + " " + objNomina.SegundoApellido,
+					NameDocTypeWorker = objNomina.TipoDocumento ==null?"": DocumentType.Where(x => x.IdDocumentType == objNomina.TipoDocumento).FirstOrDefault().NameDocumentType,
+					FirstNamerWorker = objNomina.PrimerNombre==null?"": objNomina.PrimerNombre,
+					SecondNameWorker = objNomina.OtrosNombres==null?"": objNomina.OtrosNombres,
+					LastNameWorker = objNomina.PrimerApellido==null?"": objNomina.PrimerApellido,
+					SecondLastNameWorker = objNomina.SegundoApellido==null ? "" : objNomina.PrimerApellido,
+					CompositeNameWorker = compositeNameWorker,
 					GenerationDate = objNomina.FechaGen == null ? "" : objNomina.FechaGen.ToString(),
 					InitialDate = objNomina.FechaInicio == null ? "" : (objNomina.FechaInicio.ToString()),
 					FinalDate = objNomina.FechaFin == null ? "" : (objNomina.FechaFin.ToString()),
