@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
 @{
-    ViewBag.title = "SET DE PRUEBAS - " + Model.ContributorTypeId + " " + Model.ElectronicDoc;
+    ViewBag.title = "Detalle de set de pruebas";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -72,20 +72,22 @@
 			</div>
                 }
                 <div class="row margin-horizontal-0 margin-top-20">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+					<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
 
-                        @using (Html.BeginForm("SetTestDetails", "OthersElectronicDocAssociated", FormMethod.Post))
-                        {
-                            <div class="setTestODE">
-                                @Html.HiddenFor(m => m.Id)
-                                @Html.Partial("_setTestResult")
-                            </div>
-                            <div class="panel-footer text-right">
+						@using (Html.BeginForm("SetTestDetails", "OthersElectronicDocAssociated", FormMethod.Post))
+						{
+							<div class="setTestODE">
+								@Html.HiddenFor(m => m.Id)
+								@Html.Partial("_setTestResult")
+							</div>
+							<div class="panel-footer text-right">
 								<button type="submit" class="btn btn-success btn-radian-success">Gráfico</button>
-                            </div>
-                        }
+								@Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+							</div>
 
-                    </div>
+						}
+
+					</div>
                 </div>
             </div>
         </div>
