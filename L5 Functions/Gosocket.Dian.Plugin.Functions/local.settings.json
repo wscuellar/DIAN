@@ -126,8 +126,12 @@
     "TaxShemeID": "01|04|05|06",
     "ErrorMessage_LGC43": "No se puede registrar este evento si previamente no se ha registrado el evento Registro para la circulación.",
     "ErrorMessage_AAG01a": "El adquiriente no esta autorizado para recibir esté evento",
-    "ErrorMessage_DC24z": "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio."
+    "ErrorMessage_DC24z": "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio.",
+    "ErrorMessage_NIE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
+    "ErrorMessage_NIAE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
 
+    "Namespace_IndividualPayroll": "=dian:gov:co:facturaelectronica:NominaIndividual|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance",
+    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance"
 
     // Test UAT INDRA
     //"Environment": "Test",
