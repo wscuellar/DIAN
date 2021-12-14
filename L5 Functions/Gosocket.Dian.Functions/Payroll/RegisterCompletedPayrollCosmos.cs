@@ -136,9 +136,9 @@ namespace Gosocket.Dian.Functions.Payroll
 
 						Novelty = objNomina.Novedad.ToString(),
 						NoveltyCune = objNomina.CUNENov,
-						AdmissionDate = objNomina.FechaIngreso.ToString() == null ? "" : objNomina.FechaIngreso.ToString(),
-						SettlementDateStartMonth = objNomina.FechaPagoInicio.ToString() == null ? "" : objNomina.FechaPagoInicio.ToString(),
-						SettlementDateEndMonth = objNomina.FechaPagoFin.ToString() == null ? "" : objNomina.FechaPagoFin.ToString(),
+						AdmissionDate = objNomina.FechaIngreso== null ? "" : DateTime.Parse(objNomina.FechaIngreso.ToString()).ToString("yyyy-MM-dd"),
+						SettlementDateStartMonth = objNomina.FechaPagoInicio.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
+						SettlementDateEndMonth = objNomina.FechaPagoFin.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
 						TimeWorkedCompany = objNomina.TiempoLaborado,
 						GenerationDate = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
 						GenerationDateNumber = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
@@ -299,9 +299,9 @@ namespace Gosocket.Dian.Functions.Payroll
 					//Mapeo DocumentData - SecciónDatosDocumento
 					var InsertDocumentDataPayroll = new Domain.Cosmos.DocumentDataR()
 					{
-						AdmissionDate = objNomina.FechaIngreso.ToString() == null ? "" : objNomina.FechaIngreso.ToString(),
-						SettlementDateStartMonth = objNomina.FechaPagoInicio.ToString() == null ? "" : objNomina.FechaPagoInicio.ToString(),
-						SettlementDateEndMonth = objNomina.FechaPagoFin.ToString() == null ? "" : objNomina.FechaPagoFin.ToString(),
+						AdmissionDate = objNomina.FechaIngreso == null ? "" : DateTime.Parse(objNomina.FechaIngreso.ToString()).ToString("yyyy-MM-dd"),
+						SettlementDateStartMonth = objNomina.FechaPagoInicio.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
+						SettlementDateEndMonth = objNomina.FechaPagoFin.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
 						TimeWorkedCompany = objNomina.TiempoLaborado,
 						GenerationDate = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
 						GenerationDateNumber = objNomina.FechaGen == null ? objNomina.FechaGenPred.ToString() : objNomina.FechaGen.ToString(),
