@@ -6999,6 +6999,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private List<ValidateListResponse> CheckExistsNamespacePayroll(XmlParseNomina xmlParser)
         {
             DateTime startDate = DateTime.UtcNow;
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatoryPayroll"), out bool ValidateManadatoryPayroll);
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
              
@@ -7019,7 +7020,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = false,
-                    Mandatory = true,
+                    Mandatory = ValidateManadatoryPayroll,
                     ErrorCode = LocalName.Equals(xmlNominaIndividual)? "NIE901" : "NIAE901",
                     ErrorMessage = LocalName.Equals(xmlNominaIndividual) ? ConfigurationManager.GetValue("ErrorMessage_NIE901") :  ConfigurationManager.GetValue("ErrorMessage_NIAE901"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
