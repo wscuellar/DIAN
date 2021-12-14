@@ -130,8 +130,8 @@
     "ErrorMessage_NIE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
     "ErrorMessage_NIAE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
 
-    "Namespace_IndividualPayroll": "=dian:gov:co:facturaelectronica:NominaIndividual|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance",
-    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance"
+    "Namespace_IndividualPayroll": "=dian:gov:co:facturaelectronica:NominaIndividual|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance",
+    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance"
 
     // Test UAT INDRA
     //"Environment": "Test",

@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Interfaces.Services
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
+        int NumHabilitadosOtherDocsElect(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
