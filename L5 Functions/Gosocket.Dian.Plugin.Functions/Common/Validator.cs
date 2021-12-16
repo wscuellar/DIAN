@@ -7066,13 +7066,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var vector = valueCorrectoNamespeceNominaIndivial.Split('|');
 
             //valido que si no halla mas namespace que los q necesita el archivo
-            foreach (var item in NamespaceAll)
-            {
-                if (!vector.Any(x => x.Equals(item.Key + "=" + item.Value)))   NamespaceInvalidos += (NamespaceInvalidos == String.Empty ? String.Empty : ", ") + "xmlns:" + item.Key + "=" + item.Value;
-            }
+            //foreach (var item in NamespaceAll)
+            //{
+            //    if (!vector.Any(x => x.Equals(item.Key + "=" + item.Value))) NamespaceInvalidos += (NamespaceInvalidos == String.Empty ? String.Empty : ", ") + "xmlns:" + item.Key + "=" + item.Value;
+            //}
 
-            if (!string.IsNullOrWhiteSpace(NamespaceInvalidos)) 
-               return "Existen Namespace que no corresponden a " + xmlNominaIndividualDeAjuste + ", " + NamespaceInvalidos;
+            //if (!string.IsNullOrWhiteSpace(NamespaceInvalidos))
+            //    return "Existen Namespace que no corresponden a " + xmlNominaIndividualDeAjuste + ", " + NamespaceInvalidos;
 
             //valido que esten todos los namespace que necesita el archivo
             foreach (var item in vector)
