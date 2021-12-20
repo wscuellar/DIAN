@@ -635,5 +635,44 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("CompositeName")]
 		public string CompositeName { get; set; }
 	}
+	public partial class List
+	{
+		[JsonProperty("IdList")]
+		public long IdList { get; set; }
+
+		[JsonProperty("IdSubList")]
+
+		public string IdSubList { get; set; }
+
+		[JsonProperty("ListName")]
+		public string ListName { get; set; }
+
+		[JsonProperty("CompositeName")]
+		public string CompositeName { get; set; }
+
+		[JsonProperty("State")]
+		public long State { get; set; }
+
+		[JsonProperty("CreationDate")]
+		public string CreationDate { get; set; }
+
+		[JsonProperty("id")]
+		public Guid Id { get; set; }
+
+		[JsonProperty("_rid")]
+		public string Rid { get; set; }
+
+		[JsonProperty("_self")]
+		public string Self { get; set; }
+
+		[JsonProperty("_etag")]
+		public string Etag { get; set; }
+
+		[JsonProperty("_attachments")]
+		public string Attachments { get; set; }
+
+		[JsonProperty("_ts")]
+		public long Ts { get; set; }
+	}
 
 }

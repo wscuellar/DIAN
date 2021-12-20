@@ -138,12 +138,20 @@ namespace Gosocket.Dian.DataContext
 
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=2 ";
+                var result = new List<CoinType>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<CoinType>();
-                IDocumentQuery<CoinType> QueryData = client.CreateDocumentQuery<CoinType>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "CoinType"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<CoinType>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new CoinType() { IdCoinType = x.IdSubList, CompositeNameCoinType = x.CompositeName, NameCoinType = x.ListName }).ToList();
+
+                }
                 return result.ToList();
             }
             catch (Exception e)
@@ -158,12 +166,19 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var result = new List<ContractType>();
+                var sql = "Select * from List c where  c.IdList=3 ";
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<ContractType>();
-                IDocumentQuery<ContractType> QueryData = client.CreateDocumentQuery<ContractType>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "ContractType"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<ContractType>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    result = r.Select(x => new ContractType() { IdContractType = x.IdSubList, CompositeName = x.CompositeName, NameContractType = x.ListName }).ToList();
+
+                }
                 return result.ToList();
             }
             catch (Exception e)
@@ -194,13 +209,22 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=4 ";
+                var result = new List<DocumentTypes>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<DocumentTypes>();
-                IDocumentQuery<DocumentTypes> QueryData = client.CreateDocumentQuery<DocumentTypes>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "DocumentType"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<DocumentTypes>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new DocumentTypes() { IdDocumentType = x.IdSubList, CompositeName = x.CompositeName, NameDocumentType = x.ListName }).ToList();
+
+                }
                 return result.ToList();
+
             }
             catch (Exception e)
             {
@@ -212,12 +236,20 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=9 ";
+                var result = new List<SubWorkerType>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<SubWorkerType>();
-                IDocumentQuery<SubWorkerType> QueryData = client.CreateDocumentQuery<SubWorkerType>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "SubWorkerType"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<SubWorkerType>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new SubWorkerType() { IdSubWorkerType = x.IdSubList, CompositeName = x.CompositeName, NameSubWorkerType = x.ListName }).ToList();
+
+                }
                 return result.ToList();
             }
             catch (Exception e)
@@ -230,12 +262,20 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=8 ";
+                var result = new List<WorkerType>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<WorkerType>();
-                IDocumentQuery<WorkerType> QueryData = client.CreateDocumentQuery<WorkerType>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "WorkerType"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<WorkerType>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new WorkerType() { IdWorkerType = x.IdSubList, CompositeName = x.CompositeName, NameWorkerType = x.ListName }).ToList();
+
+                }
                 return result.ToList();
             }
             catch (Exception e)
@@ -248,13 +288,22 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=7 ";
+                var result = new List<PeriodPayroll>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<PeriodPayroll>();
-                IDocumentQuery<PeriodPayroll> QueryData = client.CreateDocumentQuery<PeriodPayroll>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "PeriodPayroll"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<PeriodPayroll>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new PeriodPayroll() { IdPeriodPayroll = x.IdSubList, CompositeNamePeriodPayroll = x.CompositeName, NamePeriodPayroll = x.ListName }).ToList();
+
+                }
                 return result.ToList();
+
             }
             catch (Exception e)
             {
@@ -267,12 +316,20 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=5 ";
+                var result = new List<PaymentForm>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<PaymentForm>();
-                IDocumentQuery<PaymentForm> QueryData = client.CreateDocumentQuery<PaymentForm>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "PaymentForm"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<PaymentForm>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new PaymentForm() { IdPaymentForm = x.IdSubList, CompositeName = x.CompositeName, NamePaymentForm = x.ListName }).ToList();
+
+                }
                 return result.ToList();
             }
             catch (Exception e)
@@ -285,13 +342,22 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
+                var sql = "Select * from List c where  c.IdList=6 ";
+                var result = new List<PaymentMethod>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
-                var DepartamentData = new List<PaymentMethod>();
-                IDocumentQuery<PaymentMethod> QueryData = client.CreateDocumentQuery<PaymentMethod>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "PaymentMethod"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<PaymentMethod>().Result;
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.Select(x => new PaymentMethod() { IdPaymentMethod = x.IdSubList, CompositeName = x.CompositeName, NamePaymentMethod = x.ListName }).ToList();
+
+                }
                 return result.ToList();
+
             }
             catch (Exception e)
             {
