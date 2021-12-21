@@ -41,9 +41,10 @@
 					</figure>
 				</div><div class="row margin-horizontal-0 margin-top-20">
 						  <div class="panel-footer text-right">
-						  	@Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
 
-						  <a  class="btn btn-success btn-radian-success" href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })">Detalles</a>
+
+						  	<a class="btn btn-success btn-radian-success" href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })">Detalles</a>
+						  	@Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
 						  </div>
 				</div>
 			</div>

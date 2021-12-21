@@ -1030,6 +1030,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult LogOut()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            Session["ShowFree"] = null;
             return RedirectToAction(nameof(UserController.Login), "User");
         }
 

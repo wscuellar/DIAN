@@ -4,6 +4,7 @@
 @{
 	var contributorName = (string)ViewBag.ContributorName;
 	var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
+	var message = (string)ViewBag.Message;
 }
 
 @section css
@@ -200,24 +201,24 @@
 		</div>
 
 		@*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
-						<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
-					</div>
-					<div class="modal-body">
-						<div class="bootbox-body">
-							<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
-							<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-									  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
+							<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
 						</div>
-					</div><div class="modal-footer">
-						<button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+						<div class="modal-body">
+							<div class="bootbox-body">
+								<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
+								<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+										  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+							</div>
+						</div><div class="modal-footer">
+							<button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>*@
+			</div>*@
 		<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
 			<div class="modal-dialog">
 				<div class="modal-content">
@@ -248,7 +249,14 @@
 	<script src="~/Content/js/Radian/RadianIndex.js"></script>
 
 	<script>
-
+		  @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <text>
+            bootbox.dialog({
+                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
+                        onEscape: () => {  }});
+            </text>
+        }
         $(document).ready(function ($) {
             if ('@ViewBag.softwareActive'=='True'){
 
@@ -315,7 +323,7 @@
 					}
 				}
 
-              
+
             });
 
             $('#ProviderId').change(function () {
@@ -339,11 +347,11 @@
                 $("#dialogcancelarregistro").modal('show');
             });
 			if (@Model.ContributorIdType == 2) {
-				$('select[name=OperationModeSelectedId]').val(1);				
+				$('select[name=OperationModeSelectedId]').val(1);
 			}
 			else {
 				$('select[name=OperationModeSelectedId]').val(0);
-			}			
+			}
 			$('.selectpicker').selectpicker('refresh');
 			$('#OperationModeSelectedId').change();
 		});//ready

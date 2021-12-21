@@ -161,6 +161,20 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
         }
 
+        public List<OtherDocElecContributor> GetOtherDocElecContributor(int OtherDocContributorId)
+        {
+            
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId && p.OtherDocElecOperationModeId==3).ToList();
+        }
+
+        public bool GetOtherDocElecContributorOperations(int OtherDocContributorId)
+        {
+
+            var resp = sqlDBContext.OtherDocElecContributorOperations.Where(p => p.OtherDocElecContributorId == OtherDocContributorId && p.Deleted==false).Count();
+            return resp > 0 ? true : false;
+        }
+
+
         public Contributor GetByCode(string code, string connectionString)
         {
             using (var context = new SqlDBContext(connectionString))

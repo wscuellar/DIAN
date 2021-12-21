@@ -64,13 +64,18 @@ namespace Gosocket.Dian.Web.Controllers
 			List<ElectronicDocument> listED = _electronicDocumentService.GetElectronicDocuments();
 			List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
 			OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+			if (dataentity.Message != null)
+			{
+
+				ViewBag.Message = dataentity.Message;
+			}
 
 			var opeMode = listOM.FirstOrDefault(o => o.Id == (int)dataentity.OperationModeId);
 			//if((int)dataentity.OperationModeId)==0)
 			if (opeMode != null) model.OperationMode = opeMode.Name;
 
 			// ViewBag's
-			
+
 			ViewBag.Title = $"Asociar modo de operación";
 
 			if (dataentity.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)
@@ -142,8 +147,8 @@ namespace Gosocket.Dian.Web.Controllers
 			model.ContributorIdType = (int)dataentity.ContributorIdType;
 			model.OtherDocElecContributorId = (int)dataentity.ContributorId;
 			model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrlEvent");
-			
-				PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId);
+
+			PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId);
 			if (model.OperationModeId == 0)
 			{
 				List = _othersDocsElecContributorService.List3(User.ContributorId(), (int)dataentity.ContributorIdType);
@@ -175,7 +180,7 @@ namespace Gosocket.Dian.Web.Controllers
 				var OperationsModes = _othersDocsElecContributorService.GetOperationModes().Where(x => x.Id == 3).FirstOrDefault();
 				operationModesList.Add(new Domain.RadianOperationMode { Id = OperationsModes.Id, Name = OperationsModes.Name });
 			}
-			
+
 			var contributor = _contributorService.GetContributorById(User.ContributorId(), model.ContributorIdType);
 			model.ContributorName = contributor?.Name;
 			model.SoftwareId = Guid.NewGuid().ToString();
@@ -186,7 +191,7 @@ namespace Gosocket.Dian.Web.Controllers
 				providersList.AddRange(contributorsList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
 			ViewBag.ListTechnoProviders = new SelectList(providersList, "Id", "Name");
 
-		
+
 			if (model.OperationModeId == 1)
 			{
 				model.ContributorName = contributor?.Name;
@@ -196,7 +201,8 @@ namespace Gosocket.Dian.Web.Controllers
 			else
 			{
 				model.SoftwareName = " ";
-				model.PinSW = " ";			}
+				model.PinSW = " ";
+			}
 
 			ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
 
@@ -212,7 +218,7 @@ namespace Gosocket.Dian.Web.Controllers
 		public ActionResult AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
 		{
 
-			
+
 			if (model.OperationModeSelectedId == "3")
 			{
 				model.SoftwareName = "Solución gratuita";
@@ -222,7 +228,7 @@ namespace Gosocket.Dian.Web.Controllers
 			var tipo = model.OperationModeId;
 			if (model.OperationModeId == 0)
 			{
-				model.OperationModeId = Int32.Parse( model.OperationModeSelectedId);
+				model.OperationModeId = Int32.Parse(model.OperationModeSelectedId);
 
 
 			}
@@ -235,14 +241,15 @@ namespace Gosocket.Dian.Web.Controllers
 				model.OperationModeId = 3;
 			}
 			if (model.SoftwareId == null)
-			{				Guid g = Guid.NewGuid();
+			{
+				Guid g = Guid.NewGuid();
 				model.SoftwareId = g.ToString();
 			}
 
 			GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocumentId);
 			if (testSet == null)
 				return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
-			
+
 			if (!ModelState.IsValid)
 			{
 				IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
@@ -292,7 +299,7 @@ namespace Gosocket.Dian.Web.Controllers
 			{
 				OtherDocElecContributorId = Int32.Parse(ContributorId),
 				OperationStatusId = (int)OtherDocElecState.Test,
-				Deleted = false,				
+				Deleted = false,
 				Timestamp = now,
 				SoftwareType = model.OperationModeId,
 				SoftwareId = IdS
@@ -300,7 +307,7 @@ namespace Gosocket.Dian.Web.Controllers
 			ResponseMessage response = new ResponseMessage();
 			if (tipo != 0)
 			{
-				 response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
+				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperation(contributorOperation, software, true, true);
 			}
 			else
 			{
@@ -308,12 +315,23 @@ namespace Gosocket.Dian.Web.Controllers
 			}
 			if (response.Code == 500) // error...
 			{
-				return this.RedirectToAction("AddParticipants", new { electronicDocumentId = model.ElectronicDocumentId, message = response.Message });
+				return this.RedirectToAction("AddOrUpdate", new { ElectronicDocumentId = 1, OperationModeId = 0, ContributorIdType = model.ContributorIdType, ContributorId = model.OtherDocElecContributorId, Message = response.Message });
+			}
+			else
+			{
+				if (model.OperationModeSelectedId == "3")
+				{
+					Session["ShowFree"] = "1";
+					
+				}
 			}
 
-			
-				_othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
-	
+
+
+
+
+			_othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+
 			return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
 		}
 
@@ -385,11 +403,11 @@ namespace Gosocket.Dian.Web.Controllers
 					}
 				}
 				var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId);
-				if (mode.Where(x => x.OtherDocElecContributorTypeId == 1).Count() == 0 && ValidacionOtherDocs.ContributorIdType== Domain.Common.OtherDocElecContributorType.Transmitter)
+				if (mode.Where(x => x.OtherDocElecContributorTypeId == 1).Count() == 0 && ValidacionOtherDocs.ContributorIdType == Domain.Common.OtherDocElecContributorType.Transmitter)
 				{
 					return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
 				}
-				else if (mode.Where(x => x.OtherDocElecContributorTypeId == 2).Count() == 0 && ValidacionOtherDocs.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)  
+				else if (mode.Where(x => x.OtherDocElecContributorTypeId == 2).Count() == 0 && ValidacionOtherDocs.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)
 				{
 					return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelectParticipante_Confirm.Replace("@Participante", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
 
@@ -406,7 +424,7 @@ namespace Gosocket.Dian.Web.Controllers
 										   new
 										   {
 											   ElectronicDocumentId = 1, //ValidacionOtherDocs.ElectronicDocumentId,
-											   OperationModeId =0, //(int)ValidacionOtherDocs.OperationModeId,
+											   OperationModeId = 0, //(int)ValidacionOtherDocs.OperationModeId,
 											   ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
 											   ContributorId
 										   });
@@ -446,12 +464,12 @@ namespace Gosocket.Dian.Web.Controllers
 											   new
 											   {
 												   ElectronicDocumentId = 1, //ValidacionOtherDocs.ElectronicDocumentId,
-												   OperationModeId =1, //(int)ValidacionOtherDocs.OperationModeId,
+												   OperationModeId = 1, //(int)ValidacionOtherDocs.OperationModeId,
 												   ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
 												   ContributorId
 											   });
 					}
-					else 
+					else
 					{
 						ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
 											   new
