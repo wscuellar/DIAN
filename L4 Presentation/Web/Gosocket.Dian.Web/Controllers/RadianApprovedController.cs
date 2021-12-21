@@ -31,6 +31,11 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly UserService userService = new UserService();
 
         private readonly TelemetryClient telemetry;
+        private IRadianContributorService object1;
+        private IRadianTestSetService object2;
+        private IRadianApprovedService object3;
+        private IRadianTestSetResultService object4;
+        private IRadianTestSetAppliedService object5;
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,
@@ -48,6 +53,15 @@ namespace Gosocket.Dian.Web.Controllers
             _radianTestSetAppliedService = radianTestSetAppliedService;
             _globalRadianOperationService = globalRadianOperationService;
             this.telemetry = telemetry;
+        }
+
+        public RadianApprovedController(IRadianContributorService object1, IRadianTestSetService object2, IRadianApprovedService object3, IRadianTestSetResultService object4, IRadianTestSetAppliedService object5)
+        {
+            this.object1 = object1;
+            this.object2 = object2;
+            this.object3 = object3;
+            this.object4 = object4;
+            this.object5 = object5;
         }
 
         [HttpGet]
