@@ -86,7 +86,7 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation)
+        public ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation,int ContributorId,int ContributorIdType,int OperationModeId)
         {
             OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId);
             GlobalTestSetOthersDocuments testSet = null;
@@ -108,6 +108,11 @@ namespace Gosocket.Dian.Application
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, ContributorIdType);
+
+            if(List.Results.Any(x=>x.StateSoftware=="2"))
+                return new ResponseMessage("Tiene un modo de operación en pruebas", TextResources.alertType, 500);
 
 
             _othersDocsElecSoftwareService.CreateSoftware(software);
