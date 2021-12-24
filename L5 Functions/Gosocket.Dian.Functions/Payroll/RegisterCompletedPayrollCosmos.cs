@@ -219,7 +219,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						TypeWorker = objNomina.TipoTrabajador,
 						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == Int32.Parse(objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
 						SubTypeWorker = objNomina.SubTipoTrabajador,
-						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == (objNomina.SubTipoTrabajador == "00" ? "0" : objNomina.SubTipoTrabajador =="01"?"1":objNomina.SubTipoTrabajador)).FirstOrDefault().CompositeName,
+						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == objNomina.SubTipoTrabajador).FirstOrDefault().CompositeName,
 						//Pendiente NameSubTypeWorker
 						HighRiskPensionWorker = objNomina.AltoRiesgoPension,
 						IdCountryWorker = objNomina.LugarTrabajoPais,
@@ -378,7 +378,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == Int32.Parse(objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
 						//Pendiente TypeWorker
 						SubTypeWorker = objNomina.SubTipoTrabajador,
-						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == (objNomina.SubTipoTrabajador == "00" ? "0" : objNomina.SubTipoTrabajador == "01" ? "1" : objNomina.SubTipoTrabajador)).FirstOrDefault().CompositeName,
+						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == objNomina.SubTipoTrabajador).FirstOrDefault().CompositeName,
 						//Pendiente NameSubTypeWorker
 						HighRiskPensionWorker = objNomina.AltoRiesgoPension,
 						ContractTypeWorker = objNomina.TipoContrato,
