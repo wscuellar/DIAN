@@ -311,7 +311,7 @@ namespace Gosocket.Dian.Web.Controllers
 			}
 			else
 			{
-				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true);
+				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true, model.OtherDocElecContributorId, model.ContributorIdType,model.ElectronicDocumentId);
 			}
 			if (response.Code == 500) // error...
 			{
