@@ -2960,6 +2960,7 @@
     <Content Include="Views\User\_companyInvoiceLogin.cshtml" />
     <Content Include="Views\User\_userexInvoiceLogin.cshtml" />
     <Content Include="Views\User\_forgotPasswordFormInvoice.cshtml" />
+    <Content Include="Views\Document\ElectronicDocuments.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
