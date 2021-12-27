@@ -233,7 +233,7 @@
 										<a href="@Url.Action("Dashboard", "Home")">
 											<i class="fa fa-dashboard"></i>
 											<span class="menu-title">
-												Tablero
+												Inicio
 											</span>
 										</a>
 									</li>
@@ -262,7 +262,7 @@
 										<a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
 											<i class="fa fa-inbox"></i>
 											<span class="menu-title">
-												Documentos
+												Históricos
 											</span>
 											<i class="arrow"></i>
 										</a>
@@ -282,111 +282,134 @@
 										@if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
 										{
 											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Enviados</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Recibidos</a></li>
+												<li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Documentos enviados</a></li>
+												<li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
 												@if (User.ContributorTypeId() == (int)ContributorType.Provider)
 												{
-													<li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Generados</a></li>
+													<li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
 												}
-												<li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
+												<li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
 											</ul>
 										}
 										<!--Rol Facturador and Proveedor-->
 									</li>
-									<li>
-										<a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
-											<i class="fa fa-users"></i>
-											<span class="menu-title">
-												Participantes
-											</span>
-											<i class="arrow"></i>
-										</a>
-										<!--Submenu-->
-										<ul class="collapse">
-											<!--Rol Administrador-->
-											@if (User.IsInAnyRole("Administrador", "Super"))
-											{
-												<!--RADIAN Administrador-->
-												if (User.IsInAnyRole("Administrador", "Super"))
-												{
-													<li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
-												}
-												<!--RADIAN Administrador-->
-												<li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
-												<li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
-												<li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
-												<li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
-												<li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
-												<li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
-												if (new string[] { "Local", "Hab", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
-												{
-													<li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Gestionar Solicitudes Recepción por Lote - Asíncrono</a></li>
-												}
-											}
-											<!--Rol Administrador-->
-											<!--Rol Facturador and Proveedor-->
-											@if (!User.IsInAnyRole("Administrador", "Super"))
-											{
-												if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-												{
-													if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-													{
-														<li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar prefijos</a></li>
-													}
-												}
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Registro y habilitación
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+											<li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
+                                        </ul>
+                                        <!--<ul class="collapse">
+                                            <!--Rol Administrador-->
+                                            @*@if (User.IsInAnyRole("Administrador", "Super"))
+                                            {-->
+                                                <!--RADIAN Administrador-->
+                                                <!--if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
+                                                }-->
+                                                <!--RADIAN Administrador-->
+                                                <!--<li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
+                                                <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
+                                                <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
+                                                <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
+                                                if (new string[] { "Local", "Hab", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Gestionar Solicitudes Recepción por Lote - Asíncrono</a></li>
+                                                }
+                                            }
+                                            Rol Administrador
+                                            Rol Facturador and Proveedor
+                                            @if (!User.IsInAnyRole("Administrador", "Super"))
+                                            {
+                                                if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                {
+                                                    if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar prefijos</a></li>
+                                                    }
+                                                }
 
-												if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
-												{
-													<li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
-												}
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
+                                                }
 
-												if (User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorOperationModeId() == (int)Gosocket.Dian.Domain.Common.OperationMode.Own)
-												{
-													<li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
-												}
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorOperationModeId() == (int)Gosocket.Dian.Domain.Common.OperationMode.Own)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
+                                                }
 
-												if (User.ShowTestSet())
-												{
-													<li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("ConfigureTestSet", "Contributor", new { contributorId = User.ContributorId() })">Set de Pruebas</a></li>
-												}
+                                                if (User.ShowTestSet())
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("ConfigureTestSet", "Contributor", new { contributorId = User.ContributorId() })">Set de Pruebas</a></li>
+                                                }-->*@
 
 
-												if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
-												{
-													<li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-												}
+                                                @*if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                }
 
-											}
-											<!--Rol Facturador and Proveedor-->
-											<!--Rol Proveedor-->
-											@if (User.ContributorTypeId() == (int)ContributorType.Provider)
-											{
-												<li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("Check", "Contributor")">Proveedor Tecnológico</a></li>
-												<li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
-											}
-											<!--Rol Proveedor-->
-											<!--  RADIAN -->
-											@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
-											{
-												<li id="@Navigation.NavigationEnum.RADIAN">
-													<a href="@Url.Action("Index", "Radian")">RADIAN</a>
-												</li>
-											}
+                                            }*@
+                                            <!--Rol Facturador and Proveedor-->
+                                            <!--Rol Proveedor-->
+                                            <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("Check", "Contributor")">Proveedor Tecnológico</a></li>
+                                                <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
+                                            }-->
+                                            <!--Rol Proveedor-->
+                                            <!--  RADIAN -->
+                                            <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                            {
+                                                <li id="@Navigation.NavigationEnum.RADIAN">
+                                                    <a href="@Url.Action("Index", "Radian")">RADIAN</a>
+                                                </li>
+                                            }-->
 
-											<!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
-											@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
-											{
-												<li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
-													<a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
-												</li>
-											}
+                                            <!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
+                                            <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                            {
+                                                <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
+                                                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
+                                                </li>
+                                            }
 
-										</ul>
-									</li>
+                                        </ul>-->
+                                    </li>
 
+
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Configuración
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear Usuario</a></li>
+                                        </ul>
+                                        <ul>
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                            }
+                                        </ul>
+                                    </li>
 									<!--Rol Administrador-->
 									@*@if (User.IsInAnyRole("Administrador", "Super"))
-										{*@
+										{
 									<li id="@Navigation.NavigationEnum.ExternalUsersCreate">
 										<a href="@Url.Action("AddUser", "ExternalUsers")">
 											<i class="fa fa-user-circle-o"></i>
@@ -395,7 +418,15 @@
 											</span>
 										</a>
 									</li>
-									@*}*@
+									}*@
+									@*<li id="@Navigation.NavigationEnum.BigContributors">
+										 @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                         {
+                                             <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                         }
+										
+									</li>*@
+									
 
 									<!--Rol Administrador-->
 									@if (User.IsInAnyRole("Administrador", "Super"))
@@ -458,16 +489,18 @@
 											<a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
 												<i class="fa fa-dollar"></i>
 												<span class="menu-title">
-													Facturador Gratuito
+													Solución Gratuita
 												</span>
 												<i class="arrow"></i>
 											</a>
 											<!--Submenu-->
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios</a></li>
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-												<li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Inicio Facturador Gratuito</a></li>
-											</ul>
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
 										</li>
 									}
 									else
@@ -483,13 +516,16 @@
 												<i class="arrow"></i>
 											</a>
 											<!--Submenu-->
-											<ul class="collapse in" aria-expanded="true">
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios</a></li>
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-												<li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Inicio Facturador Gratuito</a></li>
-											</ul>
+                                            <ul class="collapse in" aria-expanded="true">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
 										</li>
 									}
+										
 
 
 									<!--Rol Facturador-->
