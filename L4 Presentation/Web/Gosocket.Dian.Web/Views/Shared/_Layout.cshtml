@@ -357,9 +357,9 @@
                                                 @*if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                                 {
                                                     <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-                                                }*@
+                                                }
 
-                                            }
+                                            }*@
                                             <!--Rol Facturador and Proveedor-->
                                             <!--Rol Proveedor-->
                                             <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
@@ -400,6 +400,12 @@
                                         <ul class="collapse">
                                             <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear Usuario</a></li>
                                         </ul>
+                                        <ul>
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                            }
+                                        </ul>
                                     </li>
 									<!--Rol Administrador-->
 									@*@if (User.IsInAnyRole("Administrador", "Super"))
@@ -413,17 +419,17 @@
 										</a>
 									</li>
 									}*@
-									<li id="@Navigation.NavigationEnum.BigContributors">
+									@*<li id="@Navigation.NavigationEnum.BigContributors">
 										 @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                          {
                                              <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
                                          }
 										
-									</li>
+									</li>*@
 									
 
 									<!--Rol Administrador-->
-									@*@if (User.IsInAnyRole("Administrador", "Super"))
+									@if (User.IsInAnyRole("Administrador", "Super"))
 									{
 										<!--  RADIAN -->
 
@@ -483,16 +489,18 @@
 											<a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
 												<i class="fa fa-dollar"></i>
 												<span class="menu-title">
-													Facturador Gratuito
+													Solución Gratuita
 												</span>
 												<i class="arrow"></i>
 											</a>
 											<!--Submenu-->
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios</a></li>
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-												<li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Inicio Facturador Gratuito</a></li>
-											</ul>
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
 										</li>
 									}
 									else
@@ -508,14 +516,16 @@
 												<i class="arrow"></i>
 											</a>
 											<!--Submenu-->
-											<ul class="collapse in" aria-expanded="true">
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios</a></li>
-												<li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Configuraci&oacute;n Permisos</a></li>
-												<li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Inicio Facturador Gratuito</a></li>
-											</ul>
+                                            <ul class="collapse in" aria-expanded="true">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
 										</li>
 									}
-										*@
+										
 
 
 									<!--Rol Facturador-->
