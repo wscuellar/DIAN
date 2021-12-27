@@ -1,5 +1,5 @@
 {
- // "functions": [ "RegisterCompletedPayrollCosmos", "ProcessBatchDocumentsZipFile", "RegistrateCompletedPayroll" ],
+  //"functions": [ "RegisterCompletedPayrollCosmos", "ProcessBatchDocumentsZipFile", "SendToActivateOtherDocumentContributor", "UpdateTestSetResult" ],
   "queues": {
     "batchSize": 1,
     "maxPollingInterval": 2000,

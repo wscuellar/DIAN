@@ -50,7 +50,7 @@
 		</div>
 
 	</div>
-    @if (Model.Step == 3 )
+    @*@if (Model.Step == 3 )
     {
         <div class="row">
             <div class="col-sm-3">
@@ -66,7 +66,7 @@
                 </div>
             </div>
         </div>
-    }
+    }*@
      @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true" )
 	 {
             <div id="panel" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
