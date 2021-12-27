@@ -325,11 +325,6 @@ namespace Gosocket.Dian.Web.Controllers
 					
 				}
 			}
-
-
-
-
-
 			_othersElectronicDocumentsService.ChangeParticipantStatus(otherDocElecContributor.Id, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
 			return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
