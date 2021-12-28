@@ -311,7 +311,7 @@ namespace Gosocket.Dian.Web.Controllers
 			}
 			else
 			{
-				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true, model.OtherDocElecContributorId, model.ContributorIdType,model.ElectronicDocumentId);
+				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true, model.OtherDocElecContributorId, model.ContributorIdType,model.OtherDocElecContributorId);
 			}
 			if (response.Code == 500) // error...
 			{
@@ -325,12 +325,7 @@ namespace Gosocket.Dian.Web.Controllers
 					
 				}
 			}
-
-
-
-
-
-			_othersElectronicDocumentsService.ChangeParticipantStatus(model.OtherDocElecContributorId, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+			_othersElectronicDocumentsService.ChangeParticipantStatus(otherDocElecContributor.Id, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
 			return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
 		}
