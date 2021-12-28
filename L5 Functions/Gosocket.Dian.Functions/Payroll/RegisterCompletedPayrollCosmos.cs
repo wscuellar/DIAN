@@ -114,7 +114,8 @@ namespace Gosocket.Dian.Functions.Payroll
 					LastNameWorker = objNomina.PrimerApellido==null?"": objNomina.PrimerApellido,
 					SecondLastNameWorker = objNomina.SegundoApellido==null ? "" : objNomina.PrimerApellido,
 					CompositeNameWorker = compositeNameWorker,
-					GenerationDate = objNomina.FechaGen == null ? "" : objNomina.FechaGen.ToString(),
+					EmisionDate = objNomina.Info_FechaGen == null ? "" : DateTime.Parse(objNomina.Info_FechaGen.ToString()).ToString("yyyy-MM-dd"),
+					GenerationDate = objNomina.Info_FechaGen == null ? "" : DateTime.Parse(objNomina.Info_FechaGen.ToString()).ToString("yyyy-MM-dd"),
 					InitialDate = objNomina.FechaInicio == null ? "" : (objNomina.FechaInicio.ToString()),
 					FinalDate = objNomina.FechaFin == null ? "" : (objNomina.FechaFin.ToString()),
 					Salary = (objNomina.SalarioTrabajado == null ? "" : objNomina.SalarioTrabajado),
@@ -122,6 +123,8 @@ namespace Gosocket.Dian.Functions.Payroll
 					TotalDiscounts = objNomina.DeduccionesTotal,
 					PaymentReceipt = objNomina.ComprobanteTotal,
 					Numeration = objNomina.Numero,
+					InitialDateStr = objNomina.FechaPagoInicio.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
+					FinalDateStr = objNomina.FechaPagoFin.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
 					State = "Valida"
 				};
 				await cosmos.UpsertDocumentPayroll_All(Insert);
