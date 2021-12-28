@@ -294,7 +294,7 @@ namespace Gosocket.Dian.Web.Controllers
 				SoftwareId = model.OperationModeSelectedId != "3" ? new Guid(model.SoftwareId) : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
 				OtherDocElecContributorId = Int32.Parse(ContributorId)
 			};
-			// Validar si esta tabla serían los Logs...?
+		
 			OtherDocElecContributorOperations contributorOperation = new OtherDocElecContributorOperations()
 			{
 				OtherDocElecContributorId = Int32.Parse(ContributorId),
