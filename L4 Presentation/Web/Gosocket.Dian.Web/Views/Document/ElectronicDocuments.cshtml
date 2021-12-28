@@ -18,28 +18,31 @@
         </svg>
 
         <div class="row-fluid">
-
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" onclick="SelectMenu('1')" id="1" contributorType="1" operationMode="0">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Factura Electrónica</p>
-                        <p class="RadianTittleCard2">Factura Electrónica</p>
-                    </div>
+                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
+                    <a href="@Url.Action("Check", "Contributor")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Factura Electrónica</p>
+                            <p class="RadianTittleCard2">Factura Electrónica</p>
+                        </div>
+                    </a>
                 </div>
-            </div>
+           </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Nomina Electrónica</p>
-                        <p class="RadianTittleCard2">Nomina Electrónica</p>
-                    </div>
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -59,13 +62,15 @@
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="4" operationMode="1" id="4">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Eventos RADIAN</p>
-                        <p class="RadianTittleCard2">Eventos RADIAN</p>
-                    </div>
+                    <a href="@Url.Action("Index", "Radian")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Eventos RADIAN</p>
+                            <p class="RadianTittleCard2">Eventos RADIAN</p>
+                        </div>
+                    </a>
                 </div>
             </div>
 
