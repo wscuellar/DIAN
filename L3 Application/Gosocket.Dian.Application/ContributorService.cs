@@ -148,7 +148,7 @@ namespace Gosocket.Dian.Application
         {            
             using (var context = new SqlDBContext())
             {
-                return context.Contributors.FirstOrDefault(p => p.Code == code);
+                return context.Contributors.AsNoTracking().Include("AcceptanceStatus").FirstOrDefault(p => p.Code == code);
             }
         }
 
