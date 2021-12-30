@@ -123,8 +123,8 @@ namespace Gosocket.Dian.Functions.Payroll
 					TotalDiscounts = objNomina.DeduccionesTotal,
 					PaymentReceipt = objNomina.ComprobanteTotal,
 					Numeration = objNomina.Numero,
-					InitialDateStr = objNomina.FechaPagoInicio.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
-					FinalDateStr = objNomina.FechaPagoFin.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
+					InitialDateStr = objNomina.FechaPagoInicio == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
+					FinalDateStr = objNomina.FechaPagoFin == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
 					State = "Valida"
 				};
 				await cosmos.UpsertDocumentPayroll_All(Insert);
