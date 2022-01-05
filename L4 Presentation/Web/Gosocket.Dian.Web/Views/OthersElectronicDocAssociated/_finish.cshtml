@@ -2,12 +2,19 @@
 
 @model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 <div class="panel-footer text-right">
-    <div class="form-group">
-        @if (Model.ContributorTypeId == (int)OtherDocElecContributorType.TechnologyProvider)
-        {
-            <button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
-        }
+	<div class="form-group">
+		@if (Model.ContributorTypeId == (int)OtherDocElecContributorType.TechnologyProvider)
+		{
+			<button type="button" class="btn btn-default btn-radian-default" id="view-costumers">Ver mis clientes asociados</button>
+		}
+		@if (Model.Step == 3)
+		{
+			
+				@*<button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>*@
+				<button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
+			
+		}
 
-        @*@Html.ActionLink("Configurar modo de operación", "SetupOperationMode", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-default btn btn-radian-success" })*@
-    </div>
+		@*@Html.ActionLink("Configurar modo de operación", "SetupOperationMode", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-default btn btn-radian-success" })*@
+	</div>
 </div>

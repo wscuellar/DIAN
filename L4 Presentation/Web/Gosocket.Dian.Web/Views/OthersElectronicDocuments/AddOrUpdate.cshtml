@@ -443,6 +443,7 @@
             else if ($('#OperationModeSelectedId').val() == 2) {
 				$('#FormPt').fadeIn()
 				$('#FormPropio').fadeOut()
+				$('#SoftwareName').val($('#SoftwareId option:selected').text());
             }
             else
                 if ($('#OperationModeSelectedId').val() == 3) {
