@@ -110,8 +110,11 @@ namespace Gosocket.Dian.Application
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
 
             PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, ContributorIdType);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
 
-            if(List.Results.Any(x=>x.StateSoftware=="2"))
+            if (List.Results.Any(x=>x.StateSoftware=="2"))
+                return new ResponseMessage("Tiene un modo de operación en pruebas", TextResources.alertType, 500);
+            if (List2.Results.Any(x => x.StateSoftware == "2"))
                 return new ResponseMessage("Tiene un modo de operación en pruebas", TextResources.alertType, 500);
 
 

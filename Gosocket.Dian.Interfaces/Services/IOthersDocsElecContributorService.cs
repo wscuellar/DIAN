@@ -16,12 +16,15 @@ namespace Gosocket.Dian.Interfaces.Services
         NameValueCollection Summary(string userCode);
         List<OtherDocElecOperationMode> GetOperationModes();
         OtherDocElecContributor CreateContributor(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
+        OtherDocElecContributor CreateContributorNew(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
         PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
+
+    
         /// <summary>
         /// Cancelar un registro en la tabla OtherDocElecContributor
         /// </summary>

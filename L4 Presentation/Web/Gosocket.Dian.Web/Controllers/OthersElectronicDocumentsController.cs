@@ -265,7 +265,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 			//var contrib = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(model.OtherDocElecContributorId).FirstOrDefault;
 
-			OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
+			OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributorNew(
 															User.ContributorId(),
 															OtherDocElecState.Registrado,
 															model.ContributorIdType,
