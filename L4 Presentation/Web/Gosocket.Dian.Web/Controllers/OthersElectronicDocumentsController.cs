@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Web.Controllers
 		{
 			ViewBag.UserCode = User.UserCode();
 			ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-			ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments()?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+			ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x=>x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
 			ViewBag.ContributorId = User.ContributorId();
 
 			return View();
