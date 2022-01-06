@@ -108,7 +108,6 @@ namespace Gosocket.Dian.Application
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
-
             PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2);
             PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
 
