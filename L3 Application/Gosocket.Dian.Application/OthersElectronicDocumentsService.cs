@@ -109,7 +109,7 @@ namespace Gosocket.Dian.Application
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, ContributorIdType);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2);
             PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
 
             if (List.Results.Any(x=>x.StateSoftware=="2"))
