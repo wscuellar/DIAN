@@ -32,7 +32,7 @@
             showNotification('info', 'fa fa-info fa-2x', 'floating', 'Aviso', 'Archivo añadido previamente');
         }
     });
-
+});
 
 function removeLine(button) {
     if ($(button).hasClass('new'))
