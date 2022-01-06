@@ -263,7 +263,7 @@ namespace Gosocket.Dian.Web.Controllers
 			var IdS = Guid.NewGuid();
 			var now = DateTime.Now;
 
-			//var contrib = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(model.OtherDocElecContributorId).FirstOrDefault;
+			
 
 			OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributorNew(
 															User.ContributorId(),
