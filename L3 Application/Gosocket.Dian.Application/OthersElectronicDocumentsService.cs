@@ -112,8 +112,9 @@ namespace Gosocket.Dian.Application
             PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
 
             if (List.Results.Any(x=>x.StateSoftware=="2")|| List2.Results.Any(x => x.StateSoftware == "2"))
-                return new ResponseMessage("Tiene un modo de operación en pruebas", TextResources.alertType, 500);
-         
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno en pruebas", TextResources.alertType, 500);
+            if (List.Results.Any(x => x.StateSoftware == "4") || List2.Results.Any(x => x.StateSoftware == "4"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno Rechazado", TextResources.alertType, 500);
 
 
             _othersDocsElecSoftwareService.CreateSoftware(software);
