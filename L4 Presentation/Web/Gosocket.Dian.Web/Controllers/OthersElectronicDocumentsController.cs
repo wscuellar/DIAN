@@ -313,7 +313,7 @@ namespace Gosocket.Dian.Web.Controllers
 			{
 				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true, model.OtherDocElecContributorId, model.ContributorIdType,model.OtherDocElecContributorId);
 			}
-			if (response.Code == 500) // error...
+			if (response.Code == 500)
 			{
 				return this.RedirectToAction("AddOrUpdate", new { ElectronicDocumentId = 1, OperationModeId = 0, ContributorIdType = model.ContributorIdType, ContributorId = model.OtherDocElecContributorId, Message = response.Message });
 			}
