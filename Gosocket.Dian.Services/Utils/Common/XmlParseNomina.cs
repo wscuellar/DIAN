@@ -322,6 +322,17 @@ namespace Gosocket.Dian.Services.Utils.Common
                 globalDocPayrolls.SoftwareID = xProveedorXML[j].Attributes["SoftwareID"]?.InnerText;
                 globalDocPayrolls.SoftwareSC = xProveedorXML[j].Attributes["SoftwareSC"]?.InnerText;
             }
+
+            XmlNodeList xQrXML = xmlDocument.GetElementsByTagName("CodigoQR");
+            for (int j = 0; j < xQrXML.Count; j++)
+            {
+                globalDocPayrolls.CodigoQR = xQrXML[j].InnerText;
+
+
+            }
+
+
+
             XmlNodeList xInformacionGeneral = xmlDocument.GetElementsByTagName("InformacionGeneral");
             for (int j = 0; j < xInformacionGeneral.Count; j++)
             {
