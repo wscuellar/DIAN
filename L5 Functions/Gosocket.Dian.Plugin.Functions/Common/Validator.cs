@@ -7597,5 +7597,72 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
+        #region Evento Cune
+
+        public ValidateListResponse ValidateCuds(CuneModel objCune, RequestObjectCuds data)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            data.TrackId = data.TrackId.ToLower();
+
+            var ValDev = objCune?.ValDev.ToString("F2");
+            var ValDesc = objCune?.ValDesc.ToString("F2");
+            var ValTol = objCune?.ValTol.ToString("F2");
+
+            string errorMessarge = string.Empty;
+            var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayrollAdjustments && objCune.TipNota == 2
+                ? "NIAE238"
+                : Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
+                    ? "NIE024"
+                    : "NIAE024";
+
+            string key = string.Empty;
+
+            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
+
+            var softwareId = objCune?.SoftwareId;
+
+            if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
+            {
+                key = billerSoftwarePin;
+            }
+            else
+            {
+                var software = GetSoftwareInstanceCache(softwareId);
+                key = software?.Pin;
+            }
+
+            errorMessarge = ConfigurationManager.GetValue("ErrorMessage_NIE024");
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
+
+            ValDev = (ValDev == null) ? "0.00" : ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
+            ValDesc = (ValDesc == null) ? "0.00" : ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
+            ValTol = (ValTol == null) ? "0.00" : ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
+
+            var NumNIE = objCune.NumNIE;
+            var FechNIE = objCune.FecNIE;
+            var HorNIE = objCune.HorNIE;
+            var NitNIE = objCune.NitNIE;
+            var DocEmp = objCune.DocEmp;
+            var SoftwarePin = key;
+            var TipAmb = objCune.TipAmb;
+            var tipoXml = objCune.TipoXML;
+
+            if (string.IsNullOrWhiteSpace(DocEmp)) DocEmp = "0";
+
+            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{tipoXml}{SoftwarePin}{TipAmb}";
+
+            var hash = numberSha384.EncryptSHA384();
+
+            if (objCune.Cune.ToLower() == hash)
+            {
+                response.IsValid = true;
+                response.ErrorMessage = $"Valor calculado correctamente.";
+            }
+
+            response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return response;
+        }
+        #endregion
     }
 }
