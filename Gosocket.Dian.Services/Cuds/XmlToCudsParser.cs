@@ -2,22 +2,24 @@
 using System.Xml;
 namespace Gosocket.Dian.Services.Cuds
 {
-    public class XmlToInvoiceParser
+    public class XmlToCudsParser
     {
         private readonly XmlDocument xmlDocument;
-        public XmlToInvoiceParser()
+        public XmlToCudsParser()
         {
             xmlDocument = new XmlDocument { PreserveWhitespace = true };
         }
-        public InvoiceDs Parser(byte[] xmlContent)
+        public InvoiceCuds Parser(byte[] xmlContent)
         {
-            var invoiceDs = new InvoiceDs();
+            var invoiceDs = new InvoiceCuds();
             using (var ms = new MemoryStream(xmlContent))
             {
                 using (var stream = new StreamReader(ms, System.Text.Encoding.UTF8))
                 {
                     xmlDocument.Load(stream);
-                    invoiceDs.InvoiceTypeCode = SelectSingleNode(InvoiceXpath.InvoiceTypeCode);
+                    invoiceDs.SoftwareId = SelectSingleNode(InvoiceXpath.SoftwareId);
+                    invoiceDs.Cuds = SelectSingleNode(InvoiceXpath.Cuds);
+                    invoiceDs.DocumentType = SelectSingleNode(InvoiceXpath.InvoiceTypeCode);
                     invoiceDs.NumDs = SelectSingleNode(InvoiceXpath.NumDs);
                     invoiceDs.FecDs = SelectSingleNode(InvoiceXpath.FecDs);
                     invoiceDs.HorDs = SelectSingleNode(InvoiceXpath.HorDs);

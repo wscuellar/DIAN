@@ -5,6 +5,14 @@
     /// </summary>
     public static class InvoiceXpath
     {
+        /// /Invoice/sts:SoftwareProvider/sts:SoftwareID
+        public const string SoftwareId = "//*[local-name()='SoftwareProvider']/*[local-name()='SoftwareID']";
+
+        /// <summary>
+        /// /Invoice/cbc:UUID
+        /// </summary>
+        public const string Cuds = "//*[local-name()='UUID']";
+
         /// <summary>
         /// /Invoice/cbc:InvoiceTypeCode=05
         /// </summary>

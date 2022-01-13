@@ -14,7 +14,7 @@ namespace Gosocket.Dian.Services.Test
         public void Should_ValidateCuds_Ok()
         {
             Console.WriteLine("Nuevo Test");
-            var invoiceDsTest = new InvoiceDs()
+            var invoiceDsTest = new InvoiceCuds()
             {
                 NumDs = "0000000001",
                 FecDs = "2020-10-24",
@@ -50,12 +50,15 @@ namespace Gosocket.Dian.Services.Test
             Console.WriteLine(pathFull);
             Console.WriteLine("Validar carga de bytes");
             Assert.IsNotNull(xmlBytes);
-            var invoceParser = new XmlToInvoiceParser();
+            var invoceParser = new XmlToCudsParser();
             var invoceDs=invoceParser.Parser(xmlBytes);
             Assert.IsNotNull(invoceDs);
-            invoceDs.SoftwarePin = "Pin";
+            invoceDs.SoftwarePin = "37346";
+            Console.WriteLine($"Cuds-{invoceDs.Cuds}");
             Console.WriteLine(invoceDs.ToCombinacionToCuds("*"));
+            Console.WriteLine(invoceDs.Cuds);
             Console.WriteLine(invoceDs.ToCombinacionToCuds().EncryptSHA384());
+            //Assert.AreEqual(invoceDs.Cuds, invoceDs.ToCombinacionToCuds().EncryptSHA384());
 
         }
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;

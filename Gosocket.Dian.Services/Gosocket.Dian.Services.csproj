@@ -67,9 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
-    <Compile Include="Cuds\InvoiceDs.cs" />
+    <Compile Include="Cuds\InvoiceCuds.cs" />
     <Compile Include="Cuds\InvoiceXpath.cs" />
-    <Compile Include="Cuds\XmlToInvoiceParser.cs" />
+    <Compile Include="Cuds\XmlToCudsParser.cs" />
     <Compile Include="Models\CufeModel.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
     <Compile Include="Models\ValidatePayroll.cs" />

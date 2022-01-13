@@ -14,6 +14,7 @@ using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Services.Cuds;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Org.BouncyCastle.Security;
@@ -7599,67 +7600,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Evento Cune
 
-        public ValidateListResponse ValidateCuds(CuneModel objCune, RequestObjectCuds data)
+        public ValidateListResponse ValidateCuds(InvoiceCuds invoceCuds, RequestObjectCuds data)
         {
             DateTime startDate = DateTime.UtcNow;
             data.TrackId = data.TrackId.ToLower();
 
-            var ValDev = objCune?.ValDev.ToString("F2");
-            var ValDesc = objCune?.ValDesc.ToString("F2");
-            var ValTol = objCune?.ValTol.ToString("F2");
-
-            string errorMessarge = string.Empty;
-            var errorCode = Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayrollAdjustments && objCune.TipNota == 2
-                ? "NIAE238"
-                : Convert.ToInt32(objCune?.DocumentType) == (int)DocumentType.IndividualPayroll
-                    ? "NIE024"
-                    : "NIAE024";
-
-            string key = string.Empty;
-
             var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
-            var softwareId = objCune?.SoftwareId;
+            var softwareId = invoceCuds.SoftwareId;
 
             if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
             {
-                key = billerSoftwarePin;
+                invoceCuds.SoftwarePin = billerSoftwarePin;
             }
             else
             {
                 var software = GetSoftwareInstanceCache(softwareId);
-                key = software?.Pin;
+                invoceCuds.SoftwarePin = software?.Pin;
             }
 
-            errorMessarge = ConfigurationManager.GetValue("ErrorMessage_NIE024");
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessarge };
-
-            ValDev = (ValDev == null) ? "0.00" : ValDev = TruncateDecimal(decimal.Parse(ValDev), 2).ToString("F2");
-            ValDesc = (ValDesc == null) ? "0.00" : ValDesc = TruncateDecimal(decimal.Parse(ValDesc), 2).ToString("F2");
-            ValTol = (ValTol == null) ? "0.00" : ValTol = TruncateDecimal(decimal.Parse(ValTol), 2).ToString("F2");
-
-            var NumNIE = objCune.NumNIE;
-            var FechNIE = objCune.FecNIE;
-            var HorNIE = objCune.HorNIE;
-            var NitNIE = objCune.NitNIE;
-            var DocEmp = objCune.DocEmp;
-            var SoftwarePin = key;
-            var TipAmb = objCune.TipAmb;
-            var tipoXml = objCune.TipoXML;
-
-            if (string.IsNullOrWhiteSpace(DocEmp)) DocEmp = "0";
-
-            var numberSha384 = $"{NumNIE}{FechNIE}{HorNIE}{ValDev}{ValDesc}{ValTol}{NitNIE}{DocEmp}{tipoXml}{SoftwarePin}{TipAmb}";
-
-            var hash = numberSha384.EncryptSHA384();
-
-            if (objCune.Cune.ToLower() == hash)
+            
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
+            var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
+            if (invoceCuds.Cuds.ToLower() == hash)
             {
                 response.IsValid = true;
-                response.ErrorMessage = $"Valor calculado correctamente.";
+                response.ErrorMessage = $"Valor calculado correctamente.{hash}";
             }
-
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return response;
         }

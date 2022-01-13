@@ -4,12 +4,17 @@
     /// Campos requeridos para el proceso de Validación del Cuds 
     /// de acuerdo al Anexo Técnico DSNO V1 1 del 24 - 11 - 2021
     /// </summary>
-    public class InvoiceDs
+    public class InvoiceCuds
     {
+        /// <summary>
+        /// /Invoice/cbc:UUID
+        /// </summary>
+        public string Cuds { get; set; }
+
         /// <summary>
         /// «/Invoice/cbc:InvoiceTypeCode=05
         /// </summary>
-        public string InvoiceTypeCode { get; set; }
+        public string DocumentType { get; set; }
 
         /// <summary>
         ///  /Invoice/cbc:ID
@@ -53,6 +58,10 @@
         /// Invoice/cbc:ProfileExecutionID
         /// </summary>
         public string TipoAmb { get; set; }
+        /// <summary>
+        /// Invoice/sts:SoftwareProvider/sts:SoftwareID
+        /// </summary>
+        public string SoftwareId { get; set; }
 
         /// <summary>
         /// Combinación de acuerdo al Anexo Técnico DSNO_V1_1
