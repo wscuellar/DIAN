@@ -7,7 +7,7 @@
     ValDS	/CreditNote/cac:LegalMonetaryTotal/cbc:LineExtensionAmount
     CodImp	/CreditNote/cacTaxTotal[x]/ cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID = 01 
     ValImp 	/CreditNote/cac:TaxTotal[x]/cbc:TaxAmount
-    ValTol	/CreditNote /cac:LegalMonetaryTotal/cbc:PayableAmount 
+    ValTol	/CreditNote/cac:LegalMonetaryTotal/cbc:PayableAmount 
     NumSNO	/CreditNote/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID
     NITABS	/CreditNote/cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID
     Software-PIN	No está en el XML
