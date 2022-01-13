@@ -813,29 +813,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
 
             var xmlBytes = await GetXmlFromStorageAsync(cuds.TrackId);
-            var xmlParser = new XmlParseNomina(xmlBytes);
+            var xmlParser = new XmlParserCuds(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
 
 
             CuneModel cmObject = new CuneModel();
-            cmObject.DocumentType = xmlParser.Fields["DocumentTypeId"].ToString();
-            cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
-            cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
+            //cmObject.DocumentType = xmlParser.Fields["DocumentTypeId"].ToString();
+            //cmObject.Cune = xmlParser.globalDocPayrolls.CUNE;
+            //cmObject.NumNIE = xmlParser.globalDocPayrolls.Numero;
 
-            cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen.Value.ToString("yyyy-MM-dd");
-            cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
-            cmObject.ValDev = xmlParser.globalDocPayrolls.DevengadosTotal;
-            cmObject.ValDesc = xmlParser.globalDocPayrolls.DeduccionesTotal;
-            cmObject.ValTol = xmlParser.globalDocPayrolls.ComprobanteTotal;
-            cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
-            cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
-            cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
-            cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
-            cmObject.TipoXML = xmlParser.globalDocPayrolls.TipoXML;
-            cmObject.TipNota = xmlParser.globalDocPayrolls.TipoNota;
+            //cmObject.FecNIE = xmlParser.globalDocPayrolls.Info_FechaGen.Value.ToString("yyyy-MM-dd");
+            //cmObject.HorNIE = xmlParser.globalDocPayrolls.HoraGen;
+            //cmObject.ValDev = xmlParser.globalDocPayrolls.DevengadosTotal;
+            //cmObject.ValDesc = xmlParser.globalDocPayrolls.DeduccionesTotal;
+            //cmObject.ValTol = xmlParser.globalDocPayrolls.ComprobanteTotal;
+            //cmObject.NitNIE = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
+            //cmObject.DocEmp = Convert.ToString(xmlParser.globalDocPayrolls.NumeroDocumento);
+            //cmObject.SoftwareId = xmlParser.globalDocPayrolls.SoftwareID;
+            //cmObject.TipAmb = Convert.ToString(xmlParser.globalDocPayrolls.Ambiente);
+            //cmObject.TipoXML = xmlParser.globalDocPayrolls.TipoXML;
+            //cmObject.TipNota = xmlParser.globalDocPayrolls.TipoNota;
 
-            // Validator instance
+            //// Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateCuds(cmObject, cuds));
             return validateResponses;
