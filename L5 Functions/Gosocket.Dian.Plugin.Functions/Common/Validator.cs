@@ -7626,7 +7626,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (invoceCuds.Cuds.ToLower() == hash)
             {
                 response.IsValid = true;
-                response.ErrorMessage = $"Valor calculado correctamente.{hash}";
+                response.ErrorMessage = $"Valor calculado correctamente.";
             }
             response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return response;
