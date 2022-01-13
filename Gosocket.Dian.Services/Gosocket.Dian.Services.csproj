@@ -68,7 +68,6 @@
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
     <Compile Include="Cuds\DocumentoSoporte.cs" />
-    <Compile Include="Cuds\DocumentoSoporteNotaAjusteXpath.cs" />
     <Compile Include="Cuds\DocumentoSoporteXpath.cs" />
     <Compile Include="Cuds\XmlToDocumentoSoporteParser.cs" />
     <Compile Include="Models\CufeModel.cs" />
