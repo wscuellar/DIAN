@@ -7600,7 +7600,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Evento Cune
 
-        public ValidateListResponse ValidateCuds(InvoiceCuds invoceCuds, RequestObjectCuds data)
+        public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
         {
             DateTime startDate = DateTime.UtcNow;
             data.TrackId = data.TrackId.ToLower();

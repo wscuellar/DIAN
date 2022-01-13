@@ -3,7 +3,7 @@
     /// <summary>
     /// Constanstes Xpath de Acuerdo al Anexo Técnico DSNO V1 1  
     /// </summary>
-    public static class InvoiceXpath
+    public static class DocumentoSoporteXpath
     {
         /// /Invoice/sts:SoftwareProvider/sts:SoftwareID
         public const string SoftwareId = "//*[local-name()='SoftwareProvider']/*[local-name()='SoftwareID']";

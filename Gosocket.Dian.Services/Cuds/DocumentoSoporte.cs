@@ -4,7 +4,7 @@
     /// Campos requeridos para el proceso de Validación del Cuds 
     /// de acuerdo al Anexo Técnico DSNO V1 1 del 24 - 11 - 2021
     /// </summary>
-    public class InvoiceCuds
+    public class DocumentoSoporte
     {
         /// <summary>
         /// /Invoice/cbc:UUID

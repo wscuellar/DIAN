@@ -14,7 +14,7 @@ namespace Gosocket.Dian.Services.Test
         public void Should_ValidateCuds_Ok()
         {
             Console.WriteLine("Nuevo Test");
-            var invoiceDsTest = new InvoiceCuds()
+            var invoiceDsTest = new DocumentoSoporte()
             {
                 NumDs = "0000000001",
                 FecDs = "2020-10-24",
@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Services.Test
             Console.WriteLine(pathFull);
             Console.WriteLine("Validar carga de bytes");
             Assert.IsNotNull(xmlBytes);
-            var invoceParser = new XmlToCudsParser();
+            var invoceParser = new XmlToDocumentoSoporteParser();
             var invoceDs=invoceParser.Parser(xmlBytes);
             Assert.IsNotNull(invoceDs);
             invoceDs.SoftwarePin = "37346";

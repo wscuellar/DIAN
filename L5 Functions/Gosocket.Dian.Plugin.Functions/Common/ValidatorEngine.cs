@@ -815,7 +815,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var xmlBytes = await GetXmlFromStorageAsync(cuds.TrackId);
 
-            var parser = new XmlToCudsParser();
+            var parser = new XmlToDocumentoSoporteParser();
             var modelCuds = parser.Parser(xmlBytes);
             var validator = new Validator();
             validateResponses.Add(validator.ValidateCuds(modelCuds, cuds));
