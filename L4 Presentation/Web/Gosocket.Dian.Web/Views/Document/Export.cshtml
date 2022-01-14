@@ -94,11 +94,12 @@
                                                         {
                                                             //@Html.LabelFor(m => m.AmountAdmin, new { @class = "control-label" })
                                                             //<input id="AmountAdmin" name="AmountAdmin" value="@Model.AmountAdmin" />
-                                                            <input id="AmountAdmin" type="text" name="AmountAdmin" value="@Model.AmountAdmin" />
+                                                            @Html.Label("hola" + @Model.AmountAdmin, new { @class = "control-label" })
+                                                            //<input id="AmountAdmin" type="text" name="AmountAdmin" value="@Model.AmountAdmin" />
                                                             //< p id = "AmountAdmin" name = "AmountAdmin" va value = "*   Se exportarán un  máximo de @Model.AmountAdmin documentos." />
-                                                           //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountAdmin + "documentos.", new { @class = "control-label" })
-                                                           //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
-               }
+                                                            //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountAdmin + "documentos.", new { @class = "control-label" })
+                                                            //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
+                                                        }
                                                         @if (!User.IsInAnyRole("Administrador", "Super"))
                                                         {
                                                             @Html.LabelFor(m => m.AmountContributor1, new { @class = "control-label" })
