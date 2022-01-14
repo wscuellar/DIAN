@@ -92,7 +92,7 @@
                                                         <br />
                                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                                         {
-                                                            @Html.Label("Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
+                                                            @Html.Label(@"Se exportarán un máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
                                                             //@Html.Label("*   Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
 
                                                         }
