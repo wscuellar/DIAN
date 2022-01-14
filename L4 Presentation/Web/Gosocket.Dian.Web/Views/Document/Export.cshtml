@@ -93,7 +93,7 @@
                                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                                         {
                                                             //@Html.LabelFor(m => m.AmountAdmin, new { @class = "control-label" })
-                                                            <input id="AmountAdmin" name="AmountAdmin" value="@Model.AmountAdmin" />
+                                                            <p id="AmountAdmin" name="AmountAdmin" value="*   Se exportarán un  máximo de @Model.AmountAdmin documentos." />
                                                             //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountAdmin + "documentos.", new { @class = "control-label" })
                                                             //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
                                                         }
