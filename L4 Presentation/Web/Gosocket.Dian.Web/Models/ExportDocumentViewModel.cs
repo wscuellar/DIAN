@@ -25,8 +25,7 @@ namespace Gosocket.Dian.Web.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string GroupCode { get; set; }
-        public List<ExportDocumentViewModel> Tasks { get; set; }
-        [Display(Name = "NITtt emisor")]
+        public List<ExportDocumentViewModel> Tasks { get; set; }        
         public string AmountAdmin { get; set; }
         public string AmountContributor1 { get; set; }
         public string AmountContributor2 { get; set; }
