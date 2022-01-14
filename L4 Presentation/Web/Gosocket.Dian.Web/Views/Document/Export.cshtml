@@ -92,12 +92,15 @@
                                                         <br />
                                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                                         {
-                                                            @Html.Label("*   Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
+                                                            @Html.Label("Se exportarán un  máximo de" + @Model.AmountAdmin, new { @class = "control-label" })
+                                                            //@Html.Label("*   Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
 
                                                         }
                                                         @if (!User.IsInAnyRole("Administrador", "Super"))
                                                         {
-                                                            @Html.Label("*   Se exportarán un  máximo de " + @Model.AmountContributor1 + " documentos.", new { @class = "control-label" })
+                                                            @Html.LabelFor(m => m.AmountContributor1, new { @class = "control-label" })
+                                                            //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountContributor1 + "documentos.", new { @class = "control-label" })
+                                                            //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
                                                         }
 
                                                     </div>
