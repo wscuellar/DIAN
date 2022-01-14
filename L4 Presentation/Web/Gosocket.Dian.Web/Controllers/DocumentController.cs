@@ -234,6 +234,9 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Export()
         {
             var model = new ExportDocumentTableViewModel();
+            model.AmountAdmin = ConfigurationManager.GetValue("AdminDocsToExport");
+            model.AmountContributor1 = ConfigurationManager.GetValue("ContributorsDocsToExport1");
+            model.AmountContributor2 = ConfigurationManager.GetValue("ContributorsDocsToExport2");
 
             GetExportDocumentTasks(ref model);
 
