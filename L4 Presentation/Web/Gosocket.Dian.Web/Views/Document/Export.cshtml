@@ -32,9 +32,10 @@
                                         @Html.HiddenFor(m => m.Type)
                                         @Html.HiddenFor(m => m.StartDate)
                                         @Html.HiddenFor(m => m.EndDate)
+                                        @Html.HiddenFor(m => m.AmountAdmin)
 
                                         @*<input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
-                                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
+            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
 
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -91,7 +92,7 @@
                                                         <br />
                                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                                         {
-                                                            @Html.LabelFor(m => m.AmountAdmin + "lalo", new { @class = "control-label" })
+                                                            @Html.LabelFor(m => m.AmountAdmin, new { @class = "control-label" })
                                                             //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountAdmin + "documentos.", new { @class = "control-label" })
                                                             //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
                                                         }
