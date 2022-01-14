@@ -13,9 +13,9 @@ namespace Gosocket.Dian.Web.Models
             StartDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1); ;
             EndDate = DateTime.Now;
             Tasks = new List<ExportDocumentViewModel>();
-            AmountAdmin = Int32.Parse(ConfigurationManager.GetValue("AdminDocsToExport"));
-            AmountContributor1 = Int32.Parse(ConfigurationManager.GetValue("ContributorsDocsToExport1"));
-            AmountContributor2 = Int32.Parse(ConfigurationManager.GetValue("ContributorsDocsToExport2"));
+            AmountAdmin = ConfigurationManager.GetValue("AdminDocsToExport");
+            AmountContributor1 = ConfigurationManager.GetValue("ContributorsDocsToExport1");
+            AmountContributor2 = ConfigurationManager.GetValue("ContributorsDocsToExport2");
         }
         [Display(Name = "NIT emisor")]
         public string SenderCode { get; set; }
@@ -26,9 +26,9 @@ namespace Gosocket.Dian.Web.Models
         public DateTime EndDate { get; set; }
         public string GroupCode { get; set; }
         public List<ExportDocumentViewModel> Tasks { get; set; }        
-        public int AmountAdmin { get; set; }
-        public int AmountContributor1 { get; set; }
-        public int AmountContributor2 { get; set; }
+        public string AmountAdmin { get; set; }
+        public string AmountContributor1 { get; set; }
+        public string AmountContributor2 { get; set; }
     }
     public class ExportDocumentViewModel
     {
