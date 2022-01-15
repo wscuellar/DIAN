@@ -270,7 +270,7 @@ namespace Gosocket.Dian.Web.Controllers
 															OtherDocElecState.Registrado,
 															model.ContributorIdType,
 															(int)model.OperationModeId,
-															1,
+															model.ElectronicDocumentId,
 															User.UserName());
 
 			var ContributorId = otherDocElecContributor.Id.ToString();
@@ -315,7 +315,7 @@ namespace Gosocket.Dian.Web.Controllers
 			}
 			if (response.Code == 500)
 			{
-				return this.RedirectToAction("AddOrUpdate", new { ElectronicDocumentId = 1, OperationModeId = 0, ContributorIdType = model.ContributorIdType, ContributorId = model.OtherDocElecContributorId, Message = response.Message });
+				return this.RedirectToAction("AddOrUpdate", new { ElectronicDocumentId = model.ElectronicDocumentId, OperationModeId = 0, ContributorIdType = model.ContributorIdType, ContributorId = model.OtherDocElecContributorId, Message = response.Message });
 			}
 			else
 			{
@@ -378,7 +378,7 @@ namespace Gosocket.Dian.Web.Controllers
 				}
 				else
 				{
-					ResponseMessageRedirectTo.RedirectTo = Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = 1, message = "" });
+					ResponseMessageRedirectTo.RedirectTo = Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId, message = "" });
 
 					return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
 

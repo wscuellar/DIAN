@@ -1536,6 +1536,8 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         public ActionResult ElectronicDocuments()
         {
+            ViewBag.UserCode = User.UserCode();
+            ViewBag.ContributorId = User.ContributorId();
 
             return View();
         }
