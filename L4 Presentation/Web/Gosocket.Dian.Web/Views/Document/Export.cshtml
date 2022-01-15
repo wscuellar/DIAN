@@ -92,20 +92,21 @@
                                                         <br />
                                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                                         {
-                                                            @Html.Label(@"Se exportarán un máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
+                                                           <label class="control-label">*   Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.</label>
+                                                            //@Html.Label(@"Se exportarán un máximo de '@Model.AmountAdmin + ' documentos.', new { @class = "control - label" })
                                                             //@Html.Label("*   Se exportarán un  máximo de " + @Model.AmountAdmin + " documentos.", new { @class = "control-label" })
 
                                                         }
-                                                        @if (!User.IsInAnyRole("Administrador", "Super"))
+                                                        @if(!User.IsInAnyRole("Administrador", "Super"))
                                                         {
                                                             @Html.LabelFor(m => m.AmountContributor1, new { @class = "control-label" })
                                                             //@Html.LabelFor(m => "*   Se exportarán un  máximo de " + m.AmountContributor1 + "documentos.", new { @class = "control-label" })
                                                             //<p class="text-normal">* Se exportarán un máximo de 100 000 documentos.</p>
                                                         }
 
-                                                    </div>
+                                                    </ div >
 
-                                                    <div class="panel-footer-grey text-right">
+                                                    < div class="panel-footer-grey text-right">
                                                         <button class="btn btn-default btn-hover-gosocket btn-export-excel"><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Exportar Excel</button>
                                                     </div>
 
@@ -128,10 +129,11 @@
     </div>
 </div>
 
-@section Scripts {
+@section Scripts
+                                            {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <!--Bootstrap Select [ OPTIONAL ]-->
+    <!--Bootstrap Select [OPTIONAL]-->
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
@@ -160,7 +162,7 @@
             //    downloadFiles(this);
             //});
 
-            $('.btn-export-excel').click(function () {
+            $('.btn-export-excel').click(function() {
                 $(this).attr('disabled', 'disabled');
                 $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Exportando...');
                 $('.table-pagination').css('display', 'none');
@@ -170,111 +172,111 @@
             });
 
             // Pagination
-            @*$('.next-page').click(function () {
-                $('#Page').val(@Model.Page + 1);
-                $('#export-form').submit();
-            });
+                                                    @*$('.next-page').click(function () {
+        $('#Page').val(@Model.Page + 1);
+        $('#export-form').submit();
+    });
 
-            $('.prev-page').click(function () {
-                $('#Page').val(@Model.Page - 1);
-                $('#export-form').submit();
-            });*@
-            // Pagination
+    $('.prev-page').click(function () {
+        $('#Page').val(@Model.Page - 1);
+        $('#export-form').submit();
+    });*@
+// Pagination
 
-        });
+});
 
-        startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
-        endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
+startDate = moment("@Model.StartDate.ToString("yyyy-MM-dd")");
+endDate = moment("@Model.EndDate.ToString("yyyy-MM-dd")");
 
-        startDate.locale('es');
-        endDate.locale('es');
+startDate.locale('es');
+endDate.locale('es');
 
-        $('#export-range').daterangepicker({
-            "buttonClasses": "btn btn-block btn-default",
-            "startDate": startDate,
-            "endDate": endDate,
-            "applyClass": "btn-hover-gosocket",
-            "cancelClass": "btn-hover-gosocket",
-            "ranges": {
-                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
-                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
-                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
-            },
-            "locale": {
-                "format": "DD-MM-YY",
-                "separator": " - ",
-                "applyLabel": "Aceptar",
-                "cancelLabel": "Cancelar",
-                "fromLabel": "Desde",
-                "toLabel": "Hasta",
-                "customRangeLabel": "Rango de Fechas",
-                "daysOfWeek": [
-                    "Do",
-                    "Lu",
-                    "Ma",
-                    "Mi",
-                    "Ju",
-                    "Vi",
-                    "Sa"
-                ],
-                "monthNames": [
-                    "Enero",
-                    "Febrero",
-                    "Marzo",
-                    "Abril",
-                    "Mayo",
-                    "Junio",
-                    "Julio",
-                    "Agosto",
-                    "Septiembre",
-                    "Octubre",
-                    "Noviembre",
-                    "Diciembre"
-                ],
-                "firstDay": 1
-            },
-            opens: ('left'),
-        }, function (start, end, label) {
-            $('#export-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
-            startDate = start;
-            endDate = end;
-            $('#StartDate').val(startDate.format('MM/DD/YYYY'));
-            $('#EndDate').val(endDate.format('MM/DD/YYYY'));
-        });
+$('#export-range').daterangepicker({
+"buttonClasses": "btn btn-block btn-default",
+"startDate": startDate,
+"endDate": endDate,
+"applyClass": "btn-hover-gosocket",
+"cancelClass": "btn-hover-gosocket",
+"ranges": {
+'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+},
+"locale": {
+"format": "DD-MM-YY",
+"separator": " - ",
+"applyLabel": "Aceptar",
+"cancelLabel": "Cancelar",
+"fromLabel": "Desde",
+"toLabel": "Hasta",
+"customRangeLabel": "Rango de Fechas",
+"daysOfWeek": [
+"Do",
+"Lu",
+"Ma",
+"Mi",
+"Ju",
+"Vi",
+"Sa"
+],
+"monthNames": [
+"Enero",
+"Febrero",
+"Marzo",
+"Abril",
+"Mayo",
+"Junio",
+"Julio",
+"Agosto",
+"Septiembre",
+"Octubre",
+"Noviembre",
+"Diciembre"
+],
+"firstDay": 1
+},
+opens: ('left'),
+}, function (start, end, label) {
+$('#export-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
+startDate = start;
+endDate = end;
+$('#StartDate').val(startDate.format('MM/DD/YYYY'));
+$('#EndDate').val(endDate.format('MM/DD/YYYY'));
+});
 
 
-        function capitalizeMonth(date) {
-            return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);
-        }
-
-        //function downloadFiles(span) {
-        //    $(span).parent().parent().addClass('not-redirect');
-        //    var id = span.id;
-        //    if ($(span).hasClass("fa-download")) {
-        //        $(span).removeClass("fa-download");
-        //        $(span).addClass("fa-spinner");
-        //        setTimeout(function () {
-        //            $("#" + id).removeClass("fa-spinner");
-        //            $("#" + id).addClass("fa-download");
-        //        }, 5000);
-        //        window.location.href = "/Document/DownloadZipFiles?trackId=" + id;
-
-        //    }
-        //}
-
-        //$(document).on('mouseenter', ".iffyTip", function () {
-        //    var $this = $(this);
-        //    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
-        //        $this.tooltip({
-        //            title: $this.text(),
-        //            placement: "top"
-        //        });
-        //        $this.tooltip('show');
-        //    }
-        //});
-        //$('.hideText').css('width', $('.hideText').parent().width());
-
-    </script>
-
+function capitalizeMonth(date) {
+return date.substring(0, 3) + date.charAt(3).toUpperCase() + date.slice(4);
 }
+
+//function downloadFiles(span) {
+//    $(span).parent().parent().addClass('not-redirect');
+//    var id = span.id;
+//    if ($(span).hasClass("fa-download")) {
+//        $(span).removeClass("fa-download");
+//        $(span).addClass("fa-spinner");
+//        setTimeout(function () {
+//            $("#" + id).removeClass("fa-spinner");
+//            $("#" + id).addClass("fa-download");
+//        }, 5000);
+//        window.location.href = "/Document/DownloadZipFiles?trackId=" + id;
+
+//    }
+//}
+
+//$(document).on('mouseenter', ".iffyTip", function () {
+//    var $this = $(this);
+//    if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+//        $this.tooltip({
+//            title: $this.text(),
+//            placement: "top"
+//        });
+//        $this.tooltip('show');
+//    }
+//});
+//$('.hideText').css('width', $('.hideText').parent().width());
+
+                                                            </script>
+
+                                                        }
