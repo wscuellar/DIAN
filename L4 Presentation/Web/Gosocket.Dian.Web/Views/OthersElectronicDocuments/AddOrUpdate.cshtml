@@ -394,12 +394,17 @@
                                 if (result != null) {
 
 									if (result.Code != 200) {
+										
+										$(' .close').click() 
 										bootbox.dialog({
 											message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
-											onEscape: () => { }
+											onEscape: () => {
+												var url = window.location.href.split('&');
+												var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+												window.location.href = ret
+											}
 										});
-
-										$('body > div.bootbox.modal.fade.in > div.modal-dialog > div > div.modal-footer > button.btn.btn-radian-default.btn-radian-success').click()
+										//
                                         return;
                                     }
 
