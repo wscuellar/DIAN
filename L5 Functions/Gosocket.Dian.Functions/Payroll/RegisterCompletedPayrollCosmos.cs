@@ -217,10 +217,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						LastNameWorker = objNomina.PrimerApellido,
 						SecondLastNameWorker = objNomina.SegundoApellido,
 						FirstNameWorker = objNomina.PrimerNombre,
-						SecondNameWorker = objNomina.OtrosNombres,
+						SecondNameWorker = objNomina.OtrosNombres==null?"": objNomina.OtrosNombres,
 						CodeWorker = objNomina.Trab_CodigoTrabajador,
 						TypeWorker = objNomina.TipoTrabajador,
-						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == Int32.Parse(objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
+						NameTypeWorker = WorkerType.Where(x => x.IdWorkerType == (objNomina.TipoTrabajador).ToString()).FirstOrDefault().CompositeName,
 						SubTypeWorker = objNomina.SubTipoTrabajador,
 						NameSubTypeWorker = SubWorkerType.Where(x => x.IdSubWorkerType == objNomina.SubTipoTrabajador).FirstOrDefault().CompositeName,
 						//Pendiente NameSubTypeWorker
