@@ -393,8 +393,13 @@
 
                                 if (result != null) {
 
-                                    if (result.Code != 200) {
-                                        bootbox.alert(result.Message);
+									if (result.Code != 200) {
+										bootbox.dialog({
+											message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
+											onEscape: () => { }
+										});
+
+                                        
                                         return;
                                     }
 

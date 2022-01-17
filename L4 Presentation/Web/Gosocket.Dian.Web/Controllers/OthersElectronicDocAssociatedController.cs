@@ -205,12 +205,58 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult CancelRegister(int id, string description)
         {
-            var result = DeleteOperationInStorageTable(id);
-            if (result != null) return result;
+            var result = DeleteOperationInStorage(id);
+            if (result != null)
+            {
+
+                
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
 
             // SQL
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
             return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+
+        private ResponseMessage DeleteOperationInStorage(int id)
+        {
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+            ResponseMessage result = new ResponseMessage();
+            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            {
+
+                result.Code = 500;
+                result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                return result;
+                //return Json(new
+                //{
+                //    code = 500,
+                //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                //    success = true,
+                //}, JsonRequestBehavior.AllowGet);
+            }
+
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(id);
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            // AZURE
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            var globalResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+            if (globalResult != null)
+            {
+                globalResult.Deleted = true;
+                _testSetOthersDocumentsResultService.InsertTestSetResult(globalResult);
+            }
+            //
+            var globalOperation = _globalOtherDocElecOperationService.GetOperation(model.Nit, software.SoftwareId);
+            if (globalOperation != null)
+            {
+                globalOperation.Deleted = true;
+                _globalOtherDocElecOperationService.Update(globalOperation);
+            }
+
+            return null;
         }
 
         [HttpPost]
