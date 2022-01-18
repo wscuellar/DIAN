@@ -52,7 +52,7 @@ namespace Gosocket.Dian.Web.Controllers
 		{
 			ViewBag.UserCode = User.UserCode();
 			ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-			ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments()?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+			ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x=>x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
 			ViewBag.ContributorId = User.ContributorId();
 
 			return View();
@@ -263,9 +263,9 @@ namespace Gosocket.Dian.Web.Controllers
 			var IdS = Guid.NewGuid();
 			var now = DateTime.Now;
 
-			//var contrib = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(model.OtherDocElecContributorId).FirstOrDefault;
+			
 
-			OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributor(
+			OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService.CreateContributorNew(
 															User.ContributorId(),
 															OtherDocElecState.Registrado,
 															model.ContributorIdType,
@@ -313,7 +313,7 @@ namespace Gosocket.Dian.Web.Controllers
 			{
 				response = _othersElectronicDocumentsService.AddOtherDocElecContributorOperationNew(contributorOperation, software, true, true, model.OtherDocElecContributorId, model.ContributorIdType,model.OtherDocElecContributorId);
 			}
-			if (response.Code == 500) // error...
+			if (response.Code == 500)
 			{
 				return this.RedirectToAction("AddOrUpdate", new { ElectronicDocumentId = 1, OperationModeId = 0, ContributorIdType = model.ContributorIdType, ContributorId = model.OtherDocElecContributorId, Message = response.Message });
 			}

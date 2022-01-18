@@ -108,11 +108,13 @@ namespace Gosocket.Dian.Application
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, ContributorIdType);
-
-            if(List.Results.Any(x=>x.StateSoftware=="2"))
-                return new ResponseMessage("Tiene un modo de operación en pruebas", TextResources.alertType, 500);
+            if (List.Results.Any(x=>x.StateSoftware=="2")|| List2.Results.Any(x => x.StateSoftware == "2"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno en pruebas", TextResources.alertType, 500);
+            if (List.Results.Any(x => x.StateSoftware == "4") || List2.Results.Any(x => x.StateSoftware == "4"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno Rechazado", TextResources.alertType, 500);
 
 
             _othersDocsElecSoftwareService.CreateSoftware(software);

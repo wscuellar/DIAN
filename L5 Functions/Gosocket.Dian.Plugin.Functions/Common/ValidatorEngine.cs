@@ -9,6 +9,7 @@ using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
+using Gosocket.Dian.Services.Cuds;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
@@ -808,6 +809,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateCuds(RequestObjectCuds cuds)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(cuds.TrackId);
+
+            var parser = new XmlToDocumentoSoporteParser();
+            var modelCuds = parser.Parser(xmlBytes);
+            var validator = new Validator();
+            validateResponses.Add(validator.ValidateCuds(modelCuds, cuds));
+            return validateResponses;
+        }
 
         #region Private methods
         private Dictionary<string, string> CreateTaxLevelCodeXpathsRequestObject(string trackId)

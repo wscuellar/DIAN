@@ -86,6 +86,36 @@ namespace Gosocket.Dian.Application
             return newContributor;
         }
 
+        public OtherDocElecContributor CreateContributorNew(int contributorId, OtherDocElecState State,
+           int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
+        {
+            var state = OtherDocElecState.Cancelado.GetDescription();
+            var state2 = OtherDocElecState.Habilitado.GetDescription();
+            OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
+                                                                                     && t.OtherDocElecContributorTypeId == ContributorType
+                                                                                     && t.OtherDocElecOperationModeId == OperationMode
+                                                                                     && t.ElectronicDocumentId == ElectronicDocumentId
+                                                                                     && t.State != state && t.State != state2);
+            // Si ya esta habilitado, no se debe actualizar el estado...
+            //if (existing != null && existing.State == OtherDocElecState.Habilitado.GetDescription()) return existing;
+
+            OtherDocElecContributor newContributor = new OtherDocElecContributor()
+            {
+                Id = existing != null ? existing.Id : 0,
+                ContributorId = contributorId,
+                CreatedBy = createdBy,
+                OtherDocElecContributorTypeId = ContributorType,
+                OtherDocElecOperationModeId = OperationMode,
+                ElectronicDocumentId = ElectronicDocumentId,
+                State = State.GetDescription(),
+                CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
+            };
+
+            newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
+
+            return newContributor;
+        }
+
         private Software GetSoftwareOwn(int contributorId)
         {
             List<Software> ownSoftwares = _contributorService.GetBaseSoftwareForRadian(contributorId);

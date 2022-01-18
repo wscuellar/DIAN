@@ -14,6 +14,7 @@ using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Services.Cuds;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Org.BouncyCastle.Security;
@@ -7597,5 +7598,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
+        #region Evento Cune
+
+        public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            data.TrackId = data.TrackId.ToLower();
+
+            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
+
+            var softwareId = invoceCuds.SoftwareId;
+
+            if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
+            {
+                invoceCuds.SoftwarePin = billerSoftwarePin;
+            }
+            else
+            {
+                var software = GetSoftwareInstanceCache(softwareId);
+                invoceCuds.SoftwarePin = software?.Pin;
+            }
+
+            
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
+            var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
+            if (invoceCuds.Cuds.ToLower() == hash)
+            {
+                response.IsValid = true;
+                response.ErrorMessage = $"Valor calculado correctamente.";
+            }
+            response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return response;
+        }
+        #endregion
     }
 }

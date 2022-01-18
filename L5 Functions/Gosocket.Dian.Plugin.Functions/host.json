@@ -1,4 +1,4 @@
 {
-  "functions": [ "ValidateSign" ],
+  "functions": [ "ValidateSign", "ValidateCuds" ],
   "functionTimeout": "00:10:30"
 }
