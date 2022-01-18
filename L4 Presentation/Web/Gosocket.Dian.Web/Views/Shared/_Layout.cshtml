@@ -242,7 +242,7 @@
                                         <a href="@Url.Action("Dashboard", "Home")">
                                             <i class="fa fa-dashboard"></i>
                                             <span class="menu-title">
-                                                Inicio
+                                                Menú
                                             </span>
                                         </a>
                                     </li>
@@ -280,10 +280,10 @@
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
                                             <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Consultar</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
                                                 <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
-                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Exportar</a></li>
-                                                <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Consultar Nómina</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                                <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
                                             </ul>
                                         }
                                         <!--Rol Administrador-->
@@ -395,8 +395,9 @@
                                         </ul>-->
                                     </li>
 
-
-                                    <li>
+                                    @if (!User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                                                         <li>
                                         <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
                                             <i class="fa fa-users"></i>
                                             <span class="menu-title">
@@ -415,6 +416,8 @@
                                             }
                                         </ul>
                                     </li>
+                                     }
+
                                     <!--Rol Administrador-->
                                     @*@if (User.IsInAnyRole("Administrador", "Super"))
                                             {
@@ -451,6 +454,15 @@
                                                 <i class="arrow"></i>
                                             </a>
                                             <!--Submenu-->
+                                            <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                             </ul>
+                                             <ul>
+                                                 @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                 {
+                                                     <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                 }
+                                             </ul>
                                             <ul class="collapse">
                                                 @if (ConfigurationManager.GetValue("Environment") != "Prod")
                                                 {

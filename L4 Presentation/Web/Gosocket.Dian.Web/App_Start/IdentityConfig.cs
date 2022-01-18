@@ -177,6 +177,7 @@ namespace Gosocket.Dian.Web
 
 			current.AddClaim(new Claim(CustomClaimTypes.GoToInvoicer, goToInvoicer.ToString()));
 
+
 			// Test set clamis
 			if (currentContributor != null)
 				current.AddClaim(new Claim(CustomClaimTypes.ShowTestSet, (currentContributor.AcceptanceStatusId == (int)Domain.Common.ContributorStatus.Registered && currentContributor.OperationModeId == (int)Domain.Common.OperationMode.Own).ToString()));

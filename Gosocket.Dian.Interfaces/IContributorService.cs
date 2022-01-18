@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Domain;
+using Gosocket.Dian.Domain.Sql;
 using System;
 using System.Collections.Generic;
 
@@ -24,6 +25,8 @@ namespace Gosocket.Dian.Interfaces
         ContributorFile GetContributorFile(Guid id);
         IEnumerable<ContributorFileHistory> GetContributorFileHistories(Guid id);
         Contributor GetContributorFiles(int id);
+
+        List<OtherDocElecContributor> GetOtherDocElecContributorPermisos(int OtherDocContributorId);
         List<ContributorFileStatus> GetContributorFileStatuses();
         IEnumerable<Contributor> GetContributors(int contributorTypeId);
         IEnumerable<Contributor> GetContributors(int contributorTypeId, int statusId);
