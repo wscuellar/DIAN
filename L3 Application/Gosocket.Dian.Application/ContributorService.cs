@@ -167,6 +167,37 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId && p.OtherDocElecOperationModeId==3).ToList();
         }
 
+        public List<OtherDocElecContributor> GetOtherDocElecContributorPermisos(int OtherDocContributorId)
+        {
+
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId ).ToList();
+        }
+
+        public ContributorOperations GetContributorOperations(int OtherDocContributorId)
+        {
+
+            ContributorOperations contributorOp = null;
+            var re = (from c in sqlDBContext.ContributorOperations
+                      where c.ContributorId == OtherDocContributorId
+                      select c).FirstOrDefault();
+
+            if (re != null)
+            {
+                contributorOp = new ContributorOperations()
+                {
+                    Id = re.Id,
+                    ContributorId = re.ContributorId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    SoftwareId = re.SoftwareId,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    ContributorTypeId = re.ContributorTypeId
+                };
+            }
+
+            return contributorOp;
+        }
         public bool GetOtherDocElecContributorOperations(int OtherDocContributorId)
         {
 
