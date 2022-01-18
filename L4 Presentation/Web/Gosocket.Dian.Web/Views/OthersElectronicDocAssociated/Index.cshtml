@@ -214,6 +214,10 @@
 		.panel-footer {
 			padding: 15px 15px !important;
 		}
+
+        .margin-right-20{
+			margin-right: 30px !important;
+        }
 	</style>
 }
 <div class="page-content radian-view margin-20">
@@ -231,7 +235,6 @@
 					<div id="steps-otherdocELectAssociate">
 						<div class="radian-personal-info">
 							@Html.Partial("_personalInfo")
-						
 						</div>
 						<h3><span class="name-state">Ingreso de solicitud</span></h3>
 						<section>
@@ -244,10 +247,11 @@
 							{
 								<div class="panel-body">
 									<div class="row">
-										<div class="text-right">
-											@*<button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>*@
-											<button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
-										</div>
+                                        <div class="text-right">
+                                            <button name="SubmitPrueba"  class="margin-right-20 btn btn-radian-success Set-Prueba">Set de pruebas</button>
+                                            <button type="button" class="btn btn-default btn-radian-default" id="btnReiniciarSerPruebas">Reiniciar set de pruebas</button>
+                                            <button type="button" class="btn btn-default btn-radian-default" id="btnSincronizarAProduccion">Sincronizar a producción</button>
+                                        </div>
 									</div>
 								</div>
 							}
