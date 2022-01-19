@@ -1,4 +1,5 @@
-﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+﻿@using Gosocket.Dian.Infrastructure;
+@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @using Newtonsoft.Json
 @{
     ViewBag.Title = Model.ContributorType + " de " + Model.ElectronicDoc;
@@ -248,12 +249,23 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="text-right">
-                                            <button name="SubmitPrueba" class="margin-right-20 btn btn-radian-success Set-Prueba">Set de pruebas</button>
-                                            <button 
-                                                    type="button" 
-                                                    class="btn btn-default btn-radian-default @(Model.State == "Rechazado" ? "disabled" : "")" 
-                                                    id="btnReiniciarSerPruebas">Reiniciar set de pruebas</button>
-                                            <button type="button" class="btn btn-default btn-radian-default" id="btnSincronizarAProduccion">Sincronizar a producción</button>
+
+                                            <button name="SubmitPrueba"
+                                                    class="margin-right-20 btn btn-radian-success Set-Prueba">
+                                                Set de pruebas
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-default btn-radian-default @(Model.State != "Rechazado" ? "disabled" : "")"
+                                                    id="btnReiniciarSerPruebas">
+                                                Reiniciar set de pruebas
+                                            </button>
+
+                                            <button type="button"
+                                                    class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
+                                                    id="btnSincronizarAProduccion">
+                                                Sincronizar a producción
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
