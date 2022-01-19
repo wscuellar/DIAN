@@ -378,12 +378,22 @@ namespace Gosocket.Dian.Web.Controllers
 				}
 				else
 				{
+					if(ValidacionOtherDocs.ElectronicDocumentId == 3)
+                    {
+						ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments", 
+						new 
+						{ 
+							ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
+							OperationModeId = 0,
+							ContributorIdType = 1,
+							ContributorId = User.ContributorId(),
+							message = "" 
+						});
+						return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
+					}
+
 					ResponseMessageRedirectTo.RedirectTo = Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId, message = "" });
-
 					return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
-
-
-
 				}
 			}
 			if (ValidacionOtherDocs.Accion == "SeleccionParticipante")

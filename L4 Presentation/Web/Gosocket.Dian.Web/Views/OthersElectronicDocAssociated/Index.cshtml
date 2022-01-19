@@ -251,7 +251,7 @@
                                             <button name="SubmitPrueba" class="margin-right-20 btn btn-radian-success Set-Prueba">Set de pruebas</button>
                                             <button 
                                                     type="button" 
-                                                    class="btn btn-default btn-radian-default @(Model.State != "Rechazado" ? "disabled" : "")" 
+                                                    class="btn btn-default btn-radian-default @(Model.State == "Rechazado" ? "disabled" : "")" 
                                                     id="btnReiniciarSerPruebas">Reiniciar set de pruebas</button>
                                             <button type="button" class="btn btn-default btn-radian-default" id="btnSincronizarAProduccion">Sincronizar a producción</button>
                                         </div>
