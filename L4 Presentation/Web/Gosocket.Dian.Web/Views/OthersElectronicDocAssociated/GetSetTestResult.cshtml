@@ -59,18 +59,6 @@
                         </p>
                     </div>
                 </div>
-                @if (Model.Software.OtherDocElecSoftwareStatusName == "Rechazado")
-                {
-                    <div>
-                        <button  onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
-                    </div>
-				}
-				else
-				{ 
-			<div>
-				<button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15 disabled">Reiniciar set de pruebas</button>
-			</div>
-                }
                 <div class="row margin-horizontal-0 margin-top-20">
 					<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
 
