@@ -1,4 +1,4 @@
 {
-  "functions": [ "ValidateSign", "ValidateCuds" ],
+  //"functions": [ "RegisterCompletedPayrollCosmos" ],
   "functionTimeout": "00:10:30"
 }

@@ -100,9 +100,12 @@
             border: 1px !important;
             border-top: 2px solid #E9E8E8 !important;
         }
+        .margin-page-content {
+            margin-top: 50px !important;
+        }
     </style>
 }
-<div class="page-content margin-15">
+<div class="page-content margin-15 margin-page-content">
     <div class="row title-container" style="margin-left: 1px;">
         <p class="title-view">
             @ViewBag.title
@@ -466,7 +469,11 @@
             else if ($('#OperationModeSelectedId').val() == 2) {
 				$('#FormPt').fadeIn()
 				$('#FormPropio').fadeOut()
-				$('#SoftwareName').val($('#SoftwareId option:selected').text());
+				$($(".SoftwareName")[2]).val($('#SoftwareId option:selected').text())
+				$($(".SoftwareName")[0]).val($('#SoftwareId option:selected').text())
+				$($(".SoftwareName")[1]).val($('#SoftwareId option:selected').text())
+				
+
             }
             else
                 if ($('#OperationModeSelectedId').val() == 3) {

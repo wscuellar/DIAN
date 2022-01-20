@@ -78,7 +78,7 @@ namespace Gosocket.Dian.Functions.Payroll
 				var PeriodPayroll = await cosmos.getPeriodPayroll();
 				var PaymentForm = await cosmos.getPaymentForm();
 				var PaymentMethod = await cosmos.getPaymentMethod();
-				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo,objNomina.TipoXML);
+				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo,objNomina.TipoXML, account);
 
 				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString());
 
@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					{
 
 						Novelty = objNomina.Novedad.ToString(),
-						NoveltyCune = objNomina.CUNENov,
+						NoveltyCune = objNomina.CUNENov== null?"" : objNomina.CUNENov,
 						AdmissionDate = objNomina.FechaIngreso== null ? "" : DateTime.Parse(objNomina.FechaIngreso.ToString()).ToString("yyyy-MM-dd"),
 						SettlementDateStartMonth = objNomina.FechaPagoInicio.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd"),
 						SettlementDateEndMonth = objNomina.FechaPagoFin.ToString() == null ? "" : DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd"),
@@ -165,10 +165,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						Number = objNomina.Numero,
 						IdGenerationCountry = objNomina.Pais,
 						IdGenerationDepartament = objNomina.DepartamentoEstado,
-						NameCompositeGenerationDepartament = Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
+						NameCompositeGenerationDepartament = string.IsNullOrEmpty(objNomina.DepartamentoEstado) ?"":  Departament.Where(x => x.IdDepartament == objNomina.DepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Peniente NameCompositeGenerationDepartament //NombreCompuestoDepartamentoGeneracion
 						IdGenerationCity = objNomina.MunicipioCiudad,
-						NameCompositeGenerationCity = City.Where(x => x.IdCity == objNomina.MunicipioCiudad).FirstOrDefault().CompositeNameCity,
+						NameCompositeGenerationCity =string.IsNullOrEmpty(objNomina.MunicipioCiudad)?"": City.Where(x => x.IdCity == objNomina.MunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeGenerationCity //NombreCompuestoMunicipioGeneracion
 						//Pendiente Settlementdocument //DocumentoLiquidacion-Si/No
 						//Pendiente CompanyWithdrawalDate // FechaDocumentoLiquidacion-Si/No
