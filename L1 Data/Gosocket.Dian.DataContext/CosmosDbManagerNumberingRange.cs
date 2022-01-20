@@ -28,7 +28,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                Uri collectionLink = UriFactory.CreateDocumentCollectionUri("List", "NumberingRange");
+                Uri collectionLink = UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange");
                 await client.CreateDocumentAsync(collectionLink, numberingRange);
                 return true;
             }
@@ -39,16 +39,19 @@ namespace Gosocket.Dian.DataContext
             }
         }
 
-        public async Task<NumberingRange> GetNumberingRangeByOtherDocElecContributor(long otherDocElecContributorId)
+        public NumberingRange GetNumberingRangeByOtherDocElecContributor(long otherDocElecContributorId)
         {
             try
             {
-                FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-                string sql = "SELECT * FROM c ";//where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1";
-                var DepartamentData = new List<NumberingRange>();
-                IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
-                              UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
+                string sql = $"SELECT * FROM c where c.OtherDocElecContributorOperation = {otherDocElecContributorId}";
+                
+                var uri = UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange");
+                IDocumentQuery<NumberingRange> QueryData = client
+                    .CreateDocumentQuery<NumberingRange>(uri, sql, new FeedOptions { MaxItemCount = -1 })
+                    .AsDocumentQuery();
+                
+                var result = QueryData.ExecuteNextAsync<NumberingRange>().Result;
+                
                 return result.FirstOrDefault();
             }
             catch (Exception e)

@@ -613,7 +613,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 
         public string ResolutionNumber { get; set; }
         public DateTimeOffset ExpirationDate { get; set; }
-        public long OtherDocElecContributor { get; set; }
+        public long OtherDocElecContributorOperation { get; set; }
     }
 
 	public partial class PaymentForm

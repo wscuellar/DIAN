@@ -327,12 +327,12 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 if(model.ElectronicDocumentId == 3) 
-                { 
-                    var accountId = Guid.Parse(User.UserCode());
-                    var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.UserName() });
+                {
+                    var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.ContributorCode() });
                     var rangoDePrueba = new NumberingRange
                     {
-                        OtherDocElecContributor = otherDocElecContributor.Id,
+                        id = Guid.NewGuid(),
+                        OtherDocElecContributorOperation = contributorOperation.Id,
                         Prefix = "SEDS",
                         ResolutionNumber = "18760000001",
                         NumberFrom = 984000000,
@@ -346,8 +346,8 @@ namespace Gosocket.Dian.Web.Controllers
                         N102 = "SEDS (984000000 - 985000000)",
                         N103 = "SEDS (984000000 - 985000000)",
                         State = 3,
-                        AccountId = accountId,
-                        PartitionKey = accountId.ToString(),
+                        //AccountId = accountId,
+                        //PartitionKey = accountId.ToString(),
                     };
                     var cosmosManager = new CosmosDbManagerNumberingRange();
                     await cosmosManager.SaveNumberingRange(rangoDePrueba);
