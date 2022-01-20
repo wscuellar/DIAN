@@ -569,11 +569,11 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("AccountId")]
 		public Guid AccountId { get; set; }
 
-		[JsonProperty("IdDocumentTypePayroll")]
-		public string IdDocumentTypePayroll { get; set; }
-
 		[JsonProperty("IDNumberingRange")]
 		public long IdNumberingRange { get; set; }
+
+		[JsonProperty("IdDocumentTypePayroll")]
+		public string IdDocumentTypePayroll { get; set; }
 
 		[JsonProperty("DocumentTypePayroll")]
 		public string DocumentTypePayroll { get; set; }
@@ -609,8 +609,12 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public DateTimeOffset CreationDate { get; set; }
 
 		[JsonProperty("id")]
-		public Guid id { get; set; }		
-	}
+		public Guid id { get; set; }
+
+        public string ResolutionNumber { get; set; }
+        public DateTimeOffset ExpirationDate { get; set; }
+        public long OtherDocElecContributor { get; set; }
+    }
 
 	public partial class PaymentForm
 	{
