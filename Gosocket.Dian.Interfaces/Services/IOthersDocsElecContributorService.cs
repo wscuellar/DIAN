@@ -35,5 +35,7 @@ namespace Gosocket.Dian.Interfaces.Services
         GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
         List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId);
         List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state);
+
+        bool HabilitarParaSincronizarAProduccion(int Id);
     }
 }

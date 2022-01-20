@@ -193,6 +193,23 @@ namespace Gosocket.Dian.Web.Controllers
 
             ViewBag.Id = Id;
 
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+            model.Software = new OtherDocElecSoftwareViewModel()
+            {
+                Id = software.Id,
+                Name = software.Name,
+                Pin = software.Pin,
+                Url = software.Url,
+                Status = software.Status,
+                OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State,
+                ProviderId = software.ProviderId,
+                SoftwareId = software.SoftwareId,
+            };
+
             return View(model);
         }
 
@@ -781,29 +798,12 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
         [HttpPost]
         public JsonResult RestartSetTestResultV2(int Id)
         {
             #region GetSetTestResultV2
 
             OthersElectronicDocAssociatedViewModel model0 = DataAssociate(Id);
-
-            if (model0.State != "Rechazado")
-            {
-                ViewBag.ValidateRequest = false;
-                return Json(new ResponseMessage("Solo se puede reiniciar el Set de pruebas si ha sido Rechazado!", TextResources.alertType, 500));
-            }
 
             if (model0.Id == -1)
                 return Json(new ResponseMessage("No se puede realizar esta operación", TextResources.alertType, 500));
@@ -839,18 +839,29 @@ namespace Gosocket.Dian.Web.Controllers
                 Url = software.Url,
                 Status = software.Status,
                 OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
-                //OtherDocElecSoftwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId),
                 OtherDocElecSoftwareStatusName = model0.GTestSetOthersDocumentsResult.State,
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
 
-            GlobalTestSetOthersDocumentsResult model = model0.GTestSetOthersDocumentsResult;
-            Guid docElecSoftwareId = software.Id;
+
+
+            #endregion
+
+            #region Validation
+
+            if (model0.Software.OtherDocElecSoftwareStatusName != "Rechazado")
+            {
+                ViewBag.ValidateRequest = false;
+                return Json(new ResponseMessage("Solo se puede reiniciar el Set de pruebas si ha sido Rechazado!", TextResources.alertType, 500));
+            }
 
             #endregion
 
             #region RestartSetTestResultV2
+
+            GlobalTestSetOthersDocumentsResult model = model0.GTestSetOthersDocumentsResult;
+            Guid docElecSoftwareId = software.Id;
 
             model.State = TestSetStatus.InProcess.GetDescription();
             model.Status = (int)TestSetStatus.InProcess;
@@ -904,6 +915,42 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
 
             #endregion
+        }
+
+
+        [HttpGet]
+        public bool HabilitarParaReinicioSetPruebas(int Id)
+        {
+            OthersElectronicDocAssociatedViewModel model0 = DataAssociate(Id);
+
+            GlobalTestSetOthersDocuments testSet;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model0.OperationModeId, model0.ElectronicDocId);
+            if (testSet == null) return false;
+
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            string key = model0.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            model0.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, key);
+
+
+            model0.GTestSetOthersDocumentsResult.State = TestSetStatus.Rejected.GetDescription();
+            model0.GTestSetOthersDocumentsResult.Status = (int)TestSetStatus.Rejected;
+            model0.GTestSetOthersDocumentsResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+
+            bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model0.GTestSetOthersDocumentsResult);
+
+            return isUpdate;
+        }
+
+        [HttpGet]
+        public bool HabilitarParaSincronizarAProduccion(int Id)
+        {
+            var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId);
+            return isUpdate;
         }
     }
 }

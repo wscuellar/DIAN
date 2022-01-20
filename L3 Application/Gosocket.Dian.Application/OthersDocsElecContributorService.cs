@@ -433,5 +433,14 @@ namespace Gosocket.Dian.Application
             return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
         }
 
+
+
+        public bool HabilitarParaSincronizarAProduccion(int Id)
+        {
+            var entity = sqlDBContext.OtherDocElecContributors.Where(t => t.Id == Id).FirstOrDefault();
+            entity.State = "Habilitado";
+            int filasAfectadas = sqlDBContext.SaveChanges();
+            return filasAfectadas > 0;
+        }
     }
 }

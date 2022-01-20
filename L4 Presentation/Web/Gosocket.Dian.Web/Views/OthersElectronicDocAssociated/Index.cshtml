@@ -219,9 +219,13 @@
         .margin-right-20 {
             margin-right: 30px !important;
         }
+        
+        .margin-page-content {
+            margin-top: 50px !important;
+        }
     </style>
 }
-<div class="page-content radian-view margin-20">
+<div class="page-content radian-view margin-20 margin-page-content">
     <div class="title-container">
         <p class="title-view">
             @ViewBag.title
@@ -256,7 +260,7 @@
                                             </button>
 
                                             <button type="button"
-                                                    class="btn btn-default btn-radian-default @(Model.State != "Rechazado" ? "disabled" : "")"
+                                                    class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
                                                     id="btnReiniciarSerPruebas">
                                                 Reiniciar set de pruebas
                                             </button>
@@ -421,7 +425,8 @@
                  window.location.href = url;
 			});
 
-			$('#btnReiniciarSerPruebas').click(function (e) {
+            $('#btnReiniciarSerPruebas').click(function (e) {
+                showLoading('#panel-form', 'Configuración', 'Reiniciando Set de pruebas, por favor espere.');
 				$.ajax({
                 url: "@Url.Action("RestartSetTestResultV2", "OthersElectronicDocAssociated")",
                 method: "Post",
@@ -435,10 +440,13 @@
                 },
 				success: function (data) {
                     hideLoading('#panel-form');
-                    if (data.success)
+                    if (data.Code == 200) {
                         showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.Message);
-                    if (!data.success)
+                        window.location.reload();
+                    }
+                    else {
                         showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.Message);
+                    }
                 }
             });
 			});
