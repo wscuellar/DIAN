@@ -36,6 +36,6 @@ namespace Gosocket.Dian.Interfaces.Services
         List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId);
         List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state);
 
-        bool HabilitarParaSincronizarAProduccion(int Id);
+        bool HabilitarParaSincronizarAProduccion(int Id, string Estado);
     }
 }

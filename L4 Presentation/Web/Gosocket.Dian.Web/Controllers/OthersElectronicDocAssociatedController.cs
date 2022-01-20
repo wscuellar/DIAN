@@ -946,10 +946,10 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        public bool HabilitarParaSincronizarAProduccion(int Id)
+        public bool HabilitarParaSincronizarAProduccion(int Id, string Estado)
         {
             var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
-            var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId);
+            var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
             return isUpdate;
         }
     }

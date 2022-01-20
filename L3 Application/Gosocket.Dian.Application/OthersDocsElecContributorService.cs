@@ -435,10 +435,10 @@ namespace Gosocket.Dian.Application
 
 
 
-        public bool HabilitarParaSincronizarAProduccion(int Id)
+        public bool HabilitarParaSincronizarAProduccion(int Id, string Estado)
         {
             var entity = sqlDBContext.OtherDocElecContributors.Where(t => t.Id == Id).FirstOrDefault();
-            entity.State = "Habilitado";
+            entity.State = Estado;
             int filasAfectadas = sqlDBContext.SaveChanges();
             return filasAfectadas > 0;
         }
