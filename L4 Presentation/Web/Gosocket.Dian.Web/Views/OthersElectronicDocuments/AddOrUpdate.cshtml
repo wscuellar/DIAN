@@ -2,253 +2,266 @@
 @using Gosocket.Dian.Infrastructure;
 
 @{
-	var contributorName = (string)ViewBag.ContributorName;
-	var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
-	var message = (string)ViewBag.Message;
+    var contributorName = (string)ViewBag.ContributorName;
+    var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
+    var message = (string)ViewBag.Message;
+    var isElectronicPayroll = (bool)ViewBag.IsElectronicPayroll;
 }
 
 @section css
 {
-	<style type="text/css">
+    <style type="text/css">
 
-		.btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
-			background-color: #348441 !important;
-			border-color: #348441 !important;
-			color: #fff !important;
-		}
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            background-color: #348441 !important;
+            border-color: #348441 !important;
+            color: #fff !important;
+        }
 
-		.btn-success:hover, btn-radian-success:hover {
-			background-color: #62C7AB;
-			background: #62C7AB;
-			border-color: #62C7AB;
-			color: #fff;
-		}
+        .btn-success:hover, btn-radian-success:hover {
+            background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
+        }
 
-		.btnAddOthersDocs {
-			height: 41px !important;
-			width: 22px;
-			font-size: 14pt;
-			color: #fff;
-			background-color: #348441;
-			border-right-width: 0px !important;
-			border-right-style: none;
-			border-top-right-radius: 6px !important;
-			border-bottom-right-radius: 6px !important;
-			border-top-left-radius: 0px !important;
-			border-bottom-left-radius: 0px !important;
-			text-align: center;
-			padding-left: 0px;
-			padding-right: 0px;
-			margin-left: -3px;
-		}
+        .btnAddOthersDocs {
+            height: 41px !important;
+            width: 22px;
+            font-size: 14pt;
+            color: #fff;
+            background-color: #348441;
+            border-right-width: 0px !important;
+            border-right-style: none;
+            border-top-right-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+            border-top-left-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+            text-align: center;
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-left: -3px;
+        }
 
 
-		.input-general {
-			background: #fff !important;
-		}
+        .input-general {
+            background: #fff !important;
+        }
 
-		.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
-			cursor: not-allowed;
-			background-color: #eee !important;
-		}
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            cursor: not-allowed;
+            background-color: #eee !important;
+        }
 
-		.btnCloseOtherDocument {
-			color: #fff;
-			background: #348441 !important;
-			background-color: #348441 !important;
-			/*border-radius: 10px !important;*/
-			float: right;
-			cursor: pointer;
-			opacity: 100 !important;
-			padding-left: 5px !important;
-			padding-right: 5px !important;
-			padding-top: 1px !important;
-			padding-bottom: 2px !important;
-			font-weight: normal !important;
-			font-family: auto !important;
-		}
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
 
-		.prompt-comment .modal-body {
-			width: 80%;
-		}
+        .prompt-comment .modal-body {
+            width: 80%;
+        }
 
-		.modal-body .close, .modal-header .close {
-			background-color: #348441 !important;
-			/*top: 20px !important;
-			right: -25px !important;*/
-		}
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+            /*top: 20px !important;
+            right: -25px !important;*/
+        }
 
-		.divBackTop {
-			padding-top: 15px;
-		}
+        .divBackTop {
+            padding-top: 15px;
+        }
 
-		.iconBackTop {
-			color: #348441;
-			font-size: 13pt;
-		}
+        .iconBackTop {
+            color: #348441;
+            font-size: 13pt;
+        }
 
-		.btnBackTop {
-			color: #348441;
-			font-size: 14pt;
-			text-decoration: underline;
-		}
+        .btnBackTop {
+            color: #348441;
+            font-size: 14pt;
+            text-decoration: underline;
+        }
 
-		hr {
-			margin-top: 20px !important;
-			margin-bottom: 20px !important;
-			border: 1px !important;
-			border-top: 2px solid #E9E8E8 !important;
-		}
-	</style>
+        hr {
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            border: 1px !important;
+            border-top: 2px solid #E9E8E8 !important;
+        }
+    </style>
 }
 <div class="page-content margin-15">
-	<div class="row title-container" style="margin-left: 1px;">
-		<p class="title-view">
-			@ViewBag.title
-		</p>
-		<div class="underline-title"></div>
-		<div class="divBackTop">
-			<span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
-			&nbsp;<a href="@Url.Action("AddParticipants", "OthersElectronicDocuments",new { electronicDocumentId=1})" class="btnBackTop">Volver</a>
-		</div>
-	</div>
+    <div class="row title-container" style="margin-left: 1px;">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+        <div class="divBackTop">
+            <span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
+            &nbsp;<a href="@Url.Action("AddParticipants", "OthersElectronicDocuments",new { electronicDocumentId=1})" class="btnBackTop">Volver</a>
+        </div>
+    </div>
 
-	<div class="row margin-horizontal-0" style="margin-top: 15px;">
-		<div class="tab-base">
-			<div class="tab-content padding-0">
-				<div id="tab-current-country" class="tab-pane fade active in">
-					<div class="panel">
-						<div class="panel-body padding-top-20">
-							<div class="row margin-horizontal-0">
-								<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+    <div class="row margin-horizontal-0" style="margin-top: 15px;">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel">
+                        <div class="panel-body padding-top-20">
+                            <div class="row margin-horizontal-0">
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
 
-									@using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
-									{
-										@Html.Partial("_form")
-										if (!ViewBag.softwareActive)
-										{
-											if (ConfigurationManager.GetValue("Environment") != "Prod")
-											{
-												<div class="panel-footer text-right">
-													<button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
-												</div>
-											}
-										}
-									}
-								</div>
-							</div>
-						</div>
-						<div class="panel-body padding-top-20">
-							<div class="row">
-								<div class="col-lg-12  col-md-12  col-xs-12">
-									<h4> Listado de modos de operación asociados</h4>
-								</div>
-								<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-								</div>
-								<div class="col-lg-12 col-md-12  col-xs-12">
-									<div class="table-responsive">
-										<table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-											<thead>
-												<tr>
-													<th class="text-center">Modo de operación</th>
-													<th class="text-center">Documento Electrónicos</th>
-													<th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
-													<th class="text-center">Estado</th>
-													<th class="text-center">Nombre del Software</th>
-													<th class="text-center">ID</th>
-													<th class="text-center">PIN del SW </th>
-													<th class="text-center">URL</th>
-													<th class="text-center">Acciones</th>
-												</tr>
-											</thead>
-											<tbody>
-												@if (Model.ListTable != null)
-												{
-													//List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-													foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
-													{
-														<tr>
-															<td class="text-left">@item.OperationMode - @item.ContributorType</td>
-															<td class="text-center">@item.ElectronicDoc</td>
-															<td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-															<td class="text-center">@item.StateSoftware</td>
-															<td class="text-center">@item.Software</td>
-															<td class="text-center">@item.SoftwareId</td>
-															<td class="text-center">@item.PinSW</td>
-															<td class="text-center">  @item.Url  </td>
-															<td class="text-center" style="width:70px">
-																@*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-																<a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Ver detalle"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-																<a onclick="EliminarRegistro(@item.Id)" title="Ver detalle"><i class="fa fa-trash" style="font-size: 22px;color: #348441;"></i></a>
-															</td>
-														</tr>
-													}
-												}
-											</tbody>
-										</table>
-									</div>
+                                    @using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
+                                    {
+                                        @Html.Partial("_form")
+                                        if (!ViewBag.softwareActive)
+                                        {
+                                            if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                            {
+                                                <div class="panel-footer text-right">
+                                                    <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body padding-top-20">
+                            <div class="row">
+                                <div class="col-lg-12  col-md-12  col-xs-12">
+                                    <h4> Listado de modos de operación asociados</h4>
+                                </div>
+                                <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+                                </div>
+                                <div class="col-lg-12 col-md-12  col-xs-12">
+                                    <div class="table-responsive">
+                                        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Modo de operación</th>
+                                                    <th class="text-center">Documento Electrónicos</th>
+                                                    <th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
+                                                    <th class="text-center">Estado</th>
+                                                    <th class="text-center">Nombre del Software</th>
+                                                    <th class="text-center">ID</th>
+                                                    <th class="text-center">PIN del SW </th>
+                                                    <th class="text-center">URL</th>
+                                                    @if (!isElectronicPayroll)
+                                                    {
+                                                        <th class="text-center">Rangos de Pruebas</th>
+                                                    }
+                                                    <th class="text-center">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.ListTable != null)
+                                                {
+                                                    //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                                    foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
+                                                    {
+                                                        <tr>
+                                                            <td class="text-left">@item.OperationMode - @item.ContributorType</td>
+                                                            <td class="text-center">@item.ElectronicDoc</td>
+                                                            <td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                            <td class="text-center">@item.StateSoftware</td>
+                                                            <td class="text-center">@item.Software</td>
+                                                            <td class="text-center">@item.SoftwareId</td>
+                                                            <td class="text-center">@item.PinSW</td>
+                                                            <td class="text-center">  @item.Url  </td>
+                                                            @if (!isElectronicPayroll)
+                                                            {
+                                                                <td class="text-center">
+                                                                    <a href="@Url.Action("ListTests", "NumberRange", new { Id =  @item.Id })" title="Ver rangos de numeración">
+                                                                        <i class="fa fa-server" style="font-size: 22px;color: #348441;"></i>
+                                                                    </a>
+                                                                </td>
+                                                            }
+                                                            <td class="text-center" style="width:70px">
+                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
+                                                                <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Ver detalle"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+                                                                <a onclick="EliminarRegistro(@item.Id)" title="Ver detalle"><i class="fa fa-trash" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-									<!--Paginación de la tabla-->
-									<div class="pull-right table-pagination padding-top-10">
+                                    <!--Paginación de la tabla-->
+                                    <div class="pull-right table-pagination padding-top-10">
 
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		@*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
-							<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
-						</div>
-						<div class="modal-body">
-							<div class="bootbox-body">
-								<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
-								<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-										  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
-							</div>
-						</div><div class="modal-footer">
-							<button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-						</div>
-					</div>
-				</div>
-			</div>*@
-		<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
+        @*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
+                            <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="bootbox-body">
+                                <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
+                                <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+                                          maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+                            </div>
+                        </div><div class="modal-footer">
+                            <button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-					<div class="modal-header">
-						<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-						<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
-					</div>
-					<div class="modal-body">
-						<div class="bootbox-body">
-							<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
-							<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-									  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+                    <div class="modal-header">
+                        <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="bootbox-body">
+                            <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
+                            <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+                                      maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
-						</div>
-					</div><div class="modal-footer">
-						<button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                        </div>
+                    </div><div class="modal-footer">
+                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section scripts
 {
-	@Scripts.Render("~/bundles/jqueryval")
-	<script src="~/Content/js/Radian/RadianIndex.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-	<script>
+    <script>
 		  @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
@@ -394,8 +407,8 @@
                                 if (result != null) {
 
 									if (result.Code != 200) {
-										
-										$(' .close').click() 
+
+										$(' .close').click()
 										bootbox.dialog({
 											message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
 											onEscape: () => {
@@ -560,5 +573,5 @@
             });
         }
 
-	</script>
+    </script>
 }

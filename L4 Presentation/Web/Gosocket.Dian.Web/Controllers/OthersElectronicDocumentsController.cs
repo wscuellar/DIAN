@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Web.Controllers
 			}
 
 			ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
-
+			ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == 1;
 			return View(model);
 		}
 
