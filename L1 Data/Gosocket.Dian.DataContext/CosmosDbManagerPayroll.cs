@@ -382,13 +382,13 @@ namespace Gosocket.Dian.DataContext
             }
         }
 
-        public async Task<List<NumberingRange>> GetNumberingRangeByTypeDocument(string prefijo, double range,string tipo)
+        public async Task<List<NumberingRange>> GetNumberingRangeByTypeDocument(string prefijo, double range,string tipo,string account)
         {
             try
             {
 
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1";
+                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '"+ account+"'";
                 var DepartamentData = new List<NumberingRange>();
                 IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
