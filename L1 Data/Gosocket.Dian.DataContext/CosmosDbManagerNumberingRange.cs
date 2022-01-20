@@ -44,18 +44,16 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1";
+                string sql = "SELECT * FROM c ";//where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1";
                 var DepartamentData = new List<NumberingRange>();
                 IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
                 var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
-                return result.ToList();
-
-
+                return result.FirstOrDefault();
             }
             catch (Exception e)
             {
-                return new List<NumberingRange>();
+                return null;
 
             }
         }

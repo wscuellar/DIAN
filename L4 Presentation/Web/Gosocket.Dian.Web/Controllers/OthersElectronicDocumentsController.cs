@@ -9,6 +9,7 @@ using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
@@ -327,7 +328,8 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if(model.ElectronicDocumentId == 3) 
                 { 
-                    var account = Guid.Parse(User.UserCode());
+                    var accountId = Guid.Parse(User.UserCode());
+                    var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.UserName() });
                     var rangoDePrueba = new NumberingRange
                     {
                         OtherDocElecContributor = otherDocElecContributor.Id,
@@ -344,8 +346,8 @@ namespace Gosocket.Dian.Web.Controllers
                         N102 = "SEDS (984000000 - 985000000)",
                         N103 = "SEDS (984000000 - 985000000)",
                         State = 3,
-                        AccountId = account,
-                        PartitionKey = account.ToString(),
+                        AccountId = accountId,
+                        PartitionKey = accountId.ToString(),
                     };
                     var cosmosManager = new CosmosDbManagerNumberingRange();
                     await cosmosManager.SaveNumberingRange(rangoDePrueba);
