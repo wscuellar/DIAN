@@ -141,7 +141,8 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareId = entity.SoftwareId,
                 SoftwareIdBase = entity.SoftwareIdBase,
                 ProviderId = entity.ProviderId,
-                LegalRepresentativeList = LegalRepresentativeList
+                LegalRepresentativeList = LegalRepresentativeList,
+                EsElectronicDocNomina = entity.ElectronicDocId == 1
             };
 
         }
@@ -240,7 +241,8 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
             ResponseMessage result = new ResponseMessage();
-            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            //if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
 
                 result.Code = 500;

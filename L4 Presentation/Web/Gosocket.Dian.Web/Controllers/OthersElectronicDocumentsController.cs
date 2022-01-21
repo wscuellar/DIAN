@@ -172,6 +172,7 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedDate = t.CreatedDate
             }).ToList();
             List<Domain.RadianOperationMode> operationModesList = new List<Domain.RadianOperationMode>();
+            operationModesList.Add(new Domain.RadianOperationMode { Id = 0, Name = "Ninguno", });
             if (dataentity.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)
             {
                 operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware, Name = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
@@ -326,9 +327,9 @@ namespace Gosocket.Dian.Web.Controllers
 
                 }
 
-                if(model.ElectronicDocumentId == 3) 
+                if (model.ElectronicDocumentId == 3)
                 {
-                    var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.ContributorCode() });
+                    //var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.ContributorCode() });
                     var rangoDePrueba = new NumberingRange
                     {
                         id = Guid.NewGuid(),
@@ -354,6 +355,17 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
             _othersElectronicDocumentsService.ChangeParticipantStatus(otherDocElecContributor.Id, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
+
+            if (model.ElectronicDocumentId == 3)
+            {
+                return RedirectToAction("AddOrUpdate", "OthersElectronicDocuments", new
+                {
+                    ElectronicDocumentId = model.ElectronicDocumentId,
+                    OperationModeId = 0,
+                    ContributorIdType = 1,
+                    ContributorId = User.ContributorId()
+                });
+            }
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }

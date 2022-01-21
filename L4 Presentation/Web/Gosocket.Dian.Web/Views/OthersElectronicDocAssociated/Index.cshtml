@@ -2,7 +2,7 @@
 @model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @using Newtonsoft.Json
 @{
-    ViewBag.Title = Model.ContributorType + " de " + Model.ElectronicDoc;
+    ViewBag.Title = Model.EsElectronicDocNomina ? Model.ContributorType + " de " + Model.ElectronicDoc : "Pruebas de aceptación";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 

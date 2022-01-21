@@ -65,7 +65,6 @@
                     </div>
                     <div class="card-body">
                         <p class="RadianTittleCard">Documento para no obligados a facturar</p>
-                        <p class="RadianTittleCard2">Documento para no obligados a facturar</p>
                     </div>
                 </div>
             </div>
@@ -106,7 +105,7 @@
                     ContributorId: '@ViewBag.ContributorId',
                     Accion: 'SeleccionElectronicDocument',
                     ElectronicDocumentId: electronicDocumentId,
-                    complementoTexto: `Documento soporte de NO obligados a facturar`,
+                    complementoTexto: `Documento Soporte y la Nota de Ajuste`,
                 };
 
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocsElecViewModel,
