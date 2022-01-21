@@ -187,7 +187,7 @@
                                                             @if (!isElectronicPayroll)
                                                             {
                                                                 <td class="text-center">
-                                                                    <a href="@Url.Action("ListTests", "NumberRange", new { Id =  @item.Id })" title="Ver rangos de numeración">
+                                                                    <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
                                                                         <i class="fa fa-server" style="font-size: 22px;color: #348441;"></i>
                                                                     </a>
                                                                 </td>
