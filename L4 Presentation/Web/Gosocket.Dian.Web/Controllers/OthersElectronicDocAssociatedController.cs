@@ -345,7 +345,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             ViewBag.Id = Id;
 
@@ -377,7 +377,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
             //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;

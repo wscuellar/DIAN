@@ -54,15 +54,16 @@
 
 @section Scripts{
 
-	<script>
+    <script>
         $(document).ready(function () {
 
             var data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model,Newtonsoft.Json.Formatting.Indented));
 
-            if ('@Model.EsElectronicDocNomina'== 'True')
+            showChartNomina(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
+            @*if ('@Model.EsElectronicDocNomina'== 'True')
                 showChartNomina(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
             else
-                showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1);
+                showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1);*@
 
             function showChartNomina(data, TitleDoc1, TitleDoc2) {
                             var dataChart = data;
@@ -216,8 +217,5 @@
                     });
                 }
             });
-
-	</script>
+    </script>
 }
-
-

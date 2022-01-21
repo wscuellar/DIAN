@@ -80,6 +80,15 @@
             </div>
         </div>
     }
+    else
+    {
+        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+            <div class="form-group">
+                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentRequired, defaultHtmlAttr)
+            </div>
+        </div>
+    }
 </div>
 
 <div class="row">
@@ -99,6 +108,15 @@
         </div>
     </div>
     @if (Model.EsElectronicDocNomina == true)
+    {
+        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+            <div class="form-group">
+                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentAcceptedRequired, defaultHtmlAttr)
+            </div>
+        </div>
+    }
+    else
     {
         <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
             <div class="form-group">
