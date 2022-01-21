@@ -241,6 +241,15 @@ namespace Gosocket.Dian.Functions.Payroll
 						SalaryWorker = objNomina.Sueldo,
 					};
 
+
+					var payment = objNomina.FechasPagos.Split(';');
+					var PaymentDates = new Domain.Cosmos.PaymentDateDatum[payment.Count()];
+					for (int i = 0; i < payment.Count(); i++)
+					{
+						PaymentDates[i] = new Domain.Cosmos.PaymentDateDatum();
+						PaymentDates[i].PaymentDate = DateTime.Parse(payment[i].ToString()).ToString("yyyy-MM-dd");
+					}
+
 					//Mapeo PaymentData - SecciónDatosPago
 					var InsertPaymentDataPayroll = new Domain.Cosmos.PaymentData()
 					{
@@ -253,8 +262,12 @@ namespace Gosocket.Dian.Functions.Payroll
 						Bank = objNomina.Banco,
 						AccountType = objNomina.TipoCuenta,
 						AccountNumber = objNomina.NumeroCuenta,
+						PaymentDateData = new Domain.Cosmos.PaymentDateDatum[payment.Count()],
+						//PaymentDateData = PaymentDates.ToArray(),
 						//Pendiente PaymentDateData
 					};
+					if(PaymentDates.Count()>0)
+					InsertPaymentDataPayroll.PaymentDateData = PaymentDates;
 
 					//Mapeo SeccionDevengados
 					var InsertBasicAccrualsDataPayroll = new Domain.Cosmos.BasicAccruals()

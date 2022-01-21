@@ -224,7 +224,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 	public partial class PaymentDateDatum
 	{
 		[JsonProperty("PaymentDate")]
-		public DateTime PaymentDate { get; set; }
+		public string PaymentDate { get; set; }
 	}
 
 	public partial class Countries
