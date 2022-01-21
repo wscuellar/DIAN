@@ -231,7 +231,7 @@
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
-        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = 1,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">

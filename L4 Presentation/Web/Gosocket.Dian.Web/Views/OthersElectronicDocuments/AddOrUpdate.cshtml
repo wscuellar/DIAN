@@ -134,7 +134,7 @@
                                             if (ConfigurationManager.GetValue("Environment") != "Prod")
                                             {
                                                 <div class="panel-footer text-right">
-                                                    <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
+                                                    <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave @(Model.ListTable.Any(t=> t.StateSoftware == "En pruebas") ? "disabled" : "")">Asociar</button>
                                                 </div>
                                             }
                                         }
