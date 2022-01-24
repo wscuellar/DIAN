@@ -239,7 +239,7 @@ namespace Gosocket.Dian.Web.Controllers
                 Guid g = Guid.NewGuid();
                 model.SoftwareId = g.ToString();
 
-                model.OperationModeId = 3;
+                model.OperationModeId = (int)Domain.Common.OtherDocElecOperationMode.FreeBiller;
             }
             if (model.SoftwareId == null)
             {
@@ -326,7 +326,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 }
 
-                if (model.ElectronicDocumentId == 3)
+                if (model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument)
                 {
                     var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
                     var rangoDePrueba = new NumberingRange
@@ -355,7 +355,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             _othersElectronicDocumentsService.ChangeParticipantStatus(otherDocElecContributor.Id, OtherDocElecState.Test.GetDescription(), model.ContributorIdType, OtherDocElecState.Registrado.GetDescription(), string.Empty);
 
-            if (model.ElectronicDocumentId == 3)
+            if (model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument)
             {
                 return RedirectToAction("AddOrUpdate", "OthersElectronicDocuments", new
                 {
@@ -419,7 +419,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
                 else
                 {
-                    if (ValidacionOtherDocs.ElectronicDocumentId == 3)
+                    if (ValidacionOtherDocs.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument)
                     {
                         ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                         new

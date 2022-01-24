@@ -522,7 +522,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
 
-            if (model.OperationModeId == 3)
+            if (model.OperationModeId == (int)Domain.Common.OtherDocElecOperationMode.FreeBiller)
             {
                 model.SoftwarePin = "0000";
                 
@@ -555,7 +555,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,                
-                SoftwareId = model.OperationModeId != 3 ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 
