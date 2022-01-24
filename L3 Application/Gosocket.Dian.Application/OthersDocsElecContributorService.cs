@@ -441,6 +441,10 @@ namespace Gosocket.Dian.Application
         {
             var entity = sqlDBContext.OtherDocElecContributors.Where(t => t.Id == Id).FirstOrDefault();
             entity.State = Estado;
+            entity.OtherDocElecContributorOperations
+                .FirstOrDefault(t => !t.Deleted)
+                .OperationStatusId = (int)OtherDocElecState.Habilitado;
+
             int filasAfectadas = sqlDBContext.SaveChanges();
             return filasAfectadas > 0;
         }

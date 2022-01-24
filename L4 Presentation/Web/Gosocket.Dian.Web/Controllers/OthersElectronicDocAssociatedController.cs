@@ -19,6 +19,7 @@ using Gosocket.Dian.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Gosocket.Dian.Application;
+using Gosocket.Dian.DataContext;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -344,6 +345,19 @@ namespace Gosocket.Dian.Web.Controllers
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
+
+            if (!model.OperationModeIsFree)
+            {
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
+                model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
+                    numberingRange.Prefix,
+                    numberingRange.ResolutionNumber,
+                    numberingRange.NumberFrom,
+                    numberingRange.NumberTo,
+                    numberingRange.CreationDate.ToString("dd-MM-yyyy"),
+                    numberingRange.ExpirationDate.ToString("dd-MM-yyyy"));
+            }
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
