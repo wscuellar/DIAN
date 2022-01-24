@@ -104,7 +104,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 case 3:
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(3));
-                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
+                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
                     _ = _contributorService.Setup(x => x.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Contributor() { Name = "NameContributor" });
 
                     //act
@@ -119,7 +119,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 case 4:
                     dataentity.OperationModeId = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider;
                     _ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(4));
-                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
+                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTechnologicalProviders(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(new List<Contributor> { new Contributor() { Id = 1001, Name = "NameContributor" } });
 
                     //act

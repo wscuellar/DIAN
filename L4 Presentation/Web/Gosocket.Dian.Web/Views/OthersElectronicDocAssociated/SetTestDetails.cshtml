@@ -7,7 +7,7 @@
 
 
 
-<div class="page-content radian-view margin-15">
+<div class="page-content radian-view margin-15 margin-page-content">
 	<div class="title-container">
 		<p class="title-view">
 			@ViewBag.title
@@ -56,166 +56,87 @@
 
     <script>
         $(document).ready(function () {
-
             var data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model,Newtonsoft.Json.Formatting.Indented));
+            showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
+        });
 
-            showChartNomina(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
-            @*if ('@Model.EsElectronicDocNomina'== 'True')
-                showChartNomina(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
-            else
-                showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1);*@
-
-            function showChartNomina(data, TitleDoc1, TitleDoc2) {
-                            var dataChart = data;
-                            Highcharts.chart('setTestDetails', {
-                                chart: {
-                                    type: 'bar'
-                                },
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    alternateGridColor: '#EBEEEC',
-                                    categories: [
-                                        TitleDoc1,
-                                        TitleDoc2
-                                    ]
-                                },
-                                yAxis: {
-                                    min: 0,
-                                    title: {
-                                        text: ''
-                                    }
-                                },
-                                legend: {
-                                    align: 'right',
-                                    verticalAlign: 'top',
-                                    x: 0,
-                                    y: 15
-                                },
-                                plotOptions: {
-                                    series: {
-                                        stacking: 'normal',
-                                        borderRadius: 8
-                                    }
-                                },
-                                series: [
-                                    {
-                                        name: 'Requeridos',
-                                        color: '#6A197D',
-                                        data: [
-                                            dataChart.OthersDocumentsRequired,
-                                            dataChart.ElectronicPayrollAjustmentRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Min requerido aceptado',
-                                        color: '#D9F489',
-                                        data: [
-                                            dataChart.OthersDocumentsAcceptedRequired,
-                                            dataChart.ElectronicPayrollAjustmentAcceptedRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Recibidos',
-                                        color: '#FFD271',
-                                        data: [
-                                            dataChart.TotalOthersDocumentsSent,
-                                            dataChart.TotalElectronicPayrollAjustmentSent
-                                        ]
-                                    },
-                                    {
-                                        name: 'Aceptados',
-                                        color: '#348441',
-                                        data: [
-                                            dataChart.OthersDocumentsAccepted,
-                                            dataChart.ElectronicPayrollAjustmentAccepted
-                                        ]
-                                    },
-                                    {
-                                        name: 'Rechazados',
-                                        color: '#FF414D',
-                                        data: [
-                                            dataChart.OthersDocumentsRejected,
-                                            dataChart.ElectronicPayrollAjustmentRejected
-                                        ]
-                                    }
-                                ]
-                            });
-                        }
-
-            function showChart(data, TitleDoc1) {
-                    var dataChart = data;
-                    Highcharts.chart('setTestDetails', {
-                        chart: {
-                            type: 'bar'
-                        },
-                        title: {
-                            text: ''
-                        },
-                        xAxis: {
-                            alternateGridColor: '#EBEEEC',
-                            categories: [
-                                TitleDoc1
-                            ]
-                        },
-                        yAxis: {
-                            min: 0,
-                            title: {
-                                text: ''
-                            }
-                        },
-                        legend: {
-                            align: 'right',
-                            verticalAlign: 'top',
-                            x: 0,
-                            y: 15
-                        },
-                        plotOptions: {
-                            series: {
-                                stacking: 'normal',
-                                borderRadius: 8
-                            }
-                        },
-                        series: [
-                            {
-                                name: 'Requeridos',
-                                color: '#6A197D',
-                                data: [
-                                    dataChart.OthersDocumentsRequired
-                                ]
-                            },
-                            {
-                                name: 'Min requerido aceptado',
-                                color: '#D9F489',
-                                data: [
-                                    dataChart.OthersDocumentsAcceptedRequired
-                                ]
-                            },
-                            {
-                                name: 'Recibidos',
-                                color: '#FFD271',
-                                data: [
-                                    dataChart.TotalOthersDocumentsSent
-                                ]
-                            },
-                            {
-                                name: 'Aceptados',
-                                color: '#348441',
-                                data: [
-                                    dataChart.OthersDocumentsAccepted
-                                ]
-                            },
-                            {
-                                name: 'Rechazados',
-                                color: '#FF414D',
-                                data: [
-                                    dataChart.OthersDocumentsRejected
-                                ]
-                            }
+        function showChart(data, TitleDoc1, TitleDoc2) {
+            var dataChart = data;
+            Highcharts.chart('setTestDetails', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    alternateGridColor: '#EBEEEC',
+                    categories: [
+                        TitleDoc1,
+                        TitleDoc2
+                    ]
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    }
+                },
+                legend: {
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: 0,
+                    y: 15
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal',
+                        borderRadius: 8
+                    }
+                },
+                series: [
+                    {
+                        name: 'Requeridos',
+                        color: '#6A197D',
+                        data: [
+                            dataChart.OthersDocumentsRequired,
+                            dataChart.ElectronicPayrollAjustmentRequired
                         ]
-                    });
-                }
+                    },
+                    {
+                        name: 'Min requerido aceptado',
+                        color: '#D9F489',
+                        data: [
+                            dataChart.OthersDocumentsAcceptedRequired,
+                            dataChart.ElectronicPayrollAjustmentAcceptedRequired
+                        ]
+                    },
+                    {
+                        name: 'Recibidos',
+                        color: '#FFD271',
+                        data: [
+                            dataChart.TotalOthersDocumentsSent,
+                            dataChart.TotalElectronicPayrollAjustmentSent
+                        ]
+                    },
+                    {
+                        name: 'Aceptados',
+                        color: '#348441',
+                        data: [
+                            dataChart.OthersDocumentsAccepted,
+                            dataChart.ElectronicPayrollAjustmentAccepted
+                        ]
+                    },
+                    {
+                        name: 'Rechazados',
+                        color: '#FF414D',
+                        data: [
+                            dataChart.OthersDocumentsRejected,
+                            dataChart.ElectronicPayrollAjustmentRejected
+                        ]
+                    }
+                ]
             });
+        }
     </script>
 }

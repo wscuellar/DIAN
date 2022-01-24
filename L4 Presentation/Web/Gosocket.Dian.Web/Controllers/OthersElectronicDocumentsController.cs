@@ -151,10 +151,10 @@ namespace Gosocket.Dian.Web.Controllers
             model.OtherDocElecContributorId = (int)dataentity.ContributorId;
             model.UrlEventReception = ConfigurationManager.GetValue("WebServiceUrlEvent");
 
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List(User.ContributorId(), (int)dataentity.ContributorIdType, (int)dataentity.OperationModeId, model.ElectronicDocumentId);
             if (model.OperationModeId == 0)
             {
-                List = _othersDocsElecContributorService.List3(User.ContributorId(), (int)dataentity.ContributorIdType);
+                List = _othersDocsElecContributorService.List3(User.ContributorId(), (int)dataentity.ContributorIdType, model.ElectronicDocumentId);
             }
             model.ListTable = List.Results.Select(t => new OtherDocsElectListViewModel()
             {
@@ -172,7 +172,6 @@ namespace Gosocket.Dian.Web.Controllers
                 CreatedDate = t.CreatedDate
             }).ToList();
             List<Domain.RadianOperationMode> operationModesList = new List<Domain.RadianOperationMode>();
-            operationModesList.Add(new Domain.RadianOperationMode { Id = 0, Name = "Ninguno", });
             if (dataentity.ContributorIdType == Domain.Common.OtherDocElecContributorType.TechnologyProvider)
             {
                 operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware, Name = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
@@ -329,7 +328,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (model.ElectronicDocumentId == 3)
                 {
-                    //var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = User.ContributorCode() });
+                    var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
                     var rangoDePrueba = new NumberingRange
                     {
                         id = Guid.NewGuid(),
@@ -347,8 +346,8 @@ namespace Gosocket.Dian.Web.Controllers
                         N102 = "SEDS (984000000 - 985000000)",
                         N103 = "SEDS (984000000 - 985000000)",
                         State = 3,
-                        //AccountId = accountId,
-                        //PartitionKey = accountId.ToString(),
+                        AccountId = Guid.Parse(accountId),
+                        PartitionKey = accountId.ToString(),
                     };
                     var cosmosManager = new CosmosDbManagerNumberingRange();
                     await cosmosManager.SaveNumberingRange(rangoDePrueba);
@@ -411,7 +410,9 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
 
-                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId).Where(x => x.OtherDocElecContributorTypeId == 1);// 1 es emisor
+                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
+                    .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
+
                 if (mode.Count() == 0)
                 {
                     return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);

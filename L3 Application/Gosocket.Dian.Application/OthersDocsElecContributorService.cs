@@ -157,7 +157,7 @@ namespace Gosocket.Dian.Application
             return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId, ContributorTypeId, OperationModeId, stateSofware);
         }
 
-        public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId)
+        public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId, int electronicDocumentId)
         {
             //IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
             //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
@@ -203,6 +203,7 @@ namespace Gosocket.Dian.Application
                                                         && oc.State != "Cancelado"
                                                         && s.Deleted == false
                                                         && oco.Deleted == false
+                                                        && eld.Id == electronicDocumentId
                                                     select new OtherDocsElectData()
                                                     {
                                                         //Id = oc.Id,
@@ -292,7 +293,7 @@ namespace Gosocket.Dian.Application
             return entity;
         }
 
-        public PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId)
+        public PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId)
         {
             //IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
             //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
@@ -337,6 +338,7 @@ namespace Gosocket.Dian.Application
                                                         && oc.State != "Cancelado"
                                                         && s.Deleted == false
                                                         && oco.Deleted == false
+                                                        && eld.Id == electronicDocumentId
                                                     select new OtherDocsElectData()
                                                     {
                                                         //Id = oc.Id,
