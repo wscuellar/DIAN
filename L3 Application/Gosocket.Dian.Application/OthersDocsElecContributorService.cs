@@ -443,7 +443,7 @@ namespace Gosocket.Dian.Application
             entity.State = Estado;
             entity.OtherDocElecContributorOperations
                 .FirstOrDefault(t => !t.Deleted)
-                .OperationStatusId = (int)OtherDocElecState.Habilitado;
+                .OperationStatusId = Estado == "Habilitado" ? (int)OtherDocElecState.Habilitado : (int)OtherDocElecState.Test;
 
             int filasAfectadas = sqlDBContext.SaveChanges();
             return filasAfectadas > 0;
