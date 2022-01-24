@@ -108,8 +108,8 @@ namespace Gosocket.Dian.Application
             OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
             if (existingOperation != null)
                 return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
-            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2);
-            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2, Contributor.ElectronicDocumentId);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1, Contributor.ElectronicDocumentId);
 
             if (List.Results.Any(x=>x.StateSoftware=="2")|| List2.Results.Any(x => x.StateSoftware == "2"))
                 return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno en pruebas", TextResources.alertType, 500);

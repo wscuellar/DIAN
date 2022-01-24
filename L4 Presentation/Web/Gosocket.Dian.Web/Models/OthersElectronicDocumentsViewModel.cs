@@ -41,7 +41,7 @@ namespace Gosocket.Dian.Web.Models
         public string OperationMode { get; set; }
 
         [Required(ErrorMessage = "{0} es requerido")]
-        [Display(Name = "URL de recepción de eventos")]
+        [Display(Name = "URL de recepción de documentos")]
         public string UrlEventReception { get; set; }   
 
         public int SoftwareType { get; set; }

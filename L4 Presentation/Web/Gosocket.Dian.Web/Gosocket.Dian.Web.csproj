@@ -329,6 +329,7 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
     <Compile Include="Controllers\FreeBillerController.cs" />
+    <Compile Include="Controllers\OthersElectronicDocNumberRangeController.cs" />
     <Compile Include="Controllers\OthersDocumentsController.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
     <Compile Include="Controllers\OthersElectronicDocumentsController.cs" />
@@ -2961,6 +2962,8 @@
     <Content Include="Views\User\_userexInvoiceLogin.cshtml" />
     <Content Include="Views\User\_forgotPasswordFormInvoice.cshtml" />
     <Content Include="Views\Document\ElectronicDocuments.cshtml" />
+    <Content Include="Views\OthersElectronicDocNumberRange\_Items.cshtml" />
+    <Content Include="Views\OthersElectronicDocNumberRange\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -3,7 +3,16 @@
 }
 @*<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />*@
 
-<div class="page-content radian-view margin-20">
+<style>
+    .RadianCardContainer {
+        cursor: pointer;
+    }
+    .margin-page-content {
+        margin-top: 50px !important;
+    }
+</style>
+
+<div class="page-content radian-view margin-20 margin-page-content">
     <div class="title-container">
         <p class="title-view">
             @ViewBag.title
@@ -30,7 +39,7 @@
                         </div>
                     </a>
                 </div>
-           </div>
+            </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
@@ -49,13 +58,13 @@
 
         <div class="row-fluid">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3">
+                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
+                     onclick="EnabledSupportDocumentForNoOfe()">
                     <div class="RadianImgContainer">
                         <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
                     </div>
                     <div class="card-body">
                         <p class="RadianTittleCard">Documento para no obligados a facturar</p>
-                        <p class="RadianTittleCard2">Documento para no obligados a facturar</p>
                     </div>
                 </div>
             </div>
@@ -78,14 +87,35 @@
     </div>
 </div>
 
-    @section scripts
+@section scripts
 {
-        @Scripts.Render("~/bundles/jqueryval")
-        <script src="~/Content/js/Radian/RadianIndex.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-        <script>
-     
-        </script>
+    <script>
+        var operationClick = false;
+        function EnabledSupportDocumentForNoOfe() {
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+            if (!operationClick) {
+                operationClick = true;
 
+                var electronicDocumentId = 3;
+                var ValidacionOtherDocsElecViewModel = {
+                    UserCode: '@ViewBag.UserCode',
+                    ContributorId: '@ViewBag.ContributorId',
+                    Accion: 'SeleccionElectronicDocument',
+                    ElectronicDocumentId: electronicDocumentId,
+                    complementoTexto: `Documento Soporte y la Nota de Ajuste`,
+                };
+
+                CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocsElecViewModel,
+                    function (param) {
+                        var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
+                        
+                        window.location.href = url;
+                    }, true, () => hideLoading('#panel-form')
+                );
+            }
+        }
+    </script>
 }
-
