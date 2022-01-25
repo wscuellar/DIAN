@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain;
+﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Web.Common;
@@ -114,6 +115,7 @@ namespace Gosocket.Dian.Web
             : base(userManager, authenticationManager)
         {
         }
+        private ContributorService contributorService = new ContributorService();
 
         public override async Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
         {
@@ -130,6 +132,9 @@ namespace Gosocket.Dian.Web
             var auth = dianAuthTableManager.Find<AuthToken>(user.Code, user.ContributorCode);
 
             Contributor currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
+
+            currentContributor = currentContributor == null ? contributorService.GetByCode(user.ContributorCode): currentContributor;
+
             // Contributor claims
             current.AddClaim(new Claim(CustomClaimTypes.ContributorAcceptanceStatusId, currentContributor.AcceptanceStatusId.ToString()));
             current.AddClaim(new Claim(CustomClaimTypes.ContributorId, currentContributor.Id.ToString()));

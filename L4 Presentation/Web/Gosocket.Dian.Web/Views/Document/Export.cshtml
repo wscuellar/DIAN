@@ -32,9 +32,10 @@
                                         @Html.HiddenFor(m => m.Type)
                                         @Html.HiddenFor(m => m.StartDate)
                                         @Html.HiddenFor(m => m.EndDate)
+                                        @Html.HiddenFor(m => m.AmountAdmin)
 
                                         @*<input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
-                                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
+            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
 
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -89,7 +90,15 @@
 
                                                         </div>
                                                         <br />
-                                                        <p class="text-normal">* Se exportarán un máximo de 10 000 documentos.</p>
+                                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                                        {
+                                                            <label class="control-label">*   Se exportarán un  máximo de @Model.AmountAdmin documentos.</label>
+                                                        }
+                                                        @if (!User.IsInAnyRole("Administrador", "Super"))
+                                                        {
+                                                            <label class="control-label">*   Se exportarán un  máximo de @Model.AmountContributor1 documentos.</label>
+                                                        }
+
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right">

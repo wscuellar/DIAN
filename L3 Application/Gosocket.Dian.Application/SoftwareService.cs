@@ -91,7 +91,7 @@ namespace Gosocket.Dian.Application
 
 
         public OtherDocElecSoftware GetByOtherDoc(Guid softwareId)
-        {
+        {            
             using (var context = new SqlDBContext())
             {
                 return context.OtherDocElecSoftwares.FirstOrDefault(x => x.SoftwareId == softwareId);

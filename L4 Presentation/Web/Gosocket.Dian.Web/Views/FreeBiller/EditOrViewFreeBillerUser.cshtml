@@ -114,6 +114,21 @@
                                                             </div>
                                                             @if (Model.IsEdit)
                                                             {
+                                                                <div class="row">
+                                                                    <div class="col-sm-3 padding-xs-0">
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
+                                                                            @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
+                                                                            @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-3 padding-xs-0 div-add-profile">
+                                                                        <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                            @*@if (Model.IsEdit)
+                                                            {
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
                                                                         @Html.LabelFor(m => m.Password, new { @class = "control-label" })
@@ -122,23 +137,9 @@
                                                                         <i onclick="showPassword(this)" class="fa fa-eye show-password"></i>
                                                                     </div>
                                                                 </div>
-                                                            }
+                                                            }*@
                                                         </div>
-                                                        @if (Model.IsEdit)
-                                                        {
-                                                            <div class="row">
-                                                                <div class="col-sm-3 padding-xs-0">
-                                                                    <div class="form-group">
-                                                                        @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                        @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, defaultHtmlAttrSelect)
-                                                                        @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-sm-3 padding-xs-0 div-add-profile">
-                                                                    <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
-                                                                </div>
-                                                            </div>
-                                                        }
+                                                        
                                                     </div>
                                                     <div class="panel-footer-grey text-right submit-container">
                                                         @if (Model.IsEdit)
@@ -186,7 +187,7 @@
                     TypeDocId: $('[name=TypeDocId]').val(),
                     NumberDoc: $('[name=NumberDoc]').val(),
                     Email: $('[name=Email]').val(),
-                    Password: $('[name=Password]').val(),
+                    //Password: $('[name=Password]').val(),
                     ProfileIds: getProfiles(),
                 }
                 var url = '@Url.Action("EditFreeBillerUser", "FreeBiller")';

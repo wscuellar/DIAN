@@ -42,7 +42,7 @@ namespace Gosocket.Dian.Functions.Export
                 var resultForEmitted = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
                 if (new string[] { "0", "1" }.Contains(task.FilterGroupCode))
                 {
-                    resultForEmitted = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, 10000, null, "00");
+                    resultForEmitted = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, Int32.Parse(ConfigurationManager.GetValue("ContributorsDocsToExport1")), null, "00");
                     var emitted = resultForEmitted.Item3.Select(d => new DocumentExported
                     {
                         DocumentTypeName = d.DocumentTypeName,
@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Functions.Export
                 var resultForReceived = new Tuple<bool, string, List<GlobalDataDocument>>(false, null, null);
                 if (new string[] { "0", "2" }.Contains(task.FilterGroupCode))
                 {
-                    resultForReceived = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", null, null, task.SenderCode, null, 10000, null, "00");
+                    resultForReceived = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(continuationToken, task.StartDate, task.EndDate, 0, "00", null, null, task.SenderCode, null, Int32.Parse(ConfigurationManager.GetValue("ContributorsDocsToExport2")), null, "00");
                     var received = resultForReceived.Item3.Select(d => new DocumentExported
                     {
                         DocumentTypeName = d.DocumentTypeName,

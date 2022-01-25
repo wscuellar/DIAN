@@ -86,11 +86,11 @@ namespace Gosocket.Dian.Application
 
         public Contributor Get(int id)
         {
-            return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
-            //using (var context = new SqlDBContext())
-            //{
-            //    return context.Contributors.FirstOrDefault(x => x.Id == id);
-            //}
+            //return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.Include("ContributorOperations").AsNoTracking().FirstOrDefault(x => x.Id == id);
+            }
         }
 
         public Contributor Get(int id, string connectionString)
@@ -145,10 +145,10 @@ namespace Gosocket.Dian.Application
         }
 
         public Contributor GetByCode(string code)
-        {
+        {            
             using (var context = new SqlDBContext())
             {
-                return context.Contributors.FirstOrDefault(p => p.Code == code);
+                return context.Contributors.Include("AcceptanceStatus").AsNoTracking().FirstOrDefault(p => p.Code == code);
             }
         }
 
