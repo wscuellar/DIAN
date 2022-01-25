@@ -1047,11 +1047,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
             start = DateTime.UtcNow;
             //Mandato sin CUFES referenciados
-            bool mandato = (eventCode == "043" && listId != "3");
-            bool validaAutho = ((eventCode == "037" || eventCode == "038" || eventCode == "039") && listId != "2" || mandato);
+            //bool mandato = (eventCode == "043" && listId != "3");
+            //bool validaAutho = ((eventCode == "037" || eventCode == "038" || eventCode == "039") && listId != "2" || mandato);
 
             //Si no es un endoso en blanco valida autorizacion            
-            if (validaAutho && senderCode != "01")
+            //if (validaAutho && senderCode != "01")
+            if (senderCode != "01" && !String.IsNullOrWhiteSpace(senderCode))
             {
                            
                 string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";
