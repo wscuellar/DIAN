@@ -572,7 +572,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("IdDocumentTypePayroll")]
 		public string IdDocumentTypePayroll { get; set; }
 
-		[JsonProperty("IDNumberingRange")]
+		[JsonProperty("IdNumberingRange")]
 		public long IdNumberingRange { get; set; }
 
 		[JsonProperty("DocumentTypePayroll")]
