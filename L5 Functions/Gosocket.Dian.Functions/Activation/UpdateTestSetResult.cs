@@ -203,6 +203,10 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.RejectInvoiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 7", "Rechazo factura electrónica");
+                    SetLogger(null, "Step 7.0", tipo.ToString(), "RF_001.1");
+                    SetLogger(null, "Step 7.1", radianTesSetResult.TotalRejectInvoiceSent.ToString(), "RF_002");
+                    SetLogger(null, "Step 7.2", radianTesSetResult.RejectInvoiceAccepted.ToString(), "RF_003");
+                    SetLogger(null, "Step 7.3", radianTesSetResult.RejectInvoiceRejected.ToString(), "RF_004");
 
                     //// Solicitud disponibilización
                     tipo = (int)EventStatus.SolicitudDisponibilizacion;
@@ -360,7 +364,7 @@ namespace Gosocket.Dian.Functions.Activation
                         || radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected)   
                         )
                     {
-                        SetLogger(null, "Step 19.e", radianTesSetResult.RejectInvoiceRejected.ToString(), "AR_010");
+                        SetLogger(null, "Step 19.e", radianTesSetResult.ExpressAcceptanceRejected.ToString(), "AR_010");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
