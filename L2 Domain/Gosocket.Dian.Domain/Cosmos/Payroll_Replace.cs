@@ -38,6 +38,9 @@ namespace Gosocket.Dian.Domain.Cosmos
 		[JsonProperty("WorkerData")]
 		public WorkerDataR WorkerData { get; set; }
 
+		[JsonProperty("PaymentData")]
+		public PaymentData PaymentData { get; set; }
+
 		[JsonProperty("id")]
 		public Guid Id { get; set; }
 
