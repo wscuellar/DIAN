@@ -382,7 +382,7 @@ namespace Gosocket.Dian.Functions.Activation
                         || radianTesSetResult.ReportForPaymentRejected > reportForPaymentRejected
                         )
                     {
-                        SetLogger(null, "Step 19.e", radianTesSetResult.ExpressAcceptanceRejected.ToString(), "AR_010");
+                        SetLogger(null, "Step 19.e", expressAcceptanceRejected.ToString(), "AR_010");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
