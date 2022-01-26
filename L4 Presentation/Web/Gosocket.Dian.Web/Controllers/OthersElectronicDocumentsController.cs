@@ -33,18 +33,21 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IContributorService _contributorService;
         private readonly IElectronicDocumentService _electronicDocumentService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
+        private readonly IContributorOperationsService _contributorOperationsService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
             IContributorService contributorService,
             IElectronicDocumentService electronicDocumentService,
-            IOthersDocsElecSoftwareService othersDocsElecSoftwareService)
+            IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
+            IContributorOperationsService contributorOperationsService)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
             _contributorService = contributorService;
             _electronicDocumentService = electronicDocumentService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
+            _contributorOperationsService = contributorOperationsService;
         }
 
         /// <summary>
@@ -64,12 +67,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpGet]
         public ActionResult AddOrUpdate(ValidacionOtherDocsElecViewModel dataentity)
         {
+            bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
+            OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+
             List<ElectronicDocument> listED = _electronicDocumentService.GetElectronicDocuments();
             List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
-            OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
+            
             if (dataentity.Message != null)
             {
-
                 ViewBag.Message = dataentity.Message;
             }
 
@@ -406,14 +411,26 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult Validation(ValidacionOtherDocsElecViewModel ValidacionOtherDocs)
         {
+            bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
+
             if (ValidacionOtherDocs.Accion == "SeleccionElectronicDocument")
             {
+                if (contributorIsOfe)
+                {
+                    /*Se debe consultar si el usuario ya tiene un proceso de habilitacion de facturación electronica habilitado*/
+                    var contributor = _contributorService.GetContributorById(User.ContributorId(), User.ContributorTypeId() ?? 0);
+                    if (contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
+                    {
+                        return Json(new ResponseMessage(TextResources.ElectronicBillerNoEnabled, TextResources.alertType), JsonRequestBehavior.AllowGet);
+                    }
+                }
+
                 var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
 
                 var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
                     .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
 
-                if (mode.Count() == 0)
+                if (!mode.Any())
                 {
                     return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
                 }

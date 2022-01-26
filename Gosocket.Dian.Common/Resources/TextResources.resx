@@ -319,4 +319,7 @@
   <data name="ReportQRCode" xml:space="preserve">
     <value>/document/searchqr?documentkey={CUFE}</value>
   </data>
+  <data name="ElectronicBillerNoEnabled" xml:space="preserve">
+    <value>Para poder continuar, realiza el proceso de habilitación como Facturador Electrónico.</value>
+  </data>
 </root>
