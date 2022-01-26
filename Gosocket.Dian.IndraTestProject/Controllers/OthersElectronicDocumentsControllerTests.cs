@@ -27,6 +27,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IContributorService> _contributorService = new Mock<IContributorService>();
         private readonly Mock<IElectronicDocumentService> _electronicDocumentService = new Mock<IElectronicDocumentService>();
         private readonly Mock<IOthersDocsElecSoftwareService> _othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
+        private readonly Mock<IContributorOperationsService> _contributorOperationsService = new Mock<IContributorOperationsService>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -36,7 +37,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _othersDocsElecContributorService.Object,
                     _contributorService.Object,
                     _electronicDocumentService.Object,
-                    _othersDocsElecSoftwareService.Object);
+                    _othersDocsElecSoftwareService.Object,
+                    _contributorOperationsService.Object);
         }
 
         [TestMethod()]

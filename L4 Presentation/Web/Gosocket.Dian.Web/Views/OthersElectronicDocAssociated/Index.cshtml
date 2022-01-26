@@ -241,57 +241,45 @@
                         <div class="radian-personal-info">
                             @Html.Partial("_personalInfo")
                         </div>
+                        @if (Model.Step > 0)
+                        {
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="text-right">
+
+                                        <button name="SubmitPrueba"
+                                                class="margin-right-20 btn btn-radian-success Set-Prueba">
+                                            Set de pruebas
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
+                                                id="btnReiniciarSerPruebas">
+                                            Reiniciar set de pruebas
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
+                                                id="btnSincronizarAProduccion">
+                                            Sincronizar a producción
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
                         <h3><span class="name-state">Ingreso de solicitud</span></h3>
                         <section>
                         </section>
 
                         <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section class="test-redirect">
-
-                            @if (Model.Step > 0)
-                            {
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="text-right">
-
-                                            <button name="SubmitPrueba"
-                                                    class="margin-right-20 btn btn-radian-success Set-Prueba">
-                                                Set de pruebas
-                                            </button>
-
-                                            <button type="button"
-                                                    class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
-                                                    id="btnReiniciarSerPruebas">
-                                                Reiniciar set de pruebas
-                                            </button>
-
-                                            <button type="button"
-                                                    class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
-                                                    id="btnSincronizarAProduccion">
-                                                Sincronizar a producción
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                            @*@if (Model.State == "Rechazado")
-                                {
-                                    <div>
-                                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div>
-                                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15 disabled">Reiniciar set de pruebas</button>
-                                    </div>
-                                }*@
+                        <section>
                         </section>
+
                         <h3></h3>
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
-
                     </div>
 
                     @if (Model.Step == 3)

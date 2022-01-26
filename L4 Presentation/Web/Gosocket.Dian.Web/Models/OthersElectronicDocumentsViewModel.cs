@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using Gosocket.Dian.Domain.Common;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gosocket.Dian.Web.Models
 {
     public class OthersElectronicDocumentsViewModel
     {
+        public OthersElectronicDocumentsViewModel()
+        {
+            OperationModesAsociatedInElectronicBiller = new List<OperationModeElectronicBillerViewModel>();
+        }
+
         public string Id { get; set; }
 
         public int  OtherDocElecContributorId { get; set; }
@@ -53,5 +59,23 @@ namespace Gosocket.Dian.Web.Models
 
         [Display(Name = "Nombre empresa proveedora")]
         public string ContributorName { get; set; }
+
+        public bool ContributorIsOfe { get; set; }
+        public bool ElectronicDocumentIsSupport => ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+        public List<OperationModeElectronicBillerViewModel> OperationModesAsociatedInElectronicBiller { get; set; }
+    }
+
+    public class OperationModeElectronicBillerViewModel
+    {
+        public int OperationModeId { get; set; }
+        public string OperationModeName { get; set; }
+        public OperationModeElectronicBillerDataViewModel Data { get; set; }
+    }
+    public class OperationModeElectronicBillerDataViewModel
+    {
+        public string ProviderCompanyName { get; set; }
+        public string SoftwareName { get; set; }
+        public string SoftwarePin { get; set; }
+        public string SoftwareId { get; set; }
     }
 }
