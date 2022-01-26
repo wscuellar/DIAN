@@ -342,26 +342,44 @@ namespace Gosocket.Dian.Functions.Activation
                     SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
                     SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), "AR_008");
                     SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), "AR_009");
-                    
-                    
-                    // Determinamos si rechazamos el set de pruebas del cliente                  
-                    if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired > 0 ? radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired : radianTesSetResult.ReceiptNoticeRejected)
-                        || radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired > 0 ? radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired : radianTesSetResult.ReceiptServiceRejected) 
-                        || radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired > 0 ? radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired : radianTesSetResult.ExpressAcceptanceRejected)
-                        || radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired > 0 ? radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired : radianTesSetResult.AutomaticAcceptanceRejected)
-                        || radianTesSetResult.RejectInvoiceRejected > (radianTesSetResult.RejectInvoiceTotalRequired > 0 ? radianTesSetResult.RejectInvoiceTotalRequired - radianTesSetResult.RejectInvoiceTotalAcceptedRequired : radianTesSetResult.RejectInvoiceRejected)
-                        || radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired > 0 ? radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired : radianTesSetResult.ApplicationAvailableRejected)
-                        || radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired > 0 ? radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired : radianTesSetResult.EndorsementPropertyRejected)
-                        || radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurementTotalRequired > 0 ? radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired : radianTesSetResult.EndorsementProcurementRejected)
-                        || radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired > 0 ? radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired : radianTesSetResult.EndorsementGuaranteeRejected)
-                        || radianTesSetResult.EndorsementCancellationRejected > (radianTesSetResult.EndorsementCancellationTotalRequired > 0 ? radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired : radianTesSetResult.EndorsementCancellationRejected)
-                        || radianTesSetResult.GuaranteeRejected > (radianTesSetResult.GuaranteeTotalRequired > 0 ? radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired : radianTesSetResult.GuaranteeRejected)
-                        || radianTesSetResult.ElectronicMandateRejected > (radianTesSetResult.ElectronicMandateTotalRequired > 0 ? radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired : radianTesSetResult.ElectronicMandateRejected)
-                        || radianTesSetResult.EndMandateRejected > (radianTesSetResult.EndMandateTotalRequired > 0 ? radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired : radianTesSetResult.EndMandateRejected)
-                        || radianTesSetResult.PaymentNotificationRejected > (radianTesSetResult.PaymentNotificationTotalRequired > 0 ? radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired : radianTesSetResult.PaymentNotificationRejected)
-                        || radianTesSetResult.CirculationLimitationRejected > (radianTesSetResult.CirculationLimitationTotalRequired > 0 ? radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired : radianTesSetResult.CirculationLimitationRejected)
-                        || radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected)
-                        || radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected)   
+
+
+                    // Determinamos si rechazamos el set de pruebas del cliente
+                    int receiptNoticeRejected = radianTesSetResult.ReceiptNoticeTotalRequired > 0 ? radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired : radianTesSetResult.ReceiptNoticeRejected;
+                    int receiptServiceRejected = radianTesSetResult.ReceiptServiceTotalRequired > 0 ? radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired : radianTesSetResult.ReceiptServiceRejected;
+                    int expressAcceptanceRejected = radianTesSetResult.ExpressAcceptanceTotalRequired > 0 ? radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired : radianTesSetResult.ExpressAcceptanceRejected;
+                    int automaticAcceptanceRejected = radianTesSetResult.AutomaticAcceptanceTotalRequired > 0 ? radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired : radianTesSetResult.AutomaticAcceptanceRejected;
+                    int rejectInvoiceRejected = radianTesSetResult.RejectInvoiceTotalRequired > 0 ? radianTesSetResult.RejectInvoiceTotalRequired - radianTesSetResult.RejectInvoiceTotalAcceptedRequired : radianTesSetResult.RejectInvoiceRejected;
+                    int applicationAvailableRejected = radianTesSetResult.ApplicationAvailableTotalRequired > 0 ? radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired : radianTesSetResult.ApplicationAvailableRejected;
+                    int endorsementPropertyRejected = radianTesSetResult.EndorsementPropertyTotalRequired > 0 ? radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired : radianTesSetResult.EndorsementPropertyRejected;
+                    int endorsementProcurementRejected = radianTesSetResult.EndorsementProcurementTotalRequired > 0 ? radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired : radianTesSetResult.EndorsementProcurementRejected;
+                    int endorsementGuaranteeRejected = radianTesSetResult.EndorsementGuaranteeTotalRequired > 0 ? radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired : radianTesSetResult.EndorsementGuaranteeRejected;
+                    int endorsementCancellationRejected = radianTesSetResult.EndorsementCancellationTotalRequired > 0 ? radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired : radianTesSetResult.EndorsementCancellationRejected;
+                    int guaranteeRejected = radianTesSetResult.GuaranteeTotalRequired > 0 ? radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired : radianTesSetResult.GuaranteeRejected;
+                    int electronicMandateRejected = radianTesSetResult.ElectronicMandateTotalRequired > 0 ? radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired : radianTesSetResult.ElectronicMandateRejected;
+                    int endMandateRejected = radianTesSetResult.EndMandateTotalRequired > 0 ? radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired : radianTesSetResult.EndMandateRejected;
+                    int paymentNotificationRejected = radianTesSetResult.PaymentNotificationTotalRequired > 0 ? radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired : radianTesSetResult.PaymentNotificationRejected;
+                    int circulationLimitationRejected = radianTesSetResult.CirculationLimitationTotalRequired > 0 ? radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired : radianTesSetResult.CirculationLimitationRejected;
+                    int endCirculationLimitationRejected = radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected;
+                    int reportForPaymentRejected = radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected;
+
+                    if (radianTesSetResult.ReceiptNoticeRejected > receiptNoticeRejected
+                        || radianTesSetResult.ReceiptServiceRejected > receiptServiceRejected
+                        || radianTesSetResult.ExpressAcceptanceRejected > expressAcceptanceRejected
+                        || radianTesSetResult.AutomaticAcceptanceRejected > automaticAcceptanceRejected
+                        || radianTesSetResult.RejectInvoiceRejected > rejectInvoiceRejected
+                        || radianTesSetResult.ApplicationAvailableRejected > applicationAvailableRejected
+                        || radianTesSetResult.EndorsementPropertyRejected > endorsementPropertyRejected
+                        || radianTesSetResult.EndorsementProcurementRejected > endorsementProcurementRejected
+                        || radianTesSetResult.EndorsementGuaranteeRejected > endorsementGuaranteeRejected
+                        || radianTesSetResult.EndorsementCancellationRejected > endorsementCancellationRejected
+                        || radianTesSetResult.GuaranteeRejected > guaranteeRejected
+                        || radianTesSetResult.ElectronicMandateRejected > electronicMandateRejected
+                        || radianTesSetResult.EndMandateRejected > endMandateRejected
+                        || radianTesSetResult.PaymentNotificationRejected > paymentNotificationRejected
+                        || radianTesSetResult.CirculationLimitationRejected > circulationLimitationRejected
+                        || radianTesSetResult.EndCirculationLimitationRejected > endCirculationLimitationRejected
+                        || radianTesSetResult.ReportForPaymentRejected > reportForPaymentRejected
                         )
                     {
                         SetLogger(null, "Step 19.e", radianTesSetResult.ExpressAcceptanceRejected.ToString(), "AR_010");
