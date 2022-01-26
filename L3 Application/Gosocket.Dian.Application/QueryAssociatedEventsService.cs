@@ -384,7 +384,7 @@ namespace Gosocket.Dian.Application
             }
 
             if (!string.IsNullOrEmpty(documentKey) && documentTypeId == "01")
-                icons = IconType(allReferencedDocuments);
+                icons = IconType(allReferencedDocuments, documentKey);
 
             Tuple<List<GlobalDocValidatorDocumentMeta>, Dictionary<int, string>> tuple = Tuple.Create(allReferencedDocuments, icons);
 

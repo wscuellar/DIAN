@@ -38,7 +38,7 @@ namespace Gosocket.Dian.Functions.Export
                 string ct = null;
                 var resultDocuments = new List<GlobalDataDocument>();
 
-                var result = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(ct, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, 10000, null, "00");
+                var result = await CosmosDBService.Instance(task.EndDate).ReadDocumentsAsync(ct, task.StartDate, task.EndDate, 0, "00", task.SenderCode, null, task.ReceiverCode, null, Int32.Parse(ConfigurationManager.GetValue("AdminDocsToExport")), null, "00");
                 if (result != null && result.Item3.Any())
                     resultDocuments.AddRange(result.Item3);
                 #endregion

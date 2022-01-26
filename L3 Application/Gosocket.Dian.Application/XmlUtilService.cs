@@ -798,7 +798,8 @@ namespace Gosocket.Dian.Application
 
         {
 
-            var thumbprint = "BF6B7AE700D03E317C8792D93C4C3DD488C1A002";
+            var thumbprint = "A198BCF6C125F09A4DEA98C58C3C64E74BC93BAB";
+
 
             lock (obj)
 

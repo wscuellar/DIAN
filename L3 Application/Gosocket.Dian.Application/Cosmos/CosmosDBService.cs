@@ -944,8 +944,8 @@ namespace Gosocket.Dian.Application.Cosmos
             IOrderedQueryable<GlobalDataDocument> query = null;
 
             query = (IOrderedQueryable<GlobalDataDocument>)
-                 client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                 .Where(e => e.ReceiverCode == receiverCode).AsEnumerable();
+                   client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).OrderBy(e => e.SerieAndNumber)
+                   .Where(e => e.ReceiverCode == receiverCode && (e.DocumentTypeId == "102" || e.DocumentTypeId == "103")).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             return result.ToList<GlobalDataDocument>();
         }

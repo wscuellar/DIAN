@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Functions.Others
 
 
         // Set queue name
-        private const string queueName = "activate-otherdocument-operation-input";
+        private const string queueName = "activate-otherdocument-operation-input%Slot%";
 
         [FunctionName("ActivateOtherDocumentContributor")]
 

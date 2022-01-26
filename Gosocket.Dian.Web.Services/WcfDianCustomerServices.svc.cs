@@ -271,6 +271,9 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public UploadDocumentResponse SendTestSetAsync(string fileName, byte[] contentFile, string testSetId)
         {
+            string email = "";
+            string authCode = "";
+
             try
             {
                 if (ConfigurationManager.GetValue("Environment") == "Prod")
@@ -284,9 +287,10 @@ namespace Gosocket.Dian.Web.Services
                     var response = new XmlParamsResponseTrackId { XmlFileName = fileName, ProcessedMessage = "Identificador del set de pruebas es obligatorio." };
                     return new UploadDocumentResponse { ErrorMessageList = new List<XmlParamsResponseTrackId>() { response } };
                 }
-
-                var email = GetAuthEmail();
-                var authCode = GetAuthCode();
+                
+                testSetId = testSetId.Trim();
+                email = GetAuthEmail();
+                authCode = GetAuthCode();
 
                 if (string.IsNullOrEmpty(authCode))
                 {
