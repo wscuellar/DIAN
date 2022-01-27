@@ -126,7 +126,7 @@
         <div class="tab-base">
             <div class="tab-content padding-0">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div class="panel">
+                    <div class="panel" id="panel-wrapper" data-target="#panel-wrapper">
                         <div class="panel-body padding-top-20">
                             <div class="row margin-horizontal-0">
                                 <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
@@ -306,82 +306,62 @@
              })
 
             $('#btnSave').click(function () {
-                    if ($('#OperationModeSelectedId').val()!=2) {
+                if ($('#OperationModeSelectedId').val()!=2) {
 					$('#ProviderId').append(new Option("", "1"));
 					$('#ProviderId').val("1")
-
                 }
 
-                    var form = $('#frmOthersElectronicDocuments');
-                    console.log(form);
-                    console.log(form.valid());
-                    if ($('#OperationModeSelectedId').val() == 1) {
+                var form = $('#frmOthersElectronicDocuments');
+                console.log(form);
+                console.log(form.valid());
+
+                if ($('#OperationModeSelectedId').val() == 1) {
 					$('#ErrorSoftwareName').hide()
-    					$('#ErrorPinSW').hide()
+    				$('#ErrorPinSW').hide()
 
                     if ($('#SoftwareName').val().trim() == '') {
 						$('#ErrorSoftwareName').show()
-
-                    }
-
-                    else {
-                            if ($('#PinSW').val().trim() == '') {
-							$('#ErrorPinSW').show()
-
-                        }
-
-                        else {
+                    } else {
+                        if ($('#PinSW').val().trim() == '') {
+						    $('#ErrorPinSW').show()
+                        } else {
 							$('#ErrorSoftwareName').hide()
 							$('#ErrorPinSW').hide()
-                            showLoading();
-                                form.submit();
-                                hideLoading();
-                            }
-
+                            showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                            form.submit();
+                            hideLoading("#panel-wrapper");
                         }
-                    }
 
-                else {
-					$('#ErrorProviderId').hide()
-					$('#ErrorSoftwareId').hide()
+                    }
+                } else {
+                    $('#ErrorProviderId').hide();
+                    $('#ErrorSoftwareId').hide();
 
                     if ($('#OperationModeSelectedId').val() == 2) {
-                            if ($('#ProviderId').val() == '') {
-							$('#ErrorProviderId').show()
+                        if ($('#ProviderId').val() == '') {
+                            $('#ErrorProviderId').show();
+                        } else {
+                            if ($('#SoftwareId').val() == '') {
+                                $('#ErrorSoftwareId').show();
+                            } else {
+                                $('#ErrorProviderId').hide();
+                                $('#ErrorSoftwareId').hide();
 
-                        }
-
-                        else {
-                                if ($('#SoftwareId').val() == '') {
-								$('#ErrorSoftwareId').show()
-
-                            }
-
-                            else {
-								$('#ErrorProviderId').hide()
-								$('#ErrorSoftwareId').hide()
-
-                                showLoading();
-                                    form.submit();
-                                    hideLoading();
-                                }
-
-                            }
-                        }
-
-                    else
-                        {
-                            if ($('#OperationModeSelectedId').val() == 3)
-                        {
-                                showLoading();
+                                showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
                                 form.submit();
-                                hideLoading();
+                                hideLoading("#panel-wrapper");
                             }
+                        }
+                    } else {
+                        if ($('#OperationModeSelectedId').val() == 3)
+                        {
+                            showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                            form.submit();
+                            hideLoading("#panel-wrapper");
                         }
                     }
-
-
-                });
+                }
+            });
 
             $('#ProviderId').change(function () {
                     if ('@ViewBag.softwareActive' == 'False') {
@@ -439,14 +419,14 @@
             }
             showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
                 function () {
-                    showLoading();
+                    showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
                     $.ajax({
                         url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
                         type: "POST",
                             data: { id: id, description: $("#txtCancelRegistro").val() },
                         datatype: "json",
                         success: function (result) {
-                            hideLoading();
+                            hideLoading("#panel-wrapper");
                             if (result != null) {
 
 							    if (result.Code != 200) {
@@ -480,29 +460,31 @@
                                 bootbox.alert("No se pudo realizar la Cancelación");
                         },
                         complete: function () {
-                            hideLoading();
+                            hideLoading("#panel-wrapper");
                         },
                         error: function (result) {
-                            hideLoading();
+                            hideLoading("#panel-wrapper");
                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
                             console.log(result.status + ' ' + result.statusText);
                             return false;
                         }
                     });  //ajax
                 }
-            , "", () => hideLoading('#panel-form')));
+            , "", () => hideLoading('#panel-wrapper')));
 		}
 
 
 		$('#OperationModeSelectedId').change(function ()
         {
-            $('#ContributorName').val(undefined);
-            $('#SoftwareName').val(undefined);
-            $('#SoftwareIdPr').val(undefined);
-            $('#PinSW').val(undefined);
-
             const contributorIsOfe = "@Model.ContributorIsOfe".toLowerCase() == "true",
                 isElectronicSupportDocument = "@Model.ElectronicDocumentIsSupport".toLowerCase() == "true";
+
+            if (contributorIsOfe && isElectronicSupportDocument) {
+                $('#ContributorName').val(undefined);
+                $('#SoftwareName').val(undefined);
+                $('#SoftwareIdPr').val(undefined);
+                $('#PinSW').val(undefined);
+            }
 
             const operationModeAssigned = OperationModesAsociatedInElectronicBiller
                 .find(t => t.OperationModeId == $('#OperationModeSelectedId').val());
@@ -542,7 +524,6 @@
                 }
 
             if (contributorIsOfe && isElectronicSupportDocument) {
-                console.log(operationModeAssigned);
                 if (!operationModeAssigned) return;
                 $('#ContributorName').val(operationModeAssigned.Data.ProviderCompanyName);
                 $('#SoftwareName').val(operationModeAssigned.Data.SoftwareName);
