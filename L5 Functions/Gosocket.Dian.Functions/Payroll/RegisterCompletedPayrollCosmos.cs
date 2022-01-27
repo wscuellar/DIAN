@@ -414,7 +414,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
 					};
-
+					//fechas de pago
 					var payment = objNomina.FechasPagos.Split(';');
 					var PaymentDates = new Domain.Cosmos.PaymentDateDatum[payment.Count()];
 					for (int i = 0; i < payment.Count(); i++)
