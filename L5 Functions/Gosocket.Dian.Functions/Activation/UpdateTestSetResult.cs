@@ -363,6 +363,9 @@ namespace Gosocket.Dian.Functions.Activation
                     int endCirculationLimitationRejected = radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected;
                     int reportForPaymentRejected = radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected;
 
+                    SetLogger(null, "Step 19.f", expressAcceptanceRejected + " - " + radianTesSetResult.ExpressAcceptanceTotalRequired + 
+                        " - " + radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired + " - " + radianTesSetResult.ExpressAcceptanceRejected, "AR_010");
+
                     if (radianTesSetResult.ReceiptNoticeRejected > receiptNoticeRejected
                         || radianTesSetResult.ReceiptServiceRejected > receiptServiceRejected
                         || radianTesSetResult.ExpressAcceptanceRejected > expressAcceptanceRejected
@@ -382,7 +385,7 @@ namespace Gosocket.Dian.Functions.Activation
                         || radianTesSetResult.ReportForPaymentRejected > reportForPaymentRejected
                         )
                     {
-                        SetLogger(null, "Step 19.e", expressAcceptanceRejected.ToString(), "AR_010");
+                        SetLogger(null, "Step 19.g", expressAcceptanceRejected.ToString(), "AR_010.1");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
