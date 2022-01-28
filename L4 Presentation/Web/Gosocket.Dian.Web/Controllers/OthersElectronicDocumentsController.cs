@@ -14,6 +14,7 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -245,12 +246,9 @@ namespace Gosocket.Dian.Web.Controllers
             model.ContributorName = contributor?.Name;
             model.SoftwareId = Guid.NewGuid().ToString();
             model.SoftwareIdPr = model.SoftwareId;
-            var providersList = new List<ContributorViewModel>();
-            var contributorsList = _othersDocsElecContributorService.GetTechnologicalProviders(User.ContributorId(), model.ElectronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, OtherDocElecState.Habilitado.GetDescription());
-            if (contributorsList != null)
-                providersList.AddRange(contributorsList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-            ViewBag.ListTechnoProviders = new SelectList(providersList, "Id", "Name");
 
+            var technologicalProvidersList = GetTechnologicalProvidersList(model.ElectronicDocumentId);
+            ViewBag.ListTechnoProviders = new SelectList(technologicalProvidersList, "Id", "Name");
 
             if (model.OperationModeId == 1)
             {
@@ -267,6 +265,47 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             return View(model);
+        }
+
+        private IEnumerable<ContributorViewModel> GetTechnologicalProvidersList(int electronicDocumentId)
+        {
+            bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
+            bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+
+            List<Contributor> providersList;
+            var providersListDto = new List<ContributorViewModel>();
+
+            if (!electronicDocumentIsSupport)
+            {
+                providersList = _othersDocsElecContributorService
+                    .GetTechnologicalProviders(
+                        User.ContributorId(), 
+                        electronicDocumentId, 
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, 
+                        OtherDocElecState.Habilitado.GetDescription());
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+            }
+            else
+            {
+                /*proveedores que esten habilitados y que tengan software que esté en produccion y no esté eliminado*/
+                providersList = _contributorService.GetContributorsByType((int)Domain.Common.ContributorType.Provider)
+                    .Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled && 
+                        x.Softwares.Any(t => 
+                            t.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production && !t.Deleted
+                        )
+                    ).ToList();
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+
+                if (contributorIsOfe)
+                {
+                    /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
+                     * en el modo de operación de facturación electrónica*/
+                }
+            }
+
+            return providersListDto;
         }
 
         private GlobalTestSetResult GetTestSetResult(List<GlobalTestSetResult> testSetResults, ContributorOperations operation)
@@ -694,14 +733,37 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult GetSoftwaresByContributorId(int id, int electronicDocumentId)
         {
-            var softwareList = _othersDocsElecSoftwareService.GetSoftwaresByProviderTechnologicalServices(id,
-                electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
-                OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+            bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            List<SoftwareViewModel> softwareList;
+            
+            if (!electronicDocumentIsSupport)
+            {
+                softwareList = _othersDocsElecSoftwareService
+                    .GetSoftwaresByProviderTechnologicalServices(id,
+                        electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                        {
+                            //Id = s.Id,
+                            Id = s.SoftwareId,
+                            Name = s.Name
+                        }).ToList();
+            }
+            else
+            {
+                var provider = _contributorService.Get(id);
+                softwareList = provider.SoftwaresInProduction().Select(s => new SoftwareViewModel
                 {
-                    //Id = s.Id,
-                    Id = s.SoftwareId,
+                    Id = s.Id,
                     Name = s.Name
                 }).ToList();
+
+                var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+                // se seleccionan solo los softwares que tenga aceptado su set de pruebas
+                var softwareIds = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(provider.Code)
+                    .Where(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted).Select(t => t.SoftwareId);
+
+                softwareList = softwareList.Where(s => softwareIds.Contains(s.Id.ToString())).ToList();
+            }
 
             return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
         }
@@ -709,7 +771,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult GetDataBySoftwareId(Guid SoftwareId)
         {
-            var software = _othersDocsElecSoftwareService.GetBySoftwareId(SoftwareId);
+            var software = _othersDocsElecSoftwareService.GetBySoftwareIdV2(SoftwareId);
             if (software != null)
             {
                 return Json(new
