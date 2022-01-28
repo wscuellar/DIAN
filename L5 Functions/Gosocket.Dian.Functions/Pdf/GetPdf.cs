@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Descargar Bytes de XML a partir de TrackId
                 var requestObj = new { trackId };
-                var response = Utils.Utils.DownloadXml(requestObj);
+                var response = await Utils.Utils.DownloadXmlAsync(requestObj);
                 if (!response.Success)
                     throw new Exception(response.Message);
                 var xmlBytes = Convert.FromBase64String(response.XmlBase64);
