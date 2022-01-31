@@ -11,22 +11,28 @@ namespace Gosocket.Dian.Web.Models
         public int ElectronicDocumentId { get; set; }
         public int OperationModeId { get; set; }
         public int ContributorIdType { get; set; }
-        [Required(ErrorMessage = "{0} es requerido")]
-        [Display(Name = "Proveedor tecnológico")]
-        public int ProviderId { get; set; }
+		//[Required(ErrorMessage = "{0} es requerido")]
+		//[Display(Name = "Proveedor tecnológico")]
+		public int ProviderId { get; set; }
 
-        [Required(ErrorMessage = "{0} es requerido")] 
+        //[Required(ErrorMessage = "{0} es requerido")] 
         [Display(Name = "ID del Software")]
 
         public string SoftwareId { get; set; }
 
+        
+        [Display(Name = "ID del Software")]
+
+        public string SoftwareIdPr { get; set; }
+
+
         [Display(Name = "Nombre de Software")] 
-        [Required(ErrorMessage = "{0} es requerido")]
+   
         //Es requerido cuando es softwarepropio
         public string SoftwareName { get; set; }
 
         [Display(Name = "PIN del Software")]
-        [Required(ErrorMessage = "{0} es requerido")]
+        //[Required(ErrorMessage = "{0} es requerido")]
         public string PinSW { get; set; }
         public int ModoOperacionId { get; set; }
 

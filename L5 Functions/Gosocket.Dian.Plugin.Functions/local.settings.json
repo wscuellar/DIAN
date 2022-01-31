@@ -60,6 +60,7 @@
     "ContributorInstanceCacheTimePolicyInMinutes": 1440,
 
     // Test INDRA
+    "LogStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "Environment": "Test",
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",

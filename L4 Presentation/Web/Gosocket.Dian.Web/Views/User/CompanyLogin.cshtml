@@ -5,7 +5,6 @@
 @model UserLoginViewModel
 
 @{
-    ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
     RecoverPasswordModel recoverPasswordModel = new RecoverPasswordModel();
     recoverPasswordModel.IdentificationTypesRecover = Model.IdentificationTypes;
@@ -60,6 +59,11 @@
                     <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
                 </a>
 
+                <!-- Not obliged to invoice -->
+                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
+                    <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
+                </a>
+
                 <!-- certificate -->
                 <a href="#" class="list-group-item text-center certificate-login-link">
                     <h4 class="glyphicon glyphicon-star"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)
@@ -70,7 +74,7 @@
                 </a>
             </div>
         </div>
-        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab cardsLogin"  style="display: none">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab cardsLogin" style="display: none">
 
             <div class="container-fluid" id="panel-form-login">
                 <center><a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a></center>
@@ -95,14 +99,14 @@
                     </div>
                 </div>
             </div>
-
+            <!-- company section -->
             <div class="companyLogin pxLogin">
-                <!-- company section -->
+
                 @Html.Partial("_companyLogin")
             </div>
-
+            <!-- company section -->
             <div class="userExLogin pxLogin">
-                <!-- company section -->
+
                 @Html.Partial("_userexLogin")
             </div>
 
@@ -127,7 +131,7 @@
     <script>
 
         $(document).ready(function () {
-            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordForm", recoverPasswordModel).ToString().Trim('"'))));
+            var htmlPartial = @(Html.Raw(JsonConvert.SerializeObject(Html.Partial("_forgotPasswordFormInvoice", recoverPasswordModel).ToString().Trim('"'))));
             $(".cardsLogin").show();
             if (location.href.indexOf('tlogin=1') > 0) {
                 showLoading("#panel-forma", "Validando datos", "Por favor esperar");
@@ -136,8 +140,7 @@
                 $(".companyLogin").show();
                 hideLoading("#panel-forma");
             }
-            else {
-
+            else {  
                     $(".pxLogin").hide();
 
                     $('.cCompany').click(function () {

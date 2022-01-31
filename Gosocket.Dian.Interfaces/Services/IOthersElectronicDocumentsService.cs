@@ -22,6 +22,8 @@ namespace Gosocket.Dian.Interfaces.Services
 
         OtherDocElecContributorOperations GetOtherDocElecContributorOperationBySoftwareId(Guid softwareId);
 
+        ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation, int ContributorId, int ContributorIdType, int OperationModeId);
+
         bool UpdateOtherDocElecContributorOperation(OtherDocElecContributorOperations model);
 
         OtherDocElecContributorOperations GetOtherDocElecContributorOperationById(int id);

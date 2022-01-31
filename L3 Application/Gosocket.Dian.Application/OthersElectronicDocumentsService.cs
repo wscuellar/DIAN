@@ -85,6 +85,48 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
+
+        public ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation,int ContributorId,int ContributorIdType,int OperationModeId)
+        {
+            OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId);
+            GlobalTestSetOthersDocuments testSet = null;
+            testSet = _othersDocsElecContributorService.GetTestResult(Contributor.OtherDocElecOperationModeId, Contributor.ElectronicDocumentId);
+            if (testSet == null)
+                return new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500);
+
+            if (validateOperation)
+            {
+                List<OtherDocElecContributorOperations> currentOperations =
+                    _othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
+                                                                    && !t.Deleted);
+                if (currentOperations.Any())
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
+            }
+
+            OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation != null)
+                return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1);
+
+            if (List.Results.Any(x=>x.StateSoftware=="2")|| List2.Results.Any(x => x.StateSoftware == "2"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno en pruebas", TextResources.alertType, 500);
+            if (List.Results.Any(x => x.StateSoftware == "4") || List2.Results.Any(x => x.StateSoftware == "4"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno Rechazado", TextResources.alertType, 500);
+
+
+            _othersDocsElecSoftwareService.CreateSoftware(software);
+            int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
+            
+
+            existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
+            // se asigna el nuevo set de pruebas...
+            ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, software);
+
+            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
+        }
         public bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description)
         {
             List<OtherDocElecContributor> contributors = _othersDocsElecContributorRepository.List(t => t.Id == contributorId

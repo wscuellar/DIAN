@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.TestProject2"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.IndraTestProject", "Gosocket.Dian.IndraTestProject\Gosocket.Dian.IndraTestProject.csproj", "{A25D6D03-FC61-4B20-8A11-145865A39B93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gosocket.Dian.Services.Test", "Gosocket.Dian.Services.Test\Gosocket.Dian.Services.Test.csproj", "{D3F07D4E-5244-462D-8214-6CB34B5AADA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -299,6 +301,22 @@ Global
 		{A25D6D03-FC61-4B20-8A11-145865A39B93}.Sandbox|Any CPU.Build.0 = Debug|Any CPU
 		{A25D6D03-FC61-4B20-8A11-145865A39B93}.Test|Any CPU.ActiveCfg = Debug|Any CPU
 		{A25D6D03-FC61-4B20-8A11-145865A39B93}.Test|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.DianProduction|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.DianProduction|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.DianSandbox|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.DianSandbox|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Production|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Production|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Sandbox|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Sandbox|Any CPU.Build.0 = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Test|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0}.Test|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -320,6 +338,7 @@ Global
 		{AB742B49-C0DE-4363-AC4A-C436FFFFB5B1} = {497528AC-25BB-419B-8229-3F06FF710A30}
 		{61F42A77-9C41-446B-9C1F-D3D84241BB6C} = {53F5A8F5-D0C3-4493-AAC8-7DE866386989}
 		{054F68BC-218E-4163-8A06-D56911F73F2B} = {1BA5AADA-C869-4AB4-911F-DE80E663EC05}
+		{D3F07D4E-5244-462D-8214-6CB34B5AADA0} = {63377118-1732-46F8-A1D5-015E4E436E7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {860ACAD2-0459-45A3-A7C7-633229B1C9EC}
