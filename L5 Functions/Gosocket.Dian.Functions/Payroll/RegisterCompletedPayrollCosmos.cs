@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-
+using Gosocket.Dian.DataContext;
 namespace Gosocket.Dian.Functions.Payroll
 {
 
@@ -66,7 +66,7 @@ namespace Gosocket.Dian.Functions.Payroll
 				var account = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("SoftwareByNitUrl"), new { Nit = objNomina.Emp_NIT });
 
 				//Consultas para Nombres
-				var cosmos = new Gosocket.Dian.DataContext.CosmosDbManagerPayroll();
+				var cosmos = new CosmosDbManagerPayroll();
 				var Countries = await cosmos.GetCountries();
 				var Departament = await cosmos.getDepartament();
 				var CoinType = await cosmos.getCoinType();
