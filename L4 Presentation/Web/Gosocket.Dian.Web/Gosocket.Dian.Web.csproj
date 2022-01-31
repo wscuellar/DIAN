@@ -46,9 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-	  <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-		  <HintPath>..\..\..\packages\BouncyCastle.Crypto.dll.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
-	  </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\..\..\packages\BouncyCastle.Crypto.dll.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="ExpressiveAnnotations, Version=2.7.4.0, Culture=neutral, PublicKeyToken=d3e372f3c1e83cec, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\ExpressiveAnnotations.2.9.6\lib\net45\ExpressiveAnnotations.dll</HintPath>
     </Reference>
@@ -2953,6 +2953,14 @@
     <Content Include="Views\User\_forgotPasswordForm.cshtml" />
     <Content Include="Views\Document\Payroll.cshtml" />
     <Content Include="Views\OthersElectronicDocuments\_default - Copia.cshtml" />
+    <Content Include="Views\User\NotObligedInvoice.cshtml" />
+    <Content Include="Views\User\_notObligedInvoice.cshtml" />
+    <Content Include="Views\User\_notObligedInvoicePerson.cshtml" />
+    <Content Include="Views\User\NotObligedInvoiceCompany.cshtml" />
+    <Content Include="Views\User\_companyInvoiceLogin.cshtml" />
+    <Content Include="Views\User\_userexInvoiceLogin.cshtml" />
+    <Content Include="Views\User\_forgotPasswordFormInvoice.cshtml" />
+    <Content Include="Views\Document\ElectronicDocuments.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
