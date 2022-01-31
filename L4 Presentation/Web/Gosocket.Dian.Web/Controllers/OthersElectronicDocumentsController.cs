@@ -247,7 +247,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.SoftwareId = Guid.NewGuid().ToString();
             model.SoftwareIdPr = model.SoftwareId;
 
-            var technologicalProvidersList = GetTechnologicalProvidersList(model.ElectronicDocumentId);
+            var technologicalProvidersList = GetTechnologicalProvidersList(model.ElectronicDocumentId, model.OperationModesAsociatedInElectronicBiller);
             ViewBag.ListTechnoProviders = new SelectList(technologicalProvidersList, "Id", "Name");
 
             if (model.OperationModeId == 1)
@@ -262,12 +262,12 @@ namespace Gosocket.Dian.Web.Controllers
                 model.PinSW = " ";
             }
 
-            ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault().Id);
+            ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             return View(model);
         }
 
-        private IEnumerable<ContributorViewModel> GetTechnologicalProvidersList(int electronicDocumentId)
+        private IEnumerable<ContributorViewModel> GetTechnologicalProvidersList(int electronicDocumentId, List<OperationModeElectronicBillerViewModel> operationModesAsociatedInElectronicBiller)
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
@@ -288,21 +288,23 @@ namespace Gosocket.Dian.Web.Controllers
             }
             else
             {
+                /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
+                     * en el modo de operación de facturación electrónica*/
+                var softwaresIdAssociatedInElectronicBiller = operationModesAsociatedInElectronicBiller
+                        .Where(t => t.OperationModeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
+                        .Select(t => new Guid(t.Data.SoftwareId))
+                        .ToList();
+
                 /*proveedores que esten habilitados y que tengan software que esté en produccion y no esté eliminado*/
                 providersList = _contributorService.GetContributorsByType((int)Domain.Common.ContributorType.Provider)
                     .Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled && 
                         x.Softwares.Any(t => 
-                            t.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production && !t.Deleted
+                            t.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production && !t.Deleted &&
+                            (!contributorIsOfe || softwaresIdAssociatedInElectronicBiller.Contains(t.Id))
                         )
                     ).ToList();
 
                 providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-
-                if (contributorIsOfe)
-                {
-                    /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
-                     * en el modo de operación de facturación electrónica*/
-                }
             }
 
             return providersListDto;

@@ -550,19 +550,19 @@
                 }
 
             if (contributorIsOfe && isElectronicSupportDocument) {
+                if ($('#OperationModeSelectedId').val() == 2) return;
                 if (!operationModeAssigned) return;
+                
                 $('#ContributorName').val(operationModeAssigned.Data.ProviderCompanyName);
                 $('#SoftwareName').val(operationModeAssigned.Data.SoftwareName);
                 $('#SoftwareIdPr').val(operationModeAssigned.Data.SoftwareId);
                 $('#PinSW').val(operationModeAssigned.Data.SoftwarePin);
-                //$('#ProviderId').val(operationModeAssigned.Data.SoftwarePin);
 
                 $('#ContributorName').attr('disabled', true);
                 $('#SoftwareName').attr('readonly', true);
                 $('#SoftwareIdPr').attr('readonly', true);
                 $('#SoftwareIdPr').removeAttr('disabled');
                 $('#PinSW').attr('readonly', true);
-                //$('#ProviderId').attr('disabled', true);
             }
         })
 
@@ -616,7 +616,7 @@
                 success: function (result) {
                     if (result != null) {
                         $('#UrlEventReception').val(result.url);
-                   Model    $('#SoftwareType').val(result.SoftwareType);
+                        $('#SoftwareType').val(result.SoftwareType);
                         $('#PinSW').val(result.SoftwarePIN);
                     }
                     else
