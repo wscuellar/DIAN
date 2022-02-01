@@ -102,7 +102,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					DocumentTypeId = objNomina.TipoXML == "102" ? "NI" : "NA",
 					DocumentTypeName = objNomina.TipoXML == "102" ? "Nomina Individual" : "Nota de Ajuste",
 					SubTypeDocumentId = objNomina.TipoXML == "102" ? "SN" : objNomina.TipoNota == 2 ? "E" : "R",
-					SubTypeDocumentName = objNomina.TipoXML == "102" ? "Sin Novedad" : objNomina.TipoNota == 2 ? "Nomina de ajuste" : "Reemplazar",
+					SubTypeDocumentName = objNomina.TipoXML == "102" ? "Sin Novedad" : objNomina.TipoNota == 2 ? "Eliminar" : "Reemplazar",
 					DocNumberSender = objNomina.Emp_NIT,
 					CompositeNameSender = compositeNameSender,
 					CodeEmployee = objNomina.CodigoTrabajador == null ? "" : objNomina.CodigoTrabajador,
@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Functions.Payroll
 					GenerationDate = objNomina.Info_FechaGen == null ? "" : DateTime.Parse(objNomina.Info_FechaGen.ToString()).ToString("yyyy-MM-dd"),
 					InitialDate = objNomina.FechaPagoInicio == null ? "" : (DateTime.Parse(objNomina.FechaPagoInicio.ToString()).ToString("yyyy-MM-dd")),
 					FinalDate = objNomina.FechaPagoFin == null ? "" : (DateTime.Parse(objNomina.FechaPagoFin.ToString()).ToString("yyyy-MM-dd")),
-					Salary = (objNomina.SalarioTrabajado == null ? "" : objNomina.SalarioTrabajado),
+					Salary = (objNomina.Sueldo == null ? "" : objNomina.Sueldo.ToString()),
 					TotalAccrued = objNomina.DevengadosTotal,
 					TotalDiscounts = objNomina.DeduccionesTotal,
 					PaymentReceipt = objNomina.ComprobanteTotal,
@@ -414,6 +414,35 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
 					};
+					//fechas de pago
+					var payment = objNomina.FechasPagos.Split(';');
+					var PaymentDates = new Domain.Cosmos.PaymentDateDatum[payment.Count()];
+					for (int i = 0; i < payment.Count(); i++)
+					{
+						PaymentDates[i] = new Domain.Cosmos.PaymentDateDatum();
+						PaymentDates[i].PaymentDate = DateTime.Parse(payment[i].ToString()).ToString("yyyy-MM-dd");
+					}
+
+					//Mapeo PaymentData - SecciónDatosPago
+					var InsertPaymentDataPayroll = new Domain.Cosmos.PaymentData()
+					{
+						PaymentForm = objNomina.Forma,
+						//Pendiente NamePaymentForm
+						NamePaymentForm = PaymentForm.Where(x => x.IdPaymentForm == objNomina.Forma).FirstOrDefault().CompositeName,
+						PaymentMethod = objNomina.Metodo,
+						NamePaymentMethod = PaymentMethod.Where(x => x.IdPaymentMethod == objNomina.Metodo).FirstOrDefault().CompositeName,
+						//Pendiente NamePaymentMethod
+						Bank = objNomina.Banco,
+						AccountType = objNomina.TipoCuenta,
+						AccountNumber = objNomina.NumeroCuenta,
+						PaymentDateData = new Domain.Cosmos.PaymentDateDatum[payment.Count()],
+						//PaymentDateData = PaymentDates.ToArray(),
+						//Pendiente PaymentDateData
+					};
+
+					if (PaymentDates.Count() > 0)
+						InsertPaymentDataPayroll.PaymentDateData = PaymentDates;
+
 
 					var InsertPayroll = new Domain.Cosmos.Payroll_Replace()
 					{
@@ -429,6 +458,8 @@ namespace Gosocket.Dian.Functions.Payroll
 						//Notes = InsertNotePayroll,
 						EmployerData = InsertEmployerDataPayroll,
 						WorkerData = InsertWorkerDataPayroll,
+						PaymentData = InsertPaymentDataPayroll
+
 					};
 
 					await cosmos.UpsertDocumentPayrollR(InsertPayroll);

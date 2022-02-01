@@ -355,6 +355,19 @@ namespace Gosocket.Dian.Services.Utils.Common
                 globalDocPayrolls.NumeroPred = xReemplazandoPredecesor[j].Attributes["NumeroPred"]?.InnerText;
                 globalDocPayrolls.CUNEPred = xReemplazandoPredecesor[j].Attributes["CUNEPred"]?.InnerText;
                 globalDocPayrolls.FechaGenPred = Convert.ToDateTime(xReemplazandoPredecesor[j].Attributes["FechaGenPred"]?.InnerText);
+
+                var paymentsDateNodeR = xmlDocument.SelectSingleNode(paymentsDatesPath);
+                if (paymentsDateNodeR != null)
+                {
+                    var datesList = new List<string>();
+                    XmlNodeList paymentsDatesList = paymentsDateNodeR.ChildNodes;
+                    for (int i = 0; i < paymentsDatesList.Count; i++)
+                    {
+                        datesList.Add(paymentsDatesList[i]?.InnerText);
+                    }
+                    globalDocPayrolls.FechasPagos = string.Join(";", datesList);
+                }
+
             }
             XmlNodeList xRemoveNode = xmlDocument.GetElementsByTagName("Eliminar");
             if (xRemoveNode != null && xRemoveNode.Count > 0) HasRemoveNode = true;
