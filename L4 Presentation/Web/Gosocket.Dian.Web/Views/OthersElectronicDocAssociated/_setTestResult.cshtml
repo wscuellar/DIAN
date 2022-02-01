@@ -31,6 +31,55 @@
     </div>
 </div>
 
+@if (!Model.EsElectronicDocNomina && !Model.OperationModeIsFree) {
+<div class="row">
+    <h4 class="panel-title-radian padding-0"><strong>Rango de numeración asignado</strong></h4>
+    <hr class="margin-5 margin-bottom-20" />
+
+    <div class="row">
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Prefijo", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.Prefix, defaultHtmlAttr)
+            </div>
+        </div>
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Número de resolución", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.ResolucionNumber, defaultHtmlAttr)
+            </div>
+        </div>
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Rango desde", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.NumberFrom, defaultHtmlAttr)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Rango hasta", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.NumberTo, defaultHtmlAttr)
+            </div>
+        </div>
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Fecha desde", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.CreationDate, defaultHtmlAttr)
+            </div>
+        </div>
+        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+            <div class="form-group">
+                @Html.Label("Fecha hasta", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.NumberingRange.ExpirationDate, defaultHtmlAttr)
+            </div>
+        </div>
+    </div>
+</div>
+}
+
 <div class="row">
     <h4 class="panel-title-radian padding-0"><strong>Información del Software</strong></h4>
     <hr class="margin-5 margin-bottom-20" />
@@ -71,15 +120,12 @@
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsRequired, defaultHtmlAttr)
         </div>
     </div>
-    @if (Model.EsElectronicDocNomina == true)
-    {
-        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
-            <div class="form-group">
-                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentRequired, defaultHtmlAttr)
-            </div>
+    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+        <div class="form-group">
+            @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentRequired, defaultHtmlAttr)
         </div>
-    }
+    </div>
 </div>
 
 <div class="row">
@@ -98,14 +144,10 @@
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsAcceptedRequired, defaultHtmlAttr)
         </div>
     </div>
-    @if (Model.EsElectronicDocNomina == true)
-    {
-        <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
-            <div class="form-group">
-                @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentAcceptedRequired, defaultHtmlAttr)
-            </div>
+    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+        <div class="form-group">
+            @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentAcceptedRequired, defaultHtmlAttr)
         </div>
-    }
+    </div>
 </div>
-

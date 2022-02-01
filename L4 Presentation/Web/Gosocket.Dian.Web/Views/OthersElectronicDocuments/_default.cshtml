@@ -4,7 +4,15 @@
     <div class="col-sm-6 col-md-3 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
-            @Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general" })
+			@if(!Model.ListTable.Any(t => t.StateSoftware == "En pruebas"))
+            {
+				@Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general" });
+            }
+            else
+            {
+				@Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general", @disabled = "disabled" });
+            }
+
         </div>
     </div>
     <div class="col-sm-5 padding-xs-0">

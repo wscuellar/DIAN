@@ -124,6 +124,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Para poder continuar, realiza el proceso de habilitación como Facturador Electrónico..
+        /// </summary>
+        public static string ElectronicBillerNoEnabled {
+            get {
+                return ResourceManager.GetString("ElectronicBillerNoEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?.
         /// </summary>
         public static string ElectronicInvoice_Confirm {
