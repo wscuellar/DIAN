@@ -351,12 +351,12 @@ namespace Gosocket.Dian.Web.Controllers
                 var cosmosManager = new CosmosDbManagerNumberingRange();
                 var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
                 model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
-                    numberingRange.Prefix,
-                    numberingRange.ResolutionNumber,
-                    numberingRange.NumberFrom,
-                    numberingRange.NumberTo,
-                    numberingRange.CreationDate.ToString("dd-MM-yyyy"),
-                    numberingRange.ExpirationDate.ToString("dd-MM-yyyy"));
+                    numberingRange?.Prefix??"-",
+                    numberingRange?.ResolutionNumber ?? "-",
+                    numberingRange?.NumberFrom??0,
+                    numberingRange?.NumberTo??0,
+                    numberingRange?.CreationDate.ToString("dd-MM-yyyy") ?? "-",
+                    numberingRange?.ExpirationDate.ToString("dd-MM-yyyy") ?? "-");
             }
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
