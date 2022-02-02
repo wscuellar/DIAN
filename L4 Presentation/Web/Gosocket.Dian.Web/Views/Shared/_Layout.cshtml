@@ -313,29 +313,26 @@
                                         <ul class="collapse">
                                             <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
                                         </ul>
-                                        <!--<ul class="collapse">
+                                        <ul class="collapse">
                                             <!--Rol Administrador-->
-                                        @*@if (User.IsInAnyRole("Administrador", "Super"))
-                                            {-->
+                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                            {
                                                 <!--RADIAN Administrador-->
-                                                <!--if (User.IsInAnyRole("Administrador", "Super"))
+                                                if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
                                                     <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
-                                                }-->
+                                                }
                                                 <!--RADIAN Administrador-->
-                                                <!--<li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
                                                 <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
                                                 <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
                                                 <li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
                                                 <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
                                                 <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
-                                                if (new string[] { "Local", "Hab", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
-                                                {
-                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Gestionar Solicitudes Recepción por Lote - Asíncrono</a></li>
-                                                }
+                                                
                                             }
-                                            Rol Administrador
-                                            Rol Facturador and Proveedor
+                                            @*Rol Administrador
+                                            Rol Facturador and Proveedor*@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
                                                 if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
@@ -359,7 +356,7 @@
                                                 if (User.ShowTestSet())
                                                 {
                                                     <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("ConfigureTestSet", "Contributor", new { contributorId = User.ContributorId() })">Set de Pruebas</a></li>
-                                                }-->*@
+                                                }
 
 
                                         @*if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
@@ -367,7 +364,7 @@
                                                     <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
                                                 }
 
-                                            }*@
+                                            }
                                         <!--Rol Facturador and Proveedor-->
                                         <!--Rol Proveedor-->
                                         <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
@@ -388,10 +385,10 @@
                                             {
                                                 <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
                                                     <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
-                                                </li>
+                                                </li>*@
                                             }
 
-                                        </ul>-->
+                                        </ul>
                                     </li>
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
@@ -460,6 +457,12 @@
                                                  @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                                  {
                                                      <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                 }
+                                             </ul>
+                                             <ul>
+                                                @if (new string[] { "Local", "Hab", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                 {
+                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Gestionar Solicitudes Recepción por Lote - Asíncrono</a></li>
                                                  }
                                              </ul>
                                             <ul class="collapse">
