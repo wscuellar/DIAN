@@ -154,8 +154,8 @@ namespace Gosocket.Dian.Web
 				{
 					{ goToInvoicer = (currentContributor.ContributorOperations.FirstOrDefault(x => x.OperationModeId == (int)Domain.Common.OperationMode.Free && !x.Deleted) != null); }
 				}
-				 if (otherCont.Any(x => x.State == "Registrado") || otherCont.Any(x => x.State == "Habilitado"))
-				{
+                if (otherCont.Any(x => x.State == "Registrado") || otherCont.Any(x => x.State == "Habilitado") || otherCont.Any(x => x.State == "En pruebas"))
+                {
 					if (!goToInvoicer)
 					{
 						foreach (var item in otherCont)
