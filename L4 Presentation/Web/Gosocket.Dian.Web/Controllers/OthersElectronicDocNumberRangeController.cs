@@ -21,21 +21,26 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int otherDocElecContributorId)
         {
             var cosmosManager = new CosmosDbManagerNumberingRange();
-
             NumberRangeTableViewModel model = new NumberRangeTableViewModel();
+            model.NumberRanges = new List<NumberRangeViewModel>();
+
             var result = cosmosManager.GetNumberingRangeByOtherDocElecContributor(otherDocElecContributorId);
-            
             var data = result;
-            model.NumberRanges = new List<NumberRangeViewModel>()
+            if(data != null)
             {
-               new NumberRangeViewModel{
-                    Serie = data.Prefix,
-                    ResolutionNumber = data.ResolutionNumber,
-                    FromNumber = data.NumberFrom,
-                    ToNumber = data.NumberTo,
-                    ValidDateNumberFrom = data.CreationDate.ToString("dd-MM-yyyy"),
-                    ValidDateNumberTo = data.ExpirationDate.ToString("dd-MM-yyyy")
-            }};
+                model.NumberRanges
+                    .Add(
+                        new NumberRangeViewModel
+                        {
+                            Serie = data.Prefix,
+                            ResolutionNumber = data.ResolutionNumber,
+                            FromNumber = data.NumberFrom,
+                            ToNumber = data.NumberTo,
+                            ValidDateNumberFrom = data.CreationDate.ToString("dd-MM-yyyy"),
+                            ValidDateNumberTo = data.ExpirationDate.ToString("dd-MM-yyyy")
+                        }
+                    );
+            }
 
             model.SearchFinished = true;
             ViewBag.CurrentPage = Navigation.NavigationEnum.HFE;
