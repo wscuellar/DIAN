@@ -1,17 +1,16 @@
-﻿using Gosocket.Dian.Services.Cuds;
+﻿using Gosocket.Dian.Services.Cude;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Gosocket.Dian.Services.Test
 {
     [TestClass]
-    public class TestValidateCuds
+    public class TestValidateCude
     {
+        /*
         [TestMethod]
-        public void Should_ValidateCuds_Ok()
+        public void Should_ValidateCude_Ok()
         {
             Console.WriteLine("Nuevo Test");
             var invoiceDsTest = new DocumentoSoporte()
@@ -40,28 +39,26 @@ namespace Gosocket.Dian.Services.Test
             
             Assert.AreEqual(cudsEsperado, invoiceDsTest.ToCombinacionToCuds().EncryptSHA384());
         }
-
+        */
         [TestMethod]
-        public void Should_Reader_Xml_Cuds()
+        public void Should_Reader_Xml_Cude()
         { 
-            var xmlEjemplo = @"\\EjemplosXml\\Documento Soporte Invoice05 26-11-2021-firmado-SHA384.xml";
+            var xmlEjemplo = @"\\EjemplosXml\\Ejemplo_POS_DIAN.xml";
             var pathFull = ObtenerPath(xmlEjemplo);
             var xmlBytes=File.ReadAllBytes(pathFull);
             Console.WriteLine(pathFull);
             Console.WriteLine("Validar carga de bytes");
             Assert.IsNotNull(xmlBytes);
-            var invoceParser = new XmlToDocumentoSoporteParser();
-            var invoceDs=invoceParser.Parser(xmlBytes);
-            Assert.IsNotNull(invoceDs);
-            invoceDs.SoftwarePin = "37346";
-            Console.WriteLine($"Cuds-{invoceDs.Cuds}");
-            Console.WriteLine(invoceDs.ToCombinacionToCuds("*"));
-            Console.WriteLine(invoceDs.Cuds);
-            Console.WriteLine(invoceDs.ToCombinacionToCuds().EncryptSHA384());
-            //Assert.AreEqual(invoceDs.Cuds, invoceDs.ToCombinacionToCuds().EncryptSHA384());
+            var invoceParser = new XmlToDocumentoEquivalenteParser();
+            var invoceDe=invoceParser.Parser(xmlBytes);
+            Assert.IsNotNull(invoceDe);
+            invoceDe.SoftwarePin = "37346";
+            Console.WriteLine($"Cude-{invoceDe.Cude}");
+            Console.WriteLine(invoceDe.ToCombinacionToCude("*"));
+            Console.WriteLine(invoceDe.Cude);
+            Console.WriteLine(invoceDe.ToCombinacionToCude().EncryptSHA384());
 
         }
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;
     }
-    
 }
