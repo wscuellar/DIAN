@@ -136,27 +136,6 @@ function ConfirmExec(operation, param, operationCancel) {
     }
 }
 
-
-function ConfirmExec2(operation, param, operationCancel) {
-    return {
-        del: {
-            label: "Aceptar",
-            className: "btn-radian-default",
-            callback: function () {
-                param ? operation(param) : operation();
-                operationClick = false;
-            }
-        },
-        del1: {
-            label: "Cancelar",
-            className: "btn-radian-default btn-radian-success",
-            callback: function () {
-                $(' .close').click() 
-            }
-        }
-    }
-}
-
 function AlertExec(operation) {
     return {
         del: {
