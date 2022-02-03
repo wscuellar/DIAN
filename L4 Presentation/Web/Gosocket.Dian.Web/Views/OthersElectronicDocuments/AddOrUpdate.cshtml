@@ -266,7 +266,7 @@
                                 onEscape: () => {  }
                  });
             }
-
+			$('#PinSW').val('')
 			$('#btnSave').click(function () {
 
 				if ($('#OperationModeSelectedId').val()!=2) {
@@ -381,7 +381,7 @@
                 }
 
                 $("#dialogcancelarregistro").modal('hide');
-                showConfirmation("¿Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName) ?", ConfirmExec(
+			showConfirmation("¿Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName) ?", ConfirmExec2(
                         function () {
 
                             $.ajax({
