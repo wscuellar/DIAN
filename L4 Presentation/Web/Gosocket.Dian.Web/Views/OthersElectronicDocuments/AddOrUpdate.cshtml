@@ -257,6 +257,26 @@
                         onEscape: () => {  }});
             </text>
         }
+
+		function ConfirmExec2(operation, param, operationCancel) {
+			return {
+				del: {
+					label: "Aceptar",
+					className: "btn-radian-default",
+					callback: function () {
+						param ? operation(param) : operation();
+						operationClick = false;
+					}
+				},
+				del1: {
+					label: "Cancelar",
+					className: "btn-radian-default btn-radian-success",
+					callback: function () {
+						$(' .close').click()
+					}
+				}
+			}
+		}
         $(document).ready(function ($) {
             if ('@ViewBag.softwareActive'=='True'){
 
@@ -436,25 +456,7 @@
 			}
 
 
-		function ConfirmExec2(operation, param, operationCancel) {
-			return {
-				del: {
-					label: "Aceptar",
-					className: "btn-radian-default",
-					callback: function () {
-						param ? operation(param) : operation();
-						operationClick = false;
-					}
-				},
-				del1: {
-					label: "Cancelar",
-					className: "btn-radian-default btn-radian-success",
-					callback: function () {
-						$(' .close').click()
-					}
-				}
-			}
-		}
+		
 
 		$('#OperationModeSelectedId').change(function ()
 		{
