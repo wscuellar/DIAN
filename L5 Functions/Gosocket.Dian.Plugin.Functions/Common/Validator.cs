@@ -7636,7 +7636,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Evento Cudeq
 
-        public ValidateListResponse ValidateCudeq(DocumentoEquivalente invoceCuds, RequestObjectCude data)
+        public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCuds, RequestObjectCude data)
         {
             DateTime startDate = DateTime.UtcNow;
             data.TrackId = data.TrackId.ToLower();

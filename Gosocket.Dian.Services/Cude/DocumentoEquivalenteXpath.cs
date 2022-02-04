@@ -36,11 +36,30 @@
         /// <summary>
         /// /Invoice/cac:TaxTotal/ cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID = 01
         /// </summary>
-        public const string CodImp1 = "//*[local-name()='TaxTotal']/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']";
+        public const string CodImp1 = "//*[local-name()='TaxTotal'][1]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']";
         /// <summary>
         /// "/Invoice/cac:TaxTotal/cbc:TaxAmount"
         /// </summary>
-        public const string ValImp1 = "//*[local-name()='TaxTotal']/*[local-name()='TaxAmount']";
+        public const string ValImp1 = "//*[local-name()='TaxTotal'][1]/*[local-name()='TaxAmount']";
+
+        /// <summary>
+        /// /Invoice/cac:TaxTotal[y]/ cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID = 04
+        /// </summary>
+        public const string CodImp2 = "//*[local-name()='TaxTotal'][2]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']";
+        /// <summary>
+        /// /Invoice/cac:TaxTotal[y]/cbc:TaxAmount
+        /// </summary>
+        public const string ValImp2 = "//*[local-name()='TaxTotal'][2]/*[local-name()='TaxAmount']";
+
+        /// <summary>
+        /// /Invoice/cac:TaxTotal[y]/ cac:TaxSubtotal/cac:TaxCategory/cac:TaxScheme/cbc:ID = 03
+        /// </summary>
+        public const string CodImp3 = "//*[local-name()='TaxTotal'][3]/*[local-name()='TaxSubtotal']/*[local-name()='TaxCategory']/*[local-name()='TaxScheme']/*[local-name()='ID']";
+        /// <summary>
+        /// /Invoice/cac:TaxTotal[y]/cbc:TaxAmount
+        /// </summary>
+        public const string ValImp3 = "//*[local-name()='TaxTotal'][3]/*[local-name()='TaxAmount']";
+
         /// <summary>
         /// "/Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount"
         /// </summary>

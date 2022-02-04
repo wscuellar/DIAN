@@ -832,7 +832,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var parser = new XmlToDocumentoEquivalenteParser();
             var modelCude = parser.Parser(xmlBytes);
             var validator = new Validator();
-            validateResponses.Add(validator.ValidateCudeq(modelCude, cude));
+            validateResponses.Add(validator.ValidateCude(modelCude, cude));
             return validateResponses;
         }
 

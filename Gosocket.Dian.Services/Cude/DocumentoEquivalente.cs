@@ -80,14 +80,14 @@
         public string SoftwareId { get; set; }
 
         /// <summary>
-        /// Combinación de acuerdo al Anexo Técnico DSNO_V1_1
-        /// NumFac + FecFac + HorFac + ValDS + CodImp + ValImp + ValTot + NitOFE + NumAdq + Software-PIN + TipoAmbie
+        /// Combinación de acuerdo al Anexo Técnico DOCUMENTO EQUIVALENTE POS-FINAL 2 V1.0
+        /// NumFac + FecFac + HorFac + ValFac + CodImp1 + ValImp1+ CodImp2 + ValImp2+ CodImp3 + ValImp3 + ValTot + NitOFE + NumAdq + Software-PIN + TipoAmb
         /// </summary>
         /// <param name="sep"></param>
         /// <returns></returns>
         public string ToCombinacionToCude(string sep = "")
         {
-            return $"{NumFac}{sep}{FecFac}{sep}{HorFac}{sep}{ValFac}{sep}{CodImp1}{sep}{ValImp1}{sep}{ValTol}{sep}{NumOfe}{sep}{NitAdq}{sep}{SoftwarePin}{sep}{TipoAmb}";
+            return $"{NumFac}{sep}{FecFac}{sep}{HorFac}{sep}{ValFac}{sep}{CodImp1}{sep}{ValImp1}{sep}{CodImp2}{sep}{ValImp2}{sep}{CodImp3}{sep}{ValImp3}{sep}{ValTol}{sep}{NumOfe}{sep}{NitAdq}{sep}{SoftwarePin}{sep}{TipoAmb}";
 
         }
 

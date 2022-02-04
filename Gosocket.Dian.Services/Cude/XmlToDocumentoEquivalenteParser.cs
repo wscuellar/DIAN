@@ -26,6 +26,10 @@ namespace Gosocket.Dian.Services.Cude
                     invoiceDs.ValFac = SelectSingleNode(DocumentoEquivalenteXpath.ValFac);
                     invoiceDs.CodImp1 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp1);
                     invoiceDs.ValImp1 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp1);
+                    invoiceDs.CodImp2 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp2);
+                    invoiceDs.ValImp2 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp2);
+                    invoiceDs.CodImp3 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp3);
+                    invoiceDs.ValImp3 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp3);
                     invoiceDs.ValTol = SelectSingleNode(DocumentoEquivalenteXpath.ValTol);
                     invoiceDs.NumOfe = SelectSingleNode(DocumentoEquivalenteXpath.NumOfe);
                     invoiceDs.NitAdq = SelectSingleNode(DocumentoEquivalenteXpath.NumAdq);
