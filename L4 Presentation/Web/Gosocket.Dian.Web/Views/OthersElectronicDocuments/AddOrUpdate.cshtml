@@ -327,6 +327,7 @@
 								$('#ErrorSoftwareId').show()
 							}
 							else {
+								$('input[name="SoftwareName"]').val($('#SoftwareId option:selected').text());
 								$('#ErrorProviderId').hide()
 								$('#ErrorSoftwareId').hide()
 								form.submit();
