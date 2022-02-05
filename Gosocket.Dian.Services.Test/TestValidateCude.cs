@@ -8,7 +8,7 @@ namespace Gosocket.Dian.Services.Test
     [TestClass]
     public class TestValidateCude
     {
-        
+
         [TestMethod]
         public void Should_ValidateCude_Ok()
         {
@@ -33,13 +33,13 @@ namespace Gosocket.Dian.Services.Test
             };
 
             var composicionCudsEsperada = "00000000012020-10-2414:04:35-05:0015000.00010.00040.00030.0017000.009003730768355990123451";
-            Console.WriteLine($"Combinación Cude e:{composicionCudsEsperada}");
-            Console.WriteLine($"Combinación Cude r:{invoiceDsTest.ToCombinacionToCude()}");
+            Console.WriteLine($"Combinación Cude esperado:{composicionCudsEsperada}");
+            Console.WriteLine($"Combinación Cude real    :{invoiceDsTest.ToCombinacionToCude()}");
             Assert.AreEqual(composicionCudsEsperada, invoiceDsTest.ToCombinacionToCude());
             
             var cudsEsperado = "92c29e6b17a584f7a67ea53e5666980bde27bc1c2b2aefbc8ba42366ff11a246982ad27075e623429efd5ed1fbcbb57b";
-            Console.WriteLine($"Cuds e:{cudsEsperado}");
-            Console.WriteLine($"Cuds r:{invoiceDsTest.ToCombinacionToCude().EncryptSHA384()}");
+            Console.WriteLine($"Cuds esperado:{cudsEsperado}");
+            Console.WriteLine($"Cuds real    :{invoiceDsTest.ToCombinacionToCude().EncryptSHA384()}");
             
             Assert.AreEqual(cudsEsperado, invoiceDsTest.ToCombinacionToCude().EncryptSHA384());
         }
@@ -56,12 +56,12 @@ namespace Gosocket.Dian.Services.Test
             var invoceParser = new XmlToDocumentoEquivalenteParser();
             var invoceDe=invoceParser.Parser(xmlBytes);
             Assert.IsNotNull(invoceDe);
-            invoceDe.SoftwarePin = "37346";
+            invoceDe.SoftwarePin = "12345";
             Console.WriteLine($"Cude-{invoceDe.Cude}");
             Console.WriteLine(invoceDe.ToCombinacionToCude("*"));
             Console.WriteLine(invoceDe.Cude);
             Console.WriteLine(invoceDe.ToCombinacionToCude().EncryptSHA384());
-
+            //Assert.AreEqual(invoceDe.Cude, invoceDe.ToCombinacionToCude().EncryptSHA384());
         }
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;
     }

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:sts="dian:gov:co:facturaelectronica:Structures-2-1" xmlns:xades141="http://uri.etsi.org/01903/v1.4.1#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd">
+	<ext:UBLExtensions>
+		<ext:UBLExtension>
+			<ext:ExtensionContent>
+				<sts:DianExtensions>
+					<sts:InvoiceControl>
+						<sts:InvoiceAuthorization>18764011817377</sts:InvoiceAuthorization> <!--autorizacion de numeracion-->
+						<sts:AuthorizationPeriod>
+							<cbc:StartDate>2021-03-24</cbc:StartDate>
+							<cbc:EndDate>2022-03-24</cbc:EndDate>
+						</sts:AuthorizationPeriod>
+						<sts:AuthorizedInvoices>
+							<sts:Prefix>PE</sts:Prefix>
+							<sts:From>1</sts:From>
+							<sts:To>5000</sts:To>
+						</sts:AuthorizedInvoices>
+					</sts:InvoiceControl>
+					<sts:InvoiceSource>
+						<cbc:IdentificationCode listAgencyID="6" listAgencyName="United Nations Economic Commission for Europe" listSchemeURI="urn:oasis:names:specification:ubl:codelist:gc:CountryIdentificationCode-2.1">CO</cbc:IdentificationCode>
+					</sts:InvoiceSource>
+					<sts:SoftwareProvider>
+						<sts:ProviderID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="2" schemeName="31">900850255</sts:ProviderID> <!--nit del fabricante del software-->
+						<sts:SoftwareID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)">bc7f0a71-a622-46dd-95fb-1e82b8cf2ded</sts:SoftwareID>
+					</sts:SoftwareProvider>
+					<sts:SoftwareSecurityCode schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)">3f53e78cd359adbc3b0f87ade50097cedd36ee44f94ac0f4a5876a90da9bba41f3954c0b9f263fe53fe4d35c8a5fa2ce</sts:SoftwareSecurityCode>
+					<sts:AuthorizationProvider>
+						<sts:AuthorizationProviderID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="4" schemeName="31">800197268</sts:AuthorizationProviderID>
+					</sts:AuthorizationProvider>
+					<sts:QRCode>NumFac: FE621 FecFac: 2021-05-24 HorFac: 15:05:40-05:00 NitFac: 900850255 DocAdq: 6762414 ValFac: 32016.81 ValIva: 6083.19 ValOtroIm: 0.00 ValTolFac: 38100.00 CUFE: 84743518e8fe75d41509c50f559e9554173ca92dc9bc5a0e75c2cb3f2ed69f0dc318ee1a467b4966d4bb7ce588c2eec7</sts:QRCode>
+				</sts:DianExtensions>
+			</ext:ExtensionContent>
+		</ext:UBLExtension>
+		<ext:UBLExtension>
+		    <ext:ExtensionContent>
+			  <FabricanteSoftware>
+			    <InformacionDelFabricanteDelSoftware>
+				    <Name>NombreApellido</Name> <!--nombre y apellidos del fabricante del software-->
+					<Value>Erick Rico</Value>
+					<Name>RazonSocial</Name> <!--Razon social del fabricante del software-->
+					<Value>Chia.sas</Value>
+					<Name>NombreSoftware</Name> <!--nombre del software-->
+					<Value>ThePos</Value>
+				</InformacionDelFabricanteDelSoftware>
+			  </FabricanteSoftware>
+			</ext:ExtensionContent>
+		</ext:UBLExtension>
+	    <ext:UBLExtension>
+		    <ext:ExtensionContent>
+			  <VeneficiosComprador>
+			   <InformacionBeneficiosComprador>
+			        <Name>Codigo</Name> <!--Codigo del comprador-->
+					<Value>79907759</Value>
+					<Name>NombresApellidos</Name> <!--Nombres y apellidos del comprador-->
+					<Value>Edison Hernandez</Value>
+				    <Name>Puntos</Name> <!--Cantidad de Puntos acumulados por el comprador-->
+					<Value>100</Value>
+				</InformacionBeneficiosComprador>
+			  </VeneficiosComprador>
+			</ext:ExtensionContent>
+		</ext:UBLExtension>
+		<ext:UBLExtension>
+		    <ext:ExtensionContent>
+			  <PuntoVenta>
+			   <InformacionCajaVenta>
+			        <Name>PlacaCaja</Name> <!--Placa de inventario de la Caja-->
+					<Value>No Registrada</Value>
+					<Name>UbicaciónCaja</Name> <!--Ubicación de la caja ALMACEN-->
+					<Value>Gilbarco Encore 4 L1 - Mangue ra 17 AC</Value>
+			        <Name>Cajero</Name> <!--Datos del Cajero o Vendedor-->
+					<Value>nombre del cajero</Value>
+					<Name>TipoCaja</Name> <!--Tipo de Caja-->
+					<Value>Caja de apoyo</Value>
+				    <Name>CódigoVenta</Name> <!--Código de la Venta-->
+					<Value>743992</Value>
+					<Name>SubTotal</Name> <!--Subtotal de la venta-->
+					<Value>729900</Value>
+				</InformacionCajaVenta>
+			  </PuntoVenta>
+			</ext:ExtensionContent>
+		</ext:UBLExtension>
+	</ext:UBLExtensions>
+	<cbc:UBLVersionID>UBL 2.1</cbc:UBLVersionID>
+	<cbc:CustomizationID>1</cbc:CustomizationID>
+	<cbc:ProfileID>DIAN 2.1</cbc:ProfileID>
+	<cbc:ProfileExecutionID>1</cbc:ProfileExecutionID>
+	<cbc:ID>PE001</cbc:ID>  <!--consecutivo-->
+	<cbc:UUID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="1" schemeName="CUPE-SHA384">84743518e8fe75d41509c50f559e9554173ca92dc9bc5a0e75c2cb3f2ed69f0dc318ee1a467b4966d4bb7ce588c2eec7</cbc:UUID>
+	<cbc:IssueDate>2021-05-24</cbc:IssueDate> <!--fecha de expedicion-->
+	<cbc:IssueTime>15:05:40-05:00</cbc:IssueTime>  <!--hora de expedicion-->
+	<cbc:DueDate>2021-05-24</cbc:DueDate>
+	<cbc:InvoiceTypeCode name="Factura tipo punto de venta POS">POS</cbc:InvoiceTypeCode> <!--identificador del documento-->
+	<cbc:DocumentCurrencyCode>COP</cbc:DocumentCurrencyCode>
+	<cbc:LineCountNumeric>1</cbc:LineCountNumeric>
+	<cac:AccountingSupplierParty>
+	<cbc:AdditionalAccountID>1</cbc:AdditionalAccountID> <!--1= Persona Juridica, 2= Persona Natural, 3= NO IDENTIFICADO-->
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>Serviparking Virgen del Carmen</cbc:Name> <!--nombre y apellidos del emisor-->
+			</cac:PartyName>
+			<cac:PartyTaxScheme>
+				<cbc:RegistrationName>Serviparking Virgen del Carmen</cbc:RegistrationName> <!--razon social del emisor-->
+				<cbc:CompanyID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="2" schemeName="31">900850255</cbc:CompanyID> <!--nit del emisor-->
+				<cbc:TaxLevelCode>O-23</cbc:TaxLevelCode>  <!--calidad del retenedor-->
+				<cac:RegistrationAddress>
+					<cbc:ID>25473</cbc:ID>
+					<cbc:CityName>MOSQUERA</cbc:CityName>
+					<cbc:PostalZone>250040</cbc:PostalZone>
+					<cbc:CountrySubentity/>
+					<cbc:CountrySubentityCode>25</cbc:CountrySubentityCode>
+					<cac:AddressLine>
+						<cbc:Line>Frente a Pastas Doria Al lado de Bodegas San Carlos III</cbc:Line>
+					</cac:AddressLine>
+					<cac:Country>
+						<cbc:IdentificationCode>CO</cbc:IdentificationCode>
+						<cbc:Name languageID="es">Colombia</cbc:Name>
+					</cac:Country>
+				</cac:RegistrationAddress>
+				<cac:TaxScheme>
+					<cbc:ID>01</cbc:ID>
+					<cbc:Name>IVA</cbc:Name>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<cbc:RegistrationName>Serviparking Virgen del Carmen</cbc:RegistrationName>
+				<cbc:CompanyID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="2" schemeName="31">900850255</cbc:CompanyID>
+				<cac:CorporateRegistrationScheme>
+					<cbc:ID>PE</cbc:ID>
+				</cac:CorporateRegistrationScheme>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Telephone>3112336735</cbc:Telephone>
+				<cbc:ElectronicMail>.</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+	<cac:AccountingCustomerParty>
+	<cbc:AdditionalAccountID>2</cbc:AdditionalAccountID>
+		<cac:Party>
+		<cac:PartyIdentification>
+		    <cbc:ID schemeName="13" schemeID="">222222222222</cbc:ID>
+		</cac:PartyIdentification>
+         <cac:PartyName>
+            <cbc:Name>Usuario Final</cbc:Name>
+         </cac:PartyName>
+		 <cac:PartyTaxScheme>
+				<cbc:RegistrationName>Usuario Final</cbc:RegistrationName> <!--Usuario Final valor fijo-->
+				<cbc:CompanyID schemeAgencyID="195" schemeAgencyName="CO, DIAN (Dirección de Impuestos y Aduanas Nacionales)" schemeID="" schemeName="13">222222222222</cbc:CompanyID> <!--nit del adquiriente valor fijo-->
+				<cac:TaxScheme>
+					<cbc:ID>01</cbc:ID> <!--valor fijo-->
+					<cbc:Name>IVA</cbc:Name><!--valor fijo-->
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+      </cac:Party>
+	</cac:AccountingCustomerParty>
+	<cac:PaymentMeans>
+		<cbc:ID>1</cbc:ID>
+		<cbc:PaymentMeansCode>10</cbc:PaymentMeansCode>  <!--medio de pago-->
+		<cbc:PaymentDueDate>2021-05-24</cbc:PaymentDueDate>
+	</cac:PaymentMeans>
+	<cac:PaymentExchangeRate>
+		<cbc:SourceCurrencyCode>COP</cbc:SourceCurrencyCode>
+		<cbc:SourceCurrencyBaseRate>1.00</cbc:SourceCurrencyBaseRate>
+		<cbc:TargetCurrencyCode>COP</cbc:TargetCurrencyCode>
+		<cbc:TargetCurrencyBaseRate>1.00</cbc:TargetCurrencyBaseRate>
+		<cbc:CalculationRate>1.00</cbc:CalculationRate>
+		<cbc:Date>2021-05-24</cbc:Date>
+	</cac:PaymentExchangeRate>
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:Percent>19.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>01</cbc:ID>
+					<cbc:Name>IVA</cbc:Name>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:Percent>8.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>01</cbc:ID>
+					<cbc:Name>IVA</cbc:Name>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:Percent>19.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>04</cbc:ID>
+					<cbc:Name>INC</cbc:Name>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:Percent>8.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>04</cbc:ID>
+					<cbc:Name>INC</cbc:Name>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<cac:LegalMonetaryTotal>
+		<cbc:LineExtensionAmount currencyID="COP">32016.81</cbc:LineExtensionAmount>
+		<cbc:TaxExclusiveAmount currencyID="COP">32016.81</cbc:TaxExclusiveAmount>
+		<cbc:TaxInclusiveAmount currencyID="COP">38100.00</cbc:TaxInclusiveAmount>
+		<cbc:ChargeTotalAmount currencyID="COP">0.00</cbc:ChargeTotalAmount>
+		<cbc:PrepaidAmount currencyID="COP">0.00</cbc:PrepaidAmount>
+		<cbc:PayableAmount currencyID="COP">38100.00</cbc:PayableAmount>  <!--valor total-->
+	</cac:LegalMonetaryTotal>
+	<cac:InvoiceLine>
+		<cbc:ID>1</cbc:ID>
+		<cbc:InvoicedQuantity unitCode="94">1</cbc:InvoicedQuantity>  <!--cantidad-->   <!--las bolsas se informarian como un producto-->
+		<cbc:LineExtensionAmount currencyID="COP">32016.8100</cbc:LineExtensionAmount>
+		<cbc:FreeOfChargeIndicator>false</cbc:FreeOfChargeIndicator>
+		<cac:AllowanceCharge> <!--Grupo para informar RECARGOS o DESCUENTOS-->
+			<cbc:ID>1</cbc:ID>
+			<cbc:ChargeIndicator>false</cbc:ChargeIndicator> <!--si el valos de este elemento es TRUE significa que es un recargo--> <!--si el valos de este elemento es FALSE significa que es un descuento-->
+			<cbc:AllowanceChargeReason>Descuento por cliente frecuente</cbc:AllowanceChargeReason>
+			<cbc:MultiplierFactorNumeric>10</cbc:MultiplierFactorNumeric>
+			<cbc:Amount currencyID="COP">10000</cbc:Amount>
+			<cbc:BaseAmount currencyID="COP">100000.00</cbc:BaseAmount>
+		</cac:AllowanceCharge>
+		<cac:TaxTotal>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxSubtotal>
+				<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+				<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+				<cac:TaxCategory>
+					<cbc:Percent>19.00</cbc:Percent>
+					<cac:TaxScheme>
+						<cbc:ID>01</cbc:ID>
+						<cbc:Name>IVA</cbc:Name>  <!--impuestos IVA, INC-->
+					</cac:TaxScheme>
+				</cac:TaxCategory>
+			</cac:TaxSubtotal>
+		</cac:TaxTotal>
+		<cac:Item>
+			<cbc:Description>Servicio de Parqueadero - Placa SVA566</cbc:Description>  <!--descripcion del bien o el servicio-->
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="999">1</cbc:ID>
+			</cac:StandardItemIdentification>
+		</cac:Item>
+		<cac:Price>
+			<cbc:PriceAmount currencyID="COP">32016.81</cbc:PriceAmount>  <!--valor unitario-->
+			<cbc:BaseQuantity unitCode="94">1.00</cbc:BaseQuantity>  <!--unidad-->
+		</cac:Price>
+	</cac:InvoiceLine>
+	<cac:InvoiceLine>
+		<cbc:ID>1</cbc:ID>
+		<cbc:InvoicedQuantity unitCode="94">1</cbc:InvoicedQuantity>  <!--cantidad-->   <!--las bolsas se informarian como un producto-->
+		<cbc:LineExtensionAmount currencyID="COP">100</cbc:LineExtensionAmount>
+		<cac:TaxTotal>
+			<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+			<cac:TaxSubtotal>
+				<cbc:TaxableAmount currencyID="COP">32016.81</cbc:TaxableAmount>
+				<cbc:TaxAmount currencyID="COP">6083.19</cbc:TaxAmount>
+				<cac:TaxCategory>
+					<cbc:Percent>19.00</cbc:Percent>
+					<cac:TaxScheme>
+						<cbc:ID>01</cbc:ID>
+						<cbc:Name>IVA</cbc:Name>  <!--impuestos IVA, INC-->
+					</cac:TaxScheme>
+				</cac:TaxCategory>
+			</cac:TaxSubtotal>
+		</cac:TaxTotal>
+		<cac:Item>
+			<cbc:Description>Bolsa</cbc:Description>  <!--descripcion del bien o el servicio-->
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="999">1</cbc:ID>
+			</cac:StandardItemIdentification>
+		</cac:Item>
+		<cac:Price>
+			<cbc:PriceAmount currencyID="COP">32016.81</cbc:PriceAmount>  <!--valor unitario-->
+			<cbc:BaseQuantity unitCode="94">1.00</cbc:BaseQuantity>  <!--unidad-->
+		</cac:Price>
+	</cac:InvoiceLine>
+</Invoice>
