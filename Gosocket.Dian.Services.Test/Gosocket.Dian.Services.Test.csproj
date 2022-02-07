@@ -50,6 +50,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncryptionExtensions.cs" />
+    <Compile Include="TestValidateCude.cs" />
     <Compile Include="TestValidateCuds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,6 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="EjemplosXml\Documento Soporte Invoice05 26-11-2021-firmado-SHA384.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EjemplosXml\Ejemplo_POS_DIAN.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
