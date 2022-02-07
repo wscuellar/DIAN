@@ -47,6 +47,13 @@ namespace Gosocket.Dian.Functions.Utils
             return JsonConvert.DeserializeObject<ResponseDownloadXml>(result);
         }
 
+        public static async Task <ResponseDownloadXml> DownloadXmlAsync<T>(T requestObj)
+        {
+            var response = await ConsumeApiAsync(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+            var result = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ResponseDownloadXml>(result);
+        }
+
         public static string ConvertImageToBase64String(Image image, System.Drawing.Imaging.ImageFormat format)
         {
             using (MemoryStream ms = new MemoryStream())
