@@ -44,61 +44,61 @@ namespace Gosocket.Dian.Functions.Office
                     if (TableName != null)
                         table.TableName = TableName;
 
-                    using (ExcelWorksheet objWorksheet = objExcelPackage.Workbook.Worksheets.Add(table.TableName))
+                    ExcelWorksheet objWorksheet = objExcelPackage.Workbook.Worksheets.Add(table.TableName);
+                    
+
+
+                    objWorksheet.Cells["A1"].LoadFromDataTable(table, true);
+
+                    if (aligments != null)
+                        for (int column = 1; column <= aligments.Count; column++)
+                            objWorksheet.Column(column).Style.HorizontalAlignment = aligments[column - 1];
+
+                    for (int column = 1; column <= table.Columns.Count; column++)
+                        objWorksheet.Column(column).AutoFit();
+
+                    if (hiddenColumns != null)
+                        for (int column = 1; column <= hiddenColumns.Count; column++)
+                            objWorksheet.Column(column).Hidden = hiddenColumns[column - 1];
+
+                    if (hyperLinkColumns != null)
                     {
+                        var styleName = "HyperLinkStyle";
+                        HyperLinkStyle = objWorksheet.Workbook.Styles.CreateNamedStyle(styleName);
+                        HyperLinkStyle.Style.Font.UnderLine = true;
+                        HyperLinkStyle.Style.Font.Color.SetColor(Color.Blue);
 
-
-                        objWorksheet.Cells["A1"].LoadFromDataTable(table, true);
-
-                        if (aligments != null)
-                            for (int column = 1; column <= aligments.Count; column++)
-                                objWorksheet.Column(column).Style.HorizontalAlignment = aligments[column - 1];
-
-                        for (int column = 1; column <= table.Columns.Count; column++)
-                            objWorksheet.Column(column).AutoFit();
-
-                        if (hiddenColumns != null)
-                            for (int column = 1; column <= hiddenColumns.Count; column++)
-                                objWorksheet.Column(column).Hidden = hiddenColumns[column - 1];
-
-                        if (hyperLinkColumns != null)
+                        int row = 1;
+                        foreach (var item in hyperLinkColumns)
                         {
-                            var styleName = "HyperLinkStyle";
-                            HyperLinkStyle = objWorksheet.Workbook.Styles.CreateNamedStyle(styleName);
-                            HyperLinkStyle.Style.Font.UnderLine = true;
-                            HyperLinkStyle.Style.Font.Color.SetColor(Color.Blue);
 
-                            int row = 1;
-                            foreach (var item in hyperLinkColumns)
+                            //var cell = objWorksheet.Cells[row + 1, item.Item1];
+                            //cell.Hyperlink = new Uri(item.Item2);
+                            //cell.Value = item.Item3;
+                            using (ExcelRange rng = objWorksheet.Cells[row + 1, item.Item1, row + 1, item.Item1])
                             {
-
-                                //var cell = objWorksheet.Cells[row + 1, item.Item1];
-                                //cell.Hyperlink = new Uri(item.Item2);
-                                //cell.Value = item.Item3;
-                                using (ExcelRange rng = objWorksheet.Cells[row + 1, item.Item1, row + 1, item.Item1])
-                                {
-                                    rng.Formula = "HYPERLINK(\"" + item.Item2 + "\" , \"" + item.Item3 + "\")";
-                                    rng.StyleName = styleName;
-                                }
-                                row++;
+                                rng.Formula = "HYPERLINK(\"" + item.Item2 + "\" , \"" + item.Item3 + "\")";
+                                rng.StyleName = styleName;
                             }
-                        }
-
-                        objWorksheet.Cells.Style.Font.SetFromFont(new Font("Calibri", 10));
-
-                        var reference = $"A1:{ExcelColumnIndexToName((uint)table.Columns.Count - 1)}1";
-                        using (ExcelRange objRange = objWorksheet.Cells[reference])
-                        {
-                            objRange.Style.Font.Bold = true;
-                            objRange.Style.Font.Color.SetColor(HeaderTextColor);
-                            //objRange.Style.Font.Size = 11;
-                            objRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                            objRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                            objRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            objRange.Style.Fill.BackgroundColor.SetColor(HeaderBgColor);
-
+                            row++;
                         }
                     }
+
+                    objWorksheet.Cells.Style.Font.SetFromFont(new Font("Calibri", 10));
+
+                    var reference = $"A1:{ExcelColumnIndexToName((uint)table.Columns.Count - 1)}1";
+                    using (ExcelRange objRange = objWorksheet.Cells[reference])
+                    {
+                        objRange.Style.Font.Bold = true;
+                        objRange.Style.Font.Color.SetColor(HeaderTextColor);
+                        //objRange.Style.Font.Size = 11;
+                        objRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        objRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                        objRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        objRange.Style.Fill.BackgroundColor.SetColor(HeaderBgColor);
+
+                    }
+                    
                     return objExcelPackage.GetAsByteArray();
                     
                 }
