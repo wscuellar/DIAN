@@ -147,8 +147,8 @@ namespace Gosocket.Dian.Application
         public Contributor GetByCode(string code)
         {            
             using (var context = new SqlDBContext())
-            {
-                return context.Contributors.Include("AcceptanceStatus").AsNoTracking().FirstOrDefault(p => p.Code == code);
+            {                
+                return context.Contributors.Include("AcceptanceStatus").Include("ContributorOperations").AsNoTracking().FirstOrDefault(p => p.Code == code);
             }
         }
 
