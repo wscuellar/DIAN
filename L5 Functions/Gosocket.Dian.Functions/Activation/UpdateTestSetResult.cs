@@ -364,7 +364,9 @@ namespace Gosocket.Dian.Functions.Activation
                     int reportForPaymentRejected = radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected;
 
                     SetLogger(null, "Step 19.f", expressAcceptanceRejected + " - " + radianTesSetResult.ExpressAcceptanceTotalRequired + 
-                        " - " + radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired + " - " + radianTesSetResult.ExpressAcceptanceRejected, "AR_010");
+                        " - " + radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired + " - " + radianTesSetResult.ExpressAcceptanceRejected + 
+                        " - " + paymentNotificationRejected + " - " + radianTesSetResult.PaymentNotificationTotalRequired + " - " +
+                        " - " + radianTesSetResult.PaymentNotificationTotalAcceptedRequired + " - " + radianTesSetResult.PaymentNotificationRejected, "AR_010");
 
                     if (radianTesSetResult.ReceiptNoticeRejected > receiptNoticeRejected
                         || radianTesSetResult.ReceiptServiceRejected > receiptServiceRejected
