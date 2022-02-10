@@ -47,7 +47,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var collection = "Payroll";
-                Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
+                Uri collectionLink = UriFactory.CreateDocumentCollectionUri("PayrollElectronic", collection);
                 var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
@@ -63,7 +63,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var collection = "Payroll_E";
-                Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
+                Uri collectionLink = UriFactory.CreateDocumentCollectionUri("PayrollElectronic", collection);
                 var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
@@ -79,7 +79,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var collection = "Payroll_R";
-                Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
+                Uri collectionLink = UriFactory.CreateDocumentCollectionUri("PayrollElectronic", collection);
                 var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
             }
