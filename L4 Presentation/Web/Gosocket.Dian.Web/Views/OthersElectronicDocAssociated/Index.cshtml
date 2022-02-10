@@ -255,13 +255,13 @@
                                         <button type="button"
                                                 class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
                                                 id="btnReiniciarSerPruebas">
-                                            Reiniciar set de pruebas
+                                            Reiniciar SET de pruebas
                                         </button>
 
                                         <button type="button"
                                                 class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
                                                 id="btnSincronizarAProduccion">
-                                            Sincronizar a producción
+                                            Sincronizar a Producción
                                         </button>
                                     </div>
                                 </div>
