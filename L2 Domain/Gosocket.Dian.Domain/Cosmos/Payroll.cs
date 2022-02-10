@@ -612,7 +612,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public Guid id { get; set; }
 
         public string ResolutionNumber { get; set; }
-        public DateTimeOffset ExpirationDate { get; set; }
+        public string ExpirationDate { get; set; }
         public long OtherDocElecContributorOperation { get; set; }
     }
 
@@ -641,6 +641,8 @@ namespace Gosocket.Dian.Domain.Cosmos
 	}
 	public partial class List
 	{
+		[JsonProperty("PartitionKey")]
+		public long PartitionKey { get; set; }
 		[JsonProperty("IdList")]
 		public long IdList { get; set; }
 

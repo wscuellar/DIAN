@@ -94,7 +94,7 @@ namespace Gosocket.Dian.Functions.Payroll
 
 				if (objNomina.TipoXML == "102")
 				{
-					if (objNomina.CUNENov != "")
+					if (!string.IsNullOrEmpty( objNomina.CUNENov))
 					{
 						Novedad = "Con novedad";
 						CuneNov = objNomina.CUNENov;
