@@ -1,6 +1,6 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @{
-	ViewBag.Title = "Gráfico del set pruebas";
+	ViewBag.Title = "Gráfico del SET Pruebas";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -40,12 +40,19 @@
 						<div id="setTestDetails"></div>
 					</figure>
 				</div><div class="row margin-horizontal-0 margin-top-20">
-						  <div class="panel-footer text-right">
+                          <div class="panel-footer text-right">
 
 
-						  	<a class="btn btn-success btn-radian-success" href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })">Detalles</a>
-						  	@Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
-						  </div>
+                              <a class="btn btn-success btn-radian-success" href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })">Detalles</a>
+                              @if (Model.EsElectronicDocNomina)
+                              {
+                                  @Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+                            }
+                            else
+                            {
+                              @Html.ActionLink("Cerrar", "GetSetTestResult", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+                            }
+                          </div>
 				</div>
 			</div>
 		</div>
