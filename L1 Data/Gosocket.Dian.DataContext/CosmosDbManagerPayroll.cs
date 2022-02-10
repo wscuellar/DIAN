@@ -16,7 +16,7 @@ namespace Gosocket.Dian.DataContext
     {
         private static readonly string endpointUrl = ConfigurationManager.GetValue("CosmosDbEndpointUrl");
         private static readonly string authorizationKey = ConfigurationManager.GetValue("CosmosDbAuthorizationKey");
-        private static readonly string databaseId = ConfigurationManager.GetValue("CosmosDbDataBaseIdPayroll");
+        
         private static readonly string collectionId = ConfigurationManager.GetValue("CosmosDbCollectionIDPayroll_all");
         private static readonly ConnectionPolicy connectionPolicy = new ConnectionPolicy { UserAgentSuffix = " samples-net/3" };
 
@@ -30,6 +30,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var collection = "Payroll_All";
+                var databaseId = "PayrollElectronic";
                 Uri collectionLink = UriFactory.CreateDocumentCollectionUri(databaseId, collection);
                 var response = await client.CreateDocumentAsync(collectionLink, document);
                 return true;
