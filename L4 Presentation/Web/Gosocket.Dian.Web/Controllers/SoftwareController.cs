@@ -249,7 +249,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult View(Guid id)
         {
-            Software software = softwareService.Get(id);
+            Software software = softwareService.GetAndContributorAndAcceptanceStatus(id);
             var model = new SoftwareViewModel
             {
                 Deleted = software.Deleted,
@@ -279,7 +279,7 @@ namespace Gosocket.Dian.Web.Controllers
         [CustomRoleAuthorization(CustomRoles = "Administrador, Super")]
         public ActionResult Edit(Guid id)
         {
-            Software software = softwareService.Get(id);
+            Software software = softwareService.GetAndContributorAndAcceptanceStatus(id);
             var model = new SoftwareViewModel
             {
                 Deleted = software.Deleted,
