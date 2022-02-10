@@ -167,7 +167,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var result = new List<ContractType>();
-                var sql = "Select * from List c where  c.IdList=3 ";
+                var sql = "Select * from List c where  c.IdList=3  and c.PartitionKey=3";
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
                   sql)
@@ -209,7 +209,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=4 ";
+                var sql = "Select * from List c where  c.IdList=4  and c.PartitionKey=4";
                 var result = new List<DocumentTypes>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -236,7 +236,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=9 ";
+                var sql = "Select * from List c where  c.IdList=9  and c.PartitionKey=9 ";
                 var result = new List<SubWorkerType>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -262,7 +262,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=8 ";
+                var sql = "Select * from List c where  c.IdList=8  and c.PartitionKey=8";
                 var result = new List<WorkerType>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -288,7 +288,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=7 ";
+                var sql = "Select * from List c where  c.IdList=7  and c.PartitionKey=7";
                 var result = new List<PeriodPayroll>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -316,7 +316,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=5 ";
+                var sql = "Select * from List c where  c.IdList=5  and c.PartitionKey=5";
                 var result = new List<PaymentForm>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -342,7 +342,7 @@ namespace Gosocket.Dian.DataContext
         {
             try
             {
-                var sql = "Select * from List c where  c.IdList=6 ";
+                var sql = "Select * from List c where  c.IdList=6   and c.PartitionKey=6";
                 var result = new List<PaymentMethod>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),

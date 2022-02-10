@@ -641,6 +641,8 @@ namespace Gosocket.Dian.Domain.Cosmos
 	}
 	public partial class List
 	{
+		[JsonProperty("PartitionKey")]
+		public long PartitionKey { get; set; }
 		[JsonProperty("IdList")]
 		public long IdList { get; set; }
 
