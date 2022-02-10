@@ -1,5 +1,5 @@
 ﻿using Gosocket.Dian.Domain.Cosmos;
-
+using Newtonsoft.Json;
 using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
@@ -365,58 +365,58 @@ namespace Gosocket.Dian.DataContext
                 return new List<PaymentMethod>();
             }
         }
-        public async Task<List<NumberingRange>> getNumberingRange()
+        public async Task<List<NumberingRangeCos>> getNumberingRange()
         {
             try
             {
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
 
-                var DepartamentData = new List<NumberingRange>();
-                IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
+                var DepartamentData = new List<NumberingRangeCos>();
+                IDocumentQuery<NumberingRangeCos> QueryData = client.CreateDocumentQuery<NumberingRangeCos>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), queryOptions).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
+                var result = (QueryData).ExecuteNextAsync<NumberingRangeCos>().Result;
                 return result.ToList();
             }
             catch (Exception e)
             {
-                return new List<NumberingRange>();
+                return new List<NumberingRangeCos>();
             }
         }
 
-        public async Task<List<NumberingRange>> GetNumberingRangeByTypeDocument(string prefijo, double range,string tipo,string account)
+        public async Task<List<NumberingRangeCos>> GetNumberingRangeByTypeDocument(string prefijo, double range,string tipo,string account)
         {
             try
             {
 
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
                 string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '"+ account+"'";
-                var DepartamentData = new List<NumberingRange>();
-                IDocumentQuery<NumberingRange> QueryData = client.CreateDocumentQuery<NumberingRange>(
+                var DepartamentData = new List<NumberingRangeCos>();
+                IDocumentQuery<NumberingRangeCos> QueryData = client.CreateDocumentQuery<NumberingRangeCos>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
-                var result = (QueryData).ExecuteNextAsync<NumberingRange>().Result;
+                var result = (QueryData).ExecuteNextAsync<NumberingRangeCos>().Result;
                 return result.ToList();
 
 
             }
             catch (Exception e)
             {
-                return new List<NumberingRange>();
+                return new List<NumberingRangeCos>();
 
             }
         }
 
-        public async Task<NumberingRange> ConsumeNumberingRange(string IdNumberingRange)
+        public async Task<NumberingRangeCos> ConsumeNumberingRange(string IdNumberingRange)
         {
-            var ret = new List<NumberingRange>();
+            var ret = new List<NumberingRangeCos>();
             string sql = "SELECT * FROM c where  c.id='"+IdNumberingRange+"'" ;
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-            IDocumentQuery<NumberingRange> query = client.CreateDocumentQuery<NumberingRange>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"),sql).AsDocumentQuery();
+            IDocumentQuery<NumberingRangeCos> query = client.CreateDocumentQuery<NumberingRangeCos>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"),sql).AsDocumentQuery();
 
             while (query.HasMoreResults)
-                    ret.AddRange(await query.ExecuteNextAsync<NumberingRange>());
+                    ret.AddRange(await query.ExecuteNextAsync<NumberingRangeCos>());
             if (ret.FirstOrDefault().CurrentNumber > ret.FirstOrDefault().NumberTo)
                     return null;
-                NumberingRange result = ret.FirstOrDefault();
+            NumberingRangeCos result = ret.FirstOrDefault();
                 Int64 currentValue = Int64.Parse(result.CurrentNumber.ToString());
                 if (currentValue <= result.NumberTo)
                 {
@@ -430,5 +430,62 @@ namespace Gosocket.Dian.DataContext
             return null;
         }
 
+    }
+    public partial class NumberingRangeCos
+    {
+        [JsonProperty("PartitionKey")]
+        public string PartitionKey { get; set; }
+
+        [JsonProperty("DocumentKey")]
+        public string DocumentKey { get; set; }
+
+        [JsonProperty("AccountId")]
+        public Guid AccountId { get; set; }
+
+        [JsonProperty("IDNumberingRange")]
+        public long IdNumberingRange { get; set; }
+
+        [JsonProperty("IdDocumentTypePayroll")]
+        public string IdDocumentTypePayroll { get; set; }
+
+        [JsonProperty("DocumentTypePayroll")]
+        public string DocumentTypePayroll { get; set; }
+
+        [JsonProperty("Prefix")]
+        public string Prefix { get; set; }
+
+        [JsonProperty("NumberFrom")]
+        public long NumberFrom { get; set; }
+
+        [JsonProperty("NumberTo")]
+        public long NumberTo { get; set; }
+
+        [JsonProperty("CurrentNumber")]
+        public long CurrentNumber { get; set; }
+
+        [JsonProperty("TypeXML")]
+        public object TypeXml { get; set; }
+
+        [JsonProperty("Current")]
+        public string Current { get; set; }
+
+        [JsonProperty("N102")]
+        public string N102 { get; set; }
+
+        [JsonProperty("N103")]
+        public string N103 { get; set; }
+
+        [JsonProperty("State")]
+        public long State { get; set; }
+
+        [JsonProperty("CreationDate")]
+        public DateTime CreationDate { get; set; }
+
+        [JsonProperty("id")]
+        public Guid id { get; set; }
+
+        public string ResolutionNumber { get; set; }
+        public string ExpirationDate { get; set; }
+        public long OtherDocElecContributorOperation { get; set; }
     }
 }
