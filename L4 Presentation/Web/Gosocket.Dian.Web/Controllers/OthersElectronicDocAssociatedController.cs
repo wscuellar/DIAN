@@ -357,6 +357,8 @@ namespace Gosocket.Dian.Web.Controllers
                     numberingRange?.NumberTo??0,
                     numberingRange?.CreationDate.ToString("dd-MM-yyyy") ?? "-",
                     numberingRange?.ExpirationDate.ToString("dd-MM-yyyy") ?? "-");
+                model.GTestSetOthersDocumentsResult.StartDate = numberingRange?.CreationDate.DateTime;
+                model.GTestSetOthersDocumentsResult.EndDate = numberingRange?.ExpirationDate.DateTime;
             }
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
