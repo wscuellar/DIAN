@@ -612,7 +612,7 @@ namespace Gosocket.Dian.Domain.Cosmos
 		public Guid id { get; set; }
 
         public string ResolutionNumber { get; set; }
-        public DateTimeOffset ExpirationDate { get; set; }
+        public string ExpirationDate { get; set; }
         public long OtherDocElecContributorOperation { get; set; }
     }
 
