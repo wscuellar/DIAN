@@ -109,8 +109,7 @@ namespace Gosocket.Dian.Web
 
     // Configure the application sign-in manager which is used in this application.
     public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
-    {
-        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+    {        
         public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
             : base(userManager, authenticationManager)
         {
@@ -128,7 +127,7 @@ namespace Gosocket.Dian.Web
             if (string.IsNullOrEmpty(user.ContributorCode))
                 return current;
 
-            
+            var dianAuthTableManager = new TableManager("AuthToken");
             var auth = dianAuthTableManager.Find<AuthToken>(user.Code, user.ContributorCode);
 
             Contributor currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
