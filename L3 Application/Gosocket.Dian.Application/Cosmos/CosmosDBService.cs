@@ -1206,7 +1206,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
 
                 operation.Telemetry.Properties.Add("RUs", rus);
-
+                operation.Telemetry.Success = true;
                 telemetryClient.StopOperation(operation);
             }
         }
