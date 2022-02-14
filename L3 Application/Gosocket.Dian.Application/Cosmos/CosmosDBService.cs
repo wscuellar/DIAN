@@ -1183,6 +1183,7 @@ namespace Gosocket.Dian.Application.Cosmos
         {
             IOperationHolder<DependencyTelemetry> operation = null;
             string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
+            telemetryClient.TrackTrace($"trackCosmos={trackCosmos}",SeverityLevel.Information);
             if ("true".Equals(trackCosmos))
             {
                 operation = telemetryClient.StartOperation<DependencyTelemetry>(name);
