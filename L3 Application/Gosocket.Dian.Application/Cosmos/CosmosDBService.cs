@@ -2,6 +2,9 @@
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Infrastructure;
 using LinqKit;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
@@ -31,6 +34,13 @@ namespace Gosocket.Dian.Application.Cosmos
 
         private static readonly string environment = ConfigurationManager.GetValue("Environment");
         private static DocumentClient client = new DocumentClient(new Uri(endpointUrl), authorizationKey);
+
+
+        private static readonly TelemetryConfiguration config = TelemetryConfiguration.CreateDefault();
+        private static readonly TelemetryClient telemetryClient = new TelemetryClient(config);
+
+
+
         public Database Database { get; set; }
 
         private static Dictionary<string, CosmosDBService> instances = new Dictionary<string, CosmosDBService>();
@@ -217,7 +227,7 @@ namespace Gosocket.Dian.Application.Cosmos
             {
                 MaxItemCount = 1000,
                 EnableCrossPartitionQuery = true,
-                RequestContinuation = null
+                //RequestContinuation = null
             };
 
             var partitionKeys = GeneratePartitionKeys(model.LastDateTimeUpdate, model.UtcNow);
@@ -225,11 +235,18 @@ namespace Gosocket.Dian.Application.Cosmos
 
             do
             {
+                
+                IOperationHolder <DependencyTelemetry> operation=StartOperation("FACELCosmosQuery_1");
+                var start = DateTime.UtcNow;
+                
+
                 query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                         .Where(e => partitionKeys.Contains(e.PartitionKey) && e.GenerationTimeStamp >= model.LastDateTimeUpdate).AsDocumentQuery();
                 var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
                 options.RequestContinuation = result.ResponseContinuation;
                 documents.AddRange(result.ToList());
+
+                StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
 
             } while (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults);
             return documents;
@@ -248,11 +265,17 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
+            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_2");
+            var start = DateTime.UtcNow;
+
             query = (IOrderedQueryable<GlobalDataDocument>)
                  client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                  .Where(e => e.PartitionKey == partitionKey
                  && e.DocumentKey == documentKey).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+
+            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+
             return result.FirstOrDefault();
         }
 
@@ -268,13 +291,25 @@ namespace Gosocket.Dian.Application.Cosmos
             {
                 filter.ContinuationToken = null;
             }
+            FeedOptions options;
 
-            var options = new FeedOptions()
+            if (string.IsNullOrEmpty(filter.ContinuationToken))
             {
-                MaxItemCount = filter.ResultMaxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = filter.ContinuationToken,
-            };
+                options = new FeedOptions()
+                {
+                    MaxItemCount = filter.ResultMaxItemCount,
+                    EnableCrossPartitionQuery = true
+                };
+            }
+            else
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = filter.ResultMaxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = filter.ContinuationToken
+                };
+            }
 
             var predicate = PredicateBuilder.New<GlobalDataDocument>();
 
@@ -300,9 +335,14 @@ namespace Gosocket.Dian.Application.Cosmos
             var resultDocs = new List<GlobalDataDocument>();
             while (query.AsDocumentQuery().HasMoreResults)
             {
+                IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_3");
+                var start = DateTime.UtcNow;
+
                 var result = query.AsDocumentQuery().ExecuteNextAsync<GlobalDataDocument>().Result;
                 resultDocs.AddRange(SaveRest(result.GetEnumerator()));
                 ct = result.ResponseContinuation;
+
+                StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
             }
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, ct, resultDocs.ToList());
@@ -436,14 +476,29 @@ namespace Gosocket.Dian.Application.Cosmos
             string collectionName = GetCollectionName(to.Value);
             string collectionLink = collections[collectionName].SelfLink;
 
-            FeedOptions options = new FeedOptions()
+            FeedOptions options;
+            if (string.IsNullOrEmpty(continuationToken))
             {
-                MaxItemCount = maxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = continuationToken
-            };
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true
+                };
+            }
+            else
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = continuationToken
+                };
+            }
 
             IOrderedQueryable<GlobalDataDocument> query = null;
+
+            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_4");
+            var start = DateTime.UtcNow;
 
             if (pks != null && !string.IsNullOrEmpty(documentKey))
             {
@@ -477,6 +532,9 @@ namespace Gosocket.Dian.Application.Cosmos
             }
 
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            
+            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
 
@@ -496,13 +554,26 @@ namespace Gosocket.Dian.Application.Cosmos
                                                List<string> pks = null,
                                                int radianStatus = 0)
         {
-            FeedOptions options = new FeedOptions()
-            {
-                MaxItemCount = maxItemCount,
-                EnableCrossPartitionQuery = true,
-                RequestContinuation = continuationToken
-            };
+            FeedOptions options;
 
+            if (string.IsNullOrEmpty(continuationToken))
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true
+
+                };
+            }
+            else
+            {
+                options = new FeedOptions()
+                {
+                    MaxItemCount = maxItemCount,
+                    EnableCrossPartitionQuery = true,
+                    RequestContinuation = continuationToken
+                };
+            }
             string collectionName = GetCollectionName(to.Value);
             string collectionLink = collections[collectionName].SelfLink;
 
@@ -830,10 +901,16 @@ namespace Gosocket.Dian.Application.Cosmos
                     predicate = predicate.And(g => g.Events.Any(e => radianStatusFilter.Contains(e.Code)));
             }
 
+            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_0");
+            var start = DateTime.UtcNow;
+
+
             query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
-            result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();           
             List<GlobalDataDocument> globalDocuments = result.ToList();
+            
+            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
                     result.ResponseContinuation,
@@ -943,11 +1020,102 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
+            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_5");
+            var start = DateTime.UtcNow;
+
+
             query = (IOrderedQueryable<GlobalDataDocument>)
                    client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options).OrderBy(e => e.SerieAndNumber)
                    .Where(e => e.ReceiverCode == receiverCode && (e.DocumentTypeId == "102" || e.DocumentTypeId == "103")).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
-            return result.ToList<GlobalDataDocument>();
+            
+            var lista = result.ToList<GlobalDataDocument>();
+
+            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+
+            return lista;
+        }
+
+
+        public async Task<int> CountDocumentsAsync(DateTime? from,
+                                                    DateTime? to,
+                                                    int status,
+                                                    string documentTypeId,
+                                                    string senderCode,
+                                                    string serieAndNumber,
+                                                    string receiverCode,
+                                                    string providerCode,
+                                                    string referenceType,
+                                                    List<string> pks = null)
+        {
+
+            if (!from.HasValue || !to.HasValue)
+            {
+                from = to.Value.AddMonths(-1);
+                to = DateTime.Now.Date;
+            }
+
+            int fromNumber = int.Parse(from.Value.ToString("yyyyMMdd"));
+            int toNumber = int.Parse(to.Value.ToString("yyyyMMdd"));
+            string documentTypeOption1 = "";
+            string documentTypeOption2 = "";
+
+            switch (documentTypeId)
+            {
+                case "01": documentTypeOption1 = "1"; documentTypeOption2 = "1"; break;
+                case "02": documentTypeOption1 = "2"; documentTypeOption2 = "2"; break;
+                case "03": documentTypeOption1 = "3"; documentTypeOption2 = "3"; break;
+                case "07": documentTypeOption1 = "7"; documentTypeOption2 = "91"; break;
+                case "08": documentTypeOption1 = "8"; documentTypeOption2 = "92"; break;
+            }
+
+            string referenceTypeOption1 = "";
+            string referenceTypeOption2 = "";
+
+            switch (referenceType)
+            {
+                case "07": referenceTypeOption1 = "7"; referenceTypeOption2 = "91"; break;
+                case "08": referenceTypeOption1 = "8"; referenceTypeOption2 = "92"; break;
+            }
+
+            string collectionName = GetCollectionName(to.Value);
+            string collectionLink = collections[collectionName].SelfLink;
+
+            FeedOptions options = new FeedOptions()
+            {
+
+                EnableCrossPartitionQuery = true
+
+            };
+
+
+            List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+
+            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_6");
+            var start = DateTime.UtcNow;
+
+            var query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
+            .Where(
+                e => partitionKeys.Contains(e.PartitionKey)
+                && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
+                && (status == 0 || e.ValidationResultInfo.Status == status)
+                && (documentTypeId == "00"
+                    || e.DocumentTypeId == documentTypeId
+                    || e.DocumentTypeId == documentTypeOption1
+                    || e.DocumentTypeId == documentTypeOption2)
+                && (referenceType == "00"
+                    || e.References.Any(r => r.DocumentTypeId == referenceType)
+                    || e.References.Any(r => r.DocumentTypeId == referenceTypeOption1)
+                    || e.References.Any(r => r.DocumentTypeId == referenceTypeOption2))
+                && (senderCode == null || e.SenderCode == senderCode)
+                && (serieAndNumber == null || e.SerieAndNumber == serieAndNumber)
+                && (receiverCode == null || e.ReceiverCode == receiverCode)
+                && (providerCode == null || e.TechProviderInfo.TechProviderCode == providerCode)
+            );
+            int res = await query.CountAsync();
+
+            StopOperation(operation, start, query.ToString(), "ND");
+            return res;
         }
 
         #region Utils
@@ -1002,6 +1170,47 @@ namespace Gosocket.Dian.Application.Cosmos
                 return new Guid(hashBytes);
             }
         }
+
+        private static List<string> GetChunks(string value, int chunkLength)
+        {
+            var res = new List<string>();
+            int count = (value.Length / chunkLength) + (value.Length % chunkLength > 0 ? 1 : 0);
+            Enumerable.Range(0, count).ToList().ForEach(f => res.Add(value.Skip(f * chunkLength).Take(chunkLength).Select(z => z.ToString()).Aggregate((a, b) => a + b)));
+            return res;
+        }
+
+        private static IOperationHolder<DependencyTelemetry> StartOperation(string name)
+        {
+            IOperationHolder<DependencyTelemetry> operation = null;
+            string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
+            if ("true".Equals(trackCosmos))
+            {
+                operation = telemetryClient.StartOperation<DependencyTelemetry>(name);
+            }
+            return operation;
+        }
+        private static void StopOperation(IOperationHolder<DependencyTelemetry> operation, DateTime start, string queryString, string rus)
+        {
+            string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
+            if ("true".Equals(trackCosmos) && operation != null)
+            {
+                //hay limites en tamaño en appinsithgs
+                List<string> lstQuerys = GetChunks(queryString, 8100);
+
+                int k = 1;
+                foreach (var queryPart in lstQuerys)
+                {
+                    operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+                }
+                operation.Telemetry.Type = "Cost";
+                operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+
+                operation.Telemetry.Properties.Add("RUs", rus);
+
+                telemetryClient.StopOperation(operation);
+            }
+        }
+
     }
 
     #region Models
