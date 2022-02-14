@@ -236,7 +236,7 @@ namespace Gosocket.Dian.Application.Cosmos
             do
             {
                 
-                IOperationHolder <DependencyTelemetry> operation=StartOperation("FACELCosmosQuery_1");
+                
                 var start = DateTime.UtcNow;
                 
 
@@ -246,7 +246,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 options.RequestContinuation = result.ResponseContinuation;
                 documents.AddRange(result.ToList());
 
-                StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+                TrackOperation("FACELCosmosQuery_1", start, query.ToString(), result.RequestCharge.ToString());
 
             } while (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults);
             return documents;
@@ -265,7 +265,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
-            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_2");
+            
             var start = DateTime.UtcNow;
 
             query = (IOrderedQueryable<GlobalDataDocument>)
@@ -274,7 +274,7 @@ namespace Gosocket.Dian.Application.Cosmos
                  && e.DocumentKey == documentKey).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
 
-            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation("FACELCosmosQuery_2", start, query.ToString(), result.RequestCharge.ToString());
 
             return result.FirstOrDefault();
         }
@@ -335,14 +335,14 @@ namespace Gosocket.Dian.Application.Cosmos
             var resultDocs = new List<GlobalDataDocument>();
             while (query.AsDocumentQuery().HasMoreResults)
             {
-                IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_3");
+                
                 var start = DateTime.UtcNow;
 
                 var result = query.AsDocumentQuery().ExecuteNextAsync<GlobalDataDocument>().Result;
                 resultDocs.AddRange(SaveRest(result.GetEnumerator()));
                 ct = result.ResponseContinuation;
 
-                StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+                TrackOperation("FACELCosmosQuery_3", start, query.ToString(), result.RequestCharge.ToString());
             }
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, ct, resultDocs.ToList());
@@ -497,7 +497,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
-            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_4");
+            
             var start = DateTime.UtcNow;
 
             if (pks != null && !string.IsNullOrEmpty(documentKey))
@@ -533,7 +533,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
             
-            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation("FACELCosmosQuery_4", start, query.ToString(), result.RequestCharge.ToString());
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
@@ -901,7 +901,7 @@ namespace Gosocket.Dian.Application.Cosmos
                     predicate = predicate.And(g => g.Events.Any(e => radianStatusFilter.Contains(e.Code)));
             }
 
-            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_0");
+            
             var start = DateTime.UtcNow;
 
 
@@ -910,7 +910,7 @@ namespace Gosocket.Dian.Application.Cosmos
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();           
             List<GlobalDataDocument> globalDocuments = result.ToList();
             
-            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation("FACELCosmosQuery_0", start, query.ToString(), result.RequestCharge.ToString());
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
                     result.ResponseContinuation,
@@ -1020,7 +1020,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             IOrderedQueryable<GlobalDataDocument> query = null;
 
-            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_5");
+            
             var start = DateTime.UtcNow;
 
 
@@ -1031,7 +1031,7 @@ namespace Gosocket.Dian.Application.Cosmos
             
             var lista = result.ToList<GlobalDataDocument>();
 
-            StopOperation(operation, start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation("FACELCosmosQuery_5", start, query.ToString(), result.RequestCharge.ToString());
 
             return lista;
         }
@@ -1091,7 +1091,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
 
-            IOperationHolder<DependencyTelemetry> operation = StartOperation("FACELCosmosQuery_6");
+            
             var start = DateTime.UtcNow;
 
             var query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
@@ -1114,7 +1114,7 @@ namespace Gosocket.Dian.Application.Cosmos
             );
             int res = await query.CountAsync();
 
-            StopOperation(operation, start, query.ToString(), "ND");
+            TrackOperation("FACELCosmosQuery_6", start, query.ToString(), "ND");
             return res;
         }
 
@@ -1178,37 +1178,26 @@ namespace Gosocket.Dian.Application.Cosmos
             Enumerable.Range(0, count).ToList().ForEach(f => res.Add(value.Skip(f * chunkLength).Take(chunkLength).Select(z => z.ToString()).Aggregate((a, b) => a + b)));
             return res;
         }
-
-        private static IOperationHolder<DependencyTelemetry> StartOperation(string name)
+        
+        private static void TrackOperation(string eventName, DateTime start, string queryString, string rus)
         {
-            IOperationHolder<DependencyTelemetry> operation = null;
             string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
-            telemetryClient.TrackTrace($"trackCosmos={trackCosmos}",SeverityLevel.Information);
             if ("true".Equals(trackCosmos))
-            {
-                operation = telemetryClient.StartOperation<DependencyTelemetry>(name);
-            }
-            return operation;
-        }
-        private static void StopOperation(IOperationHolder<DependencyTelemetry> operation, DateTime start, string queryString, string rus)
-        {
-            string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
-            if ("true".Equals(trackCosmos) && operation != null)
             {
                 //hay limites en tamaño en appinsithgs
                 List<string> lstQuerys = GetChunks(queryString, 8100);
 
                 int k = 1;
+                Dictionary<string, string> datos = new Dictionary<string, string>();
+
                 foreach (var queryPart in lstQuerys)
                 {
-                    operation.Telemetry.Properties.Add($"Query {k++}", queryPart);
+                    datos.Add($"Query {k++}", queryPart);
+                    
                 }
-                operation.Telemetry.Type = "Cost";
-                operation.Telemetry.Properties.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-
-                operation.Telemetry.Properties.Add("RUs", rus);
-                operation.Telemetry.Success = true;
-                telemetryClient.StopOperation(operation);
+                datos.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
+                datos.Add("RUs",rus);
+                telemetryClient.TrackEvent(eventName, datos);
             }
         }
 
