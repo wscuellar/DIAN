@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Application.Cosmos
         private static DocumentClient client = new DocumentClient(new Uri(endpointUrl), authorizationKey);
 
 
-        private static readonly TelemetryConfiguration config = TelemetryConfiguration.CreateDefault();
+        private static readonly TelemetryConfiguration config = TelemetryConfiguration.Active;
         private static readonly TelemetryClient telemetryClient = new TelemetryClient(config);
 
 
