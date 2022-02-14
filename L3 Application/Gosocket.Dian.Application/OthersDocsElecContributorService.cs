@@ -254,12 +254,17 @@ namespace Gosocket.Dian.Application
                               State = oc.State,
                               SoftwareId = s.Id.ToString(),
                               SoftwareIdBase=s.SoftwareId
-                          }).Distinct().FirstOrDefault();
+                          }).Distinct().ToList();
 
-            List<string> userIds = _contributorService.GetUserContributors(entity.ContributorId).Select(u => u.UserId).ToList();
-            entity.LegalRepresentativeIds = userIds;
+            if (entity.Any())
+            {
+                List<string> userIds = _contributorService.GetUserContributors(entity.First().ContributorId).Select(u => u.UserId).ToList();
+                entity.First().LegalRepresentativeIds = userIds;
 
-            return entity;
+                return entity.First();
+            }            
+
+            return new OtherDocsElectData();
         }
 
         /// <summary>
