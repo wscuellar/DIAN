@@ -181,7 +181,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
 						GenerationContry = Countries.Where(x => x.CodeAlfa2 == objNomina.Pais).FirstOrDefault().CompositeNameCountry,
 						//CompositeNameTypeCoin
-						Trm = objNomina.TRM,
+						Trm = objNomina.TRM==null?"0":objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
 						IdNumberRange = NumberingRange.FirstOrDefault().IdNumberingRange.ToString(),
@@ -355,7 +355,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						NamePeriodPayroll = PeriodPayroll.Where(x => x.IdPeriodPayroll == objNomina.PeriodoNomina).FirstOrDefault().NamePeriodPayroll,
 						TypeCoin = objNomina.TipoMoneda,
 						CompositeNameTypeCoin = CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).Count() == 0 ? "" : CoinType.Where(x => x.IdCoinType == objNomina.TipoMoneda).FirstOrDefault().CompositeNameCoinType,
-						Trm = objNomina.TRM,
+						Trm = objNomina.TRM == null ? "0" : objNomina.TRM,
 						Rounding = "0.00", //ValorDefecto 0.00
 						CodeEmployee = objNomina.CodigoTrabajador,
 						//Pendiente IdNumberRange //DatosNumeroRango
