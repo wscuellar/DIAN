@@ -18,6 +18,7 @@ using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using Newtonsoft.Json;
 using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext;
 
@@ -773,7 +774,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
 
-                var data = new RadianActivationRequest();
+                var data = new OtherDocumentActivationRequest();
                 data.Code = code.ToString();
                 data.ContributorId = contributorId;
                 data.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
@@ -782,10 +783,10 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareName = software.Name;
                 data.SoftwarePassword = software.SoftwarePassword;
                 data.SoftwareType = globalRadianOperations.OperationModeId.ToString();
-                data.SoftwareUser = software.SoftwareUser;
-                data.TestSetId = testSetResult.Id;
-                data.Url = software.Url;
+                data.SoftwareUser = software.SoftwareUser;                
+                data.Url = software.Url;                                
                 data.Enabled = true;
+
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
@@ -970,5 +971,45 @@ namespace Gosocket.Dian.Web.Controllers
             var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
             return isUpdate;
         }
+    }
+    class OtherDocumentActivationRequest
+    {
+
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "contributorId")]
+        public int ContributorId { get; set; }
+
+        [JsonProperty(PropertyName = "contributorTypeId")]
+        public int ContributorTypeId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareId")]
+        public string SoftwareId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareType")]
+        public string SoftwareType { get; set; }
+
+        [JsonProperty(PropertyName = "softwareUser")]
+        public string SoftwareUser { get; set; }
+
+        [JsonProperty(PropertyName = "softwarePassword")]
+        public string SoftwarePassword { get; set; }
+
+        [JsonProperty(PropertyName = "pin")]
+        public string Pin { get; set; }
+
+        [JsonProperty(PropertyName = "softwareName")]
+        public string SoftwareName { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "testSetId")]
+        public string TestSetId { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
+
     }
 }

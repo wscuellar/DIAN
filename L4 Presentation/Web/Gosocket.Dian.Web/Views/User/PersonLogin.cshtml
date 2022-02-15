@@ -27,14 +27,15 @@
 
                 <!-- external user -->
                 @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
-                </a>*@
+            <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
+        </a>*@
 
                 <!-- person -->
                 <a href="#" class="list-group-item text-center active">
                     <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
                 </a>
 
+                @* Se comenta para produccion
                 <!-- Not obliged to invoice -->
                 @*<a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
                     <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
@@ -48,44 +49,44 @@
                     <h4 class="glyphicon glyphicon-search"></h4><br />Documento
                 </a>
             </div>
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                    <!-- person section -->
+                    @Html.Partial("_personLogin")
+                </div>
+            </div>
         </div>
-        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
-            <!-- person section -->
-            @Html.Partial("_personLogin")
-        </div>
-    </div>
-</div>
 
 
-@section Scripts
-{
-    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+        @section Scripts
+        {
+            <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
 
-    <script>
+            <script>
 
-        $(document).ready(function () {
+                $(document).ready(function () {
 
-            $('.certificate-login-link').click(function () {
-                window.location = '@ConfigurationManager.GetValue("CertificateLoginUrl")';
-            });
+                    $('.certificate-login-link').click(function () {
+                        window.location = '@ConfigurationManager.GetValue("CertificateLoginUrl")';
+                    });
 
-            $('.list-group-item').click(function () {
-                cleanFields();
-            });
+                    $('.list-group-item').click(function () {
+                        cleanFields();
+                    });
 
-            var cleanFields = function () {
-                $('.field-validation-error').html('');
-                $('#DocumentKey').val('');
-                $('#PersonCode').val('');
-                $('#CompanyCode').val('');
-                $('#UserCode').val('');
-            };
-            grecaptcha.ready(function () {
-                grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
-                    $(".RecaptchaToken").val(token);
+                    var cleanFields = function () {
+                        $('.field-validation-error').html('');
+                        $('#DocumentKey').val('');
+                        $('#PersonCode').val('');
+                        $('#CompanyCode').val('');
+                        $('#UserCode').val('');
+                    };
+                    grecaptcha.ready(function () {
+                        grecaptcha.execute('@ConfigurationManager.GetValue("Recaptcha")', { action: 'adminLogin' }).then(function (token) {
+                            $(".RecaptchaToken").val(token);
+                        });
+                    });
                 });
-            });
-        });
 
-    </script>
-}
+            </script>
+        }

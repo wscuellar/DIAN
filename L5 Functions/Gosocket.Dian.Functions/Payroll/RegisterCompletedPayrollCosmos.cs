@@ -257,10 +257,10 @@ namespace Gosocket.Dian.Functions.Payroll
 						ContryWorkeer = Countries.Where(x => x.CodeAlfa2 == objNomina.LugarTrabajoPais).FirstOrDefault().CompositeNameCountry,
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
-						NameDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado == "" ? "" : Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
+						NameDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado==""?"": Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 
-
-						NameCompositeWorker = objNomina.LugarTrabajoMunicipioCiudad == "" ? "" : City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
+						
+						NameCompositeWorker = objNomina.LugarTrabajoMunicipioCiudad==""?"": City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						IdCityWorker = objNomina.LugarTrabajoMunicipioCiudad,
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
@@ -436,10 +436,10 @@ namespace Gosocket.Dian.Functions.Payroll
 
 						//Pendiente ContryWorkeer
 						IdDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado,
-						NameDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado == "" ? "" : Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
+						NameDepartamentWorker = objNomina.LugarTrabajoDepartamentoEstado ==""?"":Departament.Where(x => x.IdDepartament == objNomina.LugarTrabajoDepartamentoEstado).FirstOrDefault().CompositeNameDepartament,
 						//Pendiente NameDepartamentWorker
 						IdCityWorker = objNomina.LugarTrabajoMunicipioCiudad,
-						NameCompositeWorker = objNomina.LugarTrabajoMunicipioCiudad == "" ? "" : City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
+						NameCompositeWorker = objNomina.LugarTrabajoMunicipioCiudad==""?"": City.Where(x => x.IdCity == objNomina.LugarTrabajoMunicipioCiudad).FirstOrDefault().CompositeNameCity,
 						//Pendiente NameCompositeWorker
 						AddressWorker = objNomina.LugarTrabajoDireccion,
 					};

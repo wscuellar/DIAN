@@ -11,8 +11,11 @@ namespace Gosocket.Dian.Functions.WS52
 {
     public static class AssignResponsability
     {
+
+        private const string queueName="global-assign-responsability-input%Slot%";
+
         [FunctionName("AssignResponsability")]
-        public static async Task Run([QueueTrigger("global-assign-responsability-input", Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
 

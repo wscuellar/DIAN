@@ -16,8 +16,8 @@ namespace Gosocket.Dian.DataContext
     {
         private static readonly string endpointUrl = ConfigurationManager.GetValue("CosmosDbEndpointUrl");
         private static readonly string authorizationKey = ConfigurationManager.GetValue("CosmosDbAuthorizationKey");
-        
-        private static readonly string collectionId = ConfigurationManager.GetValue("CosmosDbCollectionIDPayroll_all");
+        private static readonly string databaseId = "PayrollElectronic";
+       
         private static readonly ConnectionPolicy connectionPolicy = new ConnectionPolicy { UserAgentSuffix = " samples-net/3" };
 
 

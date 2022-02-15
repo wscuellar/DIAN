@@ -22,7 +22,7 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
 
         // Set queue name
-        private const string queueName = "activate-radian-operation-input";
+        private const string queueName = "activate-radian-operation-input%Slot%";
 
         [FunctionName("ActivateRadianOperation")]
         public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)

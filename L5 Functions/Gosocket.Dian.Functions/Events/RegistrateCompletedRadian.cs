@@ -490,5 +490,6 @@ namespace Gosocket.Dian.Functions.Events
             [JsonProperty(PropertyName = "authCode")]
             public string AuthCode { get; set; }
         }
+        //test build Azure
     }
 }

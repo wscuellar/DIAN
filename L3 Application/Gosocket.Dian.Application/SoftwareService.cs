@@ -80,7 +80,19 @@ namespace Gosocket.Dian.Application
 
         public Software Get(Guid id)
         {
-            return sqlDBContext.Softwares.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.Softwares.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            }
+                
+        }
+
+        public Software GetAndContributorAndAcceptanceStatus(Guid id)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.Softwares.Include("AcceptanceStatusSoftware").Include("Contributor").AsNoTracking().FirstOrDefault(x => x.Id == id);
+            }
         }
 
 
@@ -91,8 +103,11 @@ namespace Gosocket.Dian.Application
 
 
         public OtherDocElecSoftware GetByOtherDoc(Guid softwareId)
-        {
-            return sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(x => x.SoftwareId == softwareId);
+        {            
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecSoftwares.FirstOrDefault(x => x.SoftwareId == softwareId);
+            }
         }
 
 
@@ -196,7 +211,10 @@ namespace Gosocket.Dian.Application
 
         public OtherDocElecSoftware GetOtherDocSoftware(Guid id)
         {
-            return sqlDBContext.OtherDocElecSoftwares.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecSoftwares.FirstOrDefault(x => x.Id == id);
+            }
         }
 
         public void AddOrUpdateOtherDocSoftware(OtherDocElecSoftware software)

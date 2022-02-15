@@ -107,18 +107,15 @@ namespace Gosocket.Dian.Web
 		}
 	}
 
-	// Configure the application sign-in manager which is used in this application.
-	public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
-	{
-		private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
-		private ContributorService contributorService = new ContributorService();
-
-
-
-		public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
-			: base(userManager, authenticationManager)
-		{
-		}
+    // Configure the application sign-in manager which is used in this application.
+    public class ApplicationSignInManager : SignInManager<ApplicationUser, string>
+    {
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        public ApplicationSignInManager(ApplicationUserManager userManager, IAuthenticationManager authenticationManager)
+            : base(userManager, authenticationManager)
+        {
+        }
+        private ContributorService contributorService = new ContributorService();
 
 		public override async Task<ClaimsIdentity> CreateUserIdentityAsync(ApplicationUser user)
 		{
@@ -133,24 +130,19 @@ namespace Gosocket.Dian.Web
 
 			var auth = dianAuthTableManager.Find<AuthToken>(user.Code, user.ContributorCode);
 
-			if (user.Contributors.Count < 1)
-			{
-				var contributorCode = user.ContributorCode;
-				var contributor = contributorService.GetByCode((contributorCode));
-				user.Contributors.Add(contributor);
-			}
+            Contributor currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
 
-			var currentContributor = user.Contributors.FirstOrDefault(x => x.Code == user.ContributorCode);
+            currentContributor = currentContributor == null ? contributorService.GetByCode(user.ContributorCode): currentContributor;
 
-			// Contributor claims
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorAcceptanceStatusId, currentContributor.AcceptanceStatusId.ToString()));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorId, currentContributor.Id.ToString()));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorBusinesName, currentContributor.BusinessName));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorCode, currentContributor.Code));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorName, currentContributor.Name));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorOperationModeId, currentContributor.OperationModeId.ToString()));
-			current.AddClaim(new Claim(CustomClaimTypes.ContributorTypeId, currentContributor.ContributorTypeId.ToString()));
-			current.AddClaim(new Claim(CustomClaimTypes.IdentificationTypeId, user.IdentificationTypeId.ToString()));
+            // Contributor claims
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorAcceptanceStatusId, currentContributor.AcceptanceStatusId.ToString()));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorId, currentContributor.Id.ToString()));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorBusinesName, currentContributor.BusinessName));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorCode, currentContributor.Code));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorName, currentContributor.Name));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorOperationModeId, currentContributor.OperationModeId.ToString()));
+            current.AddClaim(new Claim(CustomClaimTypes.ContributorTypeId, currentContributor.ContributorTypeId.ToString()));
+            current.AddClaim(new Claim(CustomClaimTypes.IdentificationTypeId, user.IdentificationTypeId.ToString()));
 
 			var otherCont= this.contributorService.GetOtherDocElecContributor(currentContributor.Id);
 
@@ -162,8 +154,8 @@ namespace Gosocket.Dian.Web
 				{
 					{ goToInvoicer = (currentContributor.ContributorOperations.FirstOrDefault(x => x.OperationModeId == (int)Domain.Common.OperationMode.Free && !x.Deleted) != null); }
 				}
-				 if (otherCont.Any(x => x.State == "Registrado") || otherCont.Any(x => x.State == "Habilitado" ) || otherCont.Any(x => x.State == "En pruebas"))
-				{
+                if (otherCont.Any(x => x.State == "Registrado") || otherCont.Any(x => x.State == "Habilitado") || otherCont.Any(x => x.State == "En pruebas"))
+                {
 					if (!goToInvoicer)
 					{
 						foreach (var item in otherCont)
