@@ -151,6 +151,8 @@ namespace Gosocket.Dian.Domain.Common
         Provider = 2,
         [Description("Proveedor autorizado")]
         AuthorizedProvider = 3,
+        [Description("No oligado a facturar")]
+        BillerNoObliged = 4,
     }
 
     public enum DocumentType

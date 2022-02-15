@@ -6,6 +6,14 @@ namespace Gosocket.Dian.Domain
     [System.ComponentModel.DataAnnotations.Schema.Table("RadianOperationMode")]
     public class RadianOperationMode
     {
+        public RadianOperationMode() { }
+
+        public RadianOperationMode(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
         [System.ComponentModel.DataAnnotations.Key]
         public int Id { get; set; }
 

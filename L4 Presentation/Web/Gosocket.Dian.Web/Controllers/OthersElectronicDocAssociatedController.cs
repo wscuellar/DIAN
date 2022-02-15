@@ -20,6 +20,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Newtonsoft.Json;
 using Gosocket.Dian.Application;
+using Gosocket.Dian.DataContext;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -142,7 +143,8 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareId = entity.SoftwareId,
                 SoftwareIdBase = entity.SoftwareIdBase,
                 ProviderId = entity.ProviderId,
-                LegalRepresentativeList = LegalRepresentativeList
+                LegalRepresentativeList = LegalRepresentativeList,
+                EsElectronicDocNomina = entity.ElectronicDocId == 1
             };
 
         }
@@ -194,6 +196,23 @@ namespace Gosocket.Dian.Web.Controllers
 
             ViewBag.Id = Id;
 
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+            model.Software = new OtherDocElecSoftwareViewModel()
+            {
+                Id = software.Id,
+                Name = software.Name,
+                Pin = software.Pin,
+                Url = software.Url,
+                Status = software.Status,
+                OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State,
+                ProviderId = software.ProviderId,
+                SoftwareId = software.SoftwareId,
+            };
+
             return View(model);
         }
 
@@ -224,7 +243,8 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
             ResponseMessage result = new ResponseMessage();
-            if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            //if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
 
                 result.Code = 500;
@@ -327,9 +347,24 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareId = software.SoftwareId,
             };
 
+            if (!model.OperationModeIsFree)
+            {
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
+                model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
+                    numberingRange?.Prefix??"-",
+                    numberingRange?.ResolutionNumber ?? "-",
+                    numberingRange?.NumberFrom??0,
+                    numberingRange?.NumberTo??0,
+                    numberingRange?.CreationDate.ToString("dd-MM-yyyy") ?? "-",
+                    numberingRange?.ExpirationDate.ToString("dd-MM-yyyy") ?? "-");
+                model.GTestSetOthersDocumentsResult.StartDate = numberingRange?.CreationDate;
+                model.GTestSetOthersDocumentsResult.EndDate = numberingRange?.ExpirationDate;
+            }
+
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             ViewBag.Id = Id;
 
@@ -361,7 +396,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
             model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina electrónica de Ajuste" : "";
+            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
             //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
@@ -490,7 +525,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
 
-            if (model.OperationModeId == 3)
+            if (model.OperationModeId == (int)Domain.Common.OtherDocElecOperationMode.FreeBiller)
             {
                 model.SoftwarePin = "0000";
                 
@@ -523,7 +558,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,                
-                SoftwareId = model.OperationModeId != 3 ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 
@@ -782,7 +817,160 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-    
+        [HttpPost]
+        public JsonResult RestartSetTestResultV2(int Id)
+        {
+            #region GetSetTestResultV2
+
+            OthersElectronicDocAssociatedViewModel model0 = DataAssociate(Id);
+
+            if (model0.Id == -1)
+                return Json(new ResponseMessage("No se puede realizar esta operación", TextResources.alertType, 500));
+
+            ViewBag.ValidateRequest = true;
+
+            if (model0.Id == -2)
+            {
+                ViewBag.ValidateRequest = false;
+                return Json(new ResponseMessage("No existe contribuyente!", TextResources.alertType, 500));
+            }
+
+            GlobalTestSetOthersDocuments testSet;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model0.OperationModeId, model0.ElectronicDocId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            string key = model0.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            model0.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, key);
+
+            model0.GTestSetOthersDocumentsResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.OtherDocElecOperationMode), model0.OperationModeId.ToString())));
+            model0.GTestSetOthersDocumentsResult.StatusDescription = testSet.Description;
+            model0.Software = new OtherDocElecSoftwareViewModel()
+            {
+                Id = software.Id,
+                Name = software.Name,
+                Pin = software.Pin,
+                Url = software.Url,
+                Status = software.Status,
+                OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                OtherDocElecSoftwareStatusName = model0.GTestSetOthersDocumentsResult.State,
+                ProviderId = software.ProviderId,
+                SoftwareId = software.SoftwareId,
+            };
+
+
+
+            #endregion
+
+            #region Validation
+
+            if (model0.Software.OtherDocElecSoftwareStatusName != "Rechazado")
+            {
+                ViewBag.ValidateRequest = false;
+                return Json(new ResponseMessage("Solo se puede reiniciar el Set de pruebas si ha sido Rechazado!", TextResources.alertType, 500));
+            }
+
+            #endregion
+
+            #region RestartSetTestResultV2
+
+            GlobalTestSetOthersDocumentsResult model = model0.GTestSetOthersDocumentsResult;
+            Guid docElecSoftwareId = software.Id;
+
+            model.State = TestSetStatus.InProcess.GetDescription();
+            model.Status = (int)TestSetStatus.InProcess;
+            model.StatusDescription = TestSetStatus.InProcess.GetDescription();
+
+            // Totales Generales
+            model.TotalDocumentSent = 0;
+            model.TotalDocumentAccepted = 0;
+            model.TotalDocumentsRejected = 0;
+            // EndTotales Generales
+
+            // OthersDocuments
+            model.TotalOthersDocumentsSent = 0;
+            model.OthersDocumentsAccepted = 0;
+            model.OthersDocumentsRejected = 0;
+            //End OthersDocuments
+
+            //ElectronicPayrollAjustment
+            model.TotalElectronicPayrollAjustmentSent = 0;
+            model.ElectronicPayrollAjustmentAccepted = 0;
+            model.ElectronicPayrollAjustmentRejected = 0;
+            //EndElectronicPayrollAjustment
+
+            bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model);
+
+            _radianTestSetAppliedService.ResetPreviousCounts(model.Id);
+            if (isUpdate)
+            {
+                // OtherDocElecContributor
+                //var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);
+                //this._othersDocsElecContributorService.CreateContributor(int.Parse(model.PartitionKey),
+                //    OtherDocElecState.Test,
+                //    int.Parse(model.ContributorTypeId),
+                //    operationModeId, 
+                //    model.ElectronicDocumentId,
+                //    User.UserName());
+
+                // OtherDocElecSoftware
+                //var software = _othersDocsElecSoftwareService.Get(docElecSoftwareId);
+                //software.OtherDocElecSoftwareStatusId = (int)OtherDocElecSoftwaresStatus.InProcess;
+                //_othersDocsElecSoftwareService.CreateSoftware(software);
+
+                // OtherDocElecContributorOperations
+                var softwareOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId);
+                softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
+            }
+
+            ResponseMessage response = new ResponseMessage();
+            response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
+            return Json(response, JsonRequestBehavior.AllowGet);
+
+            #endregion
+        }
+
+
+        [HttpGet]
+        public bool HabilitarParaReinicioSetPruebas(int Id)
+        {
+            OthersElectronicDocAssociatedViewModel model0 = DataAssociate(Id);
+
+            GlobalTestSetOthersDocuments testSet;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model0.OperationModeId, model0.ElectronicDocId);
+            if (testSet == null) return false;
+
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            string key = model0.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            model0.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, key);
+
+
+            model0.GTestSetOthersDocumentsResult.State = TestSetStatus.Rejected.GetDescription();
+            model0.GTestSetOthersDocumentsResult.Status = (int)TestSetStatus.Rejected;
+            model0.GTestSetOthersDocumentsResult.StatusDescription = TestSetStatus.Rejected.GetDescription();
+
+            bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model0.GTestSetOthersDocumentsResult);
+
+            return isUpdate;
+        }
+
+        [HttpGet]
+        public bool HabilitarParaSincronizarAProduccion(int Id, string Estado)
+        {
+            var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
+            return isUpdate;
+        }
     }
     class OtherDocumentActivationRequest
     {

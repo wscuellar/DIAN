@@ -876,6 +876,7 @@ namespace Gosocket.Dian.Application
                     EndDate = re.EndDate,
                     StartDateNumber = re.StartDateNumber,
                     AcceptanceStatus = re.AcceptanceStatus,
+                    AcceptanceStatusId = re.AcceptanceStatusId,
                     Status = re.Status,
                     Deleted = re.Deleted,
                     Timestamp = re.Timestamp,

@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CosmosDbManager.cs" />
+    <Compile Include="CosmosDbManagerNumberingRange.cs" />
     <Compile Include="CosmosDbManagerPayroll.cs" />
     <Compile Include="Middle\Pagination.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

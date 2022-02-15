@@ -19,8 +19,8 @@ namespace Gosocket.Dian.Interfaces.Services
         OtherDocElecContributor CreateContributorNew(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
         bool ValidateSoftwareActive(int ContributorId, int ContributorTypeId, int OperationModeId, int stateSofware);
-        PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId);
-        PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId);
+        PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId, int electronicDocumentId);
+        PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
 
@@ -35,5 +35,7 @@ namespace Gosocket.Dian.Interfaces.Services
         GlobalTestSetOthersDocuments GetTestResult(int OperatonModeId, int ElectronicDocumentId);
         List<OtherDocElecContributor> GetDocElecContributorsByContributorId(int contributorId);
         List<Contributor> GetTechnologicalProviders(int contributorId, int electronicDocumentId, int contributorTypeId, string state);
+
+        bool HabilitarParaSincronizarAProduccion(int Id, string Estado);
     }
 }
