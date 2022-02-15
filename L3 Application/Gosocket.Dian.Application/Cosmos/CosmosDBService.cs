@@ -1197,7 +1197,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 }
                 datos.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
                 datos.Add("RUs",rus);
-                telemetryClient.TrackEvent(eventName, datos);
+                telemetryClient.TrackTrace(eventName,SeverityLevel.Information, datos);
                 telemetryClient.Flush();
             }
         }
