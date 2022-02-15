@@ -1,0 +1,41 @@
+﻿@model Gosocket.Dian.Web.Models.NumberRangeTableViewModel
+
+<div class="table-responsive padding-bottom-15">
+    <table colspan="12" class="number-range-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+        <thead>
+            <tr>
+                <th>Prefijo</th>
+                <th>Nº resolución</th>
+                <th class="text-right">Rango desde</th>
+                <th class="text-right">Rango hasta</th>
+                <th class="text-center">Fecha desde</th>
+                <th class="text-center">Fecha hasta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var range in Model.NumberRanges)
+            {
+                <tr>
+                    <td class="text-nowrap">
+                        <a>@range.Serie</a>
+                    </td>
+                    <td class="text-nowrap">
+                        <a>@range.ResolutionNumber</a>
+                    </td>
+                    <td class="text-nowrap text-right">
+                        <a>@range.FromNumber</a>
+                    </td>
+                    <td class="text-nowrap text-right">
+                        <a>@range.ToNumber</a>
+                    </td>
+                    <td class="text-nowrap text-center">
+                        <a>@range.ValidDateNumberFrom</a>
+                    </td>
+                    <td class="text-nowrap text-center">
+                        <a>@range.ValidDateNumberTo</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

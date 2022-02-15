@@ -1,8 +1,10 @@
-﻿using Gosocket.Dian.Domain.Sql;
+﻿using Gosocket.Dian.Domain.Common;
+using Gosocket.Dian.Domain.Sql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Gosocket.Dian.Domain
 {
@@ -59,6 +61,7 @@ namespace Gosocket.Dian.Domain
         public virtual OperationMode OperationMode { get; set; }
 
         public virtual ICollection<Software> Softwares { get; set; }
+        public IEnumerable<Software> SoftwaresInProduction() => Softwares.Where(t => t.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production && !t.Deleted);
 
         public int? ProviderId { get; set; }
         public virtual Contributor Provider { get; set; }

@@ -67,6 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
+    <Compile Include="Cude\DocumentoEquivalente.cs" />
+    <Compile Include="Cude\DocumentoEquivalenteXpath.cs" />
+    <Compile Include="Cude\XmlToDocumentoEquivalenteParser.cs" />
     <Compile Include="Cuds\DocumentoSoporte.cs" />
     <Compile Include="Cuds\DocumentoSoporteXpath.cs" />
     <Compile Include="Cuds\XmlToDocumentoSoporteParser.cs" />
@@ -89,7 +92,6 @@
     <Compile Include="Utils\Common\Formatter.cs" />
     <Compile Include="Utils\Common\Schemas.cs" />
     <Compile Include="Utils\Common\XmlParseNomina.cs" />
-    <Compile Include="Utils\Common\XmlParserCuds.cs" />
     <Compile Include="Utils\Common\XmlParser.cs" />
     <Compile Include="Utils\Common\XPathQuery.cs" />
     <Compile Include="Utils\Cryptography\KeyManager.cs" />

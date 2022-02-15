@@ -9,6 +9,7 @@ using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
+using Gosocket.Dian.Services.Cude;
 using Gosocket.Dian.Services.Cuds;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
@@ -819,6 +820,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var modelCuds = parser.Parser(xmlBytes);
             var validator = new Validator();
             validateResponses.Add(validator.ValidateCuds(modelCuds, cuds));
+            return validateResponses;
+        }
+
+        public async Task<List<ValidateListResponse>> StartValidateCude(RequestObjectCude cude)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            var xmlBytes = await GetXmlFromStorageAsync(cude.TrackId);
+
+            var parser = new XmlToDocumentoEquivalenteParser();
+            var modelCude = parser.Parser(xmlBytes);
+            var validator = new Validator();
+            validateResponses.Add(validator.ValidateCude(modelCude, cude));
             return validateResponses;
         }
 

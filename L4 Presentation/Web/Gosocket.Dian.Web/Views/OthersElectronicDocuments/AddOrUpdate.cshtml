@@ -1,260 +1,289 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocumentsViewModel
 @using Gosocket.Dian.Infrastructure;
-
+@using Newtonsoft.Json;
 @{
-	var contributorName = (string)ViewBag.ContributorName;
-	var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
-	var message = (string)ViewBag.Message;
+    var contributorName = (string)ViewBag.ContributorName;
+    var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
+    var message = (string)ViewBag.Message;
+    var isElectronicPayroll = (bool)ViewBag.IsElectronicPayroll;
+    var dianUrlEventReception = Model.UrlEventReception;
+    var softwareIdPrInitial = Model.SoftwareIdPr;
 }
 
 @section css
 {
-	<style type="text/css">
+    <style type="text/css">
+        a.disabled {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
 
-		.btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
-			background-color: #348441 !important;
-			border-color: #348441 !important;
-			color: #fff !important;
-		}
+            a.disabled i {
+                color: #ccc !important;
+            }
 
-		.btn-success:hover, btn-radian-success:hover {
-			background-color: #62C7AB;
-			background: #62C7AB;
-			border-color: #62C7AB;
-			color: #fff;
-		}
+        .btn-success:focus, .btn-hover-success:active, .btn-hover-success.active, .btn.btn-active-success:active, .btn.btn-active-success.active, .dropdown.open > .btn.btn-active-success, .btn-group.open .dropdown-toggle.btn.btn-active-success {
+            background-color: #348441 !important;
+            border-color: #348441 !important;
+            color: #fff !important;
+        }
 
-		.btnAddOthersDocs {
-			height: 41px !important;
-			width: 22px;
-			font-size: 14pt;
-			color: #fff;
-			background-color: #348441;
-			border-right-width: 0px !important;
-			border-right-style: none;
-			border-top-right-radius: 6px !important;
-			border-bottom-right-radius: 6px !important;
-			border-top-left-radius: 0px !important;
-			border-bottom-left-radius: 0px !important;
-			text-align: center;
-			padding-left: 0px;
-			padding-right: 0px;
-			margin-left: -3px;
-		}
+        .btn-success:hover, btn-radian-success:hover {
+            background-color: #62C7AB;
+            background: #62C7AB;
+            border-color: #62C7AB;
+            color: #fff;
+        }
+
+        .btnAddOthersDocs {
+            height: 41px !important;
+            width: 22px;
+            font-size: 14pt;
+            color: #fff;
+            background-color: #348441;
+            border-right-width: 0px !important;
+            border-right-style: none;
+            border-top-right-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+            border-top-left-radius: 0px !important;
+            border-bottom-left-radius: 0px !important;
+            text-align: center;
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-left: -3px;
+        }
 
 
-		.input-general {
-			background: #fff !important;
-		}
+        .input-general {
+            background: #fff !important;
+        }
 
-		.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
-			cursor: not-allowed;
-			background-color: #eee !important;
-		}
+        .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+            cursor: not-allowed;
+            background-color: #eee !important;
+        }
 
-		.btnCloseOtherDocument {
-			color: #fff;
-			background: #348441 !important;
-			background-color: #348441 !important;
-			/*border-radius: 10px !important;*/
-			float: right;
-			cursor: pointer;
-			opacity: 100 !important;
-			padding-left: 5px !important;
-			padding-right: 5px !important;
-			padding-top: 1px !important;
-			padding-bottom: 2px !important;
-			font-weight: normal !important;
-			font-family: auto !important;
-		}
+        .btnCloseOtherDocument {
+            color: #fff;
+            background: #348441 !important;
+            background-color: #348441 !important;
+            /*border-radius: 10px !important;*/
+            float: right;
+            cursor: pointer;
+            opacity: 100 !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+            padding-top: 1px !important;
+            padding-bottom: 2px !important;
+            font-weight: normal !important;
+            font-family: auto !important;
+        }
 
-		.prompt-comment .modal-body {
-			width: 80%;
-		}
+        .prompt-comment .modal-body {
+            width: 80%;
+        }
 
-		.modal-body .close, .modal-header .close {
-			background-color: #348441 !important;
-			/*top: 20px !important;
-			right: -25px !important;*/
-		}
+        .modal-body .close, .modal-header .close {
+            background-color: #348441 !important;
+            /*top: 20px !important;
+            right: -25px !important;*/
+        }
 
-		.divBackTop {
-			padding-top: 15px;
-		}
+        .divBackTop {
+            padding-top: 15px;
+        }
 
-		.iconBackTop {
-			color: #348441;
-			font-size: 13pt;
-		}
+        .iconBackTop {
+            color: #348441;
+            font-size: 13pt;
+        }
 
-		.btnBackTop {
-			color: #348441;
-			font-size: 14pt;
-			text-decoration: underline;
-		}
+        .btnBackTop {
+            color: #348441;
+            font-size: 14pt;
+            text-decoration: underline;
+        }
 
-		hr {
-			margin-top: 20px !important;
-			margin-bottom: 20px !important;
-			border: 1px !important;
-			border-top: 2px solid #E9E8E8 !important;
-		}
-	</style>
+        hr {
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            border: 1px !important;
+            border-top: 2px solid #E9E8E8 !important;
+        }
+    </style>
 }
-<div class="page-content margin-15">
-	<div class="row title-container" style="margin-left: 1px;">
-		<p class="title-view">
-			@ViewBag.title
-		</p>
-		<div class="underline-title"></div>
-		<div class="divBackTop">
-			<span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
-			&nbsp;<a href="@Url.Action("AddParticipants", "OthersElectronicDocuments",new { electronicDocumentId=1})" class="btnBackTop">Volver</a>
-		</div>
-	</div>
+<div class="page-content margin-15 margin-page-content">
+    <div class="row title-container" style="margin-left: 1px;">
+        <p class="title-view">
+            @ViewBag.title
+        </p>
+        <div class="underline-title"></div>
+        <div class="divBackTop">
+            <span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
+            &nbsp;<a id="btnBackTop" href="#!" class="btnBackTop">Volver</a>
+        </div>
+    </div>
 
-	<div class="row margin-horizontal-0" style="margin-top: 15px;">
-		<div class="tab-base">
-			<div class="tab-content padding-0">
-				<div id="tab-current-country" class="tab-pane fade active in">
-					<div class="panel">
-						<div class="panel-body padding-top-20">
-							<div class="row margin-horizontal-0">
-								<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+    <div class="row margin-horizontal-0" style="margin-top: 15px;">
+        <div class="tab-base">
+            <div class="tab-content padding-0">
+                <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel" id="panel-wrapper" data-target="#panel-wrapper">
+                        <div class="panel-body padding-top-20">
+                            <div class="row margin-horizontal-0">
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
 
-									@using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
-									{
-										@Html.Partial("_form")
-										if (!ViewBag.softwareActive)
-										{
-											if (ConfigurationManager.GetValue("Environment") != "Prod")
-											{
-												<div class="panel-footer text-right">
-													<button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave">Asociar</button>
-												</div>
-											}
-										}
-									}
-								</div>
-							</div>
-						</div>
-						<div class="panel-body padding-top-20">
-							<div class="row">
-								<div class="col-lg-12  col-md-12  col-xs-12">
-									<h4> Listado de modos de operación asociados</h4>
-								</div>
-								<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-								</div>
-								<div class="col-lg-12 col-md-12  col-xs-12">
-									<div class="table-responsive">
-										<table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-											<thead>
-												<tr>
-													<th class="text-center">Modo de operación</th>
-													<th class="text-center">Documento Electrónicos</th>
-													<th class="text-center">&nbsp;&nbsp;Registro&nbsp;&nbsp;</th>
-													<th class="text-center">Estado</th>
-													<th class="text-center">Nombre del Software</th>
-													<th class="text-center">ID</th>
-													<th class="text-center">PIN del SW </th>
-													<th class="text-center">URL</th>
-													<th class="text-center">Acciones</th>
-												</tr>
-											</thead>
-											<tbody>
-												@if (Model.ListTable != null)
-												{
-													//List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-													foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
-													{
-														<tr>
-															<td class="text-left">@item.OperationMode - @item.ContributorType</td>
-															<td class="text-center">@item.ElectronicDoc</td>
-															<td class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-															<td class="text-center">@item.StateSoftware</td>
-															<td class="text-center">@item.Software</td>
-															<td class="text-center">@item.SoftwareId</td>
-															<td class="text-center">@item.PinSW</td>
-															<td class="text-center">  @item.Url  </td>
-															<td class="text-center" style="width:70px">
-																@*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-																<a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Ver detalle"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-																<a onclick="EliminarRegistro(@item.Id)" title="Ver detalle"><i class="fa fa-trash" style="font-size: 22px;color: #348441;"></i></a>
-															</td>
-														</tr>
-													}
-												}
-											</tbody>
-										</table>
-									</div>
+                                    @using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
+                                    {
+                                        @Html.Partial("_form")
+                                        if (!ViewBag.softwareActive)
+                                        {
+                                            if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                            {
+                                                <div class="panel-footer text-right">
+                                                    <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave @(Model.ListTable.Any(t=> t.StateSoftware == "En pruebas") ? "disabled" : "")">Asociar</button>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body padding-top-20">
+                            <div class="row">
+                                <div class="col-lg-12  col-md-12  col-xs-12">
+                                    <h4> Listado de modos de operación asociados</h4>
+                                </div>
+                                <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+                                </div>
+                                <div class="col-lg-12 col-md-12  col-xs-12">
+                                    <div class="table-responsive">
+                                        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Modo de operación</th>
+                                                    <th class="text-center">Documento Electrónico</th>
+                                                    <th class="text-center">Registro</th>
+                                                    <th class="text-center">Estado</th>
+                                                    <th class="text-center">Nombre del Software</th>
+                                                    <th class="text-center">ID</th>
+                                                    <th class="text-center">PIN del SW </th>
+                                                    <th class="text-center">URL</th>
+                                                    @if (!isElectronicPayroll)
+                                                    {
+                                                        <th class="text-center">Rangos de Pruebas</th>
+                                                    }
+                                                    <th class="text-center">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.ListTable != null)
+                                                {
+                                                    //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                                    foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
+                                                    {
+                                                        <tr>
+                                                            <td nowrap class="text-left">
+                                                                @item.OperationMode @if (isElectronicPayroll)
+                                                                {<span>- @item.ContributorType</span>}
+                                                            </td>
+                                                            <td nowrap class="text-center">@item.ElectronicDoc</td>
+                                                            <td nowrap class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                            <td class="text-center">@item.StateSoftware</td>
+                                                            <td class="text-center">@item.Software</td>
+                                                            <td class="text-center">@item.SoftwareId</td>
+                                                            <td class="text-center">@item.PinSW</td>
+                                                            <td class="text-center">  @item.Url  </td>
+                                                            @if (!isElectronicPayroll)
+                                                            {
+                                                                <td class="text-center">
+                                                                    <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
+                                                                        <i class="fa fa-server" style="font-size: 22px;color: #348441;"></i>
+                                                                    </a>
+                                                                </td>
+                                                            }
+                                                            <td class="text-center" style="width:70px">
+                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
+                                                                <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+                                                                <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-									<!--Paginación de la tabla-->
-									<div class="pull-right table-pagination padding-top-10">
+                                    <!--Paginación de la tabla-->
+                                    <div class="pull-right table-pagination padding-top-10">
 
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		@*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
-							<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
-						</div>
-						<div class="modal-body">
-							<div class="bootbox-body">
-								<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
-								<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-										  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
-							</div>
-						</div><div class="modal-footer">
-							<button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-						</div>
-					</div>
-				</div>
-			</div>*@
-		<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
+        @*<div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px !important; right: -25px !important;">×</button>
+                            <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @(contributorName) de @(electronicDocumentName)</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="bootbox-body">
+                                <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
+                                <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+                                          maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+                            </div>
+                        </div><div class="modal-footer">
+                            <button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-					<div class="modal-header">
-						<button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-						<h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
-					</div>
-					<div class="modal-body">
-						<div class="bootbox-body">
-							<Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
-							<textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-									  maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
+                    <div class="modal-header">
+                        <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="bootbox-body">
+                            <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
+                            <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
+                                      maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
-						</div>
-					</div><div class="modal-footer">
-						<button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                        </div>
+                    </div><div class="modal-footer">
+                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section scripts
 {
-	@Scripts.Render("~/bundles/jqueryval")
-	<script src="~/Content/js/Radian/RadianIndex.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-	<script>
-		  @if (!string.IsNullOrWhiteSpace(message))
+    <script>
+        let OperationModesAsociatedInElectronicBiller = [];
+
+        @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
             bootbox.dialog({
                 message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
-                        onEscape: () => {  }});
+                onEscape: () => { }
+            });
             </text>
         }
 
@@ -278,101 +307,111 @@
 			}
 		}
         $(document).ready(function ($) {
-            if ('@ViewBag.softwareActive'=='True'){
+            OperationModesAsociatedInElectronicBiller = @Html.Raw(JsonConvert.SerializeObject(Model.OperationModesAsociatedInElectronicBiller));
 
+            if ('@ViewBag.softwareActive' == 'True')
+            {
                 var sms ='No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
-                 bootbox.dialog({
-                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                                onEscape: () => {  }
-                 });
+                bootbox.dialog({
+                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
+                            onEscape: () => {  }
+                });
             }
 			$('#PinSW').val('')
-			$('#btnSave').click(function () {
 
-				if ($('#OperationModeSelectedId').val()!=2) {
+            $("#btnBackTop").click(() => {
+                 let url = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = 1 })";
+                 if (@Model.ElectronicDocumentId == 3) {
+                     url = "@Url.Action("ElectronicDocuments", "Document")";
+                 }
+                 window.location.href = url;
+             })
+
+            $('#btnSave').click(function () {
+                if ($('#OperationModeSelectedId').val()!=2) {
 					$('#ProviderId').append(new Option("", "1"));
 					$('#ProviderId').val("1")
-				}
+                }
 
                 var form = $('#frmOthersElectronicDocuments');
                 console.log(form);
-				console.log(form.valid());
-				if ($('#OperationModeSelectedId').val() == 1) {
+                console.log(form.valid());
+
+                if ($('#OperationModeSelectedId').val() == 1) {
 					$('#ErrorSoftwareName').hide()
-					$('#ErrorPinSW').hide()
-					if ($('#SoftwareName').val().trim() == '') {
+    				$('#ErrorPinSW').hide()
+
+                    if ($('#SoftwareName').val().trim() == '') {
 						$('#ErrorSoftwareName').show()
-					}
-					else {
-						if ($('#PinSW').val().trim() == '') {
-							$('#ErrorPinSW').show()
-						}
-						else {
+                    } else {
+                        if ($('#PinSW').val().trim() == '') {
+						    $('#ErrorPinSW').show()
+                        } else {
 							$('#ErrorSoftwareName').hide()
 							$('#ErrorPinSW').hide()
-							form.submit();
-						}
+                            showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                            form.submit();
+                            hideLoading("#panel-wrapper");
+                        }
 
-					}
-				}
-				else {
-					$('#ErrorProviderId').hide()
-					$('#ErrorSoftwareId').hide()
-					if ($('#OperationModeSelectedId').val() == 2) {
-						if ($('#ProviderId').val() == '') {
-							$('#ErrorProviderId').show()
-						}
-						else {
-							if ($('#SoftwareId').val() == '') {
-								$('#ErrorSoftwareId').show()
-							}
-							else {
+                    }
+                } else {
+                    $('#ErrorProviderId').hide();
+                    $('#ErrorSoftwareId').hide();
+
+                    if ($('#OperationModeSelectedId').val() == 2) {
+                        if ($('#ProviderId').val() == '') {
+                            $('#ErrorProviderId').show();
+                        } else {
+                            if ($('#SoftwareId').val() == '') {
+                                $('#ErrorSoftwareId').show();
+                            } else {
 								$('input[name="SoftwareName"]').val($('#SoftwareId option:selected').text());
-								$('#ErrorProviderId').hide()
-								$('#ErrorSoftwareId').hide()
-								form.submit();
-							}
+                                $('#ErrorProviderId').hide();
+                                $('#ErrorSoftwareId').hide();
 
-						}
-					}
-					else
-					{
-						if ($('#OperationModeSelectedId').val() == 3)
-						{
-							form.submit();
-						}
-					}
-				}
-
-
-            });
-
-            $('#ProviderId').change(function () {
-                if ('@ViewBag.softwareActive' == 'False') {
-                   // $('#UrlEventReception').val('');
-                    $('#SoftwareType').val('');
-                    getSoftwares($('#ProviderId').val());
+                                showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                                form.submit();
+                                hideLoading("#panel-wrapper");
+                            }
+                        }
+                    } else {
+                        if ($('#OperationModeSelectedId').val() == 3)
+                        {
+                            showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                            form.submit();
+                            hideLoading("#panel-wrapper");
+                        }
+                    }
                 }
             });
 
+            $('#ProviderId').change(function () {
+                    if ('@ViewBag.softwareActive' == 'False') {
+                   // $('#UrlEventReception').val('');
+                    $('#SoftwareType').val('');
+                        getSoftwares($('#ProviderId').val());
+                    }
+                });
+
             $('#SoftwareId').change(function (e) {
-                var $this = $(this);
+                    var $this = $(this);
                 $('#SoftwareName').val($('#SoftwareId option:selected').text());
-                getDataSoftwareSeleccionado($this.val());
-            });
+                    getDataSoftwareSeleccionado($this.val());
+                });
 
             $('.delete').click(function () {
                 //alert($(this).data('contributor-id'));
                 $("#txtCancelRegistro").val("");
                 $('#lbldangercancelregister').removeClass("text-danger text-bold");
                 $("#dialogcancelarregistro").modal('show');
-            });
-			if (@Model.ContributorIdType == 2) {
+                });
+                if (@Model.ContributorIdType == 2) {
 				$('select[name=OperationModeSelectedId]').val(1);
-			}
-			else {
+                }
+                else {
 				$('select[name=OperationModeSelectedId]').val(0);
-			}
+                }
 			$('.selectpicker').selectpicker('refresh');
 			$('#OperationModeSelectedId').change();
 		});//ready
@@ -380,9 +419,7 @@
 
 
 		function EliminarRegistro(id) {
-			debugger;
 			$("#dialogcancelarregistro").modal('show');
-
 
 			("#Btnsavecancel")[0].onclick = null;
 			$("#Btnsavecancel").click(function () {
@@ -391,109 +428,163 @@
 			});
 		}
 
-
-
-
 		function ElimnarOp(id)
-			{
-				 if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
-                    $('#lbldangercancelregister').addClass("text-danger  text-bold");
-                    return;
-                }
+		{
+			if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
+                $('#lbldangercancelregister').addClass("text-danger  text-bold");
+                return;
+            }
 
-                $("#dialogcancelarregistro").modal('hide');
-			showConfirmation("¿Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName) ?", ConfirmExec2(
-                        function () {
+            $("#dialogcancelarregistro").modal('hide');
+            let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
+            if (@Model.ElectronicDocumentId == 3) {
+                confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
+            }
+            showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
+                function () {
+                    showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
+                    $.ajax({
+                        url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
+                        type: "POST",
+                            data: { id: id, description: $("#txtCancelRegistro").val() },
+                        datatype: "json",
+                        success: function (result) {
+                            hideLoading("#panel-wrapper");
+                            if (result != null) {
 
-                            $.ajax({
-                           url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
-                            type: "POST",
-                                data: { id: id, description: $("#txtCancelRegistro").val() },
-                            datatype: "json",
-                            success: function (result) {
+							    if (result.Code != 200) {
 
-                                if (result != null) {
+								    $('.close').click()
+								    bootbox.dialog({
+									    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
+									    onEscape: () => {
+										    var url = window.location.href.split('&');
+										    var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+										    window.location.href = ret
+									    }
+								    });
+								    //
+                                    return;
+                                }
 
-									if (result.Code != 200) {
-										
-										$(' .close').click() 
-										bootbox.dialog({
-											message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
-											onEscape: () => {
-												var url = window.location.href.split('&');
-												var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
-												window.location.href = ret
-											}
-										});
-										//
-                                        return;
-                                    }
-
-                                    bootbox.dialog({
+                                bootbox.dialog({
                                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
                                     onEscape: () => {
                                         var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                                        if (@Model.ElectronicDocumentId == 3) {
+                                            window.location.reload();
+                                            return;
+                                        }
                                         window.location.href = url;
-                                     }
-                                    });
-                                }
-                                else
-                                    bootbox.alert("No se pudo realizar la Cancelación");
-                            },
-                            complete: function () {
-
-                            },
-                            error: function (result) {
-                                bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                                console.log(result.status + ' ' + result.statusText);
-                                return false;
+                                    }
+                                });
                             }
-                        });  //ajax
+                            else
+                                bootbox.alert("No se pudo realizar la Cancelación");
+                        },
+                        complete: function () {
+                            hideLoading("#panel-wrapper");
+                        },
+                        error: function (result) {
+                            hideLoading("#panel-wrapper");
+                            bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                            console.log(result.status + ' ' + result.statusText);
+                            return false;
+                        }
+                    });  //ajax
+                }
+            , "", () => hideLoading('#panel-wrapper')));
+		}
 
+        function ReiniciarFormulario() {
+            $('#UrlEventReception').val('@dianUrlEventReception');
 
-                     }
-                    , "", () => hideLoading('#panel-form')));
+            $('#SoftwareType').val(1);
 
-			}
+            $('#SoftwareName').val(undefined);
 
+            $('#PinSW').val(undefined);
 
-		
+            $('#ProviderId').val(undefined);
+            $("button[data-id='ProviderId']").attr("title", "Seleccione...");
+            $("button[data-id='ProviderId']").html(`
+                <span class="filter-option pull-left">Seleccione...</span>
+                &nbsp;
+                <span class="fa fa-caret-down"></span>
+            `);
+
+            $("#ulProviderId").find("li.selected").removeClass("selected");
+            $("#ulProviderId").find("li[data-original-index=0]").addClass("selected");
+
+            $('#SoftwareId').val(undefined);
+            $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
+            $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
+                'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
+            cambiarTextoSelect();
+
+            $('#ContributorName').val("@Model.ContributorName");
+            $('#SoftwareIdPr').val("@softwareIdPrInitial");
+        }
 
 		$('#OperationModeSelectedId').change(function ()
-		{
+        {
+            const contributorIsOfe = "@Model.ContributorIsOfe".toLowerCase() == "true",
+                isElectronicSupportDocument = "@Model.ElectronicDocumentIsSupport".toLowerCase() == "true";
+
+            ReiniciarFormulario();
+
+            const operationModeAssigned = OperationModesAsociatedInElectronicBiller
+                .find(t => t.OperationModeId == $('#OperationModeSelectedId').val());
 
             if ($('#OperationModeSelectedId').val() == 1) {
-				$('#FormPt').fadeOut()
-				$('#FormPropio').fadeIn()
-				$('#DivSoftwareId').fadeIn()
-				$('#DivPin').fadeIn()
-				$('#SoftwareName').removeAttr('disabled')
+                /*Modo de operación [Software Propio]*/
+                $('#FormPt').fadeOut();
+                $('#FormPropio').fadeIn();
+                $('#DivSoftwareId').fadeIn();
+                $('#DivPin').fadeIn();
+                $('#SoftwareName').removeAttr('disabled');
 				$('#ContributorName').val('@Model.ContributorName');
-				$('#SoftwareName').val('');
+                $('#SoftwareName').val('');
             }
             else if ($('#OperationModeSelectedId').val() == 2) {
-				$('#FormPt').fadeIn()
-				$('#FormPropio').fadeOut()
+                /*Modo de operación [Software Proveedor Tecnológico]*/
+                $('#FormPt').fadeIn();
+                $('#FormPropio').fadeOut();
 				$($(".SoftwareName")[2]).val($('#SoftwareId option:selected').text())
 				$($(".SoftwareName")[0]).val($('#SoftwareId option:selected').text())
 				$($(".SoftwareName")[1]).val($('#SoftwareId option:selected').text())
-				
-
             }
             else
                 if ($('#OperationModeSelectedId').val() == 3) {
-					$('#FormPt').fadeOut()
-					$('#FormPropio').fadeIn()
-					$('#ContributorName').val('DIRECCIÓN DE IMPUESTO Y ADUANAS NACIONALES - DIAN')
-					$('#SoftwareName').val('Solución gratuita')
-					$('#DivSoftwareId').fadeOut()
-					$('#DivPin').fadeOut()
-					$('#SoftwareName').attr('disabled', true)
+                    /*Modo de operación [Software Solución Gratuita]*/
+                    $('#FormPt').fadeOut();
+                    $('#FormPropio').fadeIn();
+                    $('#ContributorName').val('DIRECCIÓN DE IMPUESTO Y ADUANAS NACIONALES - DIAN');
+                    $('#SoftwareName').val('Solución gratuita');
+                    $('#SoftwareName').attr('disabled', true);
+                    $('#DivSoftwareId').fadeOut();
+                    $('#DivPin').fadeOut();
                 }
 				else {
-					$('#FormPt').fadeOut()
-					$('#FormPropio').fadeOut()
-				}
+                    $('#FormPt').fadeOut();
+                    $('#FormPropio').fadeOut();
+                }
+
+            if (contributorIsOfe && isElectronicSupportDocument) {
+                if ($('#OperationModeSelectedId').val() == 2) return;
+                if (!operationModeAssigned) return;
+
+                $('#ContributorName').val(operationModeAssigned.Data.ProviderCompanyName);
+                $('#SoftwareName').val(operationModeAssigned.Data.SoftwareName);
+                $('#SoftwareIdPr').val(operationModeAssigned.Data.SoftwareId);
+                $('#PinSW').val(operationModeAssigned.Data.SoftwarePin);
+
+                $('#ContributorName').attr('disabled', true);
+                $('#SoftwareName').attr('readonly', true);
+                $('#SoftwareIdPr').attr('readonly', true);
+                $('#SoftwareIdPr').removeAttr('disabled');
+                $('#PinSW').attr('readonly', true);
+            }
         })
 
 
@@ -545,7 +636,6 @@
                 datatype: "json",
                 success: function (result) {
                     if (result != null) {
-                        console.log(result);
                         $('#UrlEventReception').val(result.url);
                         $('#SoftwareType').val(result.SoftwareType);
                         $('#PinSW').val(result.SoftwarePIN);
@@ -585,5 +675,5 @@
             });
         }
 
-	</script>
+    </script>
 }

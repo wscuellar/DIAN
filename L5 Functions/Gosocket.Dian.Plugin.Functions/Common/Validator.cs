@@ -14,6 +14,7 @@ using Gosocket.Dian.Plugin.Functions.EventApproveCufe;
 using Gosocket.Dian.Plugin.Functions.Models;
 using Gosocket.Dian.Plugin.Functions.SigningTime;
 using Gosocket.Dian.Plugin.Functions.ValidateParty;
+using Gosocket.Dian.Services.Cude;
 using Gosocket.Dian.Services.Cuds;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
@@ -7643,7 +7644,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
-        #region Evento Cune
+        #region Evento Cuds
 
         public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
         {
@@ -7677,5 +7678,100 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return response;
         }
         #endregion
+
+        #region Evento Cudeq
+
+        public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCuds, RequestObjectCude data)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            data.TrackId = data.TrackId.ToLower();
+
+            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
+
+            var softwareId = invoceCuds.SoftwareId;
+
+            if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
+            {
+                invoceCuds.SoftwarePin = billerSoftwarePin;
+            }
+            else
+            {
+                var software = GetSoftwareInstanceCache(softwareId);
+                invoceCuds.SoftwarePin = software?.Pin;
+            }
+
+
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDE", ErrorMessage = "Cude No Válido" };
+            var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
+            if (invoceCuds.Cude.ToLower() == hash)
+            {
+                response.IsValid = true;
+                response.ErrorMessage = $"Valor calculado correctamente.";
+            }
+            response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+            return response;
+        }
+        #endregion
     }
+
+    //public class ValidadorCudeq 
+    //{
+    //    static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
+    //    private GlobalSoftware GetSoftwareInstanceCache(string id)
+    //    {
+    //        var itemKey = id;
+    //        GlobalSoftware software = null;
+    //        var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
+    //        var cacheItem = InstanceCache.SoftwareInstanceCache.GetCacheItem(itemKey);
+    //        if (cacheItem == null)
+    //        {
+    //            software = softwareTableManager.Find<GlobalSoftware>(itemKey, itemKey);
+    //            if (software == null) return null;
+    //            CacheItemPolicy policy = new CacheItemPolicy
+    //            {
+    //                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(softwareInstanceCacheTimePolicyInMinutes)
+    //            };
+    //            InstanceCache.SoftwareInstanceCache.Set(new CacheItem(itemKey, software), policy);
+    //        }
+    //        else
+    //            software = (GlobalSoftware)cacheItem.Value;
+
+    //        return software;
+    //    }
+    //    public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
+    //    {
+    //        DateTime startDate = DateTime.UtcNow;
+    //        data.TrackId = data.TrackId.ToLower();
+
+    //        var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+    //        var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
+
+    //        var softwareId = invoceCuds.SoftwareId;
+
+    //        if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
+    //        {
+    //            invoceCuds.SoftwarePin = billerSoftwarePin;
+    //        }
+    //        else
+    //        {
+    //            var @else = "";
+    //            @else = "1212";
+
+    //            var software = GetSoftwareInstanceCache(softwareId);
+    //            invoceCuds.SoftwarePin = software?.Pin;
+    //        }
+
+
+    //        var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
+    //        var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
+    //        if (invoceCuds.Cuds.ToLower() == hash)
+    //        {
+    //            response.IsValid = true;
+    //            response.ErrorMessage = $"Valor calculado correctamente.";
+    //        }
+    //        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
+    //        return response;
+    //    }
+    //}
 }
