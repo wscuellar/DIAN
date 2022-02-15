@@ -139,7 +139,7 @@ namespace Gosocket.Dian.DataContext
 
             try
             {
-                var sql = "Select * from List c where  c.IdList=2 ";
+                var sql = "Select * from List c where  c.IdList=2 and c.PartitionKey=2 ";
                 var result = new List<CoinType>();
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
@@ -168,7 +168,7 @@ namespace Gosocket.Dian.DataContext
             try
             {
                 var result = new List<ContractType>();
-                var sql = "Select * from List c where  c.IdList=3  and c.PartitionKey=3";
+                var sql = "Select * from List c where  c.IdList=3  and c.PartitionKey=3 ";
                 IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
                   UriFactory.CreateDocumentCollectionUri("Lists", "List"),
                   sql)
