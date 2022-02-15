@@ -167,6 +167,7 @@ namespace Gosocket.Dian.DataContext
         public DbSet<OtherDocElecOperationMode> OtherDocElecOperationModes { set; get; }
         public DbSet<OtherDocElecSoftware> OtherDocElecSoftwares { set; get; }
         public DbSet<OtherDocElecSoftwareStatus> OtherDocElecSoftwareStatus { set; get; }
+        public DbSet<OtherDocElecPayroll> OtherDocElecPayroll { set; get; }
 
         #endregion --- Other Docs Elect ---
         /// <summary>

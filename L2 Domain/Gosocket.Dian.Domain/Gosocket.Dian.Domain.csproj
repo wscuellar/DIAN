@@ -233,6 +233,7 @@
     <Compile Include="Sql\OtherDocElecContributorOperations.cs" />
     <Compile Include="Sql\OtherDocElecContributorType.cs" />
     <Compile Include="Sql\OtherDocElecOperationMode.cs" />
+    <Compile Include="Sql\OtherDocElecPayroll.cs" />
     <Compile Include="Sql\OtherDocElecSoftware.cs" />
     <Compile Include="Sql\OtherDocElecSoftwareStatus.cs" />
     <Compile Include="Sql\FreeBiller\MenuOptions.cs" />
