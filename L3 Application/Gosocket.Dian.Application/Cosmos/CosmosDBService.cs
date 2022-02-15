@@ -8,10 +8,12 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
+using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +50,8 @@ namespace Gosocket.Dian.Application.Cosmos
 
         // table manager instance
         private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorDocumentMeta");
+
+        private static readonly TableManager tableManagerTrackCosmos = new TableManager("TrackCosmos");
 
         //public static CosmosDBService Instance()
         //{
@@ -246,7 +250,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 options.RequestContinuation = result.ResponseContinuation;
                 documents.AddRange(result.ToList());
 
-                TrackOperation("FACELCosmosQuery_1", start, query.ToString(), result.RequestCharge.ToString());
+                TrackOperation("FACELCosmosQuery_1", start, query.ToString(), result.RequestCharge);
 
             } while (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults);
             return documents;
@@ -274,7 +278,7 @@ namespace Gosocket.Dian.Application.Cosmos
                  && e.DocumentKey == documentKey).AsEnumerable();
             var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
 
-            TrackOperation("FACELCosmosQuery_2", start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation("FACELCosmosQuery_2", start, query.ToString(), result.RequestCharge);
 
             return result.FirstOrDefault();
         }
@@ -342,7 +346,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 resultDocs.AddRange(SaveRest(result.GetEnumerator()));
                 ct = result.ResponseContinuation;
 
-                TrackOperation("FACELCosmosQuery_3", start, query.ToString(), result.RequestCharge.ToString());
+                TrackOperation("FACELCosmosQuery_3", start, query.ToString(), result.RequestCharge);
             }
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, ct, resultDocs.ToList());
@@ -532,8 +536,8 @@ namespace Gosocket.Dian.Application.Cosmos
             }
 
             FeedResponse<GlobalDataDocument> result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
-            
-            TrackOperation("FACELCosmosQuery_4", start, query.ToString(), result.RequestCharge.ToString());
+
+            TrackOperation ("FACELCosmosQuery_4", start, query.ToString(), result.RequestCharge);
 
             return Tuple.Create(((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults, result.ResponseContinuation, result.ToList());
         }
@@ -909,8 +913,8 @@ namespace Gosocket.Dian.Application.Cosmos
                     .Where(predicate).OrderByDescending(e => e.ReceptionTimeStamp).AsDocumentQuery();
             result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();           
             List<GlobalDataDocument> globalDocuments = result.ToList();
-            
-            TrackOperation("FACELCosmosQuery_0", start, query.ToString(), result.RequestCharge.ToString());
+
+            TrackOperation ("FACELCosmosQuery_0", start, query.ToString(), result.RequestCharge);
 
             return (((IDocumentQuery<GlobalDataDocument>)query).HasMoreResults,
                     result.ResponseContinuation,
@@ -1031,7 +1035,7 @@ namespace Gosocket.Dian.Application.Cosmos
             
             var lista = result.ToList<GlobalDataDocument>();
 
-            TrackOperation("FACELCosmosQuery_5", start, query.ToString(), result.RequestCharge.ToString());
+            TrackOperation ("FACELCosmosQuery_5", start, query.ToString(), result.RequestCharge);
 
             return lista;
         }
@@ -1114,7 +1118,7 @@ namespace Gosocket.Dian.Application.Cosmos
             );
             int res = await query.CountAsync();
 
-            TrackOperation("FACELCosmosQuery_6", start, query.ToString(), "ND");
+            TrackOperation("FACELCosmosQuery_6", start, query.ToString(), -1);
             return res;
         }
 
@@ -1179,32 +1183,50 @@ namespace Gosocket.Dian.Application.Cosmos
             return res;
         }
         
-        private static void TrackOperation(string eventName, DateTime start, string queryString, string rus)
+        private static void TrackOperation(string eventName, DateTime start, string queryString, double rus)
         {
             string trackCosmos = Environment.GetEnvironmentVariable("trackCosmos");
+            int maxSize = 24000;
             if ("true".Equals(trackCosmos))
             {
-                //hay limites en tamaño en appinsithgs
+                
+                queryString = queryString.Replace("\\", "");
+                int size = ASCIIEncoding.UTF8.GetByteCount(queryString);
+                if (size > maxSize)
+                {
+                    queryString = queryString.Substring(queryString.Length - maxSize);
+                }
                 List<string> lstQuerys = GetChunks(queryString, 8100);
-
-                int k = 1;
                 Dictionary<string, string> datos = new Dictionary<string, string>();
-
+                int k = 1;
                 foreach (var queryPart in lstQuerys)
                 {
                     datos.Add($"Query {k++}", queryPart);
-                    
-                }
+
+                }                          
                 datos.Add("Time", DateTime.UtcNow.Subtract(start).TotalSeconds.ToString());
-                datos.Add("RUs",rus);
-                telemetryClient.TrackTrace(eventName,SeverityLevel.Information, datos);
+                datos.Add("RUs", rus.ToString());
+                telemetryClient.TrackEvent(eventName, datos);
                 telemetryClient.Flush();
             }
         }
 
     }
 
-    #region Models
+
+    public class TrackCosmos : TableEntity
+    {
+        public TrackCosmos() { }
+
+        public TrackCosmos(string pk, string rk) : base(pk, rk)
+        {
+
+        }
+        public string Query { get; set; }
+        public double Time { get; set; }
+        public double RUS { get; set; }
+    }
+        #region Models
     public class GlobalDataDocumentModel
     {
         public string DocumentTypeId { get; set; }
