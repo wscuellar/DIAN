@@ -258,6 +258,12 @@ namespace Gosocket.Dian.Web.Controllers
                     return result;
 
                 }
+                if (List.Results.Count(x => x.StateSoftware == "3") == 1)
+                {
+                    result.Code = 500;
+                    result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                }
 
             }
             else
