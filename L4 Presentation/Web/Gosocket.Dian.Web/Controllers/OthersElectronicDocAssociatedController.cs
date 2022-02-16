@@ -258,7 +258,7 @@ namespace Gosocket.Dian.Web.Controllers
                     return result;
 
                 }
-                if (List.Results.Count(x => x.StateSoftware == "3") == 1)
+                if (List.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
                 {
                     result.Code = 500;
                     result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
@@ -269,7 +269,7 @@ namespace Gosocket.Dian.Web.Controllers
             else
             if (operation != null && List2.Results.Any(x => x.Id == operation.Id))
             {
-                if (List2.Results.Count(x => x.StateSoftware == "3") == 1)
+                if (List2.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
                 {
                     result.Code = 500;
                     result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
