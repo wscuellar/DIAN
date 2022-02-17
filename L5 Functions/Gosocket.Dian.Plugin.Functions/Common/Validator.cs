@@ -7600,17 +7600,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses = ValidateSerieAndNumber(nitModel, documentMeta);
                 validateResponses.AddRange(responses);
 
-                //Valida FE Activa como Titulo Valor y que exista la UUID
-                EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
-                responses = EventApproveCufe(nitModel, eventApproveCufe);
-                foreach (var itemEventAproveCufe in responses)
+
+                if (validaMandatoListID)
                 {
-                    if (!itemEventAproveCufe.IsValid)
-                        validateEventApproveCufe = false;
+                    //Valida FE Activa como Titulo Valor y que exista la UUID
+                    EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
+                    responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    foreach (var itemEventAproveCufe in responses)
+                    {
+                        if (!itemEventAproveCufe.IsValid)
+                            validateEventApproveCufe = false;
+                    }
+                    validateResponses.AddRange(responses);
                 }
-                validateResponses.AddRange(responses);
-
-
+                
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                     && validEventRadian)
