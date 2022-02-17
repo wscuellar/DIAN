@@ -3141,7 +3141,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         var attorneyFacultity = TableManagerGlobalAttorneyFacultity.FindDocumentFaculitityEvent<GlobalAttorneyFacultity>(eventCode);
                                         attorneyFacultity = attorneyFacultity.Where(t => t.PartitionKey == filter).ToList();
 
-                                        if (attorneyFacultity != null && attorneyFacultity.Count > 0)
+                                        if (attorneyFacultity != null || !attorneyFacultity.Any())
                                         {
                                             //Valida exista note mandatario
                                             if (noteMandato == null || !noteMandato.Contains("OBRANDO EN NOMBRE Y REPRESENTACION DE"))
