@@ -242,8 +242,42 @@ namespace Gosocket.Dian.Web.Controllers
         private ResponseMessage DeleteOperationInStorage(int id)
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+            var modes = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(operation.OtherDocElecContributorId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(User.ContributorId(), 2, 1);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(User.ContributorId(), 1, 1);
+
             ResponseMessage result = new ResponseMessage();
             //if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            if (operation != null && List.Results.Any(x => x.Id == operation.Id))
+            {
+                PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(User.ContributorId(), string.Empty, OtherDocElecState.none, 1, 10);
+                if (customers.Results.Count() > 0)
+                {
+                    result.Code = 500;
+                    result.Message = $"Tiene clientes asociados, no se permite eliminar.";
+                    return result;
+
+                }
+                if (List.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
+                {
+                    result.Code = 500;
+                    result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                }
+
+            }
+            else
+            if (operation != null && List2.Results.Any(x => x.Id == operation.Id))
+            {
+                if (List2.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
+                {
+                    result.Code = 500;
+                    result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                }
+
+            }
+            else
             if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
 
