@@ -217,7 +217,10 @@ namespace Gosocket.Dian.Functions.Others
 
                     //Se inserta en GlobalTestSetOthersDocumentsResult
                     if (IsProduction)
+                    {
+                        requestObject.TestSetOthersDocumentsResultObj.OtherDocElecContributorId = otherDocContributorId;
                         TableManagerTestSetOthersDocumentsResult.InsertOrUpdateAsync(requestObject.TestSetOthersDocumentsResultObj).Wait();
+                    }
 
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
