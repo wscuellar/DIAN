@@ -1028,7 +1028,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = documentParsed.Cude; 
+            var trackIdCude = documentParsed.Cude.ToLower(); 
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
 
@@ -1264,8 +1264,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd")
                     };
 
-                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });
-                   
+                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });                 
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
@@ -1279,8 +1278,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     trackId = documentParsed.DocumentKey;
                     var responseCode = documentParsed.ResponseCode;
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { trackId, responseCode, trackIdCude, listId });
-                    
+                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { trackId, responseCode, trackIdCude, listId });                    
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
