@@ -55,6 +55,7 @@
     //"KeyVaultCertificateName": "PersonaJuridica",
     //"VaultUrl": "https://gtpa-key-vault-hab.vault.azure.net/",
     //"GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragehab;AccountKey=ggl5Op8HgWO7iLSCr6I9kSF7HegCCUF9iwUgk+9jtdeVTOhscHWYOs/Y/XqB63hzzn9fEdGhHF2Zwp7PllozXA==;EndpointSuffix=core.windows.net",
+    //"GlobalStorageProd": "DefaultEndpointsProtocol=https;AccountName=gtpastorageprod;AccountKey=MA56GRAObMBTAitESy+Q8hNkAOvU+VOhyr0KBhL9VBwbpIqDdBT6uAo6JOg8yuMpHECNt2EBHzXTa8LcYUjs8A==;EndpointSuffix=core.windows.net",
     //"BillerSoftwarePin": "12345",
     //"SqlConnection": "Server=tcp:gtpa-sql-server-hab.database.windows.net,1433;Initial Catalog=gtpa-sql-hab;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
     //"SqlConnectionProd": "Server=tcp:gtpa-sql-server-prod.database.windows.net,1433;Initial Catalog=gtpa-sql-prod;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
@@ -67,6 +68,7 @@
     //"GetAppResponseUrl": "https://gtpa-function-commons-hab.azurewebsites.net/api/GetApplicationResponse?code=rrchw9riECXwv/ah8IxQTda4Wt5DhR83oN0eNNJL18bcyODNah1OKA==",
     //"UploadXmlUrl": "https://gtpa-function-doc-validator-hab.azurewebsites.net/api/UploadXml?code=xbSW9Tia42niR4UYcHliQP6GDOkfaJtIh27DGQVm9LA8hQkzytBAhQ==",
     //"ValidateDocumentUrl": "https://gtpa-function-doc-validator-hab.azurewebsites.net/api/ValidateDocument?code=2hlY0H43e779Gxg4HqwaP5tqBOL8EiMfjm7QDHVWPLms2d6EopdisQ==",
+    //"SendToActivateOtherDocumentContributorUrl": "https://gtpa-function-commons-hab.azurewebsites.net/api/SendToActivateOtherDocumentContributor?code=D/HkmFxy5/Gfbwj1UGXD7NhBZMG9eqpWZhvwTLXM/dtLHCeYdI4oIg=="
 
     // Prod config
     //"Environment": "Prod",

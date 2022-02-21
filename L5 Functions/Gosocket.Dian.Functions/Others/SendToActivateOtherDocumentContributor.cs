@@ -133,7 +133,7 @@ namespace Gosocket.Dian.Functions.Others
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
                         Code = data.Code,
-                        ContributorId = otherDocElecContributor.ContributorId,
+                        ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
                         OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),

@@ -622,7 +622,7 @@ namespace Gosocket.Dian.Infrastructure
         public List<T> FindDocumentReferenceAttorneyList<T>(string partitionKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-
+            
 
             var entities = CloudTable.ExecuteQuery(query);
 
@@ -1312,6 +1312,38 @@ namespace Gosocket.Dian.Infrastructure
             var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.ToList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public IEnumerable<T> GetRowsContainsInPartitionRowKey<T>(List<Tuple<string, string, int, string>> filters) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+            var filter = string.Join($" {TableOperators.Or} ", filters.Select(f => string.Format("({0})",
+            TableQuery.CombineFilters(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, f.Item1),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, string.Format("{0}|{1}", f.Item3, f.Item2))))));
+            
+            var entities = CloudTable.ExecuteQuery(query.Where(filter));
+            return entities;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filters"></param>
+        /// <returns></returns>
+        public IEnumerable<T> GetRowsContainsInAnyFilter<T>(List<Dictionary<string, string>> filters) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+            var filter = string.Join($" {TableOperators.Or} ", filters.Select(f => string.Join(string.Format(" {0} ", TableOperators.And), f.Select(d => string.Format("{0} eq {1}", d.Key, d.Value)))));
+            var entities = CloudTable.ExecuteQuery(query.Where(filter));
+            return entities;
         }
     }
 }

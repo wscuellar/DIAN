@@ -213,7 +213,7 @@ namespace Gosocket.Dian.Domain.Common
         NegotiatedInvoicePreviouslyRejected = 206,
         [Description("Evento '{0} {1}' no implementado")]
         NotImplemented = 222,
-        [Description("Documento no econtrado en los regristros de la DIAN")]
+        [Description("Documento no encontrado en los regristros de la DIAN")]
         NotFound = 223,
         [Description("Código del evento es inválido")]
         InvalidResponseCode = 298,

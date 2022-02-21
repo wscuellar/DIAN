@@ -3,6 +3,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -29,5 +30,9 @@ namespace Gosocket.Dian.Interfaces.Services
         OtherDocElecContributorOperations GetOtherDocElecContributorOperationByDocEleContributorId(int id);
 
         List<OtherDocElecContributorOperations> GetOtherDocElecContributorOperationsListByDocElecContributorId(int id);
+
+        Task<int> UpdateOtherDocElecContributorOperationStatusId(OtherDocElecContributorOperations contributorOperations, Domain.Common.OtherDocElecState operationStatus);
+
+        bool QualifiedContributor(OtherDocElecContributorOperations filters, OtherDocElecContributor otherDocElecContributorPar, string sqlConnectionStringProd);
     }
 }

@@ -4,18 +4,21 @@ using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
     public class OthersElectronicDocumentsService : IOthersElectronicDocumentsService
     {
         private readonly SqlDBContext sqlDBContext;
+        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         private readonly IContributorService _contributorService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
@@ -44,6 +47,9 @@ namespace Gosocket.Dian.Application
             if (sqlDBContext == null)
                 sqlDBContext = new SqlDBContext();
         }
+
+        public OthersElectronicDocumentsService()
+        { }
 
         public ResponseMessage Validation(string userCode, string Accion, int ElectronicDocumentId, string complementeTexto, int ContributorIdType)
         {
@@ -255,6 +261,97 @@ namespace Gosocket.Dian.Application
         public List<OtherDocElecContributorOperations> GetOtherDocElecContributorOperationsListByDocElecContributorId(int id)
         {
             return this._othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == id);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <param name="operationStatus"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateOtherDocElecContributorOperationStatusId(OtherDocElecContributorOperations filters, Domain.Common.OtherDocElecState operationStatus)
+        {
+            try
+            {
+                OtherDocElecContributorOperations contributorOperation = null;
+                using (var context = new SqlDBContext())
+                {
+                    contributorOperation = context.OtherDocElecContributorOperations.FirstOrDefault(c => c.OtherDocElecContributorId == filters.OtherDocElecContributorId &&
+                    c.SoftwareId == filters.SoftwareId);
+                    contributorOperation.Deleted = filters.Deleted;
+                    if (contributorOperation.OperationStatusId != (int)operationStatus)
+                        contributorOperation.OperationStatusId = filters.OperationStatusId;
+                    await context.SaveChangesAsync();
+                }
+                return contributorOperation.Id;
+            }
+            catch (Exception ex)
+            {
+                var logger = new GlobalLogger("Other Elec Doc - ContributorOperationStatusId", filters.Id.ToString())
+                {
+                    Action = "Update",
+                    Controller = "",
+                    Message = ex.Message,
+                    RouteData = "",
+                    StackTrace = ex.StackTrace
+                };
+                RegisterException(logger);
+                return 0;
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <param name="otherDocElecContributorPar"></param>
+        /// <param name="sqlConnectionStringProd"></param>
+        /// <returns></returns>
+        public bool QualifiedContributor(OtherDocElecContributorOperations filters, OtherDocElecContributor otherDocElecContributorPar, 
+            string sqlConnectionStringProd)
+        {
+            bool resultado = false;
+            if (string.IsNullOrEmpty(sqlConnectionStringProd))
+                sqlConnectionStringProd = ConfigurationManager.GetValue("SqlConnection");
+
+            using (var context = new SqlDBContext(sqlConnectionStringProd))
+            {
+                var contributor = context.Contributors.FirstOrDefault(co => co.Code == otherDocElecContributorPar.Description);
+                if (contributor != null)
+                {
+                    var otherDocElecContributor = context.OtherDocElecContributors.FirstOrDefault(c => c.ContributorId == contributor.Id &&
+                            c.OtherDocElecOperationModeId == otherDocElecContributorPar.OtherDocElecOperationModeId && c.State == "Habilitado" && c.Step == 3);
+                    if (otherDocElecContributor != null)
+                    {
+                        filters.OtherDocElecContributorId = otherDocElecContributor.Id;
+                        //resultado = true;
+                        OtherDocElecContributorOperations contributorOperation = context.OtherDocElecContributorOperations.FirstOrDefault(co =>
+                        co.OtherDocElecContributorId == filters.OtherDocElecContributorId &&
+                        co.SoftwareId == filters.SoftwareId && co.Deleted == filters.Deleted && co.OperationStatusId == filters.OperationStatusId);
+                        if (contributorOperation != null)
+                        {
+                            var otherdocelecsoftware = context.OtherDocElecSoftwares.FirstOrDefault(s => s.Id == contributorOperation.SoftwareId && (!s.Deleted) && s.Status &&
+                            s.OtherDocElecSoftwareStatusId == (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted);
+                            if (otherdocelecsoftware != null)
+                            {
+                                resultado = true;
+                            }
+                        }
+                    }
+                }
+            }
+            return resultado;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        private void RegisterException(GlobalLogger logger)
+        {
+
+            tableManager.InsertOrUpdate(logger);
         }
     }
 }

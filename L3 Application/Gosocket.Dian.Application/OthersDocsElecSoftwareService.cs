@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gosocket.Dian.Domain;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application
 {
@@ -23,7 +24,9 @@ namespace Gosocket.Dian.Application
         {
             _othersDocsElecSoftwareRepository = othersDocsElecSoftwareRepository;
         }
-         
+
+        public OthersDocsElecSoftwareService()
+        {}
 
         public OtherDocElecSoftware Get(Guid id)
         {
@@ -106,6 +109,45 @@ namespace Gosocket.Dian.Application
                 t.OtherDocElecContributor.ElectronicDocumentId == electronicDocumentId &&
                 t.OtherDocElecContributor.OtherDocElecContributorTypeId == contributorTypeId &&
                 t.OtherDocElecContributor.State == state && t.Deleted == false, 0, 0).Results;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="software"></param>
+        /// <param name="softwaresStatus"></param>
+        /// <returns></returns>
+        public async Task<Guid> UpdateSoftwareStatusId(OtherDocElecSoftware software, Domain.Common.OtherDocElecSoftwaresStatus softwaresStatus)
+        {
+            try
+            {
+                using (var context = new SqlDBContext())
+                {
+                    var softwareInstance = context.OtherDocElecSoftwares.FirstOrDefault(c => c.Id == software.Id);
+                    softwareInstance.Status = software.Status;
+                    softwareInstance.Deleted = software.Deleted;
+                    if (softwareInstance.OtherDocElecSoftwareStatusId != (int)softwaresStatus)
+                    {
+                        softwareInstance.OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId;
+                    }                        
+                    await context.SaveChangesAsync();
+                }
+                return software.Id;
+            }
+            catch (Exception ex)
+            {
+                var logger = new GlobalLogger("Other Docs Elec - UpdateSoftwareStatusId", software.Id.ToString())
+                {
+                    Action = "Update",
+                    Controller = "",
+                    Message = ex.Message,
+                    RouteData = "",
+                    StackTrace = ex.StackTrace
+                };
+                RegisterException(logger);
+                return Guid.Empty;
+            }
+
         }
     }
 }

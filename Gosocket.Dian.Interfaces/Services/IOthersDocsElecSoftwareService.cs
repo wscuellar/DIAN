@@ -2,6 +2,7 @@
 using Gosocket.Dian.Domain.Sql;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -22,5 +23,7 @@ namespace Gosocket.Dian.Interfaces.Services
             int electronicDocumentId,
             int contributorTypeId,
             string state);
+
+        Task<Guid> UpdateSoftwareStatusId(OtherDocElecSoftware software, Domain.Common.OtherDocElecSoftwaresStatus softwaresStatus);
     }
 }
