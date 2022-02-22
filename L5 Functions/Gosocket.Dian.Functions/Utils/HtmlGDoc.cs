@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Functions.Utils
 
             // Load XSLT Transform GDoc To HTML
             var fileManager = new FileManager();
-            var htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_html.xslt");
+            var htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
 
 
 
@@ -133,7 +133,7 @@ namespace Gosocket.Dian.Functions.Utils
         public Stream TransformToGDoc(Dictionary<string, string> parameters = null)
         {
             var fileManager = new FileManager();
-            var xsltBytes = fileManager.GetBytes("dian", "configurations/transform_dte_to_gdoc.xslt");
+            var xsltBytes = fileManager.GetBytes("dian", "configurations/transform_dte_to_gdocSE.xslt");
 
             var processor = new Processor();
             var input = processor.NewDocumentBuilder().Build(_xml);
