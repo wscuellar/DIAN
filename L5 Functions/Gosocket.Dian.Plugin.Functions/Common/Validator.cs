@@ -7269,6 +7269,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta == null || string.IsNullOrEmpty(documentMeta.PartitionKey))
             {
                 documentMeta = documentMetaRef;
+
+                //Si no retorna fecha campo SigningTimeStamp //Date = { 1 / 1 / 0001 12:00:00 AM}
+                string dateTimeStamp = documentMeta.SigningTimeStamp.ToString("yyyy-MM-ddTHH:mm:ss");
+                if (dateTimeStamp.Equals("0001-01-01T00:00:00"))
+                {
+                    var xmlBytes = GetXmlFromStorageAsync(documentMetaRef.PartitionKey);
+                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    if (!xmlParser.Parser())
+                        throw new Exception(xmlParser.ParserError);
+
+                    documentMeta.SigningTimeStamp = Convert.ToDateTime(xmlParser.SigningTime);
+
+                }
             }
 
             // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
@@ -7634,7 +7647,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.AddRange(responses);
                 }
 
-                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());
+                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());                               
 
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
