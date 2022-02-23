@@ -231,8 +231,9 @@ namespace Gosocket.Dian.Application
             var entity = (from oc in sqlDBContext.OtherDocElecContributors
                           join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                           join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
-                          join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                          join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id                          
                           join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                          join odeco in sqlDBContext.OtherDocElecContributorOperations on new { colA = s.Id, colB = oc.Id } equals new { colA = odeco.SoftwareId, colB = odeco.OtherDocElecContributorId }                                                                             
                           where oc.Id == Id
                            && oc.State != "Cancelado"
                            && s.Deleted == false
