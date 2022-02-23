@@ -33,8 +33,13 @@ namespace Gosocket.Dian.Functions.Utils
             }
         }
 
-        public byte[] PdfRender(string Html_Content, string trackId)
+        public byte[] PdfRender(string Html_Content, string trackId, PaperSize paperSize)
         {
+            if (paperSize is null)
+            {
+                paperSize = PaperSize.A4;
+            }
+
             byte[] pdf = null;
             lock (instance)
             {
@@ -44,7 +49,7 @@ namespace Gosocket.Dian.Functions.Utils
                         .WithGlobalSetting("orientation", "Portrait")
                         .WithObjectSetting("web.defaultEncoding", "utf-8")
                         //.WithTitle($"{trackId}.pdf")
-                        .OfSize(PaperSize.A4)
+                        .OfSize(paperSize)
                         .Content();
             }
             return pdf;

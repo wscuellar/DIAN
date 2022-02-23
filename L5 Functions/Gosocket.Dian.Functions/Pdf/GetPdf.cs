@@ -4,6 +4,7 @@ using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using OpenHtmlToPdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +35,9 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Establecer nombre para consultar la cadena o los datos del cuerpo
                 trackId = trackId ?? data?.trackId;
+                string typeFormat = data?.typeFormat;
+                string sectionsString = data?.sectionsToHide ?? "";
+                string[] sectionsToHide = sectionsString.Split('|');
 
                 if (trackId == null)
                     return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
@@ -78,6 +82,8 @@ namespace Gosocket.Dian.Functions.Pdf
                 var htmlGDoc = new HtmlGDoc(xmlBytes, xmlBytesApplication);
                 string Html_Content = htmlGDoc.GetHtmlGDoc(dictionary);
 
+                //-------------------------------------------------------------------------------------------------------------------------
+                Html_Content = ConfigureSectionsToVisualice(typeFormat, sectionsToHide, Html_Content);
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
@@ -127,7 +133,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 // File.WriteAllText(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.html", Html_Content);
 
                 // Salvar PDF generado de HTML en el Storage
-                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId);
+                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId, getPaperSize(typeFormat));
 
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new ByteArrayContent(pdfBytes);
@@ -166,6 +172,57 @@ namespace Gosocket.Dian.Functions.Pdf
             int sec = Convert.ToInt32(hours[2]);
             return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
 
+        }
+
+        private static string ConfigureSectionsToVisualice(string typeFormat, string[] sectionsToHide, string Html_Content)
+        {
+            if (typeFormat == "Formato tipo parametrizable")
+            {
+                foreach (var section in sectionsToHide)
+                {
+                    if (section.Equals("Descuentos y recargos globales"))
+                    {
+                        Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "display:none");
+                        continue;
+                    }
+                    if (section.Equals("Anticipos"))
+                    {
+                        Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "display:none");
+                        continue;
+                    }
+                    if (section.Equals("Referencias"))
+                    {
+                        Html_Content = Html_Content.Replace("#styleSectionReferencias#", "display:none");
+                        continue;
+                    }
+                    if (section.Equals("Información complementaria"))
+                    {
+                        Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "display:none");
+                    }
+                }
+            }
+            Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "");
+            Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "");
+            Html_Content = Html_Content.Replace("#styleSectionReferencias#", "");
+            Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "");
+            
+            return Html_Content;
+        }
+
+        private static PaperSize getPaperSize(string typeFormat)
+        {
+            switch (typeFormat)
+            {
+                case "Formato tipo carta":
+                case "Formato tipo parametrizable":
+                    return PaperSize.A4;
+                case "Formato tipo media carta":
+                    return PaperSize.A5;
+                case "Formato tipo tirilla":
+                    return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
+                default:
+                    return PaperSize.A4;
+            }
         }
     }
 }
