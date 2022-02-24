@@ -250,7 +250,7 @@ namespace Gosocket.Dian.Application
                               OperationModeId = oc.OtherDocElecOperationModeId,
                               ContributorTypeId = oc.OtherDocElecContributorTypeId,
                               ElectronicDocId = oc.ElectronicDocumentId,
-                              ProviderId = s.ProviderId,
+                              ProviderId = s.ProviderId == 0 ? oc.ContributorId : s.ProviderId,
                               Step = oc.Step,
                               State = oc.State,
                               SoftwareId = s.Id.ToString(),
