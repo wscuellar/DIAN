@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 string Html_Content = htmlGDoc.GetHtmlGDoc(dictionary);
 
                 //-------------------------------------------------------------------------------------------------------------------------
-                Html_Content = ConfigureSectionsToVisualice(typeFormat, sectionsToHide, Html_Content);
+                Html_Content = ConfigurePrintTemplate(typeFormat, sectionsToHide, Html_Content);
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
@@ -135,6 +135,9 @@ namespace Gosocket.Dian.Functions.Pdf
                 // Salvar PDF generado de HTML en el Storage
                 var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId, getPaperSize(typeFormat));
 
+                // Guardar en disco el pdf generado
+                // File.WriteAllBytes(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.pdf", pdfBytes);
+
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new ByteArrayContent(pdfBytes);
                 result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
@@ -174,38 +177,65 @@ namespace Gosocket.Dian.Functions.Pdf
 
         }
 
-        private static string ConfigureSectionsToVisualice(string typeFormat, string[] sectionsToHide, string Html_Content)
+        private static string ConfigurePrintTemplate(string typeFormat, string[] sectionsToHide, string Html_Content)
         {
+            if(typeFormat == "Formato tipo media carta")
+            {
+                Html_Content = AddStylesToTemplateForPrintHalfLetter(Html_Content);
+            }
             if (typeFormat == "Formato tipo parametrizable")
             {
-                foreach (var section in sectionsToHide)
-                {
-                    if (section.Equals("Descuentos y recargos globales"))
-                    {
-                        Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "display:none");
-                        continue;
-                    }
-                    if (section.Equals("Anticipos"))
-                    {
-                        Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "display:none");
-                        continue;
-                    }
-                    if (section.Equals("Referencias"))
-                    {
-                        Html_Content = Html_Content.Replace("#styleSectionReferencias#", "display:none");
-                        continue;
-                    }
-                    if (section.Equals("Información complementaria"))
-                    {
-                        Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "display:none");
-                    }
-                }
+                Html_Content = ConfigureTemplateForVisualizeSelectedSections(sectionsToHide, Html_Content);
             }
+
+            Html_Content = Html_Content.Replace("#stylesForHalfLetter#", "");
             Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "");
             Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "");
             Html_Content = Html_Content.Replace("#styleSectionReferencias#", "");
             Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "");
             
+            return Html_Content;
+        }
+
+        private static string ConfigureTemplateForVisualizeSelectedSections(string[] sectionsToHide, string Html_Content)
+        {
+            foreach (var section in sectionsToHide)
+            {
+                if (section.Equals("Descuentos y recargos globales"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Anticipos"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Referencias"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionReferencias#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Información complementaria"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "display:none");
+                }
+            }
+
+            return Html_Content;
+        }
+
+        private static string AddStylesToTemplateForPrintHalfLetter(string Html_Content)
+        {
+            string stylesMiddleLetter = @"
+                .titleSecundario {
+                    margin: 0 35px 0 !important;
+                }
+                .divDetalle {
+                    margin: 10px 50px 20px !important;
+                }
+            ";
+            Html_Content = Html_Content.Replace("#stylesForHalfLetter#", stylesMiddleLetter);
             return Html_Content;
         }
 
