@@ -250,7 +250,7 @@ namespace Gosocket.Dian.Application
                               OperationModeId = oc.OtherDocElecOperationModeId,
                               ContributorTypeId = oc.OtherDocElecContributorTypeId,
                               ElectronicDocId = oc.ElectronicDocumentId,
-                              ProviderId = s.ProviderId,
+                              ProviderId = s.ProviderId == 0 ? oc.ContributorId : s.ProviderId,
                               Step = oc.Step,
                               State = oc.State,
                               SoftwareId = s.Id.ToString(),
@@ -259,10 +259,13 @@ namespace Gosocket.Dian.Application
 
             if (entity.Any())
             {
-                List<string> userIds = _contributorService.GetUserContributors(entity.First().ContributorId).Select(u => u.UserId).ToList();
-                entity.First().LegalRepresentativeIds = userIds;
-
-                return entity.First();
+                OtherDocsElectData _entity = entity.Where(e => e.ProviderId != 0).FirstOrDefault();
+                if (_entity != null)
+                {
+                    List<string> userIds = _contributorService.GetUserContributors(_entity.ContributorId).Select(u => u.UserId).ToList();
+                    _entity.LegalRepresentativeIds = userIds;
+                    return _entity;
+                }
             }            
 
             return new OtherDocsElectData();
