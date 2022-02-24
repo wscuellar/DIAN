@@ -237,7 +237,6 @@ namespace Gosocket.Dian.Application
                           where oc.Id == Id
                            && oc.State != "Cancelado"
                            && s.Deleted == false
-                           && s.OtherDocElecSoftwareStatusId == 2
 
                           select new OtherDocsElectData()
                           {
@@ -260,10 +259,13 @@ namespace Gosocket.Dian.Application
 
             if (entity.Any())
             {
-                List<string> userIds = _contributorService.GetUserContributors(entity.First().ContributorId).Select(u => u.UserId).ToList();
-                entity.First().LegalRepresentativeIds = userIds;
-
-                return entity.First();
+                OtherDocsElectData _entity = entity.Where(e => e.ProviderId != 0).FirstOrDefault();
+                if (_entity != null)
+                {
+                    List<string> userIds = _contributorService.GetUserContributors(_entity.ContributorId).Select(u => u.UserId).ToList();
+                    _entity.LegalRepresentativeIds = userIds;
+                    return _entity;
+                }
             }            
 
             return new OtherDocsElectData();
