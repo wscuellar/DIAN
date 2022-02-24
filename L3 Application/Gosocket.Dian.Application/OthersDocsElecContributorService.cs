@@ -237,6 +237,7 @@ namespace Gosocket.Dian.Application
                           where oc.Id == Id
                            && oc.State != "Cancelado"
                            && s.Deleted == false
+                           && s.OtherDocElecSoftwareStatusId == 2
 
                           select new OtherDocsElectData()
                           {
