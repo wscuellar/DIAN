@@ -132,8 +132,8 @@ namespace Gosocket.Dian.Functions.Others
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
-                        Code = data.Code,
-                        ContributorId = otherDocElecContributor.ContributorId,
+                        Code = data.Code,                        
+                        ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
                         OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
