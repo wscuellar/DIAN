@@ -258,7 +258,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse, flagInvoice);
 
                 start = DateTime.UtcNow;
                 var checkPermissions = new GlobalLogger(zipKey, "8 checkPermissions")
@@ -675,7 +675,7 @@ namespace Gosocket.Dian.Functions.Batch
             return null;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false, Boolean flagInvoice = false)
         {
             var start = DateTime.UtcNow;
             var checkPermissions = new GlobalLogger(zipKey, "7 checkPermissions")
@@ -685,7 +685,8 @@ namespace Gosocket.Dian.Functions.Batch
                 " Step-authCode " + authCode +
                 " Step-testSetId " + testSetId +
                 " Step-nitNomina " + nitNomina +
-                " Step-flagApplicationResponse " + flagApplicationResponse.ToString()
+                " Step-flagApplicationResponse " + flagApplicationResponse.ToString() +
+                " Step-flagInvoice " + flagInvoice.ToString()
             };
             var insertLog = TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
 
@@ -912,8 +913,10 @@ namespace Gosocket.Dian.Functions.Batch
 
                             if (messageMandato)                                                            
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });                            
+                            else if(string.IsNullOrWhiteSpace(nitNomina) && !flagApplicationResponse && !flagInvoice)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al participante registrado en proceso de habilitación." });
                             else                                                            
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });                                                       
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });                                               
                         }
                     }
                 }
