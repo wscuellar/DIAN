@@ -138,6 +138,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 var xmlBytes = contentFileList.First().XmlBytes;               
 
+                //Si retorna información otros documentos Nomina
                 if (setResultOther != null)
                 {
                     xmlParser = new XmlParseNomina();                   
@@ -215,7 +216,8 @@ namespace Gosocket.Dian.Functions.Batch
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(checkNits);
 
-                if (setResultOther == null)
+                //Informacion documento ApplicaionResponse, FE, NC y ND
+                if (flagApplicationResponse || flagInvoice)
                 {
                     start = DateTime.UtcNow;
                     var checksetResultOther = new GlobalLogger(zipKey, "5.1 checksetResultOther")

@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Functions.Payroll
                     GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
                     {
                         PartitionKey = "Employee",
-                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
+                        RowKey = $"{docGlobalPayroll.RowKey}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
                         NumeroDocumento = numeroDocumento,
                         TipoDocumento = docGlobalPayroll.TipoDocumento,
                         NitEmpresa = docGlobalPayroll.NIT,
