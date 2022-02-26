@@ -189,6 +189,7 @@ namespace Gosocket.Dian.Functions.Pdf
             }
 
             Html_Content = Html_Content.Replace("#stylesForHalfLetter#", "");
+            Html_Content = Html_Content.Replace("#styleSectionDatosAdicionales#", "");
             Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "");
             Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "");
             Html_Content = Html_Content.Replace("#styleSectionReferencias#", "");
@@ -201,6 +202,11 @@ namespace Gosocket.Dian.Functions.Pdf
         {
             foreach (var section in sectionsToHide)
             {
+                if (section.Equals("Datos adicionales"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionDatosAdicionales#", "display:none");
+                    continue;
+                }
                 if (section.Equals("Descuentos y recargos globales"))
                 {
                     Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "display:none");
