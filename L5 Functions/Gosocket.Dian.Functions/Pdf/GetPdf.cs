@@ -35,9 +35,6 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Establecer nombre para consultar la cadena o los datos del cuerpo
                 trackId = trackId ?? data?.trackId;
-                string typeFormat = data?.typeFormat;
-                string sectionsString = data?.sectionsToHide ?? "";
-                string[] sectionsToHide = sectionsString.Split('|');
 
                 if (trackId == null)
                     return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a trackId on the query string or in the request body");
@@ -61,6 +58,9 @@ namespace Gosocket.Dian.Functions.Pdf
                     responseApplication.Content = xmlBytesApplication;
                     responseApplication.ContentBase64 = Convert.ToBase64String(xmlBytesApplication);
                 }
+
+                string typeFormat = documentMetaEntity?.PrintFormatType;
+                string[] sectionsToHide = (documentMetaEntity?.SectionsToHide ?? "").Split('|');
 
                 // Diccionario para construir Pdf
                 var dictionary = new Dictionary<string, string>
@@ -118,7 +118,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 if (documentApplication != null)
                 {
                     documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
-                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication); 
+                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
                 else
@@ -179,7 +179,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
         private static string ConfigurePrintTemplate(string typeFormat, string[] sectionsToHide, string Html_Content)
         {
-            if(typeFormat == "Formato tipo media carta")
+            if (typeFormat == "Formato tipo media carta")
             {
                 Html_Content = AddStylesToTemplateForPrintHalfLetter(Html_Content);
             }
@@ -193,7 +193,7 @@ namespace Gosocket.Dian.Functions.Pdf
             Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "");
             Html_Content = Html_Content.Replace("#styleSectionReferencias#", "");
             Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "");
-            
+
             return Html_Content;
         }
 
