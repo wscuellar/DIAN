@@ -636,7 +636,7 @@ namespace Gosocket.Dian.Application
                 else
                 {
                     return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "En pruebas");
+                    && rc.OtherDocElecContributorTypeId == contributorTypeId);
                 }
             }
         }
