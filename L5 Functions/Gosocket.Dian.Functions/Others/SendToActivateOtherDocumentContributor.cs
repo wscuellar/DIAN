@@ -114,7 +114,9 @@ namespace Gosocket.Dian.Functions.Others
                         " OtherDocElecContributorTypeId: " + otherDocElecContributor.OtherDocElecContributorTypeId +
                         " OtherDocElecOperationModeId: " + otherDocElecContributor.OtherDocElecOperationModeId +
                         " SoftwareId: " + data.SoftwareId +
-                        " SoftwareType: " + data.SoftwareType
+                        " SoftwareType: " + data.SoftwareType +
+                        " results.SoftwareId: " + results.SoftwareId +
+                        " data.Code: " + data.Code
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
 
