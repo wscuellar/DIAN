@@ -581,7 +581,7 @@ namespace Gosocket.Dian.Functions.Activation
                                     url = software.Url,
                                     softwareName = software.Name,
                                     enabled = false,
-                                    testSetId = setResultOther.Id
+                                    testSetId = testSetId
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
