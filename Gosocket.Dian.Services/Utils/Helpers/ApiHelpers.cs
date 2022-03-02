@@ -124,7 +124,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
             try
             {
                 var response = await ConsumeApiAsync(url, requestObj);
-                result = response.Content.ReadAsStringAsync()?.Result;
+                result = await response.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<T>(result);
             }
             catch (Exception ex)
