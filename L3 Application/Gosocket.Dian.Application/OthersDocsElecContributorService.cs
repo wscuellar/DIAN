@@ -38,6 +38,14 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode GetOperationModeById(int operationModeId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecOperationModes.FirstOrDefault(t => t.Id == operationModeId);
+            }
+        }
+
         public NameValueCollection Summary(string userCode)
         {
             NameValueCollection collection = new NameValueCollection();
