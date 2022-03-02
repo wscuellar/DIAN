@@ -132,7 +132,7 @@ namespace Gosocket.Dian.Functions.Others
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
-                        Code = data.Code,
+                        Code = data.Code,                        
                         ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
