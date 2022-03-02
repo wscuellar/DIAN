@@ -221,7 +221,7 @@ namespace Gosocket.Dian.Functions.Others
                         requestObject.TestSetOthersDocumentsResultObj.OtherDocElecContributorId = otherDocContributorId;
                         TableManagerTestSetOthersDocumentsResult.InsertOrUpdateAsync(requestObject.TestSetOthersDocumentsResultObj).Wait();
                     }
-
+                        
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ", "ACT-11");
 
                     start = DateTime.UtcNow;
