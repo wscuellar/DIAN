@@ -5901,6 +5901,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
             int businessDays = 0;
+            int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimit"), out int businessDaysLimit); 
+
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
             DateTime signingTimeEvent = Convert.ToDateTime(data.SigningTime).Date;
@@ -5967,7 +5969,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Rejected:
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModelSigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
-                    responses.Add(businessDays > 3
+                    responses.Add(businessDays > businessDaysLimit
                          ? new ValidateListResponse
                          {
                              IsValid = false,
@@ -5989,7 +5991,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     DateTime signingTimeAccepted = Convert.ToDateTime(data.SigningTime);
                     DateTime signingTimeReceipt = Convert.ToDateTime(dataModelSigningTime).AddHours(-5);
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeReceipt, signingTimeAccepted);
-                    responses.Add(businessDays > 3
+                    responses.Add(businessDays > businessDaysLimit
                         ? new ValidateListResponse
                         {
                             IsValid = false,
@@ -6009,7 +6011,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.AceptacionTacita:
                     businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(dataModelSigningTime).AddHours(-5), Convert.ToDateTime(data.SigningTime));
-                    responses.Add(businessDays > 3
+                    responses.Add(businessDays > businessDaysLimit
                         ? new ValidateListResponse
                         {
                             IsValid = true,
@@ -6047,7 +6049,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (endDatePaymentDueDate == paymentDueDateFactura)
                         {
                             businessDays = BusinessDaysHolidays.BusinessDaysUntil(signingTimeEvento, endDatePaymentDueDate);
-                            if (businessDays == 3)
+                            if (businessDays == businessDaysLimit)
                             {
                                 responses.Add(new ValidateListResponse
                                 {
@@ -6058,7 +6060,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                            else if (businessDays < 3)
+                            else if (businessDays < businessDaysLimit)
                             {
                                 responses.Add(new ValidateListResponse
                                 {
@@ -6070,7 +6072,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                            else if (businessDays > 3)
+                            else if (businessDays > businessDaysLimit)
                             {
                                 responses.Add(new ValidateListResponse
                                 {
