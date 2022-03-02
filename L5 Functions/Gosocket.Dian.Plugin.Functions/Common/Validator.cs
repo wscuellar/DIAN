@@ -5732,7 +5732,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
 
-                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey && string.IsNullOrEmpty(documentIdentifier.TestSetId))
+                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey )
                         {
                             responses.Add(new ValidateListResponse
                             {
