@@ -7051,16 +7051,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (LocalNamePpal.Equals(xmlNominaIndividualDeAjuste))
             {
                 if (!Namespace.Contains(xmlNominaIndividualDeAjuste)) return "El valor del Namespace no corresponde a " + xmlNominaIndividualDeAjuste;
-                if (!SchemaLocation.Contains(xmlNominaIndividualDeAjuste + " ")) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividualDeAjuste;
-                if (!SchemaLocation.Contains(xmlXSDNominaIndividualDeAjuste)) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividualDeAjuste;
+                if (string.IsNullOrWhiteSpace(SchemaLocation) || !SchemaLocation.Contains(xmlNominaIndividualDeAjuste + " ")) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividualDeAjuste;
+                if (string.IsNullOrWhiteSpace(SchemaLocation) || !SchemaLocation.Contains(xmlXSDNominaIndividualDeAjuste)) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividualDeAjuste;
                 //consulto todos los namespace que debe tener el doc para su posterior validacion
                 valueCorrectoNamespeceNominaIndivial = ConfigurationManager.GetValue("Namespace_IndividualPayrollAdjustments");
             }
             else if (LocalNamePpal.Equals(xmlNominaIndividual))
             {
                 if (!Namespace.Contains(xmlNominaIndividual)) return "El valor del Namespace no corresponde a " + xmlNominaIndividual;
-                if (!SchemaLocation.Contains(xmlNominaIndividual + " ")) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividual;
-                if (!SchemaLocation.Contains(xmlXSDNominaIndividual)) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividual;
+                if (string.IsNullOrWhiteSpace(SchemaLocation) || !SchemaLocation.Contains(xmlNominaIndividual + " ")) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividual;
+                if (string.IsNullOrWhiteSpace(SchemaLocation) || !SchemaLocation.Contains(xmlXSDNominaIndividual)) return "El valor del schemaLocation no corresponde a " + xmlNominaIndividual;
                 //consulto todos los namespace que debe tener el doc para su posterior validacion
                 valueCorrectoNamespeceNominaIndivial = ConfigurationManager.GetValue("Namespace_IndividualPayroll");
             }
