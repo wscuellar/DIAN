@@ -57,7 +57,8 @@
             let selectedValue = $(this).val();
             if (selectedValue != null && selectedValue != '') {
                 $('#SoftwareId').val(selectedValue);
-                $('#SoftwareName').val($('#ddlsoftware option:selected').text());
+                $('#SoftwareName').val($('#ddlsoftware option:selected').text()); 
+                $("#validddlSoftwareName").text('');
                 getDataSoftwareSeleccionado(selectedValue);
             }
         })
@@ -254,13 +255,20 @@
                     , "", () => hideLoading('#panel-form')));
             };
 
-            function fnvalidSoftwareName() {
+            function fnvalidSoftwareName() { 
                 $("#validSoftwareName").text('');
+                $("#validddlSoftwareName").text('');
                 if ($("#OperationModeId").val() == "1") {
                     if ($("#SoftwareName").val() == '' || $("#SoftwareName").val() == undefined) {
                         $("#validSoftwareName").text("El campo es requerido");
                         return true;
                     }
+                }
+                if ($("#OperationModeId").val() == "2") {
+                    if ($('#ddlsoftware option:selected').text() == '' || $('#ddlsoftware option:selected').text() == undefined || $('#ddlsoftware option:selected').text() == 'Seleccione...') {
+                        $("#validddlSoftwareName").text("El campo es requerido");
+                       return true;
+                   }
                 }
                 return false;
             }

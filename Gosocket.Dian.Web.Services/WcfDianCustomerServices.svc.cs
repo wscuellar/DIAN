@@ -630,9 +630,9 @@ namespace Gosocket.Dian.Web.Services
             }
             catch (Exception ex)
             {
-                Log("SendEventUpdateStatus", (int)InsightsLogType.Error, ex.Message);
-                var exception = new GlobalLogger($"SendEventUpdateStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
-                { Action = $"SendEventUpdateStatus", Message = ex.Message, StackTrace = ex.StackTrace };
+                Log("SendNominaSync", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"SendNominaSyncStatusException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString())
+                { Action = $"SendNominaSync", Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(exception);
 
                 return new DianResponse

@@ -31,7 +31,7 @@ namespace Gosocket.Dian.Infrastructure
         List<DynamicTableEntity> FindByPartitionWithPagination(string partitionKey);
         List<T> FindByPartitionWithPagination<T>(string partitionKey) where T : ITableEntity, new();
         List<T> FindByPartitionWithPagination<T>(string partitionKey, DateTime timeStampFrom, DateTime timeStampTo) where T : ITableEntity, new();        
-        T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new();       
+        T FindByTestSetId<T>(string partitionKey, string testSetId) where T : ITableEntity, new();       
         T FindDocumentReferenceAttorney<T>(string partitionKey) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorney<T>(string rowKey, string senderCode) where T : ITableEntity, new();
         List<T> FindDocumentReferenceAttorneyByCUFEList<T>(string rowKey) where T : ITableEntity, new();
@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Infrastructure
         List<T> FindGlobalOtherDocElecOperationByPartition_RowKey_Deleted_State<T>(string partitionKey, string rowKey, bool deleted, string state) where T : ITableEntity, new();
         T FindGlobalPayrollByCUNE<T>(string cune) where T : ITableEntity, new();
         List<T> FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<T>(int take, DateTime? monthStart, DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, double? employeeSalaryEnd, string employeeCity) where T : ITableEntity, new();
-        T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new();
+        T FindGlobalTestOtherDocumentId<T>(string partitionkey, string testSetId) where T : ITableEntity, new();
         T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new();
         T FindhByCufeSenderAttorney<T>(string rowKey, string senderCode, string issuerAttorney) where T : ITableEntity, new();       
         T FindhByPartitionKeyRadianStatus<T>(string partitionKey, bool deleted, string softwareId) where T : ITableEntity, new();
