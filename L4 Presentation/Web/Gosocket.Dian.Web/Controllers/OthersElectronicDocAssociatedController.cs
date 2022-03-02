@@ -29,13 +29,7 @@ namespace Gosocket.Dian.Web.Controllers
     public class OthersElectronicDocAssociatedController : Controller
     {
         private UserService userService = new UserService();
-        private ApplicationUserManager _userManager;
-        private IContributorService object1;
-        private IOthersDocsElecContributorService object2;
-        private IOthersElectronicDocumentsService object3;
-        private ITestSetOthersDocumentsResultService object4;
-        private IOthersDocsElecSoftwareService object5;
-        private IGlobalOtherDocElecOperationService object6;
+        private ApplicationUserManager _userManager;       
 
         public ApplicationUserManager UserManager
         {
@@ -73,16 +67,6 @@ namespace Gosocket.Dian.Web.Controllers
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
             _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
             this.telemetry = telemetry;
-        }
-
-        public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
-        {
-            this.object1 = object1;
-            this.object2 = object2;
-            this.object3 = object3;
-            this.object4 = object4;
-            this.object5 = object5;
-            this.object6 = object6;
         }
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
