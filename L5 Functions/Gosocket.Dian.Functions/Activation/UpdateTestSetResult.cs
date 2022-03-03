@@ -63,6 +63,7 @@ namespace Gosocket.Dian.Functions.Activation
                 GlobalTestSetOthersDocumentsResult setResultOther = null;
                 testSetId = globalTestSetTracking.TestSetId;
                 string radianProvider = string.Empty;
+                string nominaProvider = string.Empty;
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
@@ -76,7 +77,7 @@ namespace Gosocket.Dian.Functions.Activation
                         //Consigue informacion del trackId
                         GlobalDocValidatorDocumentMeta teachProviderDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(itemMeta.TrackId, itemMeta.TrackId);
                         
-                        //Obtiene información del participante directo o indirecto
+                        //Obtiene identificacion del participante directo o indirecto
                         radianProvider = teachProviderDocumentMeta.TechProviderCode != teachProviderDocumentMeta.SenderCode ? teachProviderDocumentMeta.SenderCode : teachProviderDocumentMeta.TechProviderCode;
                         radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(radianProvider, globalTestSetTracking.TestSetId);
                         if (radianTesSetResult != null) break;                     
@@ -88,6 +89,9 @@ namespace Gosocket.Dian.Functions.Activation
                     {
                         //Consigue informacion del trackId nomina individual y nomina de ajuste
                         GlobalDocPayroll teachProviderPayroll = TableManagerGlobalDocPayroll.FindByPartition<GlobalDocPayroll>(itemMeta.TrackId).FirstOrDefault();
+
+                        //Obtiene identificacion del participante habilitar
+                        nominaProvider = teachProviderPayroll.NIT != teachProviderPayroll.Emp_NIT ? teachProviderPayroll.Emp_NIT : teachProviderPayroll.NIT;
                         setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.NIT, globalTestSetTracking.TestSetId);
                         if (setResultOther != null) break;
                     }                        
