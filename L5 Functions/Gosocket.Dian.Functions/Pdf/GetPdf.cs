@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Transformar **XML** to **HTML**
                 var htmlGDoc = new HtmlGDoc(xmlBytes, xmlBytesApplication);
-                string Html_Content = htmlGDoc.GetHtmlGDoc(dictionary);
+                string Html_Content = htmlGDoc.GetHtmlGDoc(typeFormat, dictionary);
 
                 //-------------------------------------------------------------------------------------------------------------------------
                 Html_Content = ConfigurePrintTemplate(typeFormat, sectionsToHide, Html_Content);

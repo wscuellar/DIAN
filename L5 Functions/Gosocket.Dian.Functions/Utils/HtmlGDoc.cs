@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Functions.Utils
             }
         }
 
-        public string GetHtmlGDoc(Dictionary<string, string> parameters = null)
+        public string GetHtmlGDoc(string typeFormat, Dictionary<string, string> parameters = null)
         {
             // Create a processor instance.
             Processor processor = new Processor();
@@ -82,10 +82,8 @@ namespace Gosocket.Dian.Functions.Utils
             XdmNode input = newDocumentBuilder.Build(xmlReader);
 
             // Load XSLT Transform GDoc To HTML
-            var fileManager = new FileManager();
-            var htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
-
-
+            byte[] htmlXsltBytes;
+            htmlXsltBytes = GetTemplate(typeFormat);
 
             TextReader streamReaderHtmlXslt = new StreamReader(new MemoryStream(htmlXsltBytes));
 
@@ -113,6 +111,22 @@ namespace Gosocket.Dian.Functions.Utils
             transformer.Run(serializer);
 
             return result.ToString();
+        }
+
+        private static byte[] GetTemplate(string typeFormat)
+        {
+            var fileManager = new FileManager();
+            byte[] htmlXsltBytes;
+            if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "Formato tipo carta")
+            {
+                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
+            }
+            else
+            {
+                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE_customizable.xslt");
+            }
+
+            return htmlXsltBytes;
         }
 
         public XmlDocument GetXmlGDoc(Dictionary<string, string> parameters)
