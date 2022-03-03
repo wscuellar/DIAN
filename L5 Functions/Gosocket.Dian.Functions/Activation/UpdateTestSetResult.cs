@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Functions.Activation
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
                 //Ajustamos teachProviderCode para el partitionKey del set de pruebas
-                SetLogger(null, "Step 1.1", allGlobalTestSetTracking.Count.ToString(), "DocumentMeta-count");
+                SetLogger(null, "Step 1.1", allGlobalTestSetTracking.Count.ToString(), globalTestSetTracking.TestSetId);
                 foreach (GlobalTestSetTracking itemMeta in allGlobalTestSetTracking)
                 {                   
                     //ApplicationResponse
@@ -86,15 +86,20 @@ namespace Gosocket.Dian.Functions.Activation
                     if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll 
                         || Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     {
+                       
                         //Consigue informacion del trackId nomina individual y nomina de ajuste
                         GlobalDocPayroll teachProviderPayroll = TableManagerGlobalDocPayroll.FindByPartition<GlobalDocPayroll>(itemMeta.TrackId).FirstOrDefault();
-                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.Emp_NIT, globalTestSetTracking.TestSetId);
+
+                        SetLogger(null, " Step 1.2 ", " **globalTestSetTracking.TestSetId * " + globalTestSetTracking.TestSetId
+                           + " RowKey " + teachProviderPayroll.RowKey + " NIT " + teachProviderPayroll.NIT + " Emp_NIT " + teachProviderPayroll.Emp_NIT, globalTestSetTracking.TestSetId);
+
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.RowKey, globalTestSetTracking.TestSetId);
                         if (setResultOther != null) break;
                     }                        
                 }
                
                 SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId + " radianProvider " + radianProvider, "UPDATE-01");
-                SetLogger(setResultOther, " Step 0 ", " Paso setResultOther " + setResultOther + " **** " + globalTestSetTracking.TestSetId, "UPDATE-01.1");
+               
 
                 start = DateTime.UtcNow;
                 var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")
