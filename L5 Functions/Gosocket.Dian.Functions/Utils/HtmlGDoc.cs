@@ -117,7 +117,7 @@ namespace Gosocket.Dian.Functions.Utils
         {
             var fileManager = new FileManager();
             byte[] htmlXsltBytes;
-            if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "Formato tipo carta")
+            if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "formato tipo carta")
             {
                 htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
             }
