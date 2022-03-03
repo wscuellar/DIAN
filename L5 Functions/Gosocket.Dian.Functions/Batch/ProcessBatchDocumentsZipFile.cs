@@ -60,6 +60,7 @@ namespace Gosocket.Dian.Functions.Batch
             var listId = string.Empty;
             var payrollTypeXml = string.Empty;
             var payrollProvider = string.Empty;
+            var payrollEmp = string.Empty;
 
 
             try
@@ -123,6 +124,10 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
                     payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+                    payrollEmp = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaSenderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteSenderCodeXpath"];
+
+                    payrollProvider = payrollProvider != payrollEmp ? payrollEmp : payrollProvider;
+
                 }
 
                 start = DateTime.UtcNow;
@@ -131,6 +136,7 @@ namespace Gosocket.Dian.Functions.Batch
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
                     Action = "validando consulta - flagInvoice " + flagInvoice + " flagApplicationResponse " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian 
                     + " trackIdCude " + trackIdCude + " listId " + listId + " payrollTypeXml " + payrollTypeXml + " payrollProvider " + payrollProvider + " testSetId " + testSetId
+                    + " payrollEmp " + payrollEmp
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
 
