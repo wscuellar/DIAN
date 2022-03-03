@@ -372,26 +372,15 @@ namespace Gosocket.Dian.Web.Controllers
                 model.SoftwareId = !string.IsNullOrWhiteSpace(model.SoftwareIdPr) ? model.SoftwareIdPr : g.ToString();
             }
 
-            if (!model.ElectronicDocumentIsEquivalent)
-            {
-                GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService
-                    .GetTestResult(model.OperationModeId, model.ElectronicDocumentId);
+            GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService
+                .GetTestResult(model.OperationModeId, model.ElectronicDocumentId);
 
-                if (testSet == null)
-                {
-                    return Json(new ResponseMessage(
-                        TextResources.ModeElectroniDocWithoutTestSet,
-                        TextResources.alertType, 500),
-                        JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
+            if (testSet == null)
             {
-                var result = ValidateTestSetOfEquivalentDocuments(model.OperationModeId);
-                if(result != null)
-                {
-                    return result;
-                }
+                return Json(new ResponseMessage(
+                    TextResources.ModeElectroniDocWithoutTestSet,
+                    TextResources.alertType, 500),
+                    JsonRequestBehavior.AllowGet);
             }
 
             if (!ModelState.IsValid)
@@ -520,36 +509,6 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
-        }
-
-        private ActionResult ValidateTestSetOfEquivalentDocuments(int operationModeId)
-        {
-            var equivalentDocumentsWithoutTestSet = new List<string>();
-            var operationMode = _othersDocsElecContributorService.GetOperationModeById(operationModeId);
-            /*Buscar cada documento equivalente y buscar si tiene set de prueba para el modo de operación seleccionado*/
-            List<int> equivalentDocumentsTypes = new List<int>();
-
-            foreach (var documentItem in equivalentDocumentsTypes) 
-            {
-                GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService
-                        .GetTestResult(operationModeId, documentItem);
-                if(testSet == null)
-                {
-                    equivalentDocumentsWithoutTestSet.Add($"{documentItem}");
-                }
-            }
-
-            if (equivalentDocumentsWithoutTestSet.Any())
-            {
-                return Json(new ResponseMessage(
-                    TextResources.EquivalentDocumentWithoutTestSet
-                        .Replace("{EquivalentDocument}", string.Join(", ", equivalentDocumentsWithoutTestSet))
-                        .Replace("{OperationMode}", operationMode.Name),
-                    TextResources.alertType, 500),
-                    JsonRequestBehavior.AllowGet);
-            }
-
-            return null;
         }
 
         private async Task RegisterNumberingRangeForEquivalentDocumentPos(long contributorOperationId)
