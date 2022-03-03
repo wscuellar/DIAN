@@ -62,7 +62,7 @@ namespace Gosocket.Dian.Functions.Activation
                 RadianTestSetResult radianTesSetResult = null;
                 GlobalTestSetOthersDocumentsResult setResultOther = null;
                 testSetId = globalTestSetTracking.TestSetId;
-              
+                string radianProvider = string.Empty;
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
 
@@ -75,7 +75,10 @@ namespace Gosocket.Dian.Functions.Activation
                     {
                         //Consigue informacion del trackId
                         GlobalDocValidatorDocumentMeta teachProviderDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(itemMeta.TrackId, itemMeta.TrackId);
-                        radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(teachProviderDocumentMeta.TechProviderCode, globalTestSetTracking.TestSetId);
+                        
+                        //Obtiene información del participante directo o indirecto
+                        radianProvider = teachProviderDocumentMeta.TechProviderCode != teachProviderDocumentMeta.SenderCode ? teachProviderDocumentMeta.SenderCode : teachProviderDocumentMeta.TechProviderCode;
+                        radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(radianProvider, globalTestSetTracking.TestSetId);
                         if (radianTesSetResult != null) break;                     
                     }
                     
@@ -90,8 +93,8 @@ namespace Gosocket.Dian.Functions.Activation
                     }                        
                 }
                
-                SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, " Step 0 ", " Paso setResultOther " + setResultOther + " **** " + globalTestSetTracking.TestSetId, "UPDATE-01");
+                SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId + " radianProvider " + radianProvider, "UPDATE-01");
+                SetLogger(setResultOther, " Step 0 ", " Paso setResultOther " + setResultOther + " **** " + globalTestSetTracking.TestSetId, "UPDATE-01.1");
 
                 start = DateTime.UtcNow;
                 var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")
