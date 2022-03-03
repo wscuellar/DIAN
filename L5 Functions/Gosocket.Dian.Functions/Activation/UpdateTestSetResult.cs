@@ -92,7 +92,7 @@ namespace Gosocket.Dian.Functions.Activation
 
                         //Obtiene identificacion del participante habilitar
                         nominaProvider = teachProviderPayroll.NIT != teachProviderPayroll.Emp_NIT ? teachProviderPayroll.Emp_NIT : teachProviderPayroll.NIT;
-                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.NIT, globalTestSetTracking.TestSetId);
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(nominaProvider, globalTestSetTracking.TestSetId);
                         if (setResultOther != null) break;
                     }                        
                 }
