@@ -30,7 +30,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IGlobalRadianOperationService _globalRadianOperationService;
         private readonly UserService userService = new UserService();
 
-        private readonly TelemetryClient telemetry;
+        private readonly TelemetryClient telemetry;       
 
         public RadianApprovedController(IRadianContributorService radianContributorService,
                                         IRadianTestSetService radianTestSetService,

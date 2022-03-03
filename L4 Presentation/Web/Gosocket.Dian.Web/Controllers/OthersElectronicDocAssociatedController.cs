@@ -29,7 +29,8 @@ namespace Gosocket.Dian.Web.Controllers
     public class OthersElectronicDocAssociatedController : Controller
     {
         private UserService userService = new UserService();
-        private ApplicationUserManager _userManager;
+        private ApplicationUserManager _userManager;       
+
         public ApplicationUserManager UserManager
         {
             get
@@ -136,7 +137,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id = 0)//TODO:
         {
             ViewBag.ValidateRequest = true;
-            
+
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
 
             if (model.Id == -1)
@@ -409,7 +410,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            
+
             GlobalTestSetOthersDocuments testSet = null;
 
             testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
@@ -475,10 +476,20 @@ namespace Gosocket.Dian.Web.Controllers
             response.Message = TextResources.OtherDocEleSuccesModeOperation;
             return Json(response, JsonRequestBehavior.AllowGet);
         }
-        
+
         [HttpPost]
         public JsonResult DeleteOperationMode(int Id)
         {
+
+            var _resultValidarSofware = _othersElectronicDocumentsService.ValidaSoftwareDelete(Id);
+            if (_resultValidarSofware != null)
+                return Json(new
+                {
+                    code = _resultValidarSofware.Code,
+                    message = _resultValidarSofware.Message,
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
+
             var result = DeleteOperationInStorageTable(Id);
             if (result != null) return result;
 
@@ -494,14 +505,20 @@ namespace Gosocket.Dian.Web.Controllers
         private JsonResult DeleteOperationInStorageTable(int id)
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+
             if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
             {
-                return Json(new
+                int NumOperationHabilitados = _othersDocsElecContributorService.NumHabilitadosOtherDocsElect(User.ContributorId());
+
+                if (NumOperationHabilitados == 1)
                 {
-                    code = 500,
-                    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
-                    success = true,
-                }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        code = 500,
+                        message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                        success = true,
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
 
             OthersElectronicDocAssociatedViewModel model = DataAssociate(id);
@@ -552,7 +569,7 @@ namespace Gosocket.Dian.Web.Controllers
             //EndElectronicPayrollAjustment
 
             bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model);
-            if(isUpdate)
+            if (isUpdate)
             {
                 // OtherDocElecContributor
                 //var operationModeId = int.Parse(model.RowKey.Split("|".ToCharArray())[0]);

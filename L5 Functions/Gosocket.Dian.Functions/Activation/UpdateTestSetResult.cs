@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Functions.Activation
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager tableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");
+        private static readonly TableManager TableManagerGlobalDocPayroll = new TableManager("GlobalDocPayroll");
 
 
         // Set queue name 
@@ -42,7 +43,7 @@ namespace Gosocket.Dian.Functions.Activation
         public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")] string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-            var testSetId = string.Empty;
+            var testSetId = string.Empty;          
             try
             {               
                 //Obtengo informacion de la cola e insertamos el registro del tracking de envios
@@ -58,16 +59,42 @@ namespace Gosocket.Dian.Functions.Activation
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startUpdateTest);
 
-
+                RadianTestSetResult radianTesSetResult = null;
+                GlobalTestSetOthersDocumentsResult setResultOther = null;
                 testSetId = globalTestSetTracking.TestSetId;
+                string radianProvider = string.Empty;
                 //Listamos los tracking de los envios realizados para el set de pruebas en proceso
                 List<GlobalTestSetTracking> allGlobalTestSetTracking = globalTestSetTrackingTableManager.FindByPartition<GlobalTestSetTracking>(globalTestSetTracking.TestSetId);
-                GlobalTestSetOthersDocumentsResult setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindByGlobalOtherDocumentTestId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.TestSetId);
 
-                //Se busca el set de pruebas procesado para el testsetid en curso
-                RadianTestSetResult radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(globalTestSetTracking.TestSetId);
-                SetLogger(radianTesSetResult, "Step 0", globalTestSetTracking.TestSetId);
-                SetLogger(setResultOther, "Step 0", "Paso setResultOther" + setResultOther + "****" + globalTestSetTracking.TestSetId, "UPDATE-01");
+                //Ajustamos teachProviderCode para el partitionKey del set de pruebas
+                SetLogger(null, "Step 1.1", allGlobalTestSetTracking.Count.ToString(), "DocumentMeta-count");
+                foreach (GlobalTestSetTracking itemMeta in allGlobalTestSetTracking)
+                {                   
+                    //ApplicationResponse
+                    if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse)
+                    {
+                        //Consigue informacion del trackId
+                        GlobalDocValidatorDocumentMeta teachProviderDocumentMeta = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(itemMeta.TrackId, itemMeta.TrackId);
+                        
+                        //Obtiene información del participante directo o indirecto
+                        radianProvider = teachProviderDocumentMeta.TechProviderCode != teachProviderDocumentMeta.SenderCode ? teachProviderDocumentMeta.SenderCode : teachProviderDocumentMeta.TechProviderCode;
+                        radianTesSetResult = radianTestSetResultTableManager.FindByTestSetId<RadianTestSetResult>(radianProvider, globalTestSetTracking.TestSetId);
+                        if (radianTesSetResult != null) break;                     
+                    }
+                    
+                    //OtherDocument Nomina - Nomina de Ajustes
+                    if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll 
+                        || Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+                    {
+                        //Consigue informacion del trackId nomina individual y nomina de ajuste
+                        GlobalDocPayroll teachProviderPayroll = TableManagerGlobalDocPayroll.FindByPartition<GlobalDocPayroll>(itemMeta.TrackId).FirstOrDefault();
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.NIT, globalTestSetTracking.TestSetId);
+                        if (setResultOther != null) break;
+                    }                        
+                }
+               
+                SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId + " radianProvider " + radianProvider, "UPDATE-01");
+                SetLogger(setResultOther, " Step 0 ", " Paso setResultOther " + setResultOther + " **** " + globalTestSetTracking.TestSetId, "UPDATE-01.1");
 
                 start = DateTime.UtcNow;
                 var validateTestSet = new GlobalLogger(globalTestSetTracking.TestSetId, "2 validateTestSet")
@@ -179,6 +206,10 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.RejectInvoiceRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 7", "Rechazo factura electrónica");
+                    SetLogger(null, "Step 7.0", tipo.ToString(), "RF_001.1");
+                    SetLogger(null, "Step 7.1", radianTesSetResult.TotalRejectInvoiceSent.ToString(), "RF_002");
+                    SetLogger(null, "Step 7.2", radianTesSetResult.RejectInvoiceAccepted.ToString(), "RF_003");
+                    SetLogger(null, "Step 7.3", radianTesSetResult.RejectInvoiceRejected.ToString(), "RF_004");
 
                     //// Solicitud disponibilización
                     tipo = (int)EventStatus.SolicitudDisponibilizacion;
@@ -311,30 +342,55 @@ namespace Gosocket.Dian.Functions.Activation
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Habilitado);
                     }
 
-
                     SetLogger(null, "Step 19.c", radianTesSetResult.PaymentNotificationRejected.ToString(), "AR_007");
                     SetLogger(null, "Step 19.d", radianTesSetResult.PaymentNotificationTotalRequired.ToString(), "AR_008");
                     SetLogger(null, "Step 19.e", radianTesSetResult.PaymentNotificationTotalAcceptedRequired.ToString(), "AR_009");
-                    // Determinamos si rechazamos el set de pruebas del cliente
 
-                    if (radianTesSetResult.ReceiptNoticeRejected > (radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired) ||
-                        radianTesSetResult.ReceiptServiceRejected > (radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired) ||
-                        radianTesSetResult.ExpressAcceptanceRejected > (radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired) ||
-                        radianTesSetResult.AutomaticAcceptanceRejected > (radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired) ||
-                        radianTesSetResult.ApplicationAvailableRejected > (radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementPropertyRejected > (radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementProcurementRejected > (radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementGuaranteeRejected > (radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired) ||
-                        radianTesSetResult.EndorsementCancellationRejected > (radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired) ||
-                        radianTesSetResult.GuaranteeRejected > (radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired) ||
-                        radianTesSetResult.ElectronicMandateRejected > (radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired) ||
-                        radianTesSetResult.EndMandateRejected > (radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired) ||
-                        radianTesSetResult.PaymentNotificationRejected > (radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired) ||
-                        radianTesSetResult.CirculationLimitationRejected > (radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired) ||
-                        radianTesSetResult.EndCirculationLimitationRejected > (radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired) ||
-                        radianTesSetResult.ReportForPaymentRejected > (radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired))
+
+                    // Determinamos si rechazamos el set de pruebas del cliente
+                    int receiptNoticeRejected = radianTesSetResult.ReceiptNoticeTotalRequired > 0 ? radianTesSetResult.ReceiptNoticeTotalRequired - radianTesSetResult.ReceiptNoticeTotalAcceptedRequired : radianTesSetResult.ReceiptNoticeRejected;
+                    int receiptServiceRejected = radianTesSetResult.ReceiptServiceTotalRequired > 0 ? radianTesSetResult.ReceiptServiceTotalRequired - radianTesSetResult.ReceiptServiceTotalAcceptedRequired : radianTesSetResult.ReceiptServiceRejected;
+                    int expressAcceptanceRejected = radianTesSetResult.ExpressAcceptanceTotalRequired > 0 ? radianTesSetResult.ExpressAcceptanceTotalRequired - radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired : radianTesSetResult.ExpressAcceptanceRejected;
+                    int automaticAcceptanceRejected = radianTesSetResult.AutomaticAcceptanceTotalRequired > 0 ? radianTesSetResult.AutomaticAcceptanceTotalRequired - radianTesSetResult.AutomaticAcceptanceTotalAcceptedRequired : radianTesSetResult.AutomaticAcceptanceRejected;
+                    int rejectInvoiceRejected = radianTesSetResult.RejectInvoiceTotalRequired > 0 ? radianTesSetResult.RejectInvoiceTotalRequired - radianTesSetResult.RejectInvoiceTotalAcceptedRequired : radianTesSetResult.RejectInvoiceRejected;
+                    int applicationAvailableRejected = radianTesSetResult.ApplicationAvailableTotalRequired > 0 ? radianTesSetResult.ApplicationAvailableTotalRequired - radianTesSetResult.ApplicationAvailableTotalAcceptedRequired : radianTesSetResult.ApplicationAvailableRejected;
+                    int endorsementPropertyRejected = radianTesSetResult.EndorsementPropertyTotalRequired > 0 ? radianTesSetResult.EndorsementPropertyTotalRequired - radianTesSetResult.EndorsementPropertyTotalAcceptedRequired : radianTesSetResult.EndorsementPropertyRejected;
+                    int endorsementProcurementRejected = radianTesSetResult.EndorsementProcurementTotalRequired > 0 ? radianTesSetResult.EndorsementProcurementTotalRequired - radianTesSetResult.EndorsementProcurementTotalAcceptedRequired : radianTesSetResult.EndorsementProcurementRejected;
+                    int endorsementGuaranteeRejected = radianTesSetResult.EndorsementGuaranteeTotalRequired > 0 ? radianTesSetResult.EndorsementGuaranteeTotalRequired - radianTesSetResult.EndorsementGuaranteeTotalAcceptedRequired : radianTesSetResult.EndorsementGuaranteeRejected;
+                    int endorsementCancellationRejected = radianTesSetResult.EndorsementCancellationTotalRequired > 0 ? radianTesSetResult.EndorsementCancellationTotalRequired - radianTesSetResult.EndorsementCancellationTotalAcceptedRequired : radianTesSetResult.EndorsementCancellationRejected;
+                    int guaranteeRejected = radianTesSetResult.GuaranteeTotalRequired > 0 ? radianTesSetResult.GuaranteeTotalRequired - radianTesSetResult.GuaranteeTotalAcceptedRequired : radianTesSetResult.GuaranteeRejected;
+                    int electronicMandateRejected = radianTesSetResult.ElectronicMandateTotalRequired > 0 ? radianTesSetResult.ElectronicMandateTotalRequired - radianTesSetResult.ElectronicMandateTotalAcceptedRequired : radianTesSetResult.ElectronicMandateRejected;
+                    int endMandateRejected = radianTesSetResult.EndMandateTotalRequired > 0 ? radianTesSetResult.EndMandateTotalRequired - radianTesSetResult.EndMandateTotalAcceptedRequired : radianTesSetResult.EndMandateRejected;
+                    int paymentNotificationRejected = radianTesSetResult.PaymentNotificationTotalRequired > 0 ? radianTesSetResult.PaymentNotificationTotalRequired - radianTesSetResult.PaymentNotificationTotalAcceptedRequired : radianTesSetResult.PaymentNotificationRejected;
+                    int circulationLimitationRejected = radianTesSetResult.CirculationLimitationTotalRequired > 0 ? radianTesSetResult.CirculationLimitationTotalRequired - radianTesSetResult.CirculationLimitationTotalAcceptedRequired : radianTesSetResult.CirculationLimitationRejected;
+                    int endCirculationLimitationRejected = radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected;
+                    int reportForPaymentRejected = radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected;
+
+                    SetLogger(null, "Step 19.f", expressAcceptanceRejected + " - " + radianTesSetResult.ExpressAcceptanceTotalRequired + 
+                        " - " + radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired + " - " + radianTesSetResult.ExpressAcceptanceRejected + 
+                        " - " + paymentNotificationRejected + " - " + radianTesSetResult.PaymentNotificationTotalRequired + " - " +
+                        " - " + radianTesSetResult.PaymentNotificationTotalAcceptedRequired + " - " + radianTesSetResult.PaymentNotificationRejected, "AR_010");
+
+                    if (radianTesSetResult.ReceiptNoticeRejected > receiptNoticeRejected
+                        || radianTesSetResult.ReceiptServiceRejected > receiptServiceRejected
+                        || radianTesSetResult.ExpressAcceptanceRejected > expressAcceptanceRejected
+                        || radianTesSetResult.AutomaticAcceptanceRejected > automaticAcceptanceRejected
+                        || radianTesSetResult.RejectInvoiceRejected > rejectInvoiceRejected
+                        || radianTesSetResult.ApplicationAvailableRejected > applicationAvailableRejected
+                        || radianTesSetResult.EndorsementPropertyRejected > endorsementPropertyRejected
+                        || radianTesSetResult.EndorsementProcurementRejected > endorsementProcurementRejected
+                        || radianTesSetResult.EndorsementGuaranteeRejected > endorsementGuaranteeRejected
+                        || radianTesSetResult.EndorsementCancellationRejected > endorsementCancellationRejected
+                        || radianTesSetResult.GuaranteeRejected > guaranteeRejected
+                        || radianTesSetResult.ElectronicMandateRejected > electronicMandateRejected
+                        || radianTesSetResult.EndMandateRejected > endMandateRejected
+                        || radianTesSetResult.PaymentNotificationRejected > paymentNotificationRejected
+                        || radianTesSetResult.CirculationLimitationRejected > circulationLimitationRejected
+                        || radianTesSetResult.EndCirculationLimitationRejected > endCirculationLimitationRejected
+                        || radianTesSetResult.ReportForPaymentRejected > reportForPaymentRejected
+                        )
                     {
-                        SetLogger(null, "Step 19.e", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_010");
+                        SetLogger(null, "Step 19.g", expressAcceptanceRejected.ToString(), "AR_010.1");
                         radianTesSetResult.Status = (int)TestSetStatus.Rejected;
                         radianTesSetResult.State = TestSetStatus.Rejected.GetDescription();
                         contributorService.OperationUpdate(contributor.Id, isPartipantActive.RadianContributorTypeId, isPartipantActive.RowKey, isPartipantActive.SoftwareType, RadianState.Cancelado);
@@ -353,18 +409,11 @@ namespace Gosocket.Dian.Functions.Activation
                         // Send to activate contributor in production
                         if (ConfigurationManager.GetValue("Environment") == "Hab")
                         {
-
                             try
                             {
                                 SetLogger(null, "Step 19.2", "Estoy en habilitacion", "1111111112");
 
                                 #region Proceso Radian Habilitacion
-
-                                //Traemos el contribuyente
-                               
-
-                                //Consultamos al participante en GlobalRadianOperations
-                                
 
                                 //--Traemos la informacion del software
                                 string softwareId = globalTestSetTracking.SoftwareId;
@@ -534,7 +583,9 @@ namespace Gosocket.Dian.Functions.Activation
                                     pin = software.Pin,
                                     url = software.Url,
                                     softwareName = software.Name,
-                                    enabled = false
+                                    enabled = false,
+                                    testSetId = testSetId,
+                                    contributorOpertaionModeId = isPartipantActiveOtherDoc.OperationModeId
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
@@ -588,7 +639,6 @@ namespace Gosocket.Dian.Functions.Activation
 
                     if (testSetResults != null)  // Roberto Alvarado --> Esto es para mantener lo de Factura Electronica tal cual esta actualmente 2020/11/25
                     {
-
                         var globalTesSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.Id == globalTestSetTracking.TestSetId && t.Status == (int)TestSetStatus.InProcess);
 
                         if (globalTesSetResult == null)
@@ -605,7 +655,6 @@ namespace Gosocket.Dian.Functions.Activation
                         globalTesSetResult.TotalDocumentSent = allGlobalTestSetTracking.Count;
                         globalTesSetResult.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
                         globalTesSetResult.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
-
 
                         globalTesSetResult.InvoicesTotalSent = allGlobalTestSetTracking.Count(a => invoiceCodes.Contains(a.DocumentTypeId));
                         globalTesSetResult.TotalInvoicesAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && invoiceCodes.Contains(a.DocumentTypeId));
@@ -647,7 +696,6 @@ namespace Gosocket.Dian.Functions.Activation
                                 var globalSoftware = new GlobalSoftware(softwareId, softwareId) { Id = software.Id, Deleted = software.Deleted, Pin = software.Pin, StatusId = software.AcceptanceStatusSoftwareId };
                                 await softwareTableManager.InsertOrUpdateAsync(globalSoftware);
                             }
-
 
                             // Send to activate contributor in production
                             if (ConfigurationManager.GetValue("Environment") == "Hab")
