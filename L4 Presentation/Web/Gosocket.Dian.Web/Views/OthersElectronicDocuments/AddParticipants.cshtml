@@ -60,7 +60,7 @@
                 @if (ViewBag.electronicDocumentId == 13)
                 {
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="4" Participantetexto="Emisor">
+                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
                             <div class="RadianImgContainer" style="margin:10px;">
                                 <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
                             </div>
@@ -171,6 +171,7 @@
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionParticipante',
                         ElectronicDocument: electronicDocumentId,
+                        ElectronicDocumentId: electronicDocumentId,
                         complementoTexto: complementoTexto,
                         ContributorIdType: ContributorIdType,
                         ContributorId: '@ViewBag.ContributorId'
@@ -180,6 +181,7 @@
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionParticipanteEmisor',
                         ElectronicDocument: electronicDocumentId,
+                        ElectronicDocumentId: electronicDocumentId,
                         complementoTexto: complementoTexto,
                         ContributorIdType: ContributorIdType,
                         ContributorId: '@ViewBag.ContributorId'
