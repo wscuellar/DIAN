@@ -181,7 +181,8 @@ namespace Gosocket.Dian.Functions.Others
                                                                     Deleted = false
                                                                 }, new Domain.Sql.OtherDocElecContributor() { ContributorId = contributor.Id, OtherDocElecOperationModeId = itemGODEO.OperationModeId, Description = itemGODEO.PartitionKey },
 
-                                                                string.Empty)
+                                                                string.Empty),
+                                                            contributorOpertaionModeId = itemGODEO.OperationModeId
                                                         };
 
 
@@ -236,7 +237,7 @@ namespace Gosocket.Dian.Functions.Others
                                             messages.Add(String.Format("OtherDocElecContributor - OtherDocElecContributorId : {0} , SoftwareId : {1}, SE ENVIARIA HABILITAR EN PRODUCCION", itemGODEO.OtherDocElecContributorId, item.SoftwareId));
                                     }
                                     else
-                                        messages.Add(String.Format("OtherDocElecContributor - OtherDocElecContributorId : {0} , SoftwareId : {1}, YA ESTA HABILITADO EN PRODUCCION", itemGODEO.OtherDocElecContributorId, item.SoftwareId));
+                                        messages.Add(String.Format("OtherDocElecContributor - PartitionKey : {0}, OtherDocElecContributorId : {1} , SoftwareId : {2}, YA ESTA HABILITADO EN PRODUCCION", item.PartitionKey, itemGODEO.OtherDocElecContributorId, item.SoftwareId));
                                 }
                             }
                         }
@@ -246,7 +247,8 @@ namespace Gosocket.Dian.Functions.Others
 
                     //aceptados menores al requerido y aceptados faltantes menores o iguales al faltante de total requerido
                     foreach (var item1 in listGlobalTestSetOthersDocumentsResult.Where(gtsodr => (!gtsodr.Deleted) &&
-                        (gtsodr.TotalDocumentAccepted < gtsodr.TotalDocumentAcceptedRequired) &&
+                        ((gtsodr.TotalDocumentAccepted < gtsodr.TotalDocumentAcceptedRequired) || 
+                            ((gtsodr.OthersDocumentsAccepted < gtsodr.OthersDocumentsAcceptedRequired) || (gtsodr.ElectronicPayrollAjustmentAccepted < gtsodr.ElectronicPayrollAjustmentAcceptedRequired))) &&
                         (gtsodr.TotalDocumentsRejected <= (gtsodr.TotalDocumentRequired - gtsodr.TotalDocumentAcceptedRequired))
                         ))
                     {
@@ -295,7 +297,7 @@ namespace Gosocket.Dian.Functions.Others
                                         sqlConnectionStringProd))
                                         {
                                             QualificationProd = true;
-                                            messages.Add(String.Format("OtherDocElecContributorOperations - OtherDocElecContributorId : {0}, SoftwareId : {1}, No pasa set de pruebas, Habilitado en producción", itemGODEO.OtherDocElecContributorId, item1.SoftwareId));
+                                            messages.Add(String.Format("OtherDocElecContributorOperations - PartitionKey : {0}, RowKey : {1}, OperationModeId : {2}, OtherDocElecContributorId : {3}, SoftwareId : {4}, No pasa set de pruebas, Habilitado en producción", item1.PartitionKey, item1.RowKey, item1.OperationModeId, itemGODEO.OtherDocElecContributorId, item1.SoftwareId));
                                         }
                                     }
                                 }
@@ -565,7 +567,8 @@ namespace Gosocket.Dian.Functions.Others
                                                                             Deleted = false
                                                                         }, new Domain.Sql.OtherDocElecContributor() { ContributorId = contributor.Id, OtherDocElecOperationModeId = itemGODEO.OperationModeId, Description = itemGODEO.PartitionKey },
 
-                                                                        string.Empty)
+                                                                        string.Empty),
+                                                                    contributorOpertaionModeId = itemGODEO.OperationModeId
                                                                 };
 
 
