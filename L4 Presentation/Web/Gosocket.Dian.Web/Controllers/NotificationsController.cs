@@ -182,6 +182,8 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
     }
+
+    piblic class 
     public class RequestNotification
     {
         [JsonProperty(PropertyName = "Description")]
