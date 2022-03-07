@@ -52,6 +52,7 @@ namespace Gosocket.Dian.Web.Models
         public GlobalTestSetOthersDocumentsResult GTestSetOthersDocumentsResult { get; set; }
 
         public bool EsElectronicDocNomina { get; set; }
+        public bool EsElectronicDocNominaNoOFE { get; set; }
         public string TitleDoc1 { get; set; }
         public string TitleDoc2 { get; set; }
 

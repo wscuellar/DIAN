@@ -144,7 +144,8 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareIdBase = entity.SoftwareIdBase,
                 ProviderId = entity.ProviderId,
                 LegalRepresentativeList = LegalRepresentativeList,
-                EsElectronicDocNomina = entity.ElectronicDocId == 1
+                EsElectronicDocNomina = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll,
+                EsElectronicDocNominaNoOFE = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE
             };
 
         }
@@ -397,8 +398,9 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
-            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
+            model.EsElectronicDocNominaNoOFE = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.TitleDoc1 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             ViewBag.Id = Id;
 
@@ -429,8 +431,10 @@ namespace Gosocket.Dian.Web.Controllers
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
-            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
+            model.EsElectronicDocNominaNoOFE = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE;
+
+            model.TitleDoc1 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
             //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;

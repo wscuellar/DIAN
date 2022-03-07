@@ -17,6 +17,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,9 +62,10 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1 || x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             ViewBag.ContributorId = User.ContributorId();
-
+            ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
         }
 
@@ -269,6 +272,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
+            ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             return View(model);
         }
 
@@ -276,25 +280,15 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
 
             List<Contributor> providersList;
             var providersListDto = new List<ContributorViewModel>();
 
-            if (!electronicDocumentIsSupport)
-            {
-                providersList = _othersDocsElecContributorService
-                    .GetTechnologicalProviders(
-                        User.ContributorId(),
-                        electronicDocumentId,
-                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
-                        OtherDocElecState.Habilitado.GetDescription());
-
-                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-            }
-            else
+            if (electronicDocumentIsSupport)
             {
                 /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
-                     * en el modo de operación de facturación electrónica*/
+                * en el modo de operación de facturación electrónica*/
                 var softwaresIdAssociatedInElectronicBiller = operationModesAsociatedInElectronicBiller
                         .Where(t => t.OperationModeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
                         .Select(t => new Guid(t.Data.SoftwareId))
@@ -308,6 +302,31 @@ namespace Gosocket.Dian.Web.Controllers
                             (!contributorIsOfe || softwaresIdAssociatedInElectronicBiller.Contains(t.Id))
                         )
                     ).ToList();
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+            }
+            else if (electronicDocumentIsElectronicPayrollNoOFE)
+            {
+                /*Deberá trae el listado de los proveedores tecnológicos autorizados por la DIAN y que
+                ya tengan modos de operación nómina electrónica Habilitados como PT - Software Propio,
+                ellos están ubicados por la sección de OFES de la plataforma*/
+                providersList = _othersDocsElecContributorService
+                    .GetTechnologicalProviders(
+                        User.ContributorId(),
+                        (int)ElectronicsDocuments.ElectronicPayroll,
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription());
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+            }
+            else
+            {
+                providersList = _othersDocsElecContributorService
+                    .GetTechnologicalProviders(
+                        User.ContributorId(),
+                        electronicDocumentId,
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription());
 
                 providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
             }
@@ -401,6 +420,7 @@ namespace Gosocket.Dian.Web.Controllers
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService
                 .CreateContributorNew(
                     User.ContributorId(),
+                    //model.OtherDocElecContributorId,
                     OtherDocElecState.Registrado,
                     model.ContributorIdType,
                     model.OperationModeId,
@@ -651,8 +671,8 @@ namespace Gosocket.Dian.Web.Controllers
                     ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                                            new
                                            {
-                                               ElectronicDocumentId = 1, //ValidacionOtherDocs.ElectronicDocumentId,
-                                               OperationModeId = 0, //(int)ValidacionOtherDocs.OperationModeId,
+                                               ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
+                                               OperationModeId = (int)ValidacionOtherDocs.OperationModeId,
                                                ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
                                                ContributorId
                                            });
@@ -772,21 +792,10 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetSoftwaresByContributorId(int id, int electronicDocumentId)
         {
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             List<SoftwareViewModel> softwareList;
             
-            if (!electronicDocumentIsSupport)
-            {
-                softwareList = _othersDocsElecSoftwareService
-                    .GetSoftwaresByProviderTechnologicalServices(id,
-                        electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
-                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
-                        {
-                            //Id = s.Id,
-                            Id = s.SoftwareId,
-                            Name = s.Name
-                        }).ToList();
-            }
-            else
+            if (electronicDocumentIsSupport)
             {
                 var provider = _contributorService.Get(id);
                 softwareList = provider.SoftwaresInProduction().Select(s => new SoftwareViewModel
@@ -801,6 +810,30 @@ namespace Gosocket.Dian.Web.Controllers
                     .Where(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted).Select(t => t.SoftwareId);
 
                 softwareList = softwareList.Where(s => softwareIds.Contains(s.Id.ToString())).ToList();
+            }
+            else if (electronicDocumentIsElectronicPayrollNoOFE)
+            { 
+                softwareList = _othersDocsElecSoftwareService
+                    .GetSoftwaresByProviderTechnologicalServices(
+                        id,
+                        (int)ElectronicsDocuments.ElectronicPayroll, 
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                        {
+                            Id = s.SoftwareId,
+                            Name = s.Name
+                        }).ToList();
+            }
+            else
+            {
+                softwareList = _othersDocsElecSoftwareService
+                    .GetSoftwaresByProviderTechnologicalServices(id,
+                        electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                        {
+                                            Id = s.SoftwareId,
+                            Name = s.Name
+                        }).ToList();
             }
 
             return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
@@ -835,6 +868,39 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
             return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public string GetContributorOperation(int code)
+        {
+
+            try
+            {
+                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
+                                      "WHERE C.Contributorid = " + code +
+                                      " AND C.Deleted <> 1";
+
+                SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
+                conn.Open();
+                DataTable table = new DataTable();
+                SqlCommand command = new SqlCommand(sqlQuery, conn);
+
+                using (var da = new SqlDataAdapter(command))
+                {
+                    da.Fill(table);
+                }
+                conn.Close();
+
+                var conteo = table.Rows.Count;
+
+                return conteo.ToString();
+                //return contributorType;
+
+            }
+            catch (Exception exc)
+            {
+                return null;
+            }
         }
     }
 }
