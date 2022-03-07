@@ -34,6 +34,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
         private UserService userService = new UserService();
         private ApplicationUserManager _userManager;
+        private static NotificationsController notification = new NotificationsController();
+        private NotificationEntity dataNotification = new NotificationEntity();
         private IContributorService object1;
         private IOthersDocsElecContributorService object2;
         private IOthersElectronicDocumentsService object3;
@@ -927,6 +929,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
+                dataNotification.AccountId = code.ToString();
 
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
@@ -941,6 +944,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
                 telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
+               
                 return Json(new
                 {
                     success = true,
