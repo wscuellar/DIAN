@@ -74,15 +74,15 @@ namespace Gosocket.Dian.Web.Controllers
             this.telemetry = telemetry;
         }
 
-        public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
-        {
-            this.object1 = object1;
-            this.object2 = object2;
-            this.object3 = object3;
-            this.object4 = object4;
-            this.object5 = object5;
-            this.object6 = object6;
-        }
+        //public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
+        //{
+        //    this.object1 = object1;
+        //    this.object2 = object2;
+        //    this.object3 = object3;
+        //    this.object4 = object4;
+        //    this.object5 = object5;
+        //    this.object6 = object6;
+        //}
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
