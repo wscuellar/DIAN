@@ -287,7 +287,7 @@
                                         }
                                         <!--Rol Administrador-->
                                         <!--Rol Facturador and Proveedor-->
-                                        @if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
+                                        @if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
                                         {
                                             <ul class="collapse">
                                                 <li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Documentos enviados</a></li>
