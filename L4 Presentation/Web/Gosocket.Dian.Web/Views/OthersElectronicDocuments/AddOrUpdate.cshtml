@@ -170,7 +170,7 @@
                                                     <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
-                                                    @if (!isElectronicPayroll && !isElectronicPayrollNoOfe)
+                                                    @if (ViewBag.IsSupportDocument)
                                                     {
                                                         <th class="text-center">Rangos de Pruebas</th>
                                                     }
@@ -195,7 +195,7 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            @if (!isElectronicPayroll && !isElectronicPayrollNoOfe)
+                                                            @if (ViewBag.IsSupportDocument)
                                                             {
                                                                 <td class="text-center">
                                                                     <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
@@ -203,7 +203,7 @@
                                                                     </a>
                                                                 </td>
                                                             }
-                                                        <td class="text-center" style="width:70px">
+                                                        <td nowrap class="text-center">
                                                             @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
                                                             <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
                                                             @if (isElectronicPayroll || isElectronicPayrollNoOfe)
@@ -213,6 +213,10 @@
                                                             else
                                                             {
                                                                 <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            }
+                                                            @if (ViewBag.IsEquivalentDocument)
+                                                            {
+                                                                <a onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)" title="Documentos equivalentes habilitados"><i class="fa fa-check-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
                                                             }
                                                         </td>
                                                         </tr>
@@ -681,6 +685,10 @@
                     });
                 }
             });
+        }
+
+        function OpenModalShowEquivalentDocumentsEnabled(otherDocElecContributor) {
+            alert(`¡En Construcción! => ${otherDocElecContributor}`)
         }
 
     </script>

@@ -134,6 +134,7 @@
     <Compile Include="CosmosDbManagerPayroll.cs" />
     <Compile Include="Middle\Pagination.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\EquivalentElectronicDocumentRepository.cs" />
     <Compile Include="Repositories\OtherDocElecPayrollRepository.cs" />
     <Compile Include="Repositories\PermissionRepository.cs" />
     <Compile Include="Repositories\RadianContributorFileRepository.cs" />

@@ -271,6 +271,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
+            ViewBag.IsSupportDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             return View(model);
