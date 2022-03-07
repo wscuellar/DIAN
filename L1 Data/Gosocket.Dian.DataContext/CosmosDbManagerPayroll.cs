@@ -17,7 +17,7 @@ namespace Gosocket.Dian.DataContext
         private static readonly string endpointUrl = ConfigurationManager.GetValue("CosmosDbEndpointUrl");
         private static readonly string authorizationKey = ConfigurationManager.GetValue("CosmosDbAuthorizationKey");
         private static readonly string databaseId = "PayrollElectronic";
-       
+
         private static readonly ConnectionPolicy connectionPolicy = new ConnectionPolicy { UserAgentSuffix = " samples-net/3" };
 
 
@@ -383,13 +383,13 @@ namespace Gosocket.Dian.DataContext
             }
         }
 
-        public async Task<List<NumberingRangeCos>> GetNumberingRangeByTypeDocument(string prefijo, double range,string tipo,string account)
+        public async Task<List<NumberingRangeCos>> GetNumberingRangeByTypeDocument(string prefijo, double range, string tipo, string account)
         {
             try
             {
 
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '"+ account+"'";
+                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range + "  AND c.NumberTo >=" + range + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '" + account + "'";
                 var DepartamentData = new List<NumberingRangeCos>();
                 IDocumentQuery<NumberingRangeCos> QueryData = client.CreateDocumentQuery<NumberingRangeCos>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
@@ -408,25 +408,25 @@ namespace Gosocket.Dian.DataContext
         public async Task<NumberingRangeCos> ConsumeNumberingRange(string IdNumberingRange)
         {
             var ret = new List<NumberingRangeCos>();
-            string sql = "SELECT * FROM c where  c.id='"+IdNumberingRange+"'" ;
+            string sql = "SELECT * FROM c where  c.id='" + IdNumberingRange + "'";
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-            IDocumentQuery<NumberingRangeCos> query = client.CreateDocumentQuery<NumberingRangeCos>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"),sql).AsDocumentQuery();
+            IDocumentQuery<NumberingRangeCos> query = client.CreateDocumentQuery<NumberingRangeCos>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
 
             while (query.HasMoreResults)
-                    ret.AddRange(await query.ExecuteNextAsync<NumberingRangeCos>());
+                ret.AddRange(await query.ExecuteNextAsync<NumberingRangeCos>());
             if (ret.FirstOrDefault().CurrentNumber > ret.FirstOrDefault().NumberTo)
-                    return null;
+                return null;
             NumberingRangeCos result = ret.FirstOrDefault();
-                Int64 currentValue = Int64.Parse(result.CurrentNumber.ToString());
-                if (currentValue <= result.NumberTo)
-                {
-                    result.CurrentNumber= currentValue + 1;
+            Int64 currentValue = Int64.Parse(result.CurrentNumber.ToString());
+            if (currentValue <= result.NumberTo)
+            {
+                result.CurrentNumber = currentValue + 1;
 
                 await client.UpsertDocumentAsync(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), result);
-                    
-                    return ret.FirstOrDefault();
-                }
-            
+
+                return ret.FirstOrDefault();
+            }
+
             return null;
         }
 
