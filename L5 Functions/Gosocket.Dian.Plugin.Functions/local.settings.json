@@ -18,7 +18,7 @@
     //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-prod.azurewebsites.net/api/GetXpathDataValues?code=RQBDA7KTabQipQLcqo23y8VJ8X4FxuUSWTBor64G42wzdZwYdaGCyg==",
     //"SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
     //"SqlConnection": "Server=tcp:gtpa-sql-server-prod.database.windows.net,1433;Initial Catalog=gtpa-sql-prod;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
-    //"BillerSoftwarePin": "20191"
+    //"BillerSoftwarePin": "20191",
 
     // Hab environment
     //"Environment": "Hab",
@@ -32,17 +32,33 @@
     //"SqlConnection": "Server=tcp:gtpa-sql-server-hab.database.windows.net,1433;Initial Catalog=gtpa-sql-hab;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
     //"BillerSoftwarePin": "12345",
     //"TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
-    //"TestHabSoftwarePin": "12345"
+    //"TestHabSoftwarePin": "12345",
 
-    //// Test
+    // Test
+    "Environment": "Test",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
+    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    "GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
+    "DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
+    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
+    "SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
+    "SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    //"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
+    "BillerSoftwarePin": "20191",
+    "TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
+    "TestHabSoftwarePin": "20191",
+
+    // Test INDRA
     //"Environment": "Test",
     //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     //"AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     //"BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
     //"GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
     //"GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
-    //"DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
-    //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
+    //"DownloadXmlUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/DownloadXml?code=yYPfSpl5Ut6EYNNSz02oVQqxN/gu16PyqUWb88C1qs0/DJki68j9IQ==",
+    //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test-indra.azurewebsites.net/api/GetXpathDataValues?code=DvTiOcmHjnZXKakwQL5QDgR6kODjfheEzlPBGmC07CEOAWYmJAzWRg==",
     //"SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
     //"SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
     ////"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
@@ -136,7 +152,13 @@
     "TaxShemeID": "01|04|05|06",
     "ErrorMessage_LGC43": "No se puede registrar este evento si previamente no se ha registrado el evento Registro para la circulación.",
     "ErrorMessage_AAG01a": "El adquiriente no esta autorizado para recibir esté evento",
-    "ErrorMessage_DC24z": "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio."
+    "ErrorMessage_DC24z": "No se puede generar el evento de Reclamo  pasado los 3 días hábiles de la fecha de generación del evento Recibo del bien y prestación del servicio.",
+    "ErrorMessage_NIE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
+    "ErrorMessage_NIAE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
+    "BusinessDaysLimit": 1,
+    "Namespace_IndividualPayroll": "=dian:gov:co:facturaelectronica:NominaIndividual|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance",
+    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance"
+
 
 
     // Test UAT INDRA
