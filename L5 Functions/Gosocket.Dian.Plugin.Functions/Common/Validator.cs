@@ -7701,7 +7701,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDE", ErrorMessage = "Cude No Válido" };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "El CUDE debe ser calculado de acuerdo con lo que se especifica en el anexo técnico." };
             var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
             if (invoceCuds.Cude.ToLower() == hash)
             {
