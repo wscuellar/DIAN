@@ -963,7 +963,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult RestartSetTestResultV2(int Id)
+        public JsonResult RestartSetTestResultV2(int Id, int? equivalentDocumentId)
         {
             #region GetSetTestResultV2
 
@@ -1073,12 +1073,41 @@ namespace Gosocket.Dian.Web.Controllers
                 softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
                 _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
             }
+            #endregion
+
+            if (equivalentDocumentId.HasValue)
+            {
+                string keyTestSetEquivalentDocument = model0.OperationModeId.ToString() + "|" + software.SoftwareId.ToString() + "|" + equivalentDocumentId;
+                var testSetResultEquivalentDocument = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, keyTestSetEquivalentDocument);
+                
+                testSetResultEquivalentDocument.State = TestSetStatus.InProcess.GetDescription();
+                testSetResultEquivalentDocument.Status = (int)TestSetStatus.InProcess;
+                testSetResultEquivalentDocument.StatusDescription = TestSetStatus.InProcess.GetDescription();
+
+                // Totales Generales
+                testSetResultEquivalentDocument.TotalDocumentSent = 0;
+                testSetResultEquivalentDocument.TotalDocumentAccepted = 0;
+                testSetResultEquivalentDocument.TotalDocumentsRejected = 0;
+                // EndTotales Generales
+
+                // OthersDocuments
+                testSetResultEquivalentDocument.TotalOthersDocumentsSent = 0;
+                testSetResultEquivalentDocument.OthersDocumentsAccepted = 0;
+                testSetResultEquivalentDocument.OthersDocumentsRejected = 0;
+                //End OthersDocuments
+
+                //ElectronicPayrollAjustment
+                testSetResultEquivalentDocument.TotalElectronicPayrollAjustmentSent = 0;
+                testSetResultEquivalentDocument.ElectronicPayrollAjustmentAccepted = 0;
+                testSetResultEquivalentDocument.ElectronicPayrollAjustmentRejected = 0;
+                //EndElectronicPayrollAjustment
+
+                _testSetOthersDocumentsResultService.InsertTestSetResult(testSetResultEquivalentDocument);
+            }
 
             ResponseMessage response = new ResponseMessage();
             response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
             return Json(response, JsonRequestBehavior.AllowGet);
-
-            #endregion
         }
 
 
@@ -1115,6 +1144,33 @@ namespace Gosocket.Dian.Web.Controllers
             var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
             var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
             return isUpdate;
+        }
+
+        [HttpPost]
+        public JsonResult GetInformationOfTestSetEquivalentDocument(int otherDocElecContributorOperationId, int equivalentDocumentId)
+        {
+            if (otherDocElecContributorOperationId  <= 0)
+            {
+                return Json(new ResponseMessage("No existe el contribuyente", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
+            if (equivalentDocumentId <= 0)
+            {
+                return Json(new ResponseMessage("Debe enviar un documento equivalente válido", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
+            var data = DataAssociate(otherDocElecContributorOperationId);
+            string key = $"{data.OperationModeId}|{data.SoftwareIdBase}|{equivalentDocumentId}";
+            var testSet = _testSetOthersDocumentsResultService.GetTestSetResult(User.ContributorCode(), key);
+            if (testSet is null)
+            {
+                return Json(new ResponseMessage("No se encontró set de pruebas para el documento equivalente seleccionado", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+            return Json(new {
+                success= true,
+                CanResetTestSet = testSet.State == TestSetStatus.Rejected.GetDescription(), 
+                CanSyncToProduction = testSet.State == TestSetStatus.Accepted.GetDescription(),
+            }, JsonRequestBehavior.AllowGet);
         }
     }
     class OtherDocumentActivationRequest
