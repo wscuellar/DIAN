@@ -120,17 +120,17 @@ namespace Gosocket.Dian.Functions.Batch
 				trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
 				Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
 
-				if (!flagApplicationResponse && !flagInvoice)
-				{
-					payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
-					payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+				//if (!flagApplicationResponse && !flagInvoice)
+				//{
+				//	payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
+				//	payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
 			
 
-				}
+				//}
 
 
 
-				var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(payrollProvider, testSetId);
+				var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(obj.AuthCode, testSetId);
 
 				start = DateTime.UtcNow;
 				var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
