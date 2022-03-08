@@ -29,7 +29,7 @@
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.StatusDescription, defaultHtmlAttr)
         </div>
     </div>
-    @if (!Model.EsElectronicDocNomina && !Model.OperationModeIsFree)
+    @if (Model.EsSupportDocument && !Model.OperationModeIsFree)
     {
         <div class="col-sm-12 col-xs-12 col-md-3 padding-xs-0">
             <div class="form-group">
@@ -45,7 +45,7 @@
         </div>
     }
 </div>
-@if (!Model.EsElectronicDocNomina && !Model.OperationModeIsFree) {
+@if ((Model.EsSupportDocument && !Model.OperationModeIsFree) || (Model.EsEquivalentDocument && Model.NumberingRange != null)) {
 <div class="row">
     <h4 class="panel-title-radian padding-0"><strong>Rango de numeración asignado</strong></h4>
     <hr class="margin-5 margin-bottom-20" />

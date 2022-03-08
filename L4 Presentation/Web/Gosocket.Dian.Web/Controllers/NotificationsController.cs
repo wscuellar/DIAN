@@ -182,6 +182,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
     }
+
     public class RequestNotification
     {
         [JsonProperty(PropertyName = "Description")]

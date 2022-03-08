@@ -11,6 +11,64 @@ namespace Gosocket.Dian.Services.Test
     public class TestValidateCuds
     {
         [TestMethod]
+        public void Should_ValidateCudsDian_ConTrackIdWilliamXml()
+        {
+            Console.WriteLine("Nuevo Test");
+            var invoiceDsTest = new DocumentoSoporte()
+            {
+                NumDs = "DS236000000",
+                FecDs = "2022-02-18",
+                HorDs = "13:34:59-05:00",
+                ValDs = "3899000.00",
+                CodImp = "01",
+                ValImp = "432530.00",
+                ValTol = "4152176.00",
+                NumSno = "1020",
+                NitAbs = "20227859",
+                SoftwarePin = "12345",//
+                TipoAmb = "2"
+            };
+
+            var cudsEsperado  = "63930c174e440328eccc4545712ed9f26ef3d7923e6b528a25df11b6f76dcd9f8e457a1b7b72bd3d85f210c3ed3ba924";
+            Console.WriteLine($"Cuds e:{cudsEsperado}");
+            Console.WriteLine($"Cuds r:{invoiceDsTest.ToCombinacionToCuds().EncryptSHA384()}");
+
+            Assert.AreNotEqual(cudsEsperado, invoiceDsTest.ToCombinacionToCuds().EncryptSHA384());
+        }
+
+
+        [TestMethod]
+        public void Should_ValidateCudsDian_Ok()
+        {
+            Console.WriteLine("Nuevo Test");
+            var invoiceDsTest = new DocumentoSoporte()
+            {
+                NumDs = "DS236000000",
+                FecDs = "2022-02-18",
+                HorDs = "13:34:59-05:00",
+                ValDs = "3899000.00",
+                CodImp = "01",
+                ValImp = "322430.00",
+                ValTol = "4152178.00",
+                NumSno = "1020",
+                NitAbs = "20227859",
+                SoftwarePin = "12345",//
+                TipoAmb = "2"
+            };
+
+            //var composicionCudsEsperada = "00000000012020-10-2414:04:35-05:0015000.000119.0016350.009003730768355990123451";
+            //Console.WriteLine($"Combinación Cuds e:{composicionCudsEsperada}");
+            //Console.WriteLine($"Combinación Cuds r:{invoiceDsTest.ToCombinacionToCuds()}");
+            //Assert.AreEqual(composicionCudsEsperada, invoiceDsTest.ToCombinacionToCuds());
+
+            var cudsEsperado = "63930c174e440328eccc4545712ed9f26ef3d7923e6b528a25df11b6f76dcd9f8e457a1b7b72bd3d85f210c3ed3ba924";
+            Console.WriteLine($"Cuds e:{cudsEsperado}");
+            Console.WriteLine($"Cuds r:{invoiceDsTest.ToCombinacionToCuds().EncryptSHA384()}");
+
+            Assert.AreEqual(cudsEsperado, invoiceDsTest.ToCombinacionToCuds().EncryptSHA384());
+        }
+
+        [TestMethod]
         public void Should_ValidateCuds_Ok()
         {
             Console.WriteLine("Nuevo Test");

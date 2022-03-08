@@ -2,8 +2,9 @@
 @using Newtonsoft.Json;
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
 @{
-    ViewBag.title = "Detalle del SET de pruebas";
+    ViewBag.title = "Detalle del SET de pruebas " + ViewBag.EquivalentElectronicDocumentName;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int? equivalentDocumentId = ViewBag?.EquivalentDocumentId;
 }
 
 
@@ -78,6 +79,7 @@
                         {
                             <div class="setTestODE">
                                 @Html.HiddenFor(m => m.Id)
+                                @Html.Hidden("equivalentElectronicDocumentId", equivalentDocumentId)
                                 @Html.Partial("_setTestResult")
                             </div>
                             <div class="panel-footer text-right">
