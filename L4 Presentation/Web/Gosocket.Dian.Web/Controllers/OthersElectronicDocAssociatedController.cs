@@ -21,6 +21,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Newtonsoft.Json;
 using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext;
+using Gosocket.Dian.Interfaces.Repositories;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -30,8 +31,11 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocAssociatedController : Controller
     {
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
         private UserService userService = new UserService();
         private ApplicationUserManager _userManager;
+        private static NotificationsController notification = new NotificationsController();
+        private NotificationEntity dataNotification = new NotificationEntity();
         private IContributorService object1;
         private IOthersDocsElecContributorService object2;
         private IOthersElectronicDocumentsService object3;
@@ -66,9 +70,10 @@ namespace Gosocket.Dian.Web.Controllers
             IOthersElectronicDocumentsService othersElectronicDocumentsService,
             ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
-            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService, IRadianTestSetAppliedService radianTestSetAppliedService,
-            TelemetryClient telemetry
-            )
+            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService, 
+            IRadianTestSetAppliedService radianTestSetAppliedService,
+            TelemetryClient telemetry, 
+            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository)
         {
             _contributorService = contributorService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -78,6 +83,7 @@ namespace Gosocket.Dian.Web.Controllers
             _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
             _radianTestSetAppliedService = radianTestSetAppliedService;
             this.telemetry = telemetry;
+            _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
         }
 
         public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
@@ -144,7 +150,10 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareIdBase = entity.SoftwareIdBase,
                 ProviderId = entity.ProviderId,
                 LegalRepresentativeList = LegalRepresentativeList,
-                EsElectronicDocNomina = entity.ElectronicDocId == 1
+                EsElectronicDocNomina = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll,
+                EsElectronicDocNominaNoOFE = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE,
+                EsEquivalentDocument = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicEquivalent,
+                EsSupportDocument = entity.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.SupportDocument,
             };
 
         }
@@ -159,7 +168,11 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id = 0)//TODO:
         {
             ViewBag.ValidateRequest = true;
-            
+            var equivalentDocumentsList = _equivalentElectronicDocumentRepository
+                .GetEquivalentElectronicDocuments().Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name }).ToList();
+            equivalentDocumentsList.Insert(0, new SelectListItem { Value = "", Text = "[No especificado]", Selected = true });
+            ViewBag.EquivalentElectronicDocuments = equivalentDocumentsList.OrderBy(t => t.Value).ToList();
+
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
 
             if (model.Id == -1)
@@ -200,6 +213,7 @@ namespace Gosocket.Dian.Web.Controllers
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+
             model.Software = new OtherDocElecSoftwareViewModel()
             {
                 Id = software.Id,
@@ -242,8 +256,42 @@ namespace Gosocket.Dian.Web.Controllers
         private ResponseMessage DeleteOperationInStorage(int id)
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+            var modes = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationsListByDocElecContributorId(operation.OtherDocElecContributorId);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(User.ContributorId(), 2, 1);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(User.ContributorId(), 1, 1);
+
             ResponseMessage result = new ResponseMessage();
             //if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
+            if (operation != null && List.Results.Any(x => x.Id == operation.Id))
+            {
+                PagedResult<OtherDocElecCustomerList> customers = _othersElectronicDocumentsService.CustormerList(User.ContributorId(), string.Empty, OtherDocElecState.none, 1, 10);
+                if (customers.Results.Count() > 0)
+                {
+                    result.Code = 500;
+                    result.Message = $"Tiene clientes asociados, no se permite eliminar.";
+                    return result;
+
+                }
+                if (List.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
+                {
+                    result.Code = 500;
+                    result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                }
+
+            }
+            else
+            if (operation != null && List2.Results.Any(x => x.Id == operation.Id))
+            {
+                if (List2.Results.Count(x => x.StateSoftware == "3") == 1 && operation.OperationStatusId != (int)OtherDocElecState.Test)
+                {
+                    result.Code = 500;
+                    result.Message = $"Solo un Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                }
+
+            }
+            else
             if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
 
@@ -301,7 +349,7 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult GetSetTestResult(int Id)
         {
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
-
+            
             if (model.Id == -1)
                 return RedirectToAction("Index", "OthersElectronicDocuments");
 
@@ -352,10 +400,10 @@ namespace Gosocket.Dian.Web.Controllers
                 var cosmosManager = new CosmosDbManagerNumberingRange();
                 var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
                 model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
-                    numberingRange?.Prefix??"-",
+                    numberingRange?.Prefix ?? "-",
                     numberingRange?.ResolutionNumber ?? "-",
-                    numberingRange?.NumberFrom??0,
-                    numberingRange?.NumberTo??0,
+                    numberingRange?.NumberFrom ?? 0,
+                    numberingRange?.NumberTo ?? 0,
                     numberingRange?.CreationDate.ToString("dd-MM-yyyy") ?? "-",
                     numberingRange?.ExpirationDate.ToString("dd-MM-yyyy") ?? "-");
                 model.GTestSetOthersDocumentsResult.StartDate = numberingRange?.CreationDate;
@@ -363,16 +411,105 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
-            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
+            model.EsElectronicDocNominaNoOFE = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.TitleDoc1 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             ViewBag.Id = Id;
 
             return View(model);
         }
 
+        public ActionResult GetSetTestResultEquivalentDocument(int Id, int? equivalentElectronicDocumentId=null)
+        {
+            EquivalentElectronicDocument equivalentDocument = equivalentElectronicDocumentId.HasValue ? _equivalentElectronicDocumentRepository
+                .GetEquivalentElectronicDocument(equivalentElectronicDocumentId.Value) : null;
+
+            ViewBag.EquivalentElectronicDocumentName = equivalentDocument?.Name;
+
+            OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
+
+            if (equivalentElectronicDocumentId.HasValue && equivalentElectronicDocumentId  <= 0)
+            {
+                ViewBag.ValidateRequest = false;
+                ModelState.AddModelError("", "¡Debe especificar un documento equivalente válido para realizar esta operación!");
+                return View("GetSetTestResult", new OthersElectronicDocAssociatedViewModel());
+            }
+
+            if (model.Id == -1)
+                return RedirectToAction("Index", "OthersElectronicDocuments");
+
+            ViewBag.ValidateRequest = true;
+
+            if (model.Id == -2)
+            {
+                ViewBag.ValidateRequest = false;
+                ModelState.AddModelError("", "No existe contribuyente!");
+                return View("GetSetTestResult", new OthersElectronicDocAssociatedViewModel());
+            }
+
+
+            GlobalTestSetOthersDocuments testSet = null;
+
+            testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
+            if (testSet == null)
+                return Json(new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
+            var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+
+            //ViewBag.TestSetId = testSet.TestSetId;
+            //OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
+
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString() + (!equivalentElectronicDocumentId.HasValue ? "" : $"|{equivalentElectronicDocumentId.Value}");
+            model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
+
+            ViewBag.TestSetId = model.GTestSetOthersDocumentsResult.Id;
+
+            model.GTestSetOthersDocumentsResult.OperationModeName = Domain.Common.EnumHelper.GetEnumDescription((Enum.Parse(typeof(Domain.Common.OtherDocElecOperationMode), model.OperationModeId.ToString())));
+            model.GTestSetOthersDocumentsResult.StatusDescription = testSet.Description;
+            model.Software = new OtherDocElecSoftwareViewModel()
+            {
+                Id = software.Id,
+                Name = software.Name,
+                Pin = software.Pin,
+                Url = software.Url,
+                Status = software.Status,
+                OtherDocElecSoftwareStatusId = software.OtherDocElecSoftwareStatusId,
+                //OtherDocElecSoftwareStatusName = _othersDocsElecSoftwareService.GetSoftwareStatusName(software.OtherDocElecSoftwareStatusId),
+                OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State,
+                ProviderId = software.ProviderId,
+                SoftwareId = software.SoftwareId,
+            };
+
+            if (!model.OperationModeIsFree && equivalentDocument?.Name == "Documentos equivalentes POS")
+            {
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
+                model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
+                    numberingRange?.Prefix ?? "-",
+                    numberingRange?.ResolutionNumber ?? "-",
+                    numberingRange?.NumberFrom ?? 0,
+                    numberingRange?.NumberTo ?? 0,
+                    numberingRange?.CreationDate.ToString("dd-MM-yyyy") ?? "-",
+                    numberingRange?.ExpirationDate.ToString("dd-MM-yyyy") ?? "-");
+                model.GTestSetOthersDocumentsResult.StartDate = numberingRange?.CreationDate;
+                model.GTestSetOthersDocumentsResult.EndDate = numberingRange?.ExpirationDate;
+            }
+
+            model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
+            model.EsElectronicDocNominaNoOFE = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.TitleDoc1 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
+
+            ViewBag.Id = Id;
+            ViewBag.EquivalentDocumentId = equivalentElectronicDocumentId;
+
+            return View("GetSetTestResult", model);
+        }
+
         [HttpPost]
-        public ActionResult SetTestDetails(int Id)
+        public ActionResult SetTestDetails(int Id, int? equivalentElectronicDocumentId = null)
         {
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
 
@@ -391,12 +528,14 @@ namespace Gosocket.Dian.Web.Controllers
             //OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(Guid.Parse(model.SoftwareId));
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
 
-            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
+            string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString() + (!equivalentElectronicDocumentId.HasValue ? "" : $"|{equivalentElectronicDocumentId.Value}");
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
 
             model.EsElectronicDocNomina = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayroll;
-            model.TitleDoc1 = model.EsElectronicDocNomina ? "Nomina Electrónica" : model.ElectronicDoc;
-            model.TitleDoc2 = model.EsElectronicDocNomina ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
+            model.EsElectronicDocNominaNoOFE = model.ElectronicDocId == (int)Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE;
+
+            model.TitleDoc1 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica" : model.ElectronicDoc;
+            model.TitleDoc2 = (model.EsElectronicDocNomina || model.EsElectronicDocNominaNoOFE) ? "Nomina Electrónica de Ajuste" : "Notas de Ajuste";
 
             GlobalTestSetOthersDocuments testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
             //ViewBag.TestSetId = (testSet != null) ? testSet.TestSetId : string.Empty;
@@ -408,6 +547,10 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.OtherDocElecSoftwareStatusName = model.GTestSetOthersDocumentsResult.State;
 
             ViewBag.Id = Id;
+
+            EquivalentElectronicDocument equivalentDocument = !equivalentElectronicDocumentId.HasValue ? null : _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocument(equivalentElectronicDocumentId.Value);
+            ViewBag.EquivalentElectronicDocumentName = equivalentDocument?.Name;
+            ViewBag.EquivalentDocumentId = equivalentDocument?.Id;
 
             return View(model);
         }
@@ -786,6 +929,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
+                dataNotification.AccountId = code.ToString();
 
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
@@ -800,6 +944,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
                 telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
+               
                 return Json(new
                 {
                     success = true,

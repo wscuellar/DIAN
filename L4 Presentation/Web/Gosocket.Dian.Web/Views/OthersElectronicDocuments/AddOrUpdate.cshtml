@@ -6,6 +6,7 @@
     var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
     var message = (string)ViewBag.Message;
     var isElectronicPayroll = (bool)ViewBag.IsElectronicPayroll;
+    var isElectronicPayrollNoOfe = (bool)ViewBag.IsElectronicPayrollNoOfe;
     var dianUrlEventReception = Model.UrlEventReception;
     var softwareIdPrInitial = Model.SoftwareIdPr;
 }
@@ -169,7 +170,7 @@
                                                     <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
-                                                    @if (!isElectronicPayroll)
+                                                    @if (ViewBag.IsSupportDocument)
                                                     {
                                                         <th class="text-center">Rangos de Pruebas</th>
                                                     }
@@ -194,7 +195,7 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            @if (!isElectronicPayroll)
+                                                            @if (ViewBag.IsSupportDocument)
                                                             {
                                                                 <td class="text-center">
                                                                     <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
@@ -202,11 +203,22 @@
                                                                     </a>
                                                                 </td>
                                                             }
-                                                            <td class="text-center" style="width:70px">
-                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-                                                                <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+                                                        <td nowrap class="text-center">
+                                                            @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
+                                                            <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+                                                            @if (isElectronicPayroll || isElectronicPayrollNoOfe)
+                                                            {
+                                                                <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            }
+                                                            else
+                                                            {
                                                                 <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                            </td>
+                                                            }
+                                                            @if (ViewBag.IsEquivalentDocument)
+                                                            {
+                                                                <a onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)" title="Documentos habilitados"><i class="fa fa-check-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            }
+                                                        </td>
                                                         </tr>
                                                     }
                                                 }
@@ -264,6 +276,23 @@
                         <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade prompt-comment" id="dialog-equivalents-documents-enabled" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+                <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Documentos equivalentes habilitados</h4>
+            </div>
+            <div class="modal-body">
+                /*Acá hacer una tabla para visualizar los documentos equivalentes que han sido habilitados*/
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-success btn-radian-success" style="padding: 8px 13px;">Cerrar</button>
             </div>
         </div>
     </div>
@@ -673,6 +702,11 @@
                     });
                 }
             });
+        }
+
+        function OpenModalShowEquivalentDocumentsEnabled(otherDocElecContributor) {
+            /*Consultar los documentos equivalentes que han sido habilitados y listarlos*/
+            $("#dialog-equivalents-documents-enabled").modal("show");
         }
 
     </script>

@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
@@ -18,6 +19,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1543,8 +1546,41 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.ContributorId = User.ContributorId();
-
+            ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
+        }
+
+        public string GetContributorOperation(int code)
+        {
+
+            try
+            {
+                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
+                                      "WHERE C.Contributorid = " + code +
+                                      " AND C.Deleted <> 1";
+              
+                SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
+                conn.Open();
+                DataTable table = new DataTable();
+                SqlCommand command = new SqlCommand(sqlQuery, conn);
+
+                using (var da = new SqlDataAdapter(command))
+                {
+                    da.Fill(table);
+                }
+                conn.Close();
+
+                var conteo = table.Rows.Count;
+
+                return conteo.ToString();
+                //return contributorType;
+
+            }
+            catch (Exception exc)
+            {
+                return  null;
+            }
         }
     }
 }
