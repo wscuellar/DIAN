@@ -9,25 +9,21 @@ namespace Gosocket.Dian.Infrastructure.Utils
         //Lista de días festivos excluidos los fines de semana
         private static readonly DateTime[] bankHolidays=
         {
-            DateTime.ParseExact("01/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("01/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("06/01/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("23/03/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("09/04/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("10/04/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("01/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("25/05/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("15/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("22/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("29/06/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("20/07/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("07/08/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("17/08/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("12/10/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("02/11/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("16/11/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("08/12/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
-            DateTime.ParseExact("25/12/2020", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("01/01/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("21/03/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),            
+            DateTime.ParseExact("14/04/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("15/04/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("30/05/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),            
+            DateTime.ParseExact("20/06/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("27/06/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),            
+            DateTime.ParseExact("04/07/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("20/07/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("15/08/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),            
+            DateTime.ParseExact("17/10/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("07/11/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("14/11/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("08/12/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
+            DateTime.ParseExact("25/12/2022", "dd/MM/yyyy", CultureInfo.InvariantCulture),
         };
         /// <summary>
         /// Calcula el número de días hábiles, teniendo en cuenta:
@@ -45,7 +41,7 @@ namespace Gosocket.Dian.Infrastructure.Utils
                 throw new ArgumentException("Incorrect last day " + lastDay);
 
             TimeSpan span = lastDay - firstDay;
-            int businessDays = span.Days + 1;
+            int businessDays = span.Days;
             int fullWeekCount = businessDays / 7;
             //  averigüe si hay fines de semana durante el tiempo que exceden las semanas completas
             if (businessDays > fullWeekCount * 7)
