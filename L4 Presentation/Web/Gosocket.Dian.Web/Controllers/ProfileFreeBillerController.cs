@@ -44,21 +44,21 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult CreateProfile()
         {
-            ProfileFreeBillerModel model = new ProfileFreeBillerModel();
-            model.MenuOptionsByProfile = _profileService.GetOptionsByProfile(0);
-            string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
-            ViewBag.ContributorId = User.ContributorId();
-            var electronicDocument = contributorService.GetOtherDocElecContributorPermisos(User.ContributorId());
-            var contributorOp = contributorService.GetContributorOperations(User.ContributorId());
-            ViewBag.OperationMode = contributorOp.OperationModeId;
-            ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
-            foreach (var elemento in electronicDocument)
-                if (elemento.OtherDocElecOperationModeId == 3 && elemento.Step == 3 )
-                {
-                    ViewBag.DocElectronicDocument = elemento.ElectronicDocumentId;
-                }
+                ProfileFreeBillerModel model = new ProfileFreeBillerModel();
+                model.MenuOptionsByProfile = _profileService.GetOptionsByProfile(0);
+                string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
+                ViewBag.ContributorId = User.ContributorId();
+                var electronicDocument = contributorService.GetOtherDocElecContributorPermisos(User.ContributorId());
+                var contributorOp = contributorService.GetContributorOperations(User.ContributorId());
+                ViewBag.OperationMode = contributorOp.OperationModeId;
+                ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
+                foreach (var elemento in electronicDocument)
+                    if (elemento.OtherDocElecOperationModeId == 3 && elemento.Step == 3)
+                    {
+                        ViewBag.DocElectronicDocument = elemento.ElectronicDocumentId;
+                    }
 
-            return View(model);
+                return View(model);
         }
 
         [HttpPost]
