@@ -2970,7 +2970,6 @@
     <Content Include="Views\OthersElectronicDocNumberRange\_Items.cshtml" />
     <Content Include="Views\OthersElectronicDocNumberRange\Index.cshtml" />
     <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
-    <Content Include="Views\FreeBiller\_permissionsGrid.cshtml" />
     <Content Include="Views\ProfileFreeBiller\_permissionFGrid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
