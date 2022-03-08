@@ -7665,8 +7665,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var software = GetSoftwareInstanceCache(softwareId);
                 invoceCuds.SoftwarePin = software?.Pin;
             }
-                        
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"El CUDS debe ser calculado de acuerdo con lo que se especifica en el anexo técnico. invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}" };
+            //invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}                        
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"El CUDS debe ser calculado de acuerdo con lo que se especifica en el anexo técnico." };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {
