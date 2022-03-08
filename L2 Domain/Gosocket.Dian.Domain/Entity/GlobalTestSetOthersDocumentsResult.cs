@@ -57,5 +57,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+
+        public int? EquivalentElectronicDocumentId { get; set; }
     }
 }

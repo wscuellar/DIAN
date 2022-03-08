@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Application
 
         private readonly IOthersDocsElecContributorRepository _othersDocsElecContributorRepository;
         private readonly IOthersDocsElecContributorOperationRepository _othersDocsElecContributorOperationRepository;
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
 
         public OthersElectronicDocumentsService(IContributorService contributorService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
@@ -31,7 +32,8 @@ namespace Gosocket.Dian.Application
             IOthersDocsElecContributorOperationRepository othersDocsElecContributorOperationRepository,
             IOthersDocsElecContributorRepository othersDocsElecContributorRepositor,
             IGlobalOtherDocElecOperationService globalOtherDocElecOperationService,
-            ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService)
+            ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService, 
+            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository)
         {
             _contributorService = contributorService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -43,6 +45,7 @@ namespace Gosocket.Dian.Application
 
             if (sqlDBContext == null)
                 sqlDBContext = new SqlDBContext();
+            _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
         }
 
         public ResponseMessage Validation(string userCode, string Accion, int ElectronicDocumentId, string complementeTexto, int ContributorIdType)
@@ -234,46 +237,61 @@ namespace Gosocket.Dian.Application
 
             if (_globalOtherDocElecOperationService.Insert(operation, existingOperation.Software))
             {
-                string key = existingOperation.SoftwareType.ToString() + "|" + software.SoftwareId.ToString();
-                GlobalTestSetOthersDocumentsResult setResult = new GlobalTestSetOthersDocumentsResult(contributor.Code, key)
+                RegisterTestSet(testSet, ODEContributor, existingOperation, software, contributor, contributorIsOfe, electronicDocumentIsSupport);
+                bool electronicDocumentIsEquivalent = ODEContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
+                if (electronicDocumentIsEquivalent)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    OtherDocElecContributorId = ODEContributor.Id,
-                    State = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
-                    Status = (contributorIsOfe && electronicDocumentIsSupport) ? (int)TestSetStatus.Accepted : (int)TestSetStatus.InProcess,
-                    StatusDescription = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
-                    ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId.ToString(),
-                    OperationModeName = ((Domain.Common.OtherDocElecOperationMode)ODEContributor.OtherDocElecOperationModeId).GetDescription(),
-                    ElectronicDocumentId = ODEContributor.ElectronicDocumentId,
-                    SoftwareId = software.Id.ToString(),
-                    ProviderId = software.ProviderId,
-                    // Totales Generales
-                    TotalDocumentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentRequired,
-                    TotalDocumentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentAcceptedRequired,
-                    TotalDocumentSent = 0,
-                    TotalDocumentAccepted = 0,
-                    TotalDocumentsRejected = 0,
-                    // EndTotales Generales
-
-                    // OthersDocuments
-                    OthersDocumentsRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsRequired,
-                    OthersDocumentsAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsAcceptedRequired,
-                    TotalOthersDocumentsSent = 0,
-                    OthersDocumentsAccepted = 0,
-                    OthersDocumentsRejected = 0,
-                    //End OthersDocuments
-
-                    //ElectronicPayrollAjustment
-                    ElectronicPayrollAjustmentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentRequired,
-                    ElectronicPayrollAjustmentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentAcceptedRequired,
-                    TotalElectronicPayrollAjustmentSent = 0,
-                    ElectronicPayrollAjustmentAccepted = 0,
-                    ElectronicPayrollAjustmentRejected = 0,
-                    //EndElectronicPayrollAjustment
-                };
-                // insert...
-                _ = _testSetOthersDocumentsResultService.InsertTestSetResult(setResult);
+                    List<EquivalentElectronicDocument> equivalentsDocuments = _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocuments();
+                    foreach (var item in equivalentsDocuments)
+                    {
+                        RegisterTestSet(testSet, ODEContributor, existingOperation, software, contributor, contributorIsOfe, electronicDocumentIsSupport, item.Id);
+                    }
+                }
             }
+        }
+
+        private void RegisterTestSet(GlobalTestSetOthersDocuments testSet, OtherDocElecContributor ODEContributor, OtherDocElecContributorOperations existingOperation, OtherDocElecSoftware software, Contributor contributor, bool contributorIsOfe, bool electronicDocumentIsSupport, int? equivalentElectronicDocumentId = null)
+        {
+            string key = existingOperation.SoftwareType.ToString() + "|" + software.SoftwareId.ToString() + (!equivalentElectronicDocumentId.HasValue ? "" : $"|{equivalentElectronicDocumentId.Value}");
+            GlobalTestSetOthersDocumentsResult setResult = new GlobalTestSetOthersDocumentsResult(contributor.Code, key)
+            {
+                Id = Guid.NewGuid().ToString(),
+                OtherDocElecContributorId = ODEContributor.Id,
+                State = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
+                Status = (contributorIsOfe && electronicDocumentIsSupport) ? (int)TestSetStatus.Accepted : (int)TestSetStatus.InProcess,
+                StatusDescription = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
+                ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId.ToString(),
+                OperationModeName = ((Domain.Common.OtherDocElecOperationMode)ODEContributor.OtherDocElecOperationModeId).GetDescription(),
+                ElectronicDocumentId = ODEContributor.ElectronicDocumentId,
+                EquivalentElectronicDocumentId = equivalentElectronicDocumentId,
+                SoftwareId = software.Id.ToString(),
+                ProviderId = software.ProviderId,
+                // Totales Generales
+                TotalDocumentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentRequired,
+                TotalDocumentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentAcceptedRequired,
+                TotalDocumentSent = 0,
+                TotalDocumentAccepted = 0,
+                TotalDocumentsRejected = 0,
+                // EndTotales Generales
+
+                // OthersDocuments
+                OthersDocumentsRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsRequired,
+                OthersDocumentsAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsAcceptedRequired,
+                TotalOthersDocumentsSent = 0,
+                OthersDocumentsAccepted = 0,
+                OthersDocumentsRejected = 0,
+                //End OthersDocuments
+
+                //ElectronicPayrollAjustment
+                ElectronicPayrollAjustmentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentRequired,
+                ElectronicPayrollAjustmentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentAcceptedRequired,
+                TotalElectronicPayrollAjustmentSent = 0,
+                ElectronicPayrollAjustmentAccepted = 0,
+                ElectronicPayrollAjustmentRejected = 0,
+                //EndElectronicPayrollAjustment
+            };
+            // insert...
+            _ = _testSetOthersDocumentsResultService.InsertTestSetResult(setResult);
         }
         #endregion
 
