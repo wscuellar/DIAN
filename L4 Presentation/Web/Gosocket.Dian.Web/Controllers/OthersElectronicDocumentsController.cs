@@ -938,8 +938,8 @@ namespace Gosocket.Dian.Web.Controllers
                 var testResponse = new TestSetResultAceptedModel()
                 {
                     EquivalentElectronicDocumentId = test.EquivalentElectronicDocumentId.Value,
-                    EquivalentElectronicDocumentState = test.State,
-                    EquivalentElectronicDocumentName = nameEquivalentElectronicDocument
+                    EquivalentElectronicDocumentName = nameEquivalentElectronicDocument,
+                    EquivalentElectronicDocumentState = test.State == TestSetStatus.Accepted.GetDescription() ? "Habilitado" : test.State
                 };
 
                 response.Add(testResponse);
