@@ -421,6 +421,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\TestSetResultAceptedModel.cs" />
     <Compile Include="Models\ValidacionOtherElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />

@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Interfaces.Managers;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Domain.Common;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,7 +40,18 @@ namespace Gosocket.Dian.Application
 
         public List<GlobalTestSetOthersDocumentsResult> GetTestSetResultAcepted(string nit, int electronicDocumentId, int otherDocElecContributorId, string softwareId)
         {
-            throw new System.NotImplementedException();
+            var testSetsResult = _testSetOthersDocumentsResultManager.GetTestSetResultByNit(nit);
+
+            var testSetsResultAcepted = testSetsResult
+                .Where(t =>
+                    t.PartitionKey == nit &&
+                    t.ElectronicDocumentId == electronicDocumentId &&
+                    t.OtherDocElecContributorId == otherDocElecContributorId &&
+                    t.SoftwareId == softwareId &&
+                    t.Status == (int)TestSetStatus.Accepted)
+                .ToList();
+
+            return testSetsResultAcepted;
         }
     }
 }
