@@ -62,18 +62,26 @@ namespace Gosocket.Dian.Functions.ECD
                 UriBuilder downloadUriBuilder = new UriBuilder(configuration.Url);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(downloadUriBuilder.Uri);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                if(responseStream.Length > 0)
-                {
-                    var fileBytes = Utils.Utils.ConvertStreamToBytes(responseStream);
-                    fileManager.Upload(configuration.Container, configuration.FileName, fileBytes);
-                }
+                Stream br = response.GetResponseStream();
+
+                var buffer = new List<byte>();
+                while (true) 
+                { 
+                    byte[] tmpBuffer = new byte[1024]; 
+                    int bytesRead = br.Read(tmpBuffer, 0, tmpBuffer.Length);
+                    buffer.AddRange(tmpBuffer.Take(bytesRead)); 
+                    if (bytesRead < tmpBuffer.Length) 
+                        break; 
+                }               
+                
+                fileManager.Upload(configuration.Container, configuration.FileName, buffer.ToArray());
+                
             }
             catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
+            {                
                 var logger = new GlobalLogger("DonwloadECDFiles", configuration.Name) { Action = "DonwloadECDFiles", Message = ex.Message, RouteData = JsonConvert.SerializeObject(configuration) };
                 tableManagerGlobalLogger.InsertOrUpdate(logger);
+                throw;
             }
         }
 
