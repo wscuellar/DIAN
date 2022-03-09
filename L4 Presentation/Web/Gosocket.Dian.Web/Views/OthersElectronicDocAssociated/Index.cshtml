@@ -531,9 +531,21 @@
             });
 
             $('#btnSincronizarAProduccion').click(function () {
+                const isEquivalentDocument = "@Model.EsEquivalentDocument".toLowerCase() == "true",
+                    equivalentDocumentSelected = $("#equivalentElectronicDocumentId").val();
+
+                if (!equivalentDocumentSelected) {
+                    bootbox.dialog({
+                        message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
+                            + "Debe especificar un documento equivalente para poder sincronizarlo a producción"
+                            + "</h4></div></div>"
+                    });
+                    return;
+                }
+
                 showConfirmation(`¿Estás seguro que deseas sincronizar a producción?`, ConfirmExec(
                     () => {
-                        syncToProduction(@Model.Nit, @Model.ContributorId, "@Model.SoftwareId", "@Model.SoftwareIdBase");
+                        syncToProduction(@Model.Nit, @Model.ContributorId, "@Model.SoftwareId", "@Model.SoftwareIdBase", isEquivalentDocument ? equivalentDocumentSelected : null);
                     }
                     , "", () => hideLoading('#panel-form'))
                 );
@@ -558,7 +570,7 @@
              }
 
 
-            syncToProduction = (code, contributorId, softwareId, softwareIdBase) => {
+            syncToProduction = (code, contributorId, softwareId, softwareIdBase, equivalentDocumentId) => {
                 showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
                 var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
                 $.ajax({
@@ -569,7 +581,8 @@
                         code: code,
                         contributorId: contributorId,
                         softwareId:softwareId,
-                        softwareIdBase:softwareIdBase
+                        softwareIdBase: softwareIdBase,
+                        equivalentDocumentId
                     },
                     error: function (a, b, c) {
                         hideLoading('#panel-form');
@@ -616,7 +629,7 @@
                 success: function (data) {
                     hideLoading('#panel-form');
                     if (!data.success) {
-                        showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
+                        showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.Message);
                         return;
                     }
                     $("#btnDetalleSetPruebas").removeAttr("disabled");
@@ -627,8 +640,8 @@
                         $("#btnReiniciarSerPruebas").removeClass("disabled");
                     }
                     if (data.CanSyncToProduction) {
-                        $("#btnSincronizarAProduccion").remvoveAttr("disabled");
-                        $("#btnSincronizarAProduccion").remvoveClass("disabled");
+                        $("#btnSincronizarAProduccion").removeAttr("disabled");
+                        $("#btnSincronizarAProduccion").removeClass("disabled");
                     }
                 }
             });
