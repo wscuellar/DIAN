@@ -7665,9 +7665,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var software = GetSoftwareInstanceCache(softwareId);
                 invoceCuds.SoftwarePin = software?.Pin;
             }
-
-            
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
+            //invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}                        
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"El CUDS debe ser calculado de acuerdo con lo que se especifica en el anexo técnico." };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {
@@ -7702,7 +7701,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDE", ErrorMessage = "Cude No Válido" };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDS no está calculado correctamente." };
             var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
             if (invoceCuds.Cude.ToLower() == hash)
             {
@@ -7715,63 +7714,5 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
     }
 
-    //public class ValidadorCudeq 
-    //{
-    //    static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
-    //    private GlobalSoftware GetSoftwareInstanceCache(string id)
-    //    {
-    //        var itemKey = id;
-    //        GlobalSoftware software = null;
-    //        var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
-    //        var cacheItem = InstanceCache.SoftwareInstanceCache.GetCacheItem(itemKey);
-    //        if (cacheItem == null)
-    //        {
-    //            software = softwareTableManager.Find<GlobalSoftware>(itemKey, itemKey);
-    //            if (software == null) return null;
-    //            CacheItemPolicy policy = new CacheItemPolicy
-    //            {
-    //                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(softwareInstanceCacheTimePolicyInMinutes)
-    //            };
-    //            InstanceCache.SoftwareInstanceCache.Set(new CacheItem(itemKey, software), policy);
-    //        }
-    //        else
-    //            software = (GlobalSoftware)cacheItem.Value;
-
-    //        return software;
-    //    }
-    //    public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
-    //    {
-    //        DateTime startDate = DateTime.UtcNow;
-    //        data.TrackId = data.TrackId.ToLower();
-
-    //        var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
-    //        var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
-
-    //        var softwareId = invoceCuds.SoftwareId;
-
-    //        if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
-    //        {
-    //            invoceCuds.SoftwarePin = billerSoftwarePin;
-    //        }
-    //        else
-    //        {
-    //            var @else = "";
-    //            @else = "1212";
-
-    //            var software = GetSoftwareInstanceCache(softwareId);
-    //            invoceCuds.SoftwarePin = software?.Pin;
-    //        }
-
-
-    //        var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
-    //        var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
-    //        if (invoceCuds.Cuds.ToLower() == hash)
-    //        {
-    //            response.IsValid = true;
-    //            response.ErrorMessage = $"Valor calculado correctamente.";
-    //        }
-    //        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-    //        return response;
-    //    }
-    //}
+   
 }

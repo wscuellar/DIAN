@@ -4,6 +4,7 @@ using Gosocket.Dian.Infrastructure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using OpenHtmlToPdf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,6 +59,9 @@ namespace Gosocket.Dian.Functions.Pdf
                     responseApplication.ContentBase64 = Convert.ToBase64String(xmlBytesApplication);
                 }
 
+                string typeFormat = documentMetaEntity?.PrintFormatType;
+                string[] sectionsToHide = (documentMetaEntity?.SectionsToHide ?? "").Split('|');
+
                 // Diccionario para construir Pdf
                 var dictionary = new Dictionary<string, string>
                 {
@@ -76,8 +80,10 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Transformar **XML** to **HTML**
                 var htmlGDoc = new HtmlGDoc(xmlBytes, xmlBytesApplication);
-                string Html_Content = htmlGDoc.GetHtmlGDoc(dictionary);
+                string Html_Content = htmlGDoc.GetHtmlGDoc(typeFormat, dictionary);
 
+                //-------------------------------------------------------------------------------------------------------------------------
+                Html_Content = ConfigurePrintTemplate(typeFormat, sectionsToHide, Html_Content);
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
@@ -112,7 +118,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 if (documentApplication != null)
                 {
                     documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
-                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication); 
+                    Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
                 else
@@ -127,7 +133,10 @@ namespace Gosocket.Dian.Functions.Pdf
                 // File.WriteAllText(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.html", Html_Content);
 
                 // Salvar PDF generado de HTML en el Storage
-                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId);
+                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId, getPaperSize(typeFormat));
+
+                // Guardar en disco el pdf generado
+                // File.WriteAllBytes(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.pdf", pdfBytes);
 
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new ByteArrayContent(pdfBytes);
@@ -166,6 +175,90 @@ namespace Gosocket.Dian.Functions.Pdf
             int sec = Convert.ToInt32(hours[2]);
             return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
 
+        }
+
+        private static string ConfigurePrintTemplate(string typeFormat, string[] sectionsToHide, string Html_Content)
+        {
+            if (typeFormat == "Formato tipo media carta")
+            {
+                Html_Content = AddStylesToTemplateForPrintHalfLetter(Html_Content);
+            }
+            if (typeFormat == "Formato tipo parametrizable")
+            {
+                Html_Content = ConfigureTemplateForVisualizeSelectedSections(sectionsToHide, Html_Content);
+            }
+
+            Html_Content = Html_Content.Replace("#stylesForHalfLetter#", "");
+            Html_Content = Html_Content.Replace("#styleSectionDatosAdicionales#", "");
+            Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "");
+            Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "");
+            Html_Content = Html_Content.Replace("#styleSectionReferencias#", "");
+            Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "");
+
+            return Html_Content;
+        }
+
+        private static string ConfigureTemplateForVisualizeSelectedSections(string[] sectionsToHide, string Html_Content)
+        {
+            foreach (var section in sectionsToHide)
+            {
+                if (section.Equals("Datos adicionales"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionDatosAdicionales#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Descuentos y recargos globales"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionDescuentosRecargosGlobales#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Anticipos"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionAnticipos#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Referencias"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionReferencias#", "display:none");
+                    continue;
+                }
+                if (section.Equals("Información complementaria"))
+                {
+                    Html_Content = Html_Content.Replace("#styleSectionInformacionComplementaria#", "display:none");
+                }
+            }
+
+            return Html_Content;
+        }
+
+        private static string AddStylesToTemplateForPrintHalfLetter(string Html_Content)
+        {
+            string stylesMiddleLetter = @"
+                .titleSecundario {
+                    margin: 0 35px 0 !important;
+                }
+                .divDetalle {
+                    margin: 10px 50px 20px !important;
+                }
+            ";
+            Html_Content = Html_Content.Replace("#stylesForHalfLetter#", stylesMiddleLetter);
+            return Html_Content;
+        }
+
+        private static PaperSize getPaperSize(string typeFormat)
+        {
+            switch (typeFormat)
+            {
+                case "Formato tipo carta":
+                case "Formato tipo parametrizable":
+                    return PaperSize.A4;
+                case "Formato tipo media carta":
+                    return PaperSize.A5;
+                case "Formato tipo tirilla":
+                    return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
+                default:
+                    return PaperSize.A4;
+            }
         }
     }
 }
