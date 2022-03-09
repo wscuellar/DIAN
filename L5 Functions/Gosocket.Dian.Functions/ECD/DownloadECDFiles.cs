@@ -69,9 +69,10 @@ namespace Gosocket.Dian.Functions.ECD
                 { 
                     byte[] tmpBuffer = new byte[1024]; 
                     int bytesRead = br.Read(tmpBuffer, 0, tmpBuffer.Length);
+                    if (bytesRead <= 0)
+                        break;
                     buffer.AddRange(tmpBuffer.Take(bytesRead)); 
-                    if (bytesRead < tmpBuffer.Length) 
-                        break; 
+                    
                 }               
                 
                 fileManager.Upload(configuration.Container, configuration.FileName, buffer.ToArray());
