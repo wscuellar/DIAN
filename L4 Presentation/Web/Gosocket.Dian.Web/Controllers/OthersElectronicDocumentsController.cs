@@ -902,5 +902,15 @@ namespace Gosocket.Dian.Web.Controllers
                 return null;
             }
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public JsonResult GetTiposDocumentosHabilitados(int otherDocElecContributorOperationsId)
+        {
+            var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
+
+
+            return null;
+        }
     }
 }
