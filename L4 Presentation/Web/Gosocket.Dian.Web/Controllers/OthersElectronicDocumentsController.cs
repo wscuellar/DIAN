@@ -913,7 +913,6 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public JsonResult GetTestSetResultAcepted(int otherDocElecContributorOperationsId)
         {
             var response = new List<TestSetResultAceptedModel>();
@@ -921,8 +920,7 @@ namespace Gosocket.Dian.Web.Controllers
             var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
 
             var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResultAcepted(
-                //User.UserCode(),
-                "2019043067",
+                User.UserCode(),
                 otherDocElecContributorOperation.OtherDocElecContributor.ElectronicDocumentId,
                 otherDocElecContributorOperation.OtherDocElecContributorId,
                 otherDocElecContributorOperation.SoftwareId.ToString());
