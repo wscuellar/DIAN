@@ -134,7 +134,7 @@ namespace Gosocket.Dian.Functions.Payroll
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                response.Code = ((int)EventValidationMessage.Error).ToString();
+                response.Code = ((int)EventValidationMessage.ErrorNomina).ToString();
                 response.Message = ex.Message;
             }
 
