@@ -35,6 +35,11 @@ namespace Gosocket.Dian.Application
         public List<GlobalTestSetOthersDocumentsResult> GetTestSetResultByNit(string nit)
         {
             return _testSetOthersDocumentsResultManager.GetTestSetResultByNit(nit);
-        } 
+        }
+
+        public List<GlobalTestSetOthersDocumentsResult> GetTestSetResultAcepted(string nit, int electronicDocumentId, int otherDocElecContributorId, string softwareId)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
