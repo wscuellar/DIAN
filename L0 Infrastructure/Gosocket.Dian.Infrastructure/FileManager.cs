@@ -321,8 +321,7 @@ namespace Gosocket.Dian.Infrastructure
             {
                 var blobContainer = BlobClient.GetContainerReference(container);
                 var blob = blobContainer.GetBlockBlobReference(name);
-                blob.FetchAttributes();
-                return true;
+                return blob.Exists();                
             }
             catch
             {

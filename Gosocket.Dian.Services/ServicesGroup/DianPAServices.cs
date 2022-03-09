@@ -1037,7 +1037,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = documentParsed.Cude;
+            var trackIdCude = documentParsed.Cude.ToLower(); 
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
 
@@ -1048,11 +1048,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Auth
             start = DateTime.UtcNow;
             //Mandato sin CUFES referenciados
-            bool mandato = (eventCode == "043" && listId != "3");
-            bool validaAutho = ((eventCode == "037" || eventCode == "038" || eventCode == "039") && listId != "2" || mandato);
+            //bool mandato = (eventCode == "043" && listId != "3");
+            //bool validaAutho = ((eventCode == "037" || eventCode == "038" || eventCode == "039") && listId != "2" || mandato);
 
             //Si no es un endoso en blanco valida autorizacion            
-            if (validaAutho && senderCode != "01")
+            //if (validaAutho && senderCode != "01")
+            if (senderCode != "01" && !String.IsNullOrWhiteSpace(senderCode))
             {
 
                 string listIdMessage = $"NIT {authCode} no autorizado a enviar documentos para emisor con NIT {senderCode}.";

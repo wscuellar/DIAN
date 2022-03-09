@@ -270,8 +270,9 @@ namespace Gosocket.Dian.Application
             var entity = (from oc in sqlDBContext.OtherDocElecContributors
                           join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                           join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
-                          join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                          join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id                          
                           join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                          join odeco in sqlDBContext.OtherDocElecContributorOperations on new { colA = s.Id, colB = oc.Id } equals new { colA = odeco.SoftwareId, colB = odeco.OtherDocElecContributorId }                                                                             
                           where oc.Id == Id
                            && oc.State != "Cancelado"
                            && s.Deleted == false
@@ -288,17 +289,25 @@ namespace Gosocket.Dian.Application
                               OperationModeId = oc.OtherDocElecOperationModeId,
                               ContributorTypeId = oc.OtherDocElecContributorTypeId,
                               ElectronicDocId = oc.ElectronicDocumentId,
-                              ProviderId = s.ProviderId,
+                              ProviderId = s.ProviderId == 0 ? oc.ContributorId : s.ProviderId,
                               Step = oc.Step,
                               State = oc.State,
                               SoftwareId = s.Id.ToString(),
                               SoftwareIdBase=s.SoftwareId
-                          }).Distinct().FirstOrDefault();
+                          }).Distinct().ToList();
 
-            List<string> userIds = _contributorService.GetUserContributors(entity.ContributorId).Select(u => u.UserId).ToList();
-            entity.LegalRepresentativeIds = userIds;
+            if (entity.Any())
+            {
+                OtherDocsElectData _entity = entity.Where(e => e.ProviderId != 0).FirstOrDefault();
+                if (_entity != null)
+                {
+                    List<string> userIds = _contributorService.GetUserContributors(_entity.ContributorId).Select(u => u.UserId).ToList();
+                    _entity.LegalRepresentativeIds = userIds;
+                    return _entity;
+                }
+            }            
 
-            return entity;
+            return new OtherDocsElectData();
         }
 
         public PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId)
@@ -443,6 +452,39 @@ namespace Gosocket.Dian.Application
             return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
         }
 
+        public int NumHabilitadosOtherDocsElect(int contributorId)
+        { 
+            IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
+                                                    join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
+                                                    join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
+                                                    join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
+                                                    join eld in sqlDBContext.ElectronicDocuments on oc.ElectronicDocumentId equals eld.Id
+                                                    where oc.ContributorId == contributorId
+                                                        && oc.State != "Cancelado"
+                                                        && s.Deleted == false
+                                                        && oco.Deleted == false
+                                                        && oco.OperationStatusId == (int)OtherDocElecState.Habilitado
+                                                    select new OtherDocsElectData()
+                                                    {
+                                                        //Id = oc.Id,
+                                                        Id = oco.Id,
+                                                        ContributorId = oc.ContributorId,
+                                                        OperationMode = ope.Name,
+                                                        ContributorType = oty.Name,
+                                                        Software = s.Name,
+                                                        PinSW = s.Pin,
+                                                        SoftwareId = s.SoftwareId.ToString(),
+                                                        StateSoftware = oco.OperationStatusId.ToString(),
+                                                        StateContributor = oc.State,
+                                                        //CreatedDate = oc.CreatedDate,
+                                                        CreatedDate = s.SoftwareDate.Value,
+                                                        ElectronicDoc = eld.Name,
+                                                        Url = s.Url,
+                                                    }).Distinct();
+            return query.Count();
+        } 
 
 
         public bool HabilitarParaSincronizarAProduccion(int Id, string Estado)
