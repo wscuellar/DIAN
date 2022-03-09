@@ -124,6 +124,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Para poder continuar, realiza el proceso de habilitación como Facturador Electrónico..
+        /// </summary>
+        public static string ElectronicBillerNoEnabled {
+            get {
+                return ResourceManager.GetString("ElectronicBillerNoEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a ¿Está seguro que desea habilitar  la trasmisión de eventos al RADIAN como Facturador Electrónico?.
         /// </summary>
         public static string ElectronicInvoice_Confirm {
@@ -147,6 +156,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string Endoso {
             get {
                 return ResourceManager.GetString("Endoso", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a El documento equivalente &quot;{equivalentDocument}&quot; NO tiene set de pruebas configurado para el modo de operación {operationMode}. Comuníquese con el administrador del sistema..
+        /// </summary>
+        public static string EquivalentDocumentWithoutTestSet {
+            get {
+                return ResourceManager.GetString("EquivalentDocumentWithoutTestSet", resourceCulture);
             }
         }
         
@@ -498,6 +516,15 @@ namespace Gosocket.Dian.Common.Resources {
         public static string SendEmailFailed {
             get {
                 return ResourceManager.GetString("SendEmailFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Por favor inicie sesión nuevamente e intente de nuevo.
+        /// </summary>
+        public static string SessionExpired {
+            get {
+                return ResourceManager.GetString("SessionExpired", resourceCulture);
             }
         }
         

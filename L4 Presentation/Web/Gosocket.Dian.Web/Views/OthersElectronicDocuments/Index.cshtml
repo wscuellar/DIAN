@@ -70,20 +70,25 @@
             <div class="row-fluid">
                 @foreach (var item in ListDocs)
                 {
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer" style="width: 95% !important; height: 230px !important;" idElectronicDocument="@item.Value" textElectronicDocument="@item.Text">
-                            <div class="RadianImgContainer">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard" style="margin: 20px;">@item.Text</p>
+
+                    if (
+                        (item.Value == "13" && (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4)) ||
+                        (item.Value == "1" && (ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0"))
+                        )
+                    {
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="card RadianCardContainer" style="width: 95% !important; height: 230px !important;" idElectronicDocument="@item.Value" textElectronicDocument="@item.Text">
+                                <div class="RadianImgContainer">
+                                    <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
+                                </div>
+                                <div class="card-body">
+                                    <p class="RadianTittleCard" style="margin: 20px;">@item.Text</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
-
             </div>
-
         </div>
     </div>
 </div>
@@ -108,7 +113,7 @@
                         UserCode: '@ViewBag.UserCode',
 						ContributorId: '@ViewBag.ContributorId',
                         Accion: 'SeleccionElectronicDocument',
-                        ElectronicDocument: $(this).attr('idElectronicDocument'),
+                        ElectronicDocumentId: $(this).attr('idElectronicDocument'),
                         complementoTexto: $(this).attr('textElectronicDocument'),
                     };
 

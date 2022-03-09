@@ -158,6 +158,7 @@ namespace Gosocket.Dian.DataContext
         /// Otros documentos. Utilizado por el momento para la Opción/Vista de Set de Pruebas - Otros Documentos
         /// </summary>
         public DbSet<Domain.Sql.ElectronicDocument> ElectronicDocuments { set; get; }
+        public DbSet<Domain.Sql.EquivalentElectronicDocument> EquivalentElectronicDocuments { set; get; }
 
         #region --- Other Docs Elect ---
 
@@ -167,6 +168,7 @@ namespace Gosocket.Dian.DataContext
         public DbSet<OtherDocElecOperationMode> OtherDocElecOperationModes { set; get; }
         public DbSet<OtherDocElecSoftware> OtherDocElecSoftwares { set; get; }
         public DbSet<OtherDocElecSoftwareStatus> OtherDocElecSoftwareStatus { set; get; }
+        public DbSet<OtherDocElecPayroll> OtherDocElecPayroll { set; get; }
 
         #endregion --- Other Docs Elect ---
         /// <summary>

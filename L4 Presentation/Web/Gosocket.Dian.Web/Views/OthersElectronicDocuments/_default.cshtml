@@ -4,7 +4,15 @@
     <div class="col-sm-6 col-md-3 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.OperationModeSelectedId, new { @class = "control-label" })
-            @Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general" })
+			@if(!Model.ListTable.Any(t => t.StateSoftware == "En pruebas"))
+            {
+				@Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general" });
+            }
+            else
+            {
+				@Html.DropDownListFor(m => m.OperationModeSelectedId, (SelectList)ViewBag.OperationModes, " ", new { @class = "form-control selectpicker input-general", @disabled = "disabled" });
+            }
+
         </div>
     </div>
     <div class="col-sm-5 padding-xs-0">
@@ -87,7 +95,7 @@
 			<div class="col-sm-3 padding-xs-0">
 				<div class="form-group">
 					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
-					@Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general" })
+					@Html.TextBoxFor(m => m.SoftwareName, new { @class = "form-control input-general SoftwareName" })
 					<span id="ErrorSoftwareName" style="display:none" class="text-danger">Nombre de Software es requerido</span>
 				</div>
 			</div>
@@ -106,7 +114,7 @@
 			</div>
 		</div>
 		<div style="display:none" id="FormPt">
-			@Html.HiddenFor(m => m.SoftwareName)
+			@Html.HiddenFor(m => m.SoftwareName, new { @class = "SoftwareName"})
 			@Html.HiddenFor(m => m.PinSW)
 
 			<div class="col-sm-6 col-md-3 padding-xs-0">
@@ -118,7 +126,7 @@
 			</div>
 			<div class="col-sm-5 col-md-3 padding-xs-0">
 				<div class="form-group">
-					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+					@Html.LabelFor(m => m.SoftwareName, new { @class = "control-label SoftwareName" })
 					@Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
 					<span id="ErrorSoftwareId" style="display:none" class="text-danger">Nombre de software es requerido</span>
 				</div>

@@ -86,11 +86,11 @@ namespace Gosocket.Dian.Application
 
         public Contributor Get(int id)
         {
-            return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
-            //using (var context = new SqlDBContext())
-            //{
-            //    return context.Contributors.FirstOrDefault(x => x.Id == id);
-            //}
+            //return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.Include("ContributorOperations").AsNoTracking().FirstOrDefault(x => x.Id == id);
+            }
         }
 
         public Contributor Get(int id, string connectionString)
@@ -145,8 +145,11 @@ namespace Gosocket.Dian.Application
         }
 
         public Contributor GetByCode(string code)
-        {
-            return sqlDBContext.Contributors.FirstOrDefault(p => p.Code == code);
+        {            
+            using (var context = new SqlDBContext())
+            {
+                return context.Contributors.Include("AcceptanceStatus").AsNoTracking().FirstOrDefault(p => p.Code == code);
+            }
         }
 
         public RadianContributorOperation GetRadianOperations(int radianContributorId, string softwareId)
@@ -160,6 +163,51 @@ namespace Gosocket.Dian.Application
             Guid SoftId = new Guid(softwareId);
             return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
         }
+
+        public List<OtherDocElecContributor> GetOtherDocElecContributor(int OtherDocContributorId)
+        {
+            
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId && p.OtherDocElecOperationModeId==3).ToList();
+        }
+
+        public List<OtherDocElecContributor> GetOtherDocElecContributorPermisos(int OtherDocContributorId)
+        {
+
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId ).ToList();
+        }
+
+        public ContributorOperations GetContributorOperations(int OtherDocContributorId)
+        {
+
+            ContributorOperations contributorOp = null;
+            var re = (from c in sqlDBContext.ContributorOperations
+                      where c.ContributorId == OtherDocContributorId
+                      select c).FirstOrDefault();
+
+            if (re != null)
+            {
+                contributorOp = new ContributorOperations()
+                {
+                    Id = re.Id,
+                    ContributorId = re.ContributorId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    SoftwareId = re.SoftwareId,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    ContributorTypeId = re.ContributorTypeId
+                };
+            }
+
+            return contributorOp;
+        }
+        public bool GetOtherDocElecContributorOperations(int OtherDocContributorId)
+        {
+
+            var resp = sqlDBContext.OtherDocElecContributorOperations.Where(p => p.OtherDocElecContributorId == OtherDocContributorId && p.Deleted==false).Count();
+            return resp > 0 ? true : false;
+        }
+
 
         public Contributor GetByCode(string code, string connectionString)
         {
@@ -486,12 +534,9 @@ namespace Gosocket.Dian.Application
                     otherDocElec.Update = System.DateTime.Now;
                     Guid softId = new Guid(softwareId);
 
-                    //Si es software propio lo habilita.
-                    if (otherDocElec.OtherDocElecOperationModeId == (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware)
-                    {
-                        OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
-                        soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
-                    }
+                    
+                    OtherDocElecSoftware soft = context.OtherDocElecSoftwares.FirstOrDefault(t => t.Id.ToString().Equals(softId.ToString(), StringComparison.OrdinalIgnoreCase));
+                    soft.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
 
                     //Se ubica la operacion del participante para habilitarla
                     OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(
@@ -831,6 +876,7 @@ namespace Gosocket.Dian.Application
                     EndDate = re.EndDate,
                     StartDateNumber = re.StartDateNumber,
                     AcceptanceStatus = re.AcceptanceStatus,
+                    AcceptanceStatusId = re.AcceptanceStatusId,
                     Status = re.Status,
                     Deleted = re.Deleted,
                     Timestamp = re.Timestamp,

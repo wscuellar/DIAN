@@ -395,8 +395,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
-            var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
-            && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration)).ToList();
+            var listDisponibilizacion = documentMeta != null ? documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                                                                && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration 
+                                                                        || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration)
+                                                                   ).ToList()
+                                                             : null;
+
             if (listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
             {
                 responses.Add(new ValidateListResponse
@@ -605,6 +609,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     foreach (var itemLimitacionCirculacion in limitacionCirculacion)
                     {
+                        //Valida si existe terminacion limitacion de circulacion 
+                        var terminacionLimitacion = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)).ToList();
+
+                        if (terminacionLimitacion != null)
+                        {
+                            if (terminacionLimitacion.Where(x => x.CancelElectronicEvent.Equals(itemLimitacionCirculacion.PartitionKey)).Any())
+                            {
+                                break;
+                            }
+                        }
+
                         var documentCirculacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemLimitacionCirculacion.Identifier, itemLimitacionCirculacion.Identifier, itemLimitacionCirculacion.PartitionKey);
                         if (documentCirculacion != null)
                         {
@@ -644,6 +659,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     if (documentDisponibiliza != null)
                                     {
                                         //Valida fecha endoso en propiedad es mayor a fecha disponibilizacion  
+                                        senderCode = string.IsNullOrEmpty(senderCode) ? itemListDisponibilizacion.SenderCode : senderCode;
+
                                         if (Convert.ToDateTime(itemEndosoPropiedad.SigningTimeStamp) > Convert.ToDateTime(itemListDisponibilizacion.SigningTimeStamp)
                                             && itemEndosoPropiedad.SenderCode == senderCode)
                                         {
@@ -1274,7 +1291,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
-            var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList();
+            var listDisponibilizacion = documentMeta != null ? documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList() : null;
+            
             if (listDisponibilizacion != null && listDisponibilizacion.Count() > 0)
             {
                 bool validForItem = false;

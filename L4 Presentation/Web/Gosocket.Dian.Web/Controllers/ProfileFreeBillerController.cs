@@ -6,11 +6,14 @@ using System.Text;
 using System.Web;
 
 using System.Web.Mvc;
+using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.FreeBiller;
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql.FreeBiller;
+using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models.FreeBiller;
 using Newtonsoft.Json;
 
@@ -24,6 +27,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// Tabla: ProfilesFreeBiller.
         /// </summary>
         private readonly IProfileService _profileService;
+        private ContributorService contributorService = new ContributorService();
 
         public ProfileFreeBillerController(IProfileService profileService) {
             _profileService = profileService;
@@ -40,10 +44,21 @@ namespace Gosocket.Dian.Web.Controllers
 
         public ActionResult CreateProfile()
         {
-            ProfileFreeBillerModel model = new ProfileFreeBillerModel();
-            model.MenuOptionsByProfile = _profileService.GetOptionsByProfile(0);
-            string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
-            return View(model);
+                ProfileFreeBillerModel model = new ProfileFreeBillerModel();
+                model.MenuOptionsByProfile = _profileService.GetOptionsByProfile(0);
+                string output = JsonConvert.SerializeObject(model.MenuOptionsByProfile);
+                ViewBag.ContributorId = User.ContributorId();
+                var electronicDocument = contributorService.GetOtherDocElecContributorPermisos(User.ContributorId());
+                var contributorOp = contributorService.GetContributorOperations(User.ContributorId());
+                ViewBag.OperationMode = contributorOp.OperationModeId;
+                ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
+                foreach (var elemento in electronicDocument)
+                    if (elemento.OtherDocElecOperationModeId == 3 && elemento.Step == 3)
+                    {
+                        ViewBag.DocElectronicDocument = elemento.ElectronicDocumentId;
+                    }
+
+                return View(model);
         }
 
         [HttpPost]

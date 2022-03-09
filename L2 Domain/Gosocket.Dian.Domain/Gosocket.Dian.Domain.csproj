@@ -146,6 +146,10 @@
     <Compile Include="Common\EnumHelper.cs" />
     <Compile Include="Cosmos\ComosDbFilterRequest.cs" />
     <Compile Include="Cosmos\GlobalDataDocument.cs" />
+    <Compile Include="Cosmos\Payroll.cs" />
+    <Compile Include="Cosmos\Payroll_All.cs" />
+    <Compile Include="Cosmos\Payroll_Delete.cs" />
+    <Compile Include="Cosmos\Payroll_Replace.cs" />
     <Compile Include="Domain\ResponseApplicationResponse.cs" />
     <Compile Include="Domain\ResponseAssignResponsability.cs" />
     <Compile Include="Domain\ResponseAssignResponsabilityToken.cs" />
@@ -224,11 +228,13 @@
     <Compile Include="Entity\RadianCustomerList.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
     <Compile Include="Entity\RadianUserData.cs" />
+    <Compile Include="Sql\EquivalentElectronicDocument.cs" />
     <Compile Include="Sql\MenuRole.cs" />
     <Compile Include="Sql\OtherDocElecContributor.cs" />
     <Compile Include="Sql\OtherDocElecContributorOperations.cs" />
     <Compile Include="Sql\OtherDocElecContributorType.cs" />
     <Compile Include="Sql\OtherDocElecOperationMode.cs" />
+    <Compile Include="Sql\OtherDocElecPayroll.cs" />
     <Compile Include="Sql\OtherDocElecSoftware.cs" />
     <Compile Include="Sql\OtherDocElecSoftwareStatus.cs" />
     <Compile Include="Sql\FreeBiller\MenuOptions.cs" />

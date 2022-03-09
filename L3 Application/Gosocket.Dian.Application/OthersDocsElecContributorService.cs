@@ -38,6 +38,14 @@ namespace Gosocket.Dian.Application
             }
         }
 
+        public Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode GetOperationModeById(int operationModeId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecOperationModes.FirstOrDefault(t => t.Id == operationModeId);
+            }
+        }
+
         public NameValueCollection Summary(string userCode)
         {
             NameValueCollection collection = new NameValueCollection();
@@ -68,6 +76,36 @@ namespace Gosocket.Dian.Application
                                                                                      && t.State != state);
             // Si ya esta habilitado, no se debe actualizar el estado...
             if (existing != null && existing.State == OtherDocElecState.Habilitado.GetDescription()) return existing;
+
+            OtherDocElecContributor newContributor = new OtherDocElecContributor()
+            {
+                Id = existing != null ? existing.Id : 0,
+                ContributorId = contributorId,
+                CreatedBy = createdBy,
+                OtherDocElecContributorTypeId = ContributorType,
+                OtherDocElecOperationModeId = OperationMode,
+                ElectronicDocumentId = ElectronicDocumentId,
+                State = State.GetDescription(),
+                CreatedDate = existing != null ? existing.CreatedDate : DateTime.Now
+            };
+
+            newContributor.Id = _othersDocsElecContributorRepository.AddOrUpdate(newContributor);
+
+            return newContributor;
+        }
+
+        public OtherDocElecContributor CreateContributorNew(int contributorId, OtherDocElecState State,
+           int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy)
+        {
+            var state = OtherDocElecState.Cancelado.GetDescription();
+            var state2 = OtherDocElecState.Habilitado.GetDescription();
+            OtherDocElecContributor existing = _othersDocsElecContributorRepository.Get(t => t.ContributorId == contributorId
+                                                                                     && t.OtherDocElecContributorTypeId == ContributorType
+                                                                                     && t.OtherDocElecOperationModeId == OperationMode
+                                                                                     && t.ElectronicDocumentId == ElectronicDocumentId
+                                                                                     && t.State != state && t.State != state2);
+            // Si ya esta habilitado, no se debe actualizar el estado...
+            //if (existing != null && existing.State == OtherDocElecState.Habilitado.GetDescription()) return existing;
 
             OtherDocElecContributor newContributor = new OtherDocElecContributor()
             {
@@ -127,7 +165,7 @@ namespace Gosocket.Dian.Application
             return _othersDocsElecContributorRepository.GetParticipantWithActiveProcess(ContributorId, ContributorTypeId, OperationModeId, stateSofware);
         }
 
-        public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId)
+        public PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId, int electronicDocumentId)
         {
             //IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
             //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
@@ -173,6 +211,7 @@ namespace Gosocket.Dian.Application
                                                         && oc.State != "Cancelado"
                                                         && s.Deleted == false
                                                         && oco.Deleted == false
+                                                        && eld.Id == electronicDocumentId
                                                     select new OtherDocsElectData()
                                                     {
                                                         //Id = oc.Id,
@@ -262,7 +301,7 @@ namespace Gosocket.Dian.Application
             return entity;
         }
 
-        public PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId)
+        public PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId)
         {
             //IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
             //                                        join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
@@ -307,6 +346,7 @@ namespace Gosocket.Dian.Application
                                                         && oc.State != "Cancelado"
                                                         && s.Deleted == false
                                                         && oco.Deleted == false
+                                                        && eld.Id == electronicDocumentId
                                                     select new OtherDocsElectData()
                                                     {
                                                         //Id = oc.Id,
@@ -403,5 +443,18 @@ namespace Gosocket.Dian.Application
             return this._othersDocsElecContributorRepository.GetTechnologicalProviders(contributorId, electronicDocumentId, contributorTypeId, state);
         }
 
+
+
+        public bool HabilitarParaSincronizarAProduccion(int Id, string Estado)
+        {
+            var entity = sqlDBContext.OtherDocElecContributors.Where(t => t.Id == Id).FirstOrDefault();
+            entity.State = Estado;
+            entity.OtherDocElecContributorOperations
+                .FirstOrDefault(t => !t.Deleted)
+                .OperationStatusId = Estado == "Habilitado" ? (int)OtherDocElecState.Habilitado : (int)OtherDocElecState.Test;
+
+            int filasAfectadas = sqlDBContext.SaveChanges();
+            return filasAfectadas > 0;
+        }
     }
 }

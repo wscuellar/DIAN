@@ -33,7 +33,7 @@ namespace Gosocket.Dian.Functions.Others
             SetLogger(null, "Step STA-00", ConfigurationManager.GetValue("Environment"));
 
             //Solo en ambiente de habilitacion.
-            if (ConfigurationManager.GetValue("Environment") == "Hab")
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
@@ -53,7 +53,7 @@ namespace Gosocket.Dian.Functions.Others
                 OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
-                    throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}.");
+                    throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}, ContributorTypeId {data.ContributorTypeId} and Enabled {data.Enabled} .");
 
                 try
                 {
@@ -166,8 +166,8 @@ namespace Gosocket.Dian.Functions.Others
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Error al enviar a activar contribuyente con id {otherDocElecContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
-                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
+                    log.Error($"Error al enviar a activar contribuyente con id {otherDocElecContributor?.Id} en producciï¿½n _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producciï¿½n.", detail = ex.Message, trace = ex.StackTrace };
 
                     SetLogger(failResponse, "STA-Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
 
@@ -175,7 +175,7 @@ namespace Gosocket.Dian.Functions.Others
                 }
 
 
-                var response = new { success = true, message = "Contribuyente Otros Documentos Electrónicos se envió a activar a producción con éxito." };
+                var response = new { success = true, message = "Contribuyente Otros Documentos Electrï¿½nicos se enviï¿½ a activar a producciï¿½n con ï¿½xito." };
                 return req.CreateResponse(HttpStatusCode.OK, response);
             }
 

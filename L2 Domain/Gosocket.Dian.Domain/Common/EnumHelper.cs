@@ -151,6 +151,8 @@ namespace Gosocket.Dian.Domain.Common
         Provider = 2,
         [Description("Proveedor autorizado")]
         AuthorizedProvider = 3,
+        [Description("No oligado a facturar")]
+        BillerNoObliged = 4,
     }
 
     public enum DocumentType
@@ -607,10 +609,13 @@ namespace Gosocket.Dian.Domain.Common
         SupportDocument = 3,
 
         [Description("Documento equivalente electrónico")]
-        ElectronicEquivalent = 4,
+        ElectronicEquivalent = 14,
 
         [Description("POS electrónico")]
-        ElectronicPOS = 5
+        ElectronicPOS = 5,
+
+        [Description("Nómina electrónica No OFE")]
+        ElectronicPayrollNoOFE = 13
     }
 
     public enum OtherDocElecSoftwaresStatus

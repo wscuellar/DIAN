@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
@@ -7,6 +8,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
@@ -16,6 +18,9 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -49,6 +54,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianSupportDocument _radianSupportDocument;
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
+        private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
@@ -57,6 +63,8 @@ namespace Gosocket.Dian.Web.Controllers
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+
+        private readonly IRadianContributorService _radianContributorService;
 
         public List<GlobalDocPayroll> PayrollList
         {
@@ -232,6 +240,9 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Export()
         {
             var model = new ExportDocumentTableViewModel();
+            model.AmountAdmin = ConfigurationManager.GetValue("AdminDocsToExport");
+            model.AmountContributor1 = ConfigurationManager.GetValue("ContributorsDocsToExport1");
+            model.AmountContributor2 = ConfigurationManager.GetValue("ContributorsDocsToExport2");
 
             GetExportDocumentTasks(ref model);
 
@@ -264,8 +275,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-
-        [ExcludeFilter(typeof(Authorization))]
+        
+        [CustomRoleAuthorization(CustomRoles = "Administrador")]
         public async Task<ActionResult> Payroll()
         {
             var model = new PayrollViewModel();
@@ -287,8 +298,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-
-        [ExcludeFilter(typeof(Authorization))]
+      
+        [CustomRoleAuthorization(CustomRoles = "Administrador")]
         [HttpPost]
         public async Task<ActionResult> Payroll(PayrollViewModel model)
         {
@@ -1345,7 +1356,8 @@ namespace Gosocket.Dian.Web.Controllers
                 foreach (GlobalDataDocument item in listGlobalDataDocument)
                 {
                     GlobalDocPayroll payroll = payrollTableManager.Find<GlobalDocPayroll>(item.DocumentKey, item.SenderCode);
-                    this.PayrollList.Add(payroll);
+                    if (payroll != null)
+                        this.PayrollList.Add(payroll);
                 }
             }
             else
@@ -1399,12 +1411,11 @@ namespace Gosocket.Dian.Web.Controllers
                 if (model.NumeroDocumento == "00") model.NumeroDocumento = null;
 
                 if (model.Ciudad == "00") model.Ciudad = null;
-
-                this.PayrollList = payrollTableManager.FindGlobalPayrollByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity<GlobalDocPayroll>(
-                    toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
+                                
+                var otherDocElecPayrolls = otherDocElecPayrollService.Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
 
-                //return globalDocPayroll;
+                this.PayrollList = DocumentParsedNomina.SetOtherDocElecPayrollsToGlobalDocPayrolls(otherDocElecPayrolls);
             }
         }
         private void SetViewBag_FirstSurnameData()
@@ -1515,6 +1526,61 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
             return result;
+        }
+
+
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a ElectronicDocuments, Consulta la informacion del contribuyente postulante, para los modos de Facturador Electronico.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ElectronicInvoiceView()
+        {
+            return ElectronicDocuments();
+        }
+
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ElectronicDocuments()
+        {
+            ViewBag.UserCode = User.UserCode();
+            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
+            return View();
+        }
+
+        public string GetContributorOperation(int code)
+        {
+
+            try
+            {
+                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
+                                      "WHERE C.Contributorid = " + code +
+                                      " AND C.Deleted <> 1";
+              
+                SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
+                conn.Open();
+                DataTable table = new DataTable();
+                SqlCommand command = new SqlCommand(sqlQuery, conn);
+
+                using (var da = new SqlDataAdapter(command))
+                {
+                    da.Fill(table);
+                }
+                conn.Close();
+
+                var conteo = table.Rows.Count;
+
+                return conteo.ToString();
+                //return contributorType;
+
+            }
+            catch (Exception exc)
+            {
+                return  null;
+            }
         }
     }
 }
