@@ -3,7 +3,6 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
-using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
 using Gosocket.Dian.Infrastructure;
@@ -22,6 +21,7 @@ using Newtonsoft.Json;
 using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Interfaces.Repositories;
+using Gosocket.Dian.Interfaces.Services;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -884,9 +884,10 @@ namespace Gosocket.Dian.Web.Controllers
 
             return Json(null, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase)
+        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
         {
             try
             {
@@ -946,7 +947,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.Url = software.Url;                                
                 data.Enabled = true;
                 dataNotification.AccountId = code.ToString();
-
+                data.EquivalentDocumentId = equivalentDocumentId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
@@ -979,7 +980,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult RestartSetTestResultV2(int Id)
+        public JsonResult RestartSetTestResultV2(int Id, int? equivalentDocumentId)
         {
             #region GetSetTestResultV2
 
@@ -1028,9 +1029,45 @@ namespace Gosocket.Dian.Web.Controllers
 
             #endregion
 
+            #region ResetTestSetEquivalentDocument
+            GlobalTestSetOthersDocumentsResult testSetResultEquivalentDocument;
+            string stateTestSetResultEquivalentDocument = string.Empty;
+            if (equivalentDocumentId.HasValue)
+            {
+                string keyTestSetEquivalentDocument = model0.OperationModeId.ToString() + "|" + software.SoftwareId.ToString() + "|" + equivalentDocumentId;
+                testSetResultEquivalentDocument = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, keyTestSetEquivalentDocument);
+                
+                stateTestSetResultEquivalentDocument = testSetResultEquivalentDocument.State;
+
+                testSetResultEquivalentDocument.State = TestSetStatus.InProcess.GetDescription();
+                testSetResultEquivalentDocument.Status = (int)TestSetStatus.InProcess;
+                testSetResultEquivalentDocument.StatusDescription = TestSetStatus.InProcess.GetDescription();
+
+                // Totales Generales
+                testSetResultEquivalentDocument.TotalDocumentSent = 0;
+                testSetResultEquivalentDocument.TotalDocumentAccepted = 0;
+                testSetResultEquivalentDocument.TotalDocumentsRejected = 0;
+                // EndTotales Generales
+
+                // OthersDocuments
+                testSetResultEquivalentDocument.TotalOthersDocumentsSent = 0;
+                testSetResultEquivalentDocument.OthersDocumentsAccepted = 0;
+                testSetResultEquivalentDocument.OthersDocumentsRejected = 0;
+                //End OthersDocuments
+
+                //ElectronicPayrollAjustment
+                testSetResultEquivalentDocument.TotalElectronicPayrollAjustmentSent = 0;
+                testSetResultEquivalentDocument.ElectronicPayrollAjustmentAccepted = 0;
+                testSetResultEquivalentDocument.ElectronicPayrollAjustmentRejected = 0;
+                //EndElectronicPayrollAjustment
+
+                _testSetOthersDocumentsResultService.InsertTestSetResult(testSetResultEquivalentDocument);
+            }
+            #endregion
+
             #region Validation
 
-            if (model0.Software.OtherDocElecSoftwareStatusName != "Rechazado")
+            if (model0.Software.OtherDocElecSoftwareStatusName != "Rechazado" && (string.IsNullOrWhiteSpace(stateTestSetResultEquivalentDocument) || stateTestSetResultEquivalentDocument != "Rechazado"))
             {
                 ViewBag.ValidateRequest = false;
                 return Json(new ResponseMessage("Solo se puede reiniciar el Set de pruebas si ha sido Rechazado!", TextResources.alertType, 500));
@@ -1089,12 +1126,11 @@ namespace Gosocket.Dian.Web.Controllers
                 softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
                 _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
             }
+            #endregion
 
             ResponseMessage response = new ResponseMessage();
             response.Message = isUpdate ? "Contadores reiniciados correctamente" : "¡Error en la actualización!";
             return Json(response, JsonRequestBehavior.AllowGet);
-
-            #endregion
         }
 
 
@@ -1122,6 +1158,22 @@ namespace Gosocket.Dian.Web.Controllers
 
             bool isUpdate = _testSetOthersDocumentsResultService.InsertTestSetResult(model0.GTestSetOthersDocumentsResult);
 
+            if(operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent)
+            {
+                var equivalentsDocuments = _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocuments();
+                foreach (var item in equivalentsDocuments)
+                {
+                    string keyDocumentEquivalent = $"{model0.OperationModeId}|{software.SoftwareId}|{item.Id}";
+                    var testSetEquivalentDocument = _testSetOthersDocumentsResultService.GetTestSetResult(model0.Nit, keyDocumentEquivalent);
+
+                    testSetEquivalentDocument.State = TestSetStatus.Rejected.GetDescription();
+                    testSetEquivalentDocument.Status = (int)TestSetStatus.Rejected;
+                    testSetEquivalentDocument.StatusDescription = TestSetStatus.Rejected.GetDescription();
+
+                    _testSetOthersDocumentsResultService.InsertTestSetResult(testSetEquivalentDocument);
+                }
+            }
+
             return isUpdate;
         }
 
@@ -1131,6 +1183,42 @@ namespace Gosocket.Dian.Web.Controllers
             var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
             var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
             return isUpdate;
+        }
+
+        [HttpPost]
+        public JsonResult GetInformationOfTestSetEquivalentDocument(int otherDocElecContributorOperationId, int equivalentDocumentId)
+        {
+            if (otherDocElecContributorOperationId  <= 0)
+            {
+                return Json(new ResponseMessage("No existe el contribuyente", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
+            if (equivalentDocumentId <= 0)
+            {
+                return Json(new ResponseMessage("Debe enviar un documento equivalente válido", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
+            var data = DataAssociate(otherDocElecContributorOperationId);
+            string key = $"{data.OperationModeId}|{data.SoftwareIdBase}|{equivalentDocumentId}";
+            var testSet = _testSetOthersDocumentsResultService.GetTestSetResult(User.ContributorCode(), key);
+            if (testSet is null)
+            {
+                return Json(new ResponseMessage("No se encontró set de pruebas para el documento equivalente seleccionado", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+            }
+
+            bool canSyncToProduction = (
+                    ConfigurationManager.GetValue("Environment") == "Hab" ||
+                    ConfigurationManager.GetValue("Environment") == "Local" ||
+                    ConfigurationManager.GetValue("Environment") == "Test"
+                ) &&
+                data.State == "Habilitado" && !User.IsInRole("Administrador")
+                && ConfigurationManager.GetValue("BotonSincronizar") == "true";
+
+            return Json(new {
+                success= true,
+                CanResetTestSet = testSet.State == TestSetStatus.Rejected.GetDescription(), 
+                CanSyncToProduction = canSyncToProduction
+            }, JsonRequestBehavior.AllowGet);
         }
     }
     class OtherDocumentActivationRequest
@@ -1171,6 +1259,8 @@ namespace Gosocket.Dian.Web.Controllers
 
         [JsonProperty(PropertyName = "enabled")]
         public bool Enabled { get; set; }
+
+        public int? EquivalentDocumentId { get; set; }
 
     }
 }

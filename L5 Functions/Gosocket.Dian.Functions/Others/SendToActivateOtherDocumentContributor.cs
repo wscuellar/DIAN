@@ -87,7 +87,7 @@ namespace Gosocket.Dian.Functions.Others
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
                     // Se obtiene el set de pruebas par el cliente
-                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    string key = data.SoftwareType + '|' + data.SoftwareId + (data.EquivalentDocumentId.HasValue ? $"|{data.EquivalentDocumentId}":"");
                     SetLogger(null, "Step STA-4.1", data.Code,"SEND-06");
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
                     GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
@@ -265,6 +265,10 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "enabled")]
             public bool Enabled { get; set; }
+
+            [JsonProperty(PropertyName = "equivalentDocumentId")]
+            public int? EquivalentDocumentId { get; set; }
+
 
             [JsonProperty(PropertyName = "contributorOpertaionModeId")]
             public int ContributorOpertaionModeId { get; set; }
