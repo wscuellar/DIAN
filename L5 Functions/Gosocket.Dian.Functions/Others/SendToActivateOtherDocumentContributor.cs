@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Functions.Others
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
 
                 //Se obtiene participante otros documentos habilitacion
-                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled);
+                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled, data.ContributorOpertaionModeId);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
                     throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}, ContributorTypeId {data.ContributorTypeId} and Enabled {data.Enabled} .");
@@ -114,7 +114,9 @@ namespace Gosocket.Dian.Functions.Others
                         " OtherDocElecContributorTypeId: " + otherDocElecContributor.OtherDocElecContributorTypeId +
                         " OtherDocElecOperationModeId: " + otherDocElecContributor.OtherDocElecOperationModeId +
                         " SoftwareId: " + data.SoftwareId +
-                        " SoftwareType: " + data.SoftwareType
+                        " SoftwareType: " + data.SoftwareType +
+                        " results.SoftwareId: " + results.SoftwareId +
+                        " data.Code: " + data.Code
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
 
@@ -132,8 +134,8 @@ namespace Gosocket.Dian.Functions.Others
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
-                        Code = data.Code,
-                        ContributorId = otherDocElecContributor.ContributorId,
+                        Code = data.Code,                        
+                        ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
                         OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
@@ -263,7 +265,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "enabled")]
             public bool Enabled { get; set; }
-            
+
+            [JsonProperty(PropertyName = "contributorOpertaionModeId")]
+            public int ContributorOpertaionModeId { get; set; }
         }
 
         class OtherDocumentActivateContributorRequestObject
