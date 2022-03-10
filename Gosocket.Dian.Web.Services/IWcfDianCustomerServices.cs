@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Web.Services.Filters;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -123,5 +124,9 @@ namespace Gosocket.Dian.Web.Services
         [OperationContract]
         [CustomOperation]
         DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber);
+
+        [OperationContract]
+        [CustomOperation]
+        DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup);
     }
 }

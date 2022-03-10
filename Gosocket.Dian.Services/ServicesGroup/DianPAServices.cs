@@ -9,6 +9,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -1734,6 +1735,35 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
-        
+        public DianResponse SendRequestBulkDocumentsDownload(string nit, DateTime startDate, DateTime endDate, string documentGroup) 
+        {
+            var timer = new Stopwatch();
+            DianResponse dianResponse = new DianResponse
+            {
+                IsValid = false,
+                StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
+                StatusDescription = "",
+                ErrorMessage = new List<string>()
+            };
+
+            timer.Start();
+            var request = new { nit, startDate, endDate, documentGroup };
+            var response = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
+            timer.Stop();
+            if (!response.Success)
+            {
+                dianResponse.StatusCode = "89";
+                dianResponse.StatusDescription = response.Message;
+                var globalEnd = timer.ElapsedMilliseconds/1000;
+                if (globalEnd >= 10)
+                {
+                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
+                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+                }
+                return dianResponse;
+            }
+
+            return dianResponse;
+        }
     }
 }

@@ -857,5 +857,71 @@ namespace Gosocket.Dian.Web.Services
                 return "";
             }
         }
+
+        /// <summary>
+        /// Generate report of Send or Received Documents
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="contentFile"></param>
+        /// <returns></returns>
+        public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate , DateTime endDate, string documentGroup)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if (string.IsNullOrEmpty(authCode))
+                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
+
+                if (startDate.Date <= DateTime.MinValue)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha inicio es obligatoria.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "La fecha inicio es obligatoria." };
+                }
+
+                if (endDate.Date <= DateTime.MinValue)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final es obligatoria.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final es obligatoria." };
+                }
+
+                if((endDate.Date - startDate.Date).TotalDays > 90)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses).");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
+                }
+
+                DianPAServices customerDianPa = new DianPAServices();
+                
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                var result = customerDianPa.SendRequestBulkDocumentsDownload(nit, startDate, endDate, documentGroup);
+
+                customerDianPa = null;
+
+                stopwatch.Stop();
+                double ms = stopwatch.ElapsedMilliseconds;
+                double seconds = ms / 1000;
+
+                stopwatch.Reset();
+                Log($"{authCode} {email}", (int)InsightsLogType.Info, "BulkDocumentDownloadAsync " + seconds);
+                if (seconds >= 10)
+                {
+                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
+                    tableManagerGlobalLogger.InsertOrUpdate(logger);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log($"{nit} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"BulkDocumentDownloadAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"BulkDocumentDownloadAsync, Nit: {nit}, StartDate: {startDate:dd/MM/yyyy}, EndDate: {endDate:dd/MM/yyyy}, DocumentGroup: {documentGroup}", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+            }
+        }
     }
 }
