@@ -76,21 +76,21 @@
     "ContributorInstanceCacheTimePolicyInMinutes": 1440,
 
     // Test INDRA
-    "LogStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
-    "Environment": "Test",
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
-    "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
-    "BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
-    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
-    "GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
-    "DownloadXmlUrl": "https://gtpa-function-doc-validator-test-dian.azurewebsites.net/api/DownloadXml?code=KdwOXUL0YOckpGq9YaaoWpN4I/0x4jFaStyW6N81ls3q6xUH/C9eRg==",
-    "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test-dian.azurewebsites.net/api/GetXpathDataValues?code=XhDJMWLvY9cL4bvhc9oYOv5a/XoHsFSTahX8dyOU0PDcK9anlbpa5Q==",
-    "SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
-    "SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
-    //"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
-    "BillerSoftwarePin": "20191",
-    "TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
-    "TestHabSoftwarePin": "20191",
+    //"LogStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    //"Environment": "Test",
+    //"AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    //"AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    //"BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
+    //"GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=yUB630nXPtzKcoSL8H/52UCzETQ0XLdRNjp/y8gYiUeZ8bH4TTftUzkesF6x6+DHpgu1RsNKa9d2TTYaBIJw4Q==;EndpointSuffix=core.windows.net",
+    //"GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
+    //"DownloadXmlUrl": "https://gtpa-function-doc-validator-test-dian.azurewebsites.net/api/DownloadXml?code=KdwOXUL0YOckpGq9YaaoWpN4I/0x4jFaStyW6N81ls3q6xUH/C9eRg==",
+    //"GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test-dian.azurewebsites.net/api/GetXpathDataValues?code=XhDJMWLvY9cL4bvhc9oYOv5a/XoHsFSTahX8dyOU0PDcK9anlbpa5Q==",
+    //"SignatureDigestValue": "dMoMvtcG5aIzgYo0tIsSQeVJBDnUnfSOfBpxXrmor0Y=@EQC0kiWPaAME6IsEZ7WuaTWJ97Zmf6hIO69rMCVURmQxBB9ebgLrjhL5BArQ0a0l@Zcjw1Z9nGQn2j6NyGx8kAaLbOfJGd/fJxRTCeirlqAg7zRG27piJkJOpflGu7XACpMj9hC6dVMcCyzqHxxPZeQ==",
+    //"SqlConnection": "Server=tcp:gtpa-sql-server-test.database.windows.net,1433;Initial Catalog=gtpa-sql-test;Persist Security Info=False;User ID=DBAdmin;Password=Password1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    ////"BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
+    //"BillerSoftwarePin": "20191",
+    //"TestHabTechnicalKey": "fc8eac422eba16e22ffd8c6f94b3f40a6e38162c",
+    //"TestHabSoftwarePin": "20191",
     "ApplicationResponseProcessUrl": "https://gtpa-function-commons-test.azurewebsites.net/api/ApplicationResponseProcess?code=ocMBoXmOlNNffsNts7H4M4VMJiqoiAk3QBKhkRpkzIGWpEiQQ3SiQQ==",
     "MAX_Attorney": "20",
     "ErrorMessage_AAH07": "Esta UUID no existe en la base de datos de la DIAN",
@@ -157,8 +157,8 @@
     "ErrorMessage_NIAE901": "El documento debe poseer Todos los Namespace correspondientes a su estructura.",
     "BusinessDaysLimit": 1,
     "Namespace_IndividualPayroll": "=dian:gov:co:facturaelectronica:NominaIndividual|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance",
-    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance"
-
+    "Namespace_IndividualPayrollAdjustments": "=dian:gov:co:facturaelectronica:NominaIndividualDeAjuste|ds=http://www.w3.org/2000/09/xmldsig#|ext=urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2|xades=http://uri.etsi.org/01903/v1.3.2#|xades141=http://uri.etsi.org/01903/v1.4.1#|xsi=http://www.w3.org/2001/XMLSchema-instance|xs=http://www.w3.org/2001/XMLSchema-instance",
+    "ValidatePayrollFG": "true"
 
 
     // Test UAT INDRA
