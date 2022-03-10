@@ -1,4 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.FreeBiller.ProfileFreeBillerModel
+@using Gosocket.Dian.Web.Common
 @{
     ViewBag.Title = "Creación de Perfiles";
     //Layout = "~/Views/Shared/_Layout.cshtml";
@@ -63,7 +64,6 @@
         background: #E9E8E8;
         border-radius: 2px;
     }
-
 </style>
 
 <div class="page-content margin-15">
@@ -84,7 +84,7 @@
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
-                                    @using (Html.BeginForm("CreateProfile", "ProfileFreeBiller", FormMethod.Post, new { id = "checked-add-form"}))
+                                    @using (Html.BeginForm("CreateProfile", "ProfileFreeBiller", FormMethod.Post, new { id = "checked-add-form" }))
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
@@ -101,8 +101,16 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    
-                                                        @Html.Partial("_checksGrid");
+                                                        @if (User.ContributorTypeId() == 4)
+                                                        {
+                                                            @Html.Partial("_permissionGrid");
+                                                        }
+                                                        else
+                                                        if (User.ContributorTypeId() != 4)
+                                                        {
+                                                            @Html.Partial("_permissionFGrid");
+                                                        }
+
                                                     </div>
 
                                                     <div class="panel-footer-grey text-right submit-container">

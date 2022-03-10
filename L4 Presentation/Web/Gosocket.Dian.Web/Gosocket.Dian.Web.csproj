@@ -2955,8 +2955,7 @@
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
     <Content Include="Views\User\_userexLogin.cshtml" />
-    <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
-    <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_permissionGrid.cshtml" />
     <Content Include="Views\Document\_payrolls.cshtml" />
     <Content Include="Views\User\_forgotPasswordForm.cshtml" />
     <Content Include="Views\Document\Payroll.cshtml" />
@@ -2971,6 +2970,8 @@
     <Content Include="Views\Document\ElectronicDocuments.cshtml" />
     <Content Include="Views\OthersElectronicDocNumberRange\_Items.cshtml" />
     <Content Include="Views\OthersElectronicDocNumberRange\Index.cshtml" />
+    <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_permissionFGrid.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

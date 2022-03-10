@@ -86,15 +86,15 @@ namespace Gosocket.Dian.Web.Controllers
             _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
         }
 
-        public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
-        {
-            this.object1 = object1;
-            this.object2 = object2;
-            this.object3 = object3;
-            this.object4 = object4;
-            this.object5 = object5;
-            this.object6 = object6;
-        }
+        //public OthersElectronicDocAssociatedController(IContributorService object1, IOthersDocsElecContributorService object2, IOthersElectronicDocumentsService object3, ITestSetOthersDocumentsResultService object4, IOthersDocsElecSoftwareService object5, IGlobalOtherDocElecOperationService object6)
+        //{
+        //    this.object1 = object1;
+        //    this.object2 = object2;
+        //    this.object3 = object3;
+        //    this.object4 = object4;
+        //    this.object5 = object5;
+        //    this.object6 = object6;
+        //}
 
         private OthersElectronicDocAssociatedViewModel DataAssociate(int Id)
         {
@@ -657,7 +657,7 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult SetupOperationModePost(OtherDocElecSetupOperationModeViewModel model)
         {
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            
+
             GlobalTestSetOthersDocuments testSet = null;
 
             testSet = _othersDocsElecContributorService.GetTestResult((int)model.OperationModeId, model.ElectronicDocId);
@@ -731,10 +731,20 @@ namespace Gosocket.Dian.Web.Controllers
             response.Message = TextResources.OtherDocEleSuccesModeOperation;
             return Json(response, JsonRequestBehavior.AllowGet);
         }
-        
+
         [HttpPost]
         public JsonResult DeleteOperationMode(int Id)
         {
+
+            var _resultValidarSofware = _othersElectronicDocumentsService.ValidaSoftwareDelete(Id);
+            if (_resultValidarSofware != null)
+                return Json(new
+                {
+                    code = _resultValidarSofware.Code,
+                    message = _resultValidarSofware.Message,
+                    success = true,
+                }, JsonRequestBehavior.AllowGet);
+
             var result = DeleteOperationInStorageTable(Id);
             if (result != null) return result;
 
@@ -750,14 +760,20 @@ namespace Gosocket.Dian.Web.Controllers
         private JsonResult DeleteOperationInStorageTable(int id)
         {
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(id);
+
             if (operation != null && operation.OperationStatusId == (int)OtherDocElecState.Habilitado)
             {
-                return Json(new
+                int NumOperationHabilitados = _othersDocsElecContributorService.NumHabilitadosOtherDocsElect(User.ContributorId());
+
+                if (NumOperationHabilitados == 1)
                 {
-                    code = 500,
-                    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
-                    success = true,
-                }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        code = 500,
+                        message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                        success = true,
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
 
             OthersElectronicDocAssociatedViewModel model = DataAssociate(id);

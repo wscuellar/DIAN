@@ -19,6 +19,7 @@ namespace Gosocket.Dian.Interfaces.Services
         PagedResult<OtherDocElecCustomerList> CustormerList(int ContributorId, string code, OtherDocElecState nState, int page, int pagesize);
 
         ResponseMessage OperationDelete(int ODEContributorId);
+        ResponseMessage ValidaSoftwareDelete(int ODEContributorId);
 
         OtherDocElecContributorOperations GetOtherDocElecContributorOperationBySoftwareId(Guid softwareId);
 
