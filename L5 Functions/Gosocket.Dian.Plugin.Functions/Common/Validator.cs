@@ -4175,7 +4175,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "DSAB05b",
-                        ErrorMessage = "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente vendedor para este Proveedor de Autorización",
+                        ErrorMessage = "Número del formato 1876 informado no corresponde a un número de autorización de este ABS",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
