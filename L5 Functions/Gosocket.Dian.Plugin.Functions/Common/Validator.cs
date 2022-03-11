@@ -7059,33 +7059,61 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatoryPayroll"), out bool ValidateManadatoryPayroll);
-
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidatePayrollFG"), out bool ValidatePayrollFG);
+            string NitProvider = String.Empty;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-             
-            var LocalName = xmlParser.xmlDocument.DocumentElement.LocalName;
-            responses.Add(new ValidateListResponse
-            {
-                IsValid = true,
-                Mandatory = true,
-                ErrorCode = LocalName.Equals(xmlNominaIndividual) ? "NIE901" : "NIAE901",
-                ErrorMessage = "Evento CheckExistsNamespacePayroll referenciado correctamente",
-                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-            });
-            var validate = ValidarNamesPace(xmlParser, LocalName);
 
-            if (!string.IsNullOrWhiteSpace(validate))
+            var noteTypePath = "//*[local-name()='TipoNota']";
+            var noteTypeNodeValue = xmlParser.SelectSingleNode(noteTypePath)?.InnerText;
+            var LocalName = xmlParser.xmlDocument.DocumentElement.LocalName;
+
+            if (string.IsNullOrWhiteSpace(noteTypeNodeValue)) // Invidual Payroll
+            {                
+                NitProvider = xmlParser.SelectSingleNode("//*[local-name()='NominaIndividual']/*[local-name()='ProveedorXML']/@NIT")?.Value;
+            }
+            else // Payroll Adjustment
             {
-                responses.Clear();
+                NitProvider = xmlParser.SelectSingleNode("//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='ProveedorXML']/@NIT")?.Value;
+            }
+
+            //Valida proveedor FG par evaluar namespace
+            if (ValidatePayrollFG && NitProvider == "800197268")
+            {
                 responses.Add(new ValidateListResponse
                 {
-                    IsValid = false,
-                    Mandatory = ValidateManadatoryPayroll,
-                    ErrorCode = LocalName.Equals(xmlNominaIndividual)? "NIE901" : "NIAE901",
-                    ErrorMessage = LocalName.Equals(xmlNominaIndividual) ? ConfigurationManager.GetValue("ErrorMessage_NIE901") :  ConfigurationManager.GetValue("ErrorMessage_NIAE901"),
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = LocalName.Equals(xmlNominaIndividual) ? "NIE901" : "NIAE901",
+                    ErrorMessage = "Evento CheckExistsNamespacePayroll referenciado correctamente",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-           
+            else
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = true,
+                    Mandatory = true,
+                    ErrorCode = LocalName.Equals(xmlNominaIndividual) ? "NIE901" : "NIAE901",
+                    ErrorMessage = "Evento CheckExistsNamespacePayroll referenciado correctamente",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+                var validate = ValidarNamesPace(xmlParser, LocalName);
+
+                if (!string.IsNullOrWhiteSpace(validate))
+                {
+                    responses.Clear();
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateManadatoryPayroll,
+                        ErrorCode = LocalName.Equals(xmlNominaIndividual) ? "NIE901" : "NIAE901",
+                        ErrorMessage = LocalName.Equals(xmlNominaIndividual) ? ConfigurationManager.GetValue("ErrorMessage_NIE901") : ConfigurationManager.GetValue("ErrorMessage_NIAE901"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }   
+
             return responses;
         }
 
