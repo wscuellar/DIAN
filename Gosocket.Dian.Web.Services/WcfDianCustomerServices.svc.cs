@@ -910,7 +910,7 @@ namespace Gosocket.Dian.Web.Services
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                var result = customerDianPa.SendRequestBulkDocumentsDownload(nit, startDate, endDate, documentGroup);
+                var result = customerDianPa.SendRequestBulkDocumentsDownload(email, nit, startDate, endDate, documentGroup);
 
                 customerDianPa = null;
 

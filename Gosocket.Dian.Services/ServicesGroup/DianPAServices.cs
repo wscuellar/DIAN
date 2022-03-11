@@ -20,7 +20,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class DianPAServices : IDisposable
     {
-        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");      
+        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
         private static readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
@@ -499,7 +499,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            
+
             //if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD")) isUploaded = true;
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
@@ -726,17 +726,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 List<GlobalDocAssociate> events = source.ToList();
 
                 //calcula items del proceso
-                List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();               
+                List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();
                 GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, cufe);
 
                 //Unifica la data
                 var eventDoc = from associate in events
-                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey                               
+                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey
                                select new EventDocument()
                                {
                                    Cufe = cufe,
                                    Associate = associate,
-                                   DocumentMeta = docMeta,                                  
+                                   DocumentMeta = docMeta,
                                };
 
                 InvoiceWrapper invoiceWrapper = new InvoiceWrapper()
@@ -761,7 +761,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <returns></returns>
         public DianResponse GetStatusEvent(string trackId)
         {
-            var globalStart = DateTime.UtcNow; 
+            var globalStart = DateTime.UtcNow;
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
@@ -769,7 +769,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
-                { 
+                {
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
                     bool existDocument = false;
@@ -1038,7 +1038,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = documentParsed.Cude.ToLower(); 
+            var trackIdCude = documentParsed.Cude.ToLower();
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
 
@@ -1439,11 +1439,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
                 return eventResponse;
             }
-            
+
             if (Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                 || Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
             {
-               
+
                 xmlParserNomina = new XmlParseNomina(xmlBytes);
                 if (!xmlParserNomina.Parser())
                 {
@@ -1459,7 +1459,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             else
             {
-                
+
                 xmlParser = new XmlParser(xmlBytes);
                 if (!xmlParser.Parser())
                 {
@@ -1474,7 +1474,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 receiverCode = documentParsed.ReceiverCode;
             }
 
-            
+
 
             if (!authCode.Contains(senderCode) && !authCode.Contains(receiverCode))
             {
@@ -1517,7 +1517,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
             }
 
-            if(string.IsNullOrWhiteSpace(dateNumber)) // Si no llega fecha, se establece la actual...
+            if (string.IsNullOrWhiteSpace(dateNumber)) // Si no llega fecha, se establece la actual...
             {
                 var now = DateTime.Now;
                 dateNumber = $"{now.Year}{now.Month.ToString().PadLeft(2, char.Parse("0"))}{now.Day.ToString().PadLeft(2, char.Parse("0"))}";
@@ -1525,7 +1525,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var partitionKey = $"{dateNumber}|{contributorCode}"; // Se arma el PartitionKey compuesto (fecha|NIT)
             var eventsList = TableManagerGlobalDocumentWithEventRegistered.FindAll<GlobalDocumentWithEventRegistered>(partitionKey).ToList();
-            if(eventsList == null || eventsList.Count <= 0)
+            if (eventsList == null || eventsList.Count <= 0)
             {
                 response.Message = $"No existe información con los criterios de búsqueda recibidos";
                 return response;
@@ -1652,7 +1652,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
 
-            } 
+            }
         }
 
         /// <summary>
@@ -1735,7 +1735,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
-        public DianResponse SendRequestBulkDocumentsDownload(string nit, DateTime startDate, DateTime endDate, string documentGroup) 
+        public DianResponse SendRequestBulkDocumentsDownload(string email, string nit, DateTime startDate, DateTime endDate, string documentGroup)
         {
             var timer = new Stopwatch();
             DianResponse dianResponse = new DianResponse
@@ -1747,14 +1747,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
 
             timer.Start();
-            var request = new { nit, startDate, endDate, documentGroup };
-            var response = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
+            var request = new BulkDocumentDownloadRequest(email, nit, startDate, endDate, documentGroup);
+            var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
             timer.Stop();
-            if (!response.Success)
+            if (!response.IsCorrect)
             {
                 dianResponse.StatusCode = "89";
-                dianResponse.StatusDescription = response.Message;
-                var globalEnd = timer.ElapsedMilliseconds/1000;
+                dianResponse.StatusDescription = "";
+                var globalEnd = timer.ElapsedMilliseconds / 1000;
                 if (globalEnd >= 10)
                 {
                     var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
@@ -1765,5 +1765,31 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return dianResponse;
         }
+    }
+
+    public class BulkDocumentDownloadRequest
+    {
+        public BulkDocumentDownloadRequest(string email, string nit, DateTime initialDate, DateTime endDate, string groupDocument)
+        {
+            Email = email;
+            Nit = nit;
+            InitialDate = initialDate;
+            EndDate = endDate;
+            GroupDocument = groupDocument;
+        }
+
+        public string Email { get; set; }
+        public string Nit { get; set; }
+        public DateTime InitialDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string GroupDocument { get; set; }
+    }
+    public class BulkDocumentDownloadResponse
+    {
+        public bool IsCorrect { get; set; }
+        public string DistributionTransacionId { get; set; }
+        public string DistributionId { get; set; }
+
+
     }
 }
