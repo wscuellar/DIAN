@@ -887,7 +887,7 @@ namespace Gosocket.Dian.Web.Services
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final es obligatoria." };
                 }
 
-                if (endDate.Date >= startDate.Date)
+                if (endDate.Date < startDate.Date)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final debe ser mayor o igual a la fecha inicial.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final debe ser mayor o igual a la fecha inicial." };
@@ -914,7 +914,7 @@ namespace Gosocket.Dian.Web.Services
                 if ((DateTime.Now.Date - startDate.Date).TotalDays > 90)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "la fecha de inicio supera el rango máximo de fechas permitido (3 meses).");
-                    return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
