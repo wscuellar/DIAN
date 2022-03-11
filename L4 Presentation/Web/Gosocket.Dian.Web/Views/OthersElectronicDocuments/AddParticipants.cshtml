@@ -86,7 +86,7 @@
 
 
 
-        <div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
+        @*<div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content" style="padding-right: 12px;">
                     <div class="modal-header">
@@ -112,7 +112,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>*@
 
 
 
@@ -124,7 +124,7 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-    <script>
+	<script>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
@@ -161,18 +161,54 @@
                         ContributorId: '@ViewBag.ContributorId'
                     };
 
+                      var ValidacionOtherElectronicDocumentsViewModelEmisor = {
+                        UserCode: '@ViewBag.UserCode',
+                        Accion: 'SeleccionParticipanteEmisor',
+                        ElectronicDocument: electronicDocumentId,
+                        complementoTexto: complementoTexto,
+                        ContributorIdType: ContributorIdType,
+                        ContributorId: '@ViewBag.ContributorId'
+                    };
+
                     CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                         function (param) {
                             // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
-                            if (ContributorIdType == 1) {
+							if (ContributorIdType == 1 || ContributorIdType == 2) {
                                 hideLoading('#panel-form');
-                                $("#dialogModeOperation").modal('show');
+                              //  $("#dialogModeOperation").modal('show');
+
+								CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModelEmisor,
+                                    function (param) {
+                                        // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
+										if (ContributorIdType == 1 || ContributorIdType == 2)
+                                        {
+                                            hideLoading('#panel-form');
+
+                                           var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                                        + "?ElectronicDocumentId=1" 
+                                        + "&OperationModeId=0"
+                                        + "&ContributorIdType=" + ContributorIdType
+                                        + "&ContributorId=" + @ViewBag.ContributorId;
+
+                                        window.location.href = url;
+
+                                          //  $("#dialogModeOperation").modal('show');
+
+                                        }
+                                        //else {
+                                        //    // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".
+                                        //    $("#OperationMode").val(1);
+                                        //    $("#btnOperationMode").trigger('click');
+                                        //}
+                                     }, true, () => hideLoading('#panel-form')
+                                );
+
                             }
-                            else {
-                                // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".
-                                $("#OperationMode").val(1);
-                                $("#btnOperationMode").trigger('click');
-                            }
+                            //else {
+                            //    // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".
+                            //    $("#OperationMode").val(1);
+                            //    $("#btnOperationMode").trigger('click');
+                            //}
                          }, true, () => hideLoading('#panel-form')
                     );
                 }
@@ -223,6 +259,6 @@
             }
 
         });
-    </script>
+	</script>
 
 }

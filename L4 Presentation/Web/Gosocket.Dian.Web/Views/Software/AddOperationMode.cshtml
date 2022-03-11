@@ -1,0 +1,249 @@
+﻿@model Gosocket.Dian.Web.Models.SoftwareTableViewModel
+
+@{
+	ViewBag.Title = "Asociar modo de operación";
+	var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control software-props" }, { "readonly", "readonly" } };
+}
+
+<div class="page-content margin-15">
+	<div class="row margin-horizontal-0">
+		<div class="panel">
+			<div class="panel-heading">
+				<button class="fa fa-arrow-left" onclick="history.back();" ></button>
+				<h3 class="panel-title">@ViewBag.Title</h3>
+			</div>
+
+			<div class="panel-body padding-top-20">
+				<div class="pad-btm padding-bottom-0">
+
+
+
+					@using (Html.BeginForm("AddNumberRange", "Software", FormMethod.Post, new { id = "add-prefix-form" }))
+					{
+						<input id="page" name="Page" type="hidden" value="@Model.Page" />
+						@Html.HiddenFor(m => m.ContributorCode)
+						@Html.HiddenFor(m => m.ContributorName)
+
+						<div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+							<div class="col-md-12 padding-horizontal-0">
+								<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+
+									<div class="panel-body padding-20 padding-bottom-10">
+										<div class="row">
+											<div class="col-sm-6 padding-xs-0">
+												<div class="form-group">
+													@Html.LabelFor(m => m.ContributorCode, new { @class = "control-label" })
+													@Html.TextBoxFor(m => m.ContributorCode, defaultHtmlAttr)
+												</div>
+											</div>
+											<div class="col-sm-6 padding-xs-0">
+												<div class="form-group">
+													@Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
+													@Html.TextBoxFor(m => m.ContributorName, defaultHtmlAttr)
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-sm-8 padding-xs-0">
+												<div class="form-group">
+													@Html.LabelFor(m => m.Softwares, new { @class = "control-label" })
+													@Html.DropDownListFor(m => m.SoftwareId, new SelectList(Model.Softwares.OrderBy(s => s.Name), "Id", "Name", Model.SoftwareId), "Seleccione...", new { @class = "form-control selectpicker" })
+												</div>
+											</div>
+											<div class="col-sm-4 padding-xs-0">
+												<div class="form-group">
+													@Html.LabelFor(m => m.Prefixes, new { @class = "control-label" })
+													@Html.DropDownListFor(m => m.NumberRangeRowKey, new SelectList(Model.Prefixes.OrderBy(s => s.Serie), "RowKey", "Serie", Model.NumberRangeRowKey), "Seleccione...", new { @class = "form-control selectpicker" })
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel-footer text-right">
+										@*<a href="@Url.Action("List", "Software")" class="btn btn-default">Volver</a>*@
+										<button type="button" class="btn btn-default btn-hover-gosocket btn-add-prefix">Agregar</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						@*<div class="row margin-horizontal-0">
+								<div class="col-md-9 table-toolbar-left padding-left-0">
+								</div>
+								<div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+									@if (Model.AssociatedRanges.Count > 0)
+									{
+										<span class="text-muted">
+											<strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.AssociatedRanges.Count ? (Model.Page) * Model.Length + Model.AssociatedRanges.Count : (Model.Page + 1) * Model.Length)</strong>
+										</span>
+										<div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+											<a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+												<span class="fa fa-chevron-left"></span>
+											</a>
+											<a class="btn btn-default paginate-btn next-page" @(Model.AssociatedRanges.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+												<span class="fa fa-chevron-right"></span>
+											</a>
+										</div>
+									}
+								</div>
+							</div>*@
+					}
+
+				</div>
+
+				@Html.Partial("_associatedRanges")
+
+				@if (Model.AssociatedRanges.Count == 0)
+				{
+					<div class="alert panel-footer-grey text-center contributor-alert">
+						Ningún rango de numeración asociado disponible para mostrar.
+					</div>
+				}
+
+				@*<div class="pull-right table-pagination padding-top-10">
+						@if (Model.AssociatedRanges.Count > 0)
+						{
+							<span class="text-muted">
+								<strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.AssociatedRanges.Count ? (Model.Page) * Model.Length + Model.AssociatedRanges.Count : (Model.Page + 1) * Model.Length)</strong>
+							</span>
+							<div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+								<a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+									<span class="fa fa-chevron-left"></span>
+								</a>
+								<a class="btn btn-default paginate-btn next-page" @(Model.AssociatedRanges.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+									<span class="fa fa-chevron-right"></span>
+								</a>
+							</div>
+						}
+					</div>*@
+			</div>
+		</div>
+	</div>
+</div>
+
+@section scripts
+{
+	<script src="~/Content/js/contributor/contributor.js?1.0.0"></script>
+
+	<script>
+
+        $(document).ready(function ($) {
+
+            var form = $('#add-prefix-form');
+
+            // Pagination
+            $('.next-page').click(function () {
+                $('#page').val(@Model.Page + 1);
+                form.submit();
+            });
+
+            $('.prev-page').click(function () {
+                $('#page').val(@Model.Page - 1);
+                form.submit();
+            });
+            // Pagination
+
+            $('.btn-add-prefix').click(function () {
+                if (preValidateFields()) {
+                    bootbox.dialog({
+                        title: "Advertencia",
+                        message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea asociar el prefijo?</strong></h4></div></div>",
+                        buttons: {
+                            del: {
+                                label: "Aceptar",
+                                className: "btn-gosocket",
+                                callback: function () {
+                                    addPrefix();
+                                }
+                            },
+                        }
+                    });
+                }
+            });
+        });
+
+        function addPrefix() {
+            showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                $.ajax({
+                    url: "@Url.Action("AddPrefix","Software")",
+                    method: "Post",
+                    data: {
+                        //__RequestVerificationToken: __RequestVerificationToken,
+                        softwareId: $('#SoftwareId').val(),
+                        rangeRowKey: $('#NumberRangeRowKey').val()
+                    },
+                    error: function (a, b, c) {
+                        hideLoading('#panel-form');
+                        showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            window.location.href = '@Url.Action("AddNumberRange", "Software")';
+                        }
+                    }
+                });
+        }
+
+        function preValidateFields() {
+            var softwareId = $('#SoftwareId').val();
+            if (softwareId == '') {
+                showNotification('danger', 'fa fa-info-circle fa-2x', 'floating', '', '' + ' ' + 'No tiene un software seleccionado.');
+                hideLoading('#panel-form');
+                return false;
+            }
+            var numberRangeRowKey = $('#NumberRangeRowKey').val();
+            if (numberRangeRowKey == '') {
+                showNotification('danger', 'fa fa-info-circle fa-2x', 'floating', '', '' + ' ' + 'No tiene un prefijo seleccionado.');
+                hideLoading('#panel-form');
+                return false;
+            }
+            return true;
+        }
+
+        function removeRangeAssociationAlert(button) {
+            var pk = $(button).attr("data-pk")
+            var rk = $(button).attr("data-rk")
+            bootbox.dialog({
+                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea eliminar la asociación del prefijo?</strong></h4></div></div>",
+                title: "Advertencia",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            removeRangeAssociation(pk, rk);
+                        }
+                    },
+                }
+            });
+        }
+
+        function removeRangeAssociation(pk, rk) {
+            showLoading('#panel-form', 'Eliminando', 'Procesando, por favor espere.');
+            //var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+            url: "@Url.Action("RemoveRangeAssociation", "Software")",
+            method: "Post",
+                data: {
+                    //__RequestVerificationToken: __RequestVerificationToken,
+                    partitionKey: pk,
+                    rowKey: rk
+                },
+            error: function (a, b, c) {
+            },
+            success: function (data) {
+                if (data.success) {
+                    $("[data-index-contributorOperations*='" + data.id + "']").remove();
+                    } else {
+                        showNotification('danger', 'fa fa-bolt fa-2x', '#panel-form', 'Error al eliminar el modo de operación.', data.message);
+                    }
+                hideLoading('#panel-form');
+                location.reload();
+                }
+            });
+        }
+
+	</script>
+}
+}

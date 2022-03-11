@@ -35,6 +35,10 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public Guid AddOrUpdate(OtherDocElecSoftware Software)
         {
+			try
+			{
+
+			
             using (var context = new SqlDBContext())
             {
                 OtherDocElecSoftware  SoftwareInstance = context.OtherDocElecSoftwares.FirstOrDefault(c => c.Id == Software.Id);
@@ -62,6 +66,12 @@ namespace Gosocket.Dian.DataContext.Repositories
                 context.SaveChanges();
 
                 return SoftwareInstance != null ? SoftwareInstance.Id : Software.Id;
+            }
+            }
+            catch (Exception e)
+            {
+
+                throw e;
             }
         }
 

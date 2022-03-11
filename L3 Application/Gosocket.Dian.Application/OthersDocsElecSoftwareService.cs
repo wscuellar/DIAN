@@ -38,6 +38,21 @@ namespace Gosocket.Dian.Application
             return _othersDocsElecSoftwareRepository.Get(t => t.SoftwareId == id);
         }
 
+        public OtherDocElecSoftware GetBySoftwareIdV2(Guid id)
+        {
+            var softwareOtherDoc = _othersDocsElecSoftwareRepository.Get(t => t.SoftwareId == id);
+            if (softwareOtherDoc != null) return softwareOtherDoc;
+
+            var software = _softwareService.Get(id);
+            return Map(software);
+        }
+
+        private OtherDocElecSoftware Map(Software software)
+        {
+            if (software is null) return null;
+            return new OtherDocElecSoftware(software, 0, "");
+        }
+
         public List<Software> GetSoftwares(int contributorId)
         {
             return _softwareService.GetSoftwares(contributorId);

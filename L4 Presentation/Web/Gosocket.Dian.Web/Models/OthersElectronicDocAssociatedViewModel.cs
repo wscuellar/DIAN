@@ -39,6 +39,7 @@ namespace Gosocket.Dian.Web.Models
 
         public string OperationMode { get; set; }
         public int OperationModeId { get; set; }
+        public bool OperationModeIsFree => OperationModeId == (int)OtherDocElecOperationMode.FreeBiller;
         public string ElectronicDoc { get; set; }
         public int ElectronicDocId { get; set; }
         [Display(Name = "Tipo de participante")]
@@ -47,6 +48,7 @@ namespace Gosocket.Dian.Web.Models
         public Guid SoftwareIdBase { get; set; }
         public int ProviderId { get; set; }
         public OtherDocElecSoftwareViewModel Software { get; set; }
+        public OtherDocElecNumberingRangeViewModel NumberingRange { get; set; }
         public GlobalTestSetOthersDocumentsResult GTestSetOthersDocumentsResult { get; set; }
 
         public bool EsElectronicDocNomina { get; set; }
@@ -62,5 +64,31 @@ namespace Gosocket.Dian.Web.Models
         public string NitSearch { get; set; }
         public List<OtherDocElecCustomerListViewModel> Customers { get; set; }
         public List<UserViewModel> LegalRepresentativeList { get; set; }
+    }
+
+    public class OtherDocElecNumberingRangeViewModel
+    {
+        public OtherDocElecNumberingRangeViewModel(
+            string prefix, 
+            string resolucionNumber, 
+            long numberFrom, 
+            long numberTo, 
+            string creationDate, 
+            string expirationDate)
+        {
+            Prefix = prefix;
+            ResolucionNumber = resolucionNumber;
+            NumberFrom = numberFrom;
+            NumberTo = numberTo;
+            CreationDate = creationDate;
+            ExpirationDate = expirationDate;
+        }
+
+        public string Prefix { get; set; }
+        public string ResolucionNumber { get; set; }
+        public long NumberFrom { get; set; }
+        public long NumberTo { get; set; }
+        public string CreationDate { get; set; }
+        public string ExpirationDate { get; set; }
     }
 }

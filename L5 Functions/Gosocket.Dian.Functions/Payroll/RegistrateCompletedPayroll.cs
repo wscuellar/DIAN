@@ -70,7 +70,7 @@ namespace Gosocket.Dian.Functions.Payroll
                     GlobalDocPayrollEmployees globalDocPayrollEmployees = new GlobalDocPayrollEmployees
                     {
                         PartitionKey = "Employee",
-                        RowKey = $"{docGlobalPayroll.NIT}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
+                        RowKey = $"{docGlobalPayroll.RowKey}|{docGlobalPayroll.TipoDocumento}|{numeroDocumento}",
                         NumeroDocumento = numeroDocumento,
                         TipoDocumento = docGlobalPayroll.TipoDocumento,
                         NitEmpresa = docGlobalPayroll.NIT,
@@ -79,7 +79,7 @@ namespace Gosocket.Dian.Functions.Payroll
                         Timestamp = DateTime.Now,
                     };
                     arrayTasks.Add(TableManagerGlobalDocPayrollEmployees.InsertOrUpdateAsync(globalDocPayrollEmployees));
-                }               
+                }
 
                 // Nómina Individual de Ajuste...
                 if ((documentTypeId == (int)DocumentType.IndividualPayroll && xmlParser.Novelty)
@@ -116,6 +116,19 @@ namespace Gosocket.Dian.Functions.Payroll
 
                 OtherDocElecPayroll otherDocElecPayroll = DocumentParsedNomina.SetGlobalDocPayrollToOtherDocElecPayroll(docGlobalPayroll);
 
+                //17/12/2021 Validacion para cuando migre a sql server no falle por el año minimo 1753
+                otherDocElecPayroll.AdmissionDate = ValidateFechaAnio(otherDocElecPayroll.AdmissionDate);
+                otherDocElecPayroll.CreateDate = ValidateFechaAnio(otherDocElecPayroll.CreateDate);
+                otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
+                otherDocElecPayroll.EndPaymentDate = ValidateFechaAnio(otherDocElecPayroll.EndPaymentDate);
+                otherDocElecPayroll.GenDate = ValidateFechaAnio(otherDocElecPayroll.GenDate);
+                otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
+                otherDocElecPayroll.Info_DateGen = ValidateFechaAnio(otherDocElecPayroll.Info_DateGen);
+                otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
+                otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
+                otherDocElecPayroll.StartPaymentDate = ValidateFechaAnio(otherDocElecPayroll.StartPaymentDate);
+                otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
+
                 otherDocElecPayroll = otherDocElecPayrollService.CreateOtherDocElecPayroll(otherDocElecPayroll);
             }
             catch (Exception ex)
@@ -126,6 +139,20 @@ namespace Gosocket.Dian.Functions.Payroll
             }
 
             return response;
+        }
+
+        private static DateTime? ValidateFechaAnio(DateTime? Fecha)
+        {
+            if (Fecha != null)
+            {
+                var year = ((DateTime)Fecha).Year;
+                if (year <= 1700)
+                {
+                    year = 1753 - year;
+                    return ((DateTime)Fecha).AddYears(year);
+                } 
+            } 
+            return Fecha;
         }
 
         public class RequestObject

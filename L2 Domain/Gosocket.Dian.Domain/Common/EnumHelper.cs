@@ -151,6 +151,8 @@ namespace Gosocket.Dian.Domain.Common
         Provider = 2,
         [Description("Proveedor autorizado")]
         AuthorizedProvider = 3,
+        [Description("No oligado a facturar")]
+        BillerNoObliged = 4,
     }
 
     public enum DocumentType
@@ -421,6 +423,9 @@ namespace Gosocket.Dian.Domain.Common
         Person = 3,
         [Description("Usuario Registrado")]
         ExternalUser = 4,
+        [Description("No obligados a Facturar")]
+        NotObligedInvoice = 5,
+
     }
 
     public enum NumberRangeState
@@ -653,7 +658,10 @@ namespace Gosocket.Dian.Domain.Common
         OwnSoftware = 1,
         [Display(Name = "Software de un proveedor tecnológico")]
         [Description("Software de un proveedor tecnológico")]
-        SoftwareTechnologyProvider = 2
+        SoftwareTechnologyProvider = 2,
+        [Display(Name = "Software solución gratuita")]
+        [Description("Software solución gratuita")]
+        FreeBiller = 3
     }
 
     public enum EventCustomization

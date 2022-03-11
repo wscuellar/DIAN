@@ -58,6 +58,9 @@ namespace Gosocket.Dian.Functions.Batch
             var trackIdReferenceRadian = string.Empty;
             var trackIdCude = string.Empty;
             var listId = string.Empty;
+            var payrollTypeXml = string.Empty;
+            var payrollProvider = string.Empty;
+            var payrollEmp = string.Empty;
 
 
             try
@@ -110,23 +113,38 @@ namespace Gosocket.Dian.Functions.Batch
                 var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
+                Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
                 eventCodeRadian = xpathResponse.XpathsValues["AppResEventCodeXpath"];
                 trackIdReferenceRadian = xpathResponse.XpathsValues["AppResDocumentReferenceKeyXpath"];
                 listId = string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResListIDXpath"]) ? "1" : xpathResponse.XpathsValues["AppResListIDXpath"];
                 trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
 
-                var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
+                //Informacion documento Nomina Individual / Ajuste
+                if(!flagApplicationResponse && !flagInvoice)
+                {
+                    payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
+                    payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+                    payrollEmp = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaSenderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteSenderCodeXpath"];
+
+                    payrollProvider = payrollProvider != payrollEmp ? payrollEmp : payrollProvider;
+
+                }
 
                 start = DateTime.UtcNow;
                 var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
                 {
                     Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                    Action = "validando consulta " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian + " trackIdCude " + trackIdCude + " listId " + listId
+                    Action = "validando consulta - flagInvoice " + flagInvoice + " flagApplicationResponse " + flagApplicationResponse + " eventCodeRadian " + eventCodeRadian + " trackIdReferenceRadian " + trackIdReferenceRadian 
+                    + " trackIdCude " + trackIdCude + " listId " + listId + " payrollTypeXml " + payrollTypeXml + " payrollProvider " + payrollProvider + " testSetId " + testSetId
+                    + " payrollEmp " + payrollEmp
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(flagAppResponse);
 
+                var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(payrollProvider, testSetId);
+
                 var xmlBytes = contentFileList.First().XmlBytes;               
 
+                //Si retorna información otros documentos Nomina
                 if (setResultOther != null)
                 {
                     xmlParser = new XmlParseNomina();                   
@@ -204,7 +222,8 @@ namespace Gosocket.Dian.Functions.Batch
                 };
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(checkNits);
 
-                if (setResultOther == null)
+                //Informacion documento ApplicaionResponse, FE, NC y ND
+                if (flagApplicationResponse || flagInvoice)
                 {
                     start = DateTime.UtcNow;
                     var checksetResultOther = new GlobalLogger(zipKey, "5.1 checksetResultOther")
@@ -245,7 +264,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse, flagInvoice);
 
                 start = DateTime.UtcNow;
                 var checkPermissions = new GlobalLogger(zipKey, "8 checkPermissions")
@@ -399,6 +418,14 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             if (validateDocumentUrl)
                             {
+                                if (softwareIdNomina == ConfigurationManager.GetValue("BillerSoftwareId"))
+                                {
+
+                                    ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegisterCompletedPayrollCosmosUrl"), new { TrackId = trackId });
+
+                                }
+
+
                                 SetLogger(null, "Step prueba nomina", " Ingresa cargue de documento NOMINA ", "PROC-04");
                                 try
                                 {
@@ -601,12 +628,16 @@ namespace Gosocket.Dian.Functions.Batch
                 { "NominaCUNE", "//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@CUNE"},
                 { "NominaReceiverCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Trabajador']/@NumeroDocumento" },
                 { "NominaSenderCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='Empleador']/@NIT" },
+                { "NominaProviderCodeXpath","//*[local-name()='NominaIndividual']/*[local-name()='ProveedorXML']/@NIT"},
+                { "NominaTipoXML","//*[local-name()='NominaIndividual']/*[local-name()='InformacionGeneral']/@TipoXML"},
 
                 //Xpath Nomina Individual de Ajustes
-                { "NominaAjusteCUNE", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='InformacionGeneral']/@CUNE"},
-                { "NominaAjusteCUNEPred", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='ReemplazandoPredecesor']/@CUNEPred"},
-                { "NominaAjusteReceiverCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Trabajador']/@NumeroDocumento" },
-                { "NominaAjusteSenderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Empleador']/@NIT" },
+                { "NominaAjusteCUNE", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='InformacionGeneral']/@CUNE"},
+                { "NominaAjusteCUNEPred", "//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='ReemplazandoPredecesor' or local-name()='EliminandoPredecesor']/@CUNEPred"},
+                { "NominaAjusteReceiverCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='Trabajador']/@NumeroDocumento" },
+                { "NominaAjusteSenderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='Empleador']/@NIT" },
+                { "NominaAjusteProviderCodeXpath","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='ProveedorXML']/@NIT" },
+                { "NominaAjusteTipoXML","//*[local-name()='NominaIndividualDeAjuste']/*[local-name()='Reemplazar' or local-name()='Eliminar']/*[local-name()='InformacionGeneral']/@TipoXML" },
 
             };
 
@@ -635,7 +666,7 @@ namespace Gosocket.Dian.Functions.Batch
             SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " +  senderCode + " IssuerAttorney " + issuerAttorney + " operationCode " + operationCode, "ATT-1");
 
             //Se busca el set de pruebas procesado para el testsetid en curso
-            RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+            RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(issuerAttorney, testSetId);
 
             //Evento Mandato el provider es el mandatario
             if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")
@@ -658,7 +689,7 @@ namespace Gosocket.Dian.Functions.Batch
             return null;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false, Boolean flagInvoice = false)
         {
             var start = DateTime.UtcNow;
             var checkPermissions = new GlobalLogger(zipKey, "7 checkPermissions")
@@ -668,7 +699,8 @@ namespace Gosocket.Dian.Functions.Batch
                 " Step-authCode " + authCode +
                 " Step-testSetId " + testSetId +
                 " Step-nitNomina " + nitNomina +
-                " Step-flagApplicationResponse " + flagApplicationResponse.ToString()
+                " Step-flagApplicationResponse " + flagApplicationResponse.ToString() +
+                " Step-flagInvoice " + flagInvoice.ToString()
             };
             var insertLog = TableManagerGlobalLogger.InsertOrUpdateAsync(checkPermissions);
 
@@ -895,8 +927,10 @@ namespace Gosocket.Dian.Functions.Batch
 
                             if (messageMandato)                                                            
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al proceso de mandato Abierto." });                            
+                            else if(string.IsNullOrWhiteSpace(nitNomina) && !flagApplicationResponse && !flagInvoice)
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no corresponde al participante registrado en proceso de habilitación." });
                             else                                                            
-                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });                                                       
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = code, ProcessedMessage = $"Set de prueba con identificador {testSetId} no se encuentra registrado para realizar proceso de habilitación." });                                               
                         }
                     }
                 }

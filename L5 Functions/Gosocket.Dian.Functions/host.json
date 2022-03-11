@@ -1,7 +1,7 @@
 {
-  //"functions": [ "DownloadECDFiles" ],
+  //"functions": [ "SendToActivateOtherDocumentContributor", "UpdateTestSetResultPrueba", "RegisterCompletedPayrollCosmos" ],
   "queues": {
-    "batchSize": 16,
+    "batchSize": 1,
     "maxPollingInterval": 2000,
     "maxDequeueCount": 5,
     "newBatchThreshold": 8,

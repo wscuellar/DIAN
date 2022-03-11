@@ -6,10 +6,13 @@ using Gosocket.Dian.Interfaces;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
+using Gosocket.Dian.Application;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
@@ -23,6 +26,9 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IOthersDocsElecSoftwareService> _othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
         private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
         private readonly Mock<IGlobalOtherDocElecOperationService> _globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
+        private readonly Mock<IRadianTestSetAppliedService> _globalRadianTestSetAppliedService = new Mock<IRadianTestSetAppliedService>();
+        private readonly TelemetryClient telemetry;
+
 
         [TestInitialize]
         public void TestInitialize()
@@ -33,7 +39,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 _othersElectronicDocumentsService.Object,
                 _testSetOthersDocumentsResultService.Object,
                 _othersDocsElecSoftwareService.Object,
-                _globalOtherDocElecOperationService.Object);
+                _globalOtherDocElecOperationService.Object, _globalRadianTestSetAppliedService.Object,
+                 telemetry);
         }
 
 
