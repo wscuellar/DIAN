@@ -858,11 +858,14 @@ namespace Gosocket.Dian.Web.Services
             }
         }
 
+
         /// <summary>
         /// Generate report of Send or Received Documents
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="contentFile"></param>
+        /// <param name="nit" type="string"></param>
+        /// <param name="startDate" type="DateTime"></param>
+        /// <param name="endDate" type="DateTime"></param>
+        /// <param name="documentGroup" type="string"></param>
         /// <returns></returns>
         public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate , DateTime endDate, string documentGroup)
         {

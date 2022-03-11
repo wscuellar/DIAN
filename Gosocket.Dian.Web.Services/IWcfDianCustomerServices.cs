@@ -125,6 +125,14 @@ namespace Gosocket.Dian.Web.Services
         [CustomOperation]
         DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber);
 
+        /// <summary>
+        /// Generar solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
+        /// </summary>
+        /// <param name="nit" type="string"></param>
+        /// <param name="startDate" type="DateTime"></param>
+        /// <param name="endDate" type="DateTime"></param>
+        /// <param name="documentGroup" type="string"></param>
+        /// <returns></returns>
         [OperationContract]
         [CustomOperation]
         DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup);
