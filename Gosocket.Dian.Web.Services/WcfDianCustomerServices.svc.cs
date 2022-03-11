@@ -866,6 +866,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate , DateTime endDate, string documentGroup)
         {
+            string[] allowedDocumentGroups = new string[]{ "Todos", "Emitido", "Recibido" };
             try
             {
                 var authCode = GetAuthCode();
@@ -898,6 +899,17 @@ namespace Gosocket.Dian.Web.Services
                     return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
                 }
 
+                if (string.IsNullOrWhiteSpace(documentGroup))
+                {
+                    documentGroup = "Todos";
+                }
+
+                if(!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, $"El grupo de documento solicitado ({documentGroup}) es inválido.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"El grupo de documento solicitado({ documentGroup }) es inválido." };
+                }
+
                 /*agregar validacion de que la fecha inicial no debe ser mayor a 3 meses a partir de hoy*/
                 if ((DateTime.Now.Date - startDate.Date).TotalDays > 90)
                 {
@@ -911,8 +923,6 @@ namespace Gosocket.Dian.Web.Services
                 stopwatch.Start();
 
                 var result = customerDianPa.SendRequestBulkDocumentsDownload(email, nit, startDate, endDate, documentGroup);
-
-                customerDianPa = null;
 
                 stopwatch.Stop();
                 double ms = stopwatch.ElapsedMilliseconds;

@@ -1750,17 +1750,21 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var request = new BulkDocumentDownloadRequest(email, nit, startDate, endDate, documentGroup);
             var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
             timer.Stop();
-            if (!response.IsCorrect)
+            if (response.IsCorrect)
+            {
+                dianResponse.StatusDescription = $"Solicitud de descarga realizada con exito [código de seguimiento {response.DistributionId}]. Le notificaremos por medio de un correo electrónico cuando el listado esté completado para descargar.";
+            }
+            else
             {
                 dianResponse.StatusCode = "89";
                 dianResponse.StatusDescription = "";
-                var globalEnd = timer.ElapsedMilliseconds / 1000;
-                if (globalEnd >= 10)
-                {
-                    var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
-                    TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
-                }
-                return dianResponse;
+            }
+            
+            var globalEnd = timer.ElapsedMilliseconds / 1000;
+            if (globalEnd >= 10)
+            {
+                var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
+                TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
             }
 
             return dianResponse;
