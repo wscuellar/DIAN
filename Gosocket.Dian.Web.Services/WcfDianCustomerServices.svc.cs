@@ -895,8 +895,8 @@ namespace Gosocket.Dian.Web.Services
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final debe ser mayor o igual a la fecha inicial.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final debe ser mayor o igual a la fecha inicial." };
                 }
-
-                if ((endDate.Date - startDate.Date).TotalDays > 90)
+                int maxQuantyDays = Convert.ToInt32(ConfigurationManager.GetValue("BulkDocumentsDownload_QuantyMaxDaysFoDateRange"));
+                if ((endDate.Date - startDate.Date).TotalDays > maxQuantyDays)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses).");
                     return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
@@ -914,7 +914,7 @@ namespace Gosocket.Dian.Web.Services
                 }
 
                 /*agregar validacion de que la fecha inicial no debe ser mayor a 3 meses a partir de hoy*/
-                if ((DateTime.Now.Date - startDate.Date).TotalDays > 90)
+                if ((DateTime.Now.Date - startDate.Date).TotalDays > maxQuantyDays)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "la fecha de inicio supera el rango máximo de fechas permitido (3 meses).");
                     return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
