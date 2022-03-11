@@ -481,7 +481,32 @@ namespace Gosocket.Dian.DataContext
                 return new List();
             }
         }
+        public async Task<List<List>> getFormapago()
+        {
+            try
+            {
+                var sql = "Select * from List c where  c.IdList=22   and c.PartitionKey=22";
+                var result = new List<List>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.ToList();
+
+                }
+                return result.ToList();
+
+            }
+            catch (Exception e)
+            {
+                return new List<List>();
+            }
+        }
     }
     public partial class NumberingRangeCos
     {
