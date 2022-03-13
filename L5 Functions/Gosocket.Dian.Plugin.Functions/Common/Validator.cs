@@ -4224,7 +4224,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (range.ValidDateNumberFrom == fromDateNumber)
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
@@ -4364,14 +4364,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                 ? "Valor inicial del rango de numeración informado no corresponde a la autorización vigente para el ABS"
                 : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
-
+            var tipoEmisor = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "ABS" : "contribuyente emisor";
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel,
-                    ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.",
+                    ErrorMessage = $"Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4387,7 +4387,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
+                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)
@@ -4396,7 +4396,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel2,
-                    ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.",
+                    ErrorMessage = $"Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
