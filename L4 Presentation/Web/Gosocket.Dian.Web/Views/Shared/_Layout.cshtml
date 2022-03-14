@@ -121,7 +121,16 @@
                             <li>
                                 <center>
                                     <h4>
-                                        <b>Sistema de facturación electrónica – Ambiente de Habilitación</b>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación </b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod" )
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción </b>
+                                        }
+
                                     </h4>
                                 </center>
                             </li>
