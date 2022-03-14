@@ -35,18 +35,22 @@
                 <th>Resultado</th>
                 <th>Estado RADIAN</th>
                 <th style="text-align:center">Valor Total</th>
+                @if (Model.ContributorTypeId == 4)
+                {
+                    <th>Creado desde</th>
+                }
             </tr>
         </thead>
         <tbody>
             @if (Model.Documents.Count == 0)
             {
                 <tr style="background-color: transparent !important;">
-                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <td class="text-nowrap text-center" colspan="@(Model.ContributorTypeId != 4 ? 13 : 14)" style="padding-left: 0 !important; padding-right: 0 !important;">
                         <div class="alert panel-footer-grey">
                             Ningún documento disponible para mostrar.
                         </div>
                     </td>
-                </tr>
+                </tr> 
             }
             @foreach (var document in Model.Documents)
             {
@@ -119,6 +123,12 @@
                         <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                             @document.TotalAmount.ToString("C0")
                         </td>
+                        if (Model.ContributorTypeId == 4)
+                        {
+                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                
+                            </td>
+                        }
                     }
                     else
                     {
@@ -159,11 +169,17 @@
                         <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                             @document.TotalAmount.ToString("C0")
                         </td>
+                        if (Model.ContributorTypeId == 4)
+                        {
+                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                
+                            </td>
+                        }
                     }
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
 </div>
 

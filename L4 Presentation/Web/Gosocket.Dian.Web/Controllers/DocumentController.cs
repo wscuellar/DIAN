@@ -254,8 +254,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Export(ExportDocumentTableViewModel model)
         {
             await CreateGlobalTask(model);
-
-            return RedirectToAction(nameof(Export));
+            return Json(true);
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1107,6 +1106,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             model.IsNextPage = cosmosResponse.hasMoreResults;
             Session["Continuation_Token_" + (model.Page + 1)] = cosmosResponse.continuation;
+
+            model.ContributorTypeId = User.ContributorTypeId() ?? 0;
 
             return View("Index", model);
         }
