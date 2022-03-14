@@ -265,15 +265,17 @@
                         <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
                         <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="width:100%">
                         <div class="bootbox-body">
                             <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
                             <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
                                       maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
                         </div>
-                    </div><div class="modal-footer">
-                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                    <div class="modal-footer" style="position:relative;width:initial;">
+                        <button type="button" class="btn btn-radian-default" style="display:block; padding: 8px 13px;" data-dismiss="modal">Cancelar</button>
+                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Aceptar</button>
                     </div>
                 </div>
             </div>

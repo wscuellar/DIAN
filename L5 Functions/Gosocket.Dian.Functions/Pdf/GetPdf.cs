@@ -270,7 +270,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 case "Formato tipo media carta":
                     return new PaperSize(Length.Inches(5.5), Length.Inches(8.5));
                 case "Formato tipo tirilla":
-                    return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
+                    //return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
                 default:
                     return PaperSize.A4;
             }
