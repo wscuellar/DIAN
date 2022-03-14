@@ -1084,6 +1084,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     receiverDvErrorCode = "DSAJ24b";
                     receiverDvrErrorDescription = "El DV del NIT no es correcto";
                 }
+                /*Si el documento pertenece a un Documento Equivalente*/
+                if (new string[]{ "55","60","45", "50", "20", "25", "27", "94", "95", "35"}.Contains(documentMeta.DocumentTypeId))
+                {
+                    receiverDvErrorCode = "DEAJ24b";
+                    receiverDvrErrorDescription = "El DV del NIT no es correcto";
+                }
                 if (documentMeta.DocumentTypeId == "91") receiverDvErrorCode = "CAK24";
                 else if (documentMeta.DocumentTypeId == "92") receiverDvErrorCode = "DAK24";
                 else if (documentMeta.DocumentTypeId == "96") receiverDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK24;
