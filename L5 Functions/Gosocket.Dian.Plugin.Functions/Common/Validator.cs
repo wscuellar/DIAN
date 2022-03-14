@@ -1365,8 +1365,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (softwareProvider != null || habilitadoRadian)
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else 
+                {
+                    var mensajeError = documentMeta.DocumentTypeId == "05"? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = mensajeError, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+                   
             }
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
@@ -4224,7 +4228,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (range.ValidDateNumberFrom == fromDateNumber)
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
@@ -4364,14 +4368,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                 ? "Valor inicial del rango de numeración informado no corresponde a la autorización vigente para el ABS"
                 : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
-
+            var tipoEmisor = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "ABS" : "contribuyente emisor";
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel,
-                    ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.",
+                    ErrorMessage = $"Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4387,7 +4391,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
+                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)
@@ -4396,7 +4400,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel2,
-                    ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.",
+                    ErrorMessage = $"Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4493,7 +4497,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                 response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE233" : "NIAE020";
             if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+            {
                 response.ErrorCode = "DSAB27b";
+                response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
+
+            }
+                
 
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                 || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
@@ -4528,7 +4537,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE232" : "NIAE019";
                     if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+                    {
                         response.ErrorCode = "DSAB24b";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
+                    }
+                    
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                          || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
@@ -7856,7 +7869,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDS no está calculado correctamente." };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDE no está calculado correctamente." };
             var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
             if (invoceCuds.Cude.ToLower() == hash)
             {
