@@ -311,7 +311,7 @@
                                         </a>
                                         <!--Submenu-->
                                         <ul class="collapse">
-                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
                                         </ul>
                                         <ul class="collapse">
                                             <!--Rol Administrador-->
@@ -343,7 +343,7 @@
                                                     }
                                                 }
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }

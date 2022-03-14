@@ -2972,6 +2972,9 @@
     <Content Include="Views\OthersElectronicDocNumberRange\Index.cshtml" />
     <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
     <Content Include="Views\ProfileFreeBiller\_permissionFGrid.cshtml" />
+    <Content Include="Views\Contributor\CheckContributorRegister.cshtml" />
+    <Content Include="Views\Contributor\RegisterNoOfe.cshtml" />
+    <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

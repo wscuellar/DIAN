@@ -255,6 +255,23 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction(nameof(HomeController.Dashboard));
         }
 
+        public ActionResult CheckContributorRegister()
+        {
+            Contributor contributor = contributorService.Get(User.ContributorId());
+            var contributorId = contributor.Id;
+            var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
+            var contributorTypeId = contributor.ContributorTypeId;
+            
+            if (contributorTypeId == null || contributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                return RedirectToAction(nameof(RegisterNoOfe));
+            }
+            else
+            {
+                return RedirectToAction("ElectronicDocuments", "Document");
+            }
+        }
+
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         public ActionResult Configuration()
         {
@@ -694,6 +711,78 @@ namespace Gosocket.Dian.Web.Controllers
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction(nameof(UserController.Login), "User");
+        }
+
+        public ActionResult RegisterNoOfe()
+        {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+                return RedirectToAction(nameof(UserController.Unauthorized));
+
+            Contributor contributor = contributorService.Get(User.ContributorId());
+            SetView(contributor.ContributorTypeId.ToString());
+
+            var model = new ContributorViewModel
+            {
+                Id = contributor.Id,
+                Code = contributor.Code,
+                Name = contributor.Name,
+                BusinessName = contributor.BusinessName,
+                Email = contributor.Email?.Trim(),
+                ExchangeEmail = contributor.ExchangeEmail ?? "",
+                AcceptanceStatusId = contributor.AcceptanceStatusId,
+                AcceptanceStatusName = Domain.Common.EnumHelper.GetEnumDescription((ContributorStatus)contributor.AcceptanceStatusId),
+                PrincipalActivityCode = contributor.PrincipalActivityCode
+            };
+            FillContributorCategory(model);
+
+            if (string.IsNullOrEmpty(model.PrincipalActivityCode))
+                ModelState.AddModelError("PrincipalActivityCode", "");
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult RegisterNoOfe(ContributorViewModel model)
+        {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+                return RedirectToAction(nameof(UserController.Unauthorized));
+
+            if (User.ContributorId() == 0)
+            {
+                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                return RedirectToAction(nameof(UserController.Login), "User");
+            }
+
+            if (User.ContributorId() != model.Id)
+                return RedirectToAction(nameof(UserController.Unauthorized), "User");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            Contributor contributor = contributorService.ObsoleteGet(model.Id);
+            contributor.ContributorTypeId = (int)Domain.Common.ContributorType.BillerNoObliged;
+            contributor.AcceptanceStatusId = (int)ContributorStatus.Registered;
+            contributor.ExchangeEmail = model.ExchangeEmail?.ToLower();
+            contributorService.AddOrUpdate(contributor);
+
+            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
+            tableManagerGlobalContributor.InsertOrUpdate(globalContributor);
+
+            if (!string.IsNullOrEmpty(contributor.ExchangeEmail))
+            {
+                var globalExchangeEmail = new GlobalExchangeEmail(contributor.Code, contributor.Code) { Email = contributor.ExchangeEmail?.ToLower() };
+                tableManagerGlobalExchangeEmail.InsertOrUpdate(globalExchangeEmail);
+
+                // insert in production.
+                if (ConfigurationManager.GetValue("Environment") == "Hab")
+                {
+                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
+                    var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
+                    tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
+                }
+            }
+
+            return RedirectToAction(nameof(RegisterNoOfe), "Contributor");
         }
 
         public ActionResult ConfigureOperationModes(int id)
