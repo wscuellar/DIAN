@@ -774,7 +774,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="contentFile"></param>
         /// <returns></returns>
         //public async Task<DianResponse> SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
-        public DianResponse SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
+        public async Task<DianResponse> SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
         {
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
@@ -885,7 +885,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // send to validate document sync
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);            
+            var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);            
             sb.AppendLine($"{Properties.Settings.Default.Param_ValidateDocumentUrl} {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture)} ValidateDocument ");
             // send to validate document sync
 
@@ -1004,7 +1004,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     //} 
                     #endregion
 
-                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
+                    var processRegistrateComplete = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;

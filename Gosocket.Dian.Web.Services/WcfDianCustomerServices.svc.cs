@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.ServiceModel;
 using System.Text;
+using System.Threading.Tasks;
 using static Gosocket.Dian.Logger.Logger;
 
 namespace Gosocket.Dian.Web.Services
@@ -32,7 +33,7 @@ namespace Gosocket.Dian.Web.Services
         /// Get contributors exchange email
         /// </summary>
         /// <returns></returns>
-        public ExchangeEmailResponse GetExchangeEmails()
+        public async Task<ExchangeEmailResponse> GetExchangeEmails()
         {
             try
             {
@@ -42,7 +43,7 @@ namespace Gosocket.Dian.Web.Services
                 DianPAServices customerDianPa = new DianPAServices();
                 {
                     var start = DateTime.UtcNow;
-                    var result = customerDianPa.GetExchangeEmails(authCode);
+                    var result = await customerDianPa.GetExchangeEmails(authCode);
 
                     customerDianPa = null;
                     var end = DateTime.UtcNow.Subtract(start).TotalSeconds;
@@ -66,7 +67,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public DianResponse GetStatus(string trackId)
+        public async Task<DianResponse> GetStatus(string trackId)
         {
             try
             {
@@ -83,7 +84,7 @@ namespace Gosocket.Dian.Web.Services
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
                     if (exist)
                     {
-                        var previusResult = fileManager.GetText(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                        var previusResult = await fileManager.GetTextAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
 
                         if (!string.IsNullOrEmpty(previusResult))
                         {
@@ -126,7 +127,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public List<DianResponse> GetStatusZip(string trackId)
+        public async Task<List<DianResponse>> GetStatusZip(string trackId)
         {
             try
             {
@@ -139,7 +140,7 @@ namespace Gosocket.Dian.Web.Services
                 DianPAServices customerDianPa = new DianPAServices();
                 {
                     var start = DateTime.UtcNow;
-                    var result = customerDianPa.GetBatchStatus(trackId.ToLower());
+                    var result = await customerDianPa.GetBatchStatus(trackId.ToLower());
                     customerDianPa = null;
 
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatusZip " + DateTime.UtcNow.Subtract(start).TotalSeconds);
@@ -207,7 +208,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public UploadDocumentResponse SendBillAsync(string fileName, byte[] contentFile)
+        public async Task<UploadDocumentResponse> SendBillAsync(string fileName, byte[] contentFile)
         {
             try
             {
@@ -246,7 +247,7 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendBillAsync");
                     var start = DateTime.UtcNow;
-                    var result = customerDianPa.ProcessBatchZipFile(fileName, contentFile, authCode);
+                    var result = await customerDianPa.ProcessBatchZipFile(fileName, contentFile, authCode);
                     customerDianPa = null;
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendBillAsync " + DateTime.UtcNow.Subtract(start).TotalSeconds);
                     return result;
@@ -269,7 +270,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="contentFile"></param>
         /// <param name="testSetId"></param>
         /// <returns></returns>
-        public UploadDocumentResponse SendTestSetAsync(string fileName, byte[] contentFile, string testSetId)
+        public async Task<UploadDocumentResponse> SendTestSetAsync(string fileName, byte[] contentFile, string testSetId)
         {
             string email = "";
             string authCode = "";
@@ -324,7 +325,7 @@ namespace Gosocket.Dian.Web.Services
                 {
                     var start = DateTime.UtcNow;
                     //var result = customerDianPa.UploadMultipleDocumentAsync(fileName, contentFile, authCode, testSetId);
-                    var result = customerDianPa.ProcessBatchZipFile(fileName, contentFile, authCode, testSetId);
+                    var result = await customerDianPa.ProcessBatchZipFile(fileName, contentFile, authCode, testSetId);
                     customerDianPa = null;
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "SendTestSetAsync " + DateTime.UtcNow.Subtract(start).TotalSeconds);
                     return result;
@@ -347,7 +348,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public DianResponse SendBillSync(string fileName, byte[] contentFile)
+        public async Task<DianResponse> SendBillSync(string fileName, byte[] contentFile)
         {
             try
             {
@@ -380,11 +381,11 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    var result = customerDianPa.UploadDocumentSync(fileName, contentFile, authCode);
+                    var result = await customerDianPa.UploadDocumentSync(fileName, contentFile, authCode);
 
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -485,7 +486,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public DianResponse SendEventUpdateStatus(byte[] contentFile)
+        public async Task<DianResponse> SendEventUpdateStatus(byte[] contentFile)
         {
             try
             {
@@ -515,11 +516,11 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    var result = customerDianPa.SendEventUpdateStatus(contentFile, authCode);
+                    var result = await customerDianPa.SendEventUpdateStatus(contentFile, authCode);
 
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -568,7 +569,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public DianResponse SendNominaSync(byte[] contentFile)
+        public async Task<DianResponse> SendNominaSync(byte[] contentFile)
         {
             try
             {
@@ -598,11 +599,11 @@ namespace Gosocket.Dian.Web.Services
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    var result = customerNomina.SendNominaUpdateStatusAsync(contentFile, authCode);
+                    var result = await customerNomina.SendNominaUpdateStatusAsync(contentFile, authCode);
 
                     var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        fileManager.Upload(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerNomina = null;
 
@@ -683,7 +684,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public EventResponse GetXmlByDocumentKey(string trackId)
+        public async Task<EventResponse> GetXmlByDocumentKey(string trackId)
         {
             try
             {
@@ -696,7 +697,7 @@ namespace Gosocket.Dian.Web.Services
                 DianPAServices customerDianPa = new DianPAServices();
                 {
                     Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetXmlByDocumentKey");
-                    var result = customerDianPa.GetXmlByDocumentKey(trackId, GetAuthCode());
+                    var result = await customerDianPa.GetXmlByDocumentKey(trackId, GetAuthCode());
                     customerDianPa = null;
                     return result;
                 }
