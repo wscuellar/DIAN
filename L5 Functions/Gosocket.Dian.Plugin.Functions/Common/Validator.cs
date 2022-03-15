@@ -4305,7 +4305,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "DSAB08a",
-                        ErrorMessage = "Fecha de generación posterior a la fecha final de la autorización de numeración EndDate < IssueDate ",
+                        ErrorMessage = "Fecha de generación posterior a la fecha final de la autorización de numeración EndDate &lt; IssueDate ",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 else
