@@ -4397,7 +4397,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el ABS."
+                ? "Valor final del rango de numeración informado no corresponde a la autorización vigente para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)
