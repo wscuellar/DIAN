@@ -123,12 +123,12 @@
                                     <h4>
                                         @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
                                         {
-                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación </b>
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
                                         }
                                         else
                                         if (ConfigurationManager.GetValue("Environment") == "Prod" )
                                         {
-                                            <b>Sistema de facturación electrónica – Ambiente de Producción </b>
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
                                         }
 
                                     </h4>
