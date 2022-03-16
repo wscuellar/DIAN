@@ -4268,7 +4268,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if(validateNumberID)
                 {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
@@ -4305,7 +4305,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "DSAB08a",
-                        ErrorMessage = "Fecha de generación posterior a la fecha final de la autorización de numeración EndDate < IssueDate ",
+                        ErrorMessage = "Fecha de generación posterior a la fecha final de la autorización de numeración EndDate &lt; IssueDate ",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 else
@@ -4397,7 +4397,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el ABS."
+                ? "Valor final del rango de numeración informado no corresponde a la autorización vigente para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)
@@ -7840,7 +7840,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 invoceCuds.SoftwarePin = software?.Pin;
             }
             //invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}                        
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"El CUDS debe ser calculado de acuerdo con lo que se especifica en el anexo técnico." };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"Valor del CUDS no está calculado correctamente." };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {

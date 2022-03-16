@@ -120,20 +120,18 @@
                         <ul>
                             <li>
                                 <center>
+                                    <h4>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod" )
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
+                                        }
 
-                                    @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-                                    {
-                                        <h4>
-                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación </b>
-                                        </h4>
-                                    }
-                                    else
-                                    if (ConfigurationManager.GetValue("Environment") == "Prod")
-                                    {
-                                        <h4>
-                                            <b>Sistema de facturación electrónica – Ambiente de Producción </b>
-                                        </h4>
-                                    }
+                                    </h4>
                                 </center>
                             </li>
                         </ul>
@@ -326,7 +324,7 @@
                                         </a>
                                         <!--Submenu-->
                                         <ul class="collapse">
-                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
                                         </ul>
                                         <ul class="collapse">
                                             <!--Rol Administrador-->
@@ -351,7 +349,7 @@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }
@@ -401,34 +399,25 @@
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
                                     {
-                                        <li>
-                                              <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
-                                                  <i class="fa fa-users"></i>
-                                                  <span class="menu-title">
-                                                      Configuración
-                                                  </span>
-                                                  <i class="arrow"></i>
-                                              </a>
-                                              <!--Submenu-->
-                                              <ul class="collapse">
-                                                  <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
-                                              </ul>
-                                              <ul>
-                                                  @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
-                                                  {
-                                                      <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-                                                  }
-                                              </ul>
-                                              <ul>
-                                                  @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-                                                  {
-                                                      if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-                                                      {
-                                                          <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
-                                                      }
-                                                  }
-                                              </ul>
-                                        </li>
+                                                                         <li>
+                                        <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Configuración
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                        </ul>
+                                        <ul>
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                            }
+                                        </ul>
+                                    </li>
                                      }
 
                                     <!--Rol Administrador-->
