@@ -176,6 +176,10 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }
+                else
+                {
+                    Session["Login_ContributorType"] = "";
+                }
             }
 
             return View(model);
