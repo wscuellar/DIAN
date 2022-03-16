@@ -121,7 +121,16 @@
                             <li>
                                 <center>
                                     <h4>
-                                        <b>Sistema de facturación electrónica – Ambiente de Habilitación</b>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod" )
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
+                                        }
+
                                     </h4>
                                 </center>
                             </li>
@@ -311,7 +320,7 @@
                                         </a>
                                         <!--Submenu-->
                                         <ul class="collapse">
-                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
                                         </ul>
                                         <ul class="collapse">
                                             <!--Rol Administrador-->
@@ -343,7 +352,7 @@
                                                     }
                                                 }
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }
@@ -406,7 +415,7 @@
                                             <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
                                         </ul>
                                         <ul>
-                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
                                             {
                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
                                             }
