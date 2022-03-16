@@ -5138,6 +5138,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorCodeReglaUUID = "AAH07";
             //string trackidRef = documentMeta.DocumentReferencedKey;
 
+            var typeListInstance = GetTypeOperation_InvoiceCache();
+            var typeListvalues = typeListInstance.Value.Split(';');
+
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
 
@@ -5259,7 +5262,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    //Valida DocumentTypeCode coincida con el documento informado
+                    //Valida DocumentTypeCode coincida con el documento informado                    
+                    if(typeListvalues.Contains(documentMetaRef.DocumentTypeId)) documentMetaRef.DocumentTypeId = "01";
+
                     if (documentMetaRef.DocumentTypeId != documentMeta.DocumentReferencedTypeId)
                     {
                         responses.Add(new ValidateListResponse
@@ -7791,6 +7796,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     _ns.AddNamespace(nsItem.Key, nsItem.Value);
             }
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
+        }
+
+        private GlobalTypeList GetTypeOperation_InvoiceCache()
+        {
+            GlobalTypeList typeList = null;
+            List<GlobalTypeList> typesList;
+            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
+            var cacheItem = InstanceCache.TypesListInstanceCache.GetCacheItem("TypesList");
+            if (cacheItem == null)
+            {
+                typesList = typeListTableManager.FindByPartition<GlobalTypeList>("new-dian-ubl21");
+                CacheItemPolicy policy = new CacheItemPolicy
+                {
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(typesListInstanceCacheTimePolicyInMinutes)
+                };
+                InstanceCache.TypesListInstanceCache.Set(new CacheItem("TypesList", typesList), policy);
+            }
+            else
+                typesList = (List<GlobalTypeList>)cacheItem.Value;
+
+            typeList = typesList.FirstOrDefault(t => t.Name == "TypeOperation_Invoice");
+            return typeList;
+
         }
 
     }
