@@ -35,9 +35,7 @@ namespace Gosocket.Dian.Functions.Others
 
             //Solo en ambiente de habilitacion.
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-            {
-                NotificationsController notification = new NotificationsController();
-                await notification.EventNotificationsAsync("03", "2019043070");
+            {                
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                 if (data == null)
@@ -95,7 +93,7 @@ namespace Gosocket.Dian.Functions.Others
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
                     GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
                     SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
-
+                    NotificationsController notification = new NotificationsController();
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
                     {

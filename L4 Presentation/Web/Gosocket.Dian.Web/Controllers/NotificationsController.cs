@@ -67,10 +67,10 @@ namespace Gosocket.Dian.Web.Controllers
             var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
-            notification.PetitionName = contributor.Email;
+            notification.PetitionName = contributor.ExchangeEmail;
             notification.UserName = contributor.Code;
             notification.PartitionKey = accountId.ToString();
-            notification.RecipientEmail = contributor.Email; 
+            notification.RecipientEmail = contributor.ExchangeEmail; 
 
             switch (type)
             {
