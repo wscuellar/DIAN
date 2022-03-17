@@ -303,7 +303,11 @@
                                                 <li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
                                                 @if (User.ContributorTypeId() == (int)ContributorType.Provider)
                                                 {
-                                                    <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    if (new string[] { "Dev", "Local", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    }
+                                                    
                                                 }
                                                 <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
                                             </ul>
@@ -344,13 +348,6 @@
                                             Rol Facturador and Proveedor*@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
-                                                if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-                                                {
-                                                    if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-                                                    {
-                                                        <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar prefijos</a></li>
-                                                    }
-                                                }
 
                                                 if (User.ContributorTypeId() == (int)ContributorType.Biller)
                                                 {

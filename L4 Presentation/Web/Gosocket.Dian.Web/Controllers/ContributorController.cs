@@ -262,13 +262,20 @@ namespace Gosocket.Dian.Web.Controllers
             var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
             var contributorTypeId = contributor.ContributorTypeId;
             
-            if (contributorTypeId == null || contributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+            if (contributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
             {
-                return RedirectToAction(nameof(RegisterNoOfe));
+                if(contributorAcceptanceStatusId == (int)Domain.Common.ContributorStatus.Pending)
+                {
+                    return RedirectToAction(nameof(RegisterNoOfe));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(DocumentController.ElectronicDocuments), "Document");
+                }
             }
             else
             {
-                return RedirectToAction("ElectronicDocuments", "Document");
+                return RedirectToAction(nameof(DocumentController.ElectronicDocuments), "Document");
             }
         }
 
