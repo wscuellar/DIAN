@@ -1735,30 +1735,29 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
-        public DianResponse SendRequestBulkDocumentsDownload(string email, string nit, DateTime startDate, DateTime endDate, string documentGroup)
+        public DianResponse SendRequestBulkDocumentsDownload(string authCode, string email, string nit, DateTime startDate, DateTime endDate, string documentGroup)
         {
             var timer = new Stopwatch();
             DianResponse dianResponse = new DianResponse
             {
-                IsValid = false,
                 StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
                 StatusDescription = "",
                 ErrorMessage = new List<string>()
             };
 
             timer.Start();
-            var request = new BulkDocumentDownloadRequest(email, nit, startDate, endDate, documentGroup);
+
+            var user = GetGlobalContributor(authCode);
+
+            var request = new BulkDocumentDownloadRequest(user.Code, email, nit, startDate, endDate, documentGroup);
             var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
             timer.Stop();
-            if (response.IsCorrect)
-            {
-                dianResponse.StatusDescription = $"Solicitud de descarga realizada con exito [código de seguimiento {response.DistributionId}]. Le notificaremos por medio de un correo electrónico cuando el listado esté completado para descargar.";
-            }
-            else
+            if (!response.IsCorrect)
             {
                 dianResponse.StatusCode = "89";
-                dianResponse.StatusDescription = "";
             }
+            dianResponse.IsValid = response.IsCorrect;
+            dianResponse.StatusDescription = response.Message;
             
             var globalEnd = timer.ElapsedMilliseconds / 1000;
             if (globalEnd >= 10)
@@ -1775,7 +1774,6 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var timer = new Stopwatch();
             DianResponse dianResponse = new DianResponse
             {
-                IsValid = false,
                 StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
                 StatusDescription = "",
                 ErrorMessage = new List<string>()
@@ -1793,6 +1791,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 dianResponse.StatusCode = "89";
                 dianResponse.StatusDescription = response.Message;
             }
+            dianResponse.IsValid = response.IsCorrect;
 
             var globalEnd = timer.ElapsedMilliseconds / 1000;
             if (globalEnd >= 10)
@@ -1807,8 +1806,9 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
     public class BulkDocumentDownloadRequest
     {
-        public BulkDocumentDownloadRequest(string email, string nit, DateTime initialDate, DateTime endDate, string groupDocument)
+        public BulkDocumentDownloadRequest(string userId, string email, string nit, DateTime initialDate, DateTime endDate, string groupDocument)
         {
+            UserId = userId;
             Email = email;
             Nit = nit;
             InitialDate = initialDate;
@@ -1816,6 +1816,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             GroupDocument = groupDocument;
         }
 
+        public string UserId { get; set; }
         public string Email { get; set; }
         public string Nit { get; set; }
         public DateTime InitialDate { get; set; }
@@ -1825,8 +1826,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
     public class BulkDocumentDownloadResponse
     {
         public bool IsCorrect { get; set; }
-        public string DistributionTransacionId { get; set; }
-        public string DistributionId { get; set; }
+        public string Message { get; set; }
+        public string LogDownloadWsTrackId { get; set; }
     }
 
     public class GetStatusBulkDocumentDownloadResponse
