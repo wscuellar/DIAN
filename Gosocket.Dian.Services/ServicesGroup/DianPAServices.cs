@@ -1782,16 +1782,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
 
             timer.Start();
-            var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("GetStatusBulkDocumentsDownloadUrl"), new { trackId });
+            var response = ApiHelpers.ExecuteRequest<GetStatusBulkDocumentDownloadResponse>(ConfigurationManager.GetValue("GetStatusBulkDocumentsDownloadUrl"), new { trackId });
             timer.Stop();
             if (response.IsCorrect)
             {
-                dianResponse.StatusDescription = $"----";
+                dianResponse.StatusDescription = $"La solicitud {trackId} se encuentra en estado: {response.State}, {response.Response}";
             }
             else
             {
                 dianResponse.StatusCode = "89";
-                dianResponse.StatusDescription = "";
+                dianResponse.StatusDescription = response.Message;
             }
 
             var globalEnd = timer.ElapsedMilliseconds / 1000;
@@ -1827,7 +1827,19 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public bool IsCorrect { get; set; }
         public string DistributionTransacionId { get; set; }
         public string DistributionId { get; set; }
+    }
 
-
+    public class GetStatusBulkDocumentDownloadResponse
+    {
+        public bool IsCorrect { get; set; }
+        public string Message { get; set; }
+        public string Nit { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public string logDownloadWs { get; set; }
+        public string State { get; set; }
+        public string Response { get; set; }
+        public string TotalRecords { get; set; }
+        public string UrlFileCsv { get; set; }
     }
 }
