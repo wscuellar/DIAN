@@ -1,39 +1,39 @@
 ﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
 @{
-    ViewBag.title = "Configurar modo de operación - " + @Model.ContributorType;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.title = "Configurar modo de operación - " + @Model.ContributorType;
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="page-content radian-view margin-20">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
+	<div class="title-container">
+		<p class="title-view">
+			@ViewBag.title
+		</p>
+		<div class="underline-title"></div>
 
-        <div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = (int)ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
-    </div>
-    <div class="margin-top-50">
-        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
-            <div class="panel-body padding-top-20">
-                <div class="pad-btm padding-bottom-0">
-                    <div class="row margin-horizontal-0">
-                        @using (Html.BeginForm("SetupOperationModePost", "OthersElectronicDocAssociated", FormMethod.Post, new { id = "formst" }))
-                        {
-                            @Html.HiddenFor(m => m.ContributorId)
-                            @Html.HiddenFor(m => m.ContributorTypeId)
-                            @Html.HiddenFor(m => m.SoftwareId)
-                            @Html.HiddenFor(m => m.SoftwareIdBase)
-                            @Html.HiddenFor(m => m.ElectronicDocId)
+		<div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = (int)ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+	</div>
+	<div class="margin-top-50">
+		<div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+			<div class="panel-body padding-top-20">
+				<div class="pad-btm padding-bottom-0">
+					<div class="row margin-horizontal-0">
+						@using (Html.BeginForm("SetupOperationModePost", "OthersElectronicDocAssociated", FormMethod.Post, new { id = "formst" }))
+						{
+							@Html.HiddenFor(m => m.ContributorId)
+							@Html.HiddenFor(m => m.ContributorTypeId)
+							@Html.HiddenFor(m => m.SoftwareId)
+							@Html.HiddenFor(m => m.SoftwareIdBase)
+							@Html.HiddenFor(m => m.ElectronicDocId)
 
-                            @Html.Partial("_setupOperationModeForm")
-                        }
+							@Html.Partial("_setupOperationModeForm")
+						}
 
-                        @Html.Partial("_setupOperationModeList")
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						@Html.Partial("_setupOperationModeList")
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script src="~/Content/js/Radian/RadianIndex.js"></script>
@@ -43,7 +43,7 @@
 
 @section Scripts{
 
-    <script>
+	<script>
 
         $(document).on('change', '#ProviderId', function () {
             let selectedValue = $(this).val();
@@ -294,12 +294,35 @@
                 if ($("#OperationModeId").val() == "1") {
                     $(".section-own-software").show();
                     $(".section-software-technology-provider").hide();
+                    $("#divSoftwarePin").show();
+                        $('#DivSoftwareId').show()
+
+                        $('#SoftwareName').removeAttr('disabled')
+						$('#Provider').val('@Model.Provider');
+				        $('#SoftwareName').val('');
                 }
                 else {
-                    $(".section-own-software").hide();
-                    $(".section-software-technology-provider").show();
+                    if ($("#OperationModeId").val() == "2") {
+                        $(".section-own-software").hide();
+                        $(".section-software-technology-provider").show();
+
+                    }
+                    else
+                    {
+						$(".section-own-software").show();
+                        $(".section-software-technology-provider").hide();
+                        $("#divSoftwarePin").hide();
+						$('#Provider').val('DIRECCIÓN DE IMPUESTO Y ADUANAS NACIONALES - DIAN')
+						$('#SoftwareName').val('Solución gratuita')
+						$('#DivSoftwareId').hide()
+                        $('#SoftwareName').attr('disabled', true)
+						$('#SoftwareUrl').val("@Model.SoftwareUrl")
+
+
+                    }
                 }
+
             }
         });
-    </script>
+	</script>
 }

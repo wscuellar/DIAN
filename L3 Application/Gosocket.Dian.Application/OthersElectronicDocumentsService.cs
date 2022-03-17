@@ -85,6 +85,48 @@ namespace Gosocket.Dian.Application
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
+
+        public ResponseMessage AddOtherDocElecContributorOperationNew(OtherDocElecContributorOperations ContributorOperation, OtherDocElecSoftware software, bool isInsert, bool validateOperation,int ContributorId,int ContributorIdType,int OperationModeId)
+        {
+            OtherDocElecContributor Contributor = _othersDocsElecContributorRepository.Get(t => t.Id == ContributorOperation.OtherDocElecContributorId);
+            GlobalTestSetOthersDocuments testSet = null;
+            testSet = _othersDocsElecContributorService.GetTestResult(Contributor.OtherDocElecOperationModeId, Contributor.ElectronicDocumentId);
+            if (testSet == null)
+                return new ResponseMessage(TextResources.ModeElectroniDocWithoutTestSet, TextResources.alertType, 500);
+
+            if (validateOperation)
+            {
+                List<OtherDocElecContributorOperations> currentOperations =
+                    _othersDocsElecContributorOperationRepository.List(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId
+                                                                    && t.SoftwareType == ContributorOperation.SoftwareType
+                                                                    && t.OperationStatusId == (int)OtherDocElecState.Test
+                                                                    && !t.Deleted);
+                if (currentOperations.Any())
+                    return new ResponseMessage(TextResources.OperationFailOtherInProcess, TextResources.alertType, 500);
+            }
+
+            OtherDocElecContributorOperations existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.OtherDocElecContributorId == ContributorOperation.OtherDocElecContributorId && t.SoftwareId == ContributorOperation.SoftwareId && !t.Deleted);
+            if (existingOperation != null)
+                return new ResponseMessage(TextResources.ExistingSoftware, TextResources.alertType, 500);
+            PagedResult<OtherDocsElectData> List = _othersDocsElecContributorService.List3(ContributorId, 2, Contributor.ElectronicDocumentId);
+            PagedResult<OtherDocsElectData> List2 = _othersDocsElecContributorService.List3(ContributorId, 1, Contributor.ElectronicDocumentId);
+
+            if (List.Results.Any(x=>x.StateSoftware=="2")|| List2.Results.Any(x => x.StateSoftware == "2"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno en pruebas", TextResources.alertType, 500);
+            if (List.Results.Any(x => x.StateSoftware == "4") || List2.Results.Any(x => x.StateSoftware == "4"))
+                return new ResponseMessage("No se puede asociar modo de operación, ya que tiene uno Rechazado", TextResources.alertType, 500);
+
+
+            _othersDocsElecSoftwareService.CreateSoftware(software);
+            int operationId = _othersDocsElecContributorOperationRepository.Add(ContributorOperation);
+            
+
+            existingOperation = _othersDocsElecContributorOperationRepository.Get(t => t.Id == operationId);
+            // se asigna el nuevo set de pruebas...
+            ApplyTestSet(ContributorOperation, testSet, Contributor, existingOperation, software);
+
+            return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
+        }
         public bool ChangeParticipantStatus(int contributorId, string newState, int ContributorTypeId, string actualState, string description)
         {
             List<OtherDocElecContributor> contributors = _othersDocsElecContributorRepository.List(t => t.Id == contributorId
@@ -179,6 +221,9 @@ namespace Gosocket.Dian.Application
         private void ApplyTestSet(OtherDocElecContributorOperations ODEOperation, GlobalTestSetOthersDocuments testSet, OtherDocElecContributor ODEContributor, OtherDocElecContributorOperations existingOperation, OtherDocElecSoftware software)
         {
             Contributor contributor = ODEContributor.Contributor;
+            bool contributorIsOfe = contributor.ContributorTypeId == (int)Domain.Common.ContributorType.Biller;
+            bool electronicDocumentIsSupport = ODEContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+
             GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
             if (operation == null)
                 operation = new GlobalOtherDocElecOperation(contributor.Code, software.SoftwareId.ToString());
@@ -194,7 +239,7 @@ namespace Gosocket.Dian.Application
             operation.SoftwareId = existingOperation.SoftwareId.ToString();
             operation.ElectronicDocumentId = ODEContributor.ElectronicDocumentId;
             operation.OtherDocElecContributorId = ODEContributor.Id;
-            operation.State = OtherDocElecState.Test.GetDescription();
+            operation.State = (contributorIsOfe && electronicDocumentIsSupport) ? OtherDocElecState.Habilitado.GetDescription() : OtherDocElecState.Test.GetDescription();
             operation.ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId;
             operation.Deleted = false;
 
@@ -205,33 +250,33 @@ namespace Gosocket.Dian.Application
                 {
                     Id = Guid.NewGuid().ToString(),
                     OtherDocElecContributorId = ODEContributor.Id,
-                    State = TestSetStatus.InProcess.GetDescription(),
-                    Status = (int)TestSetStatus.InProcess,
-                    StatusDescription = TestSetStatus.InProcess.GetDescription(),
+                    State = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
+                    Status = (contributorIsOfe && electronicDocumentIsSupport) ? (int)TestSetStatus.Accepted : (int)TestSetStatus.InProcess,
+                    StatusDescription = (contributorIsOfe && electronicDocumentIsSupport) ? TestSetStatus.Accepted.GetDescription() : TestSetStatus.InProcess.GetDescription(),
                     ContributorTypeId = ODEContributor.OtherDocElecContributorTypeId.ToString(),
                     OperationModeName = ((Domain.Common.OtherDocElecOperationMode)ODEContributor.OtherDocElecOperationModeId).GetDescription(),
                     ElectronicDocumentId = ODEContributor.ElectronicDocumentId,
                     SoftwareId = software.Id.ToString(),
                     ProviderId = software.ProviderId,
                     // Totales Generales
-                    TotalDocumentRequired = testSet.TotalDocumentRequired,
-                    TotalDocumentAcceptedRequired = testSet.TotalDocumentAcceptedRequired,
+                    TotalDocumentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentRequired,
+                    TotalDocumentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.TotalDocumentAcceptedRequired,
                     TotalDocumentSent = 0,
                     TotalDocumentAccepted = 0,
                     TotalDocumentsRejected = 0,
                     // EndTotales Generales
 
                     // OthersDocuments
-                    OthersDocumentsRequired = testSet.OthersDocumentsRequired,
-                    OthersDocumentsAcceptedRequired = testSet.OthersDocumentsAcceptedRequired,
+                    OthersDocumentsRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsRequired,
+                    OthersDocumentsAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.OthersDocumentsAcceptedRequired,
                     TotalOthersDocumentsSent = 0,
                     OthersDocumentsAccepted = 0,
                     OthersDocumentsRejected = 0,
                     //End OthersDocuments
 
                     //ElectronicPayrollAjustment
-                    ElectronicPayrollAjustmentRequired = testSet.ElectronicPayrollAjustmentRequired,
-                    ElectronicPayrollAjustmentAcceptedRequired = testSet.ElectronicPayrollAjustmentAcceptedRequired,
+                    ElectronicPayrollAjustmentRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentRequired,
+                    ElectronicPayrollAjustmentAcceptedRequired = (contributorIsOfe && electronicDocumentIsSupport) ? 0 : testSet.ElectronicPayrollAjustmentAcceptedRequired,
                     TotalElectronicPayrollAjustmentSent = 0,
                     ElectronicPayrollAjustmentAccepted = 0,
                     ElectronicPayrollAjustmentRejected = 0,

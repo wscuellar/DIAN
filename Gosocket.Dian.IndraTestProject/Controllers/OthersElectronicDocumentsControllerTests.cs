@@ -12,6 +12,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
@@ -26,6 +27,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IContributorService> _contributorService = new Mock<IContributorService>();
         private readonly Mock<IElectronicDocumentService> _electronicDocumentService = new Mock<IElectronicDocumentService>();
         private readonly Mock<IOthersDocsElecSoftwareService> _othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
+        private readonly Mock<IContributorOperationsService> _contributorOperationsService = new Mock<IContributorOperationsService>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -35,7 +37,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _othersDocsElecContributorService.Object,
                     _contributorService.Object,
                     _electronicDocumentService.Object,
-                    _othersDocsElecSoftwareService.Object);
+                    _othersDocsElecSoftwareService.Object,
+                    _contributorOperationsService.Object);
         }
 
         [TestMethod()]
@@ -103,7 +106,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 case 3:
                     //arrange
                     _ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(3));
-                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
+                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
                     _ = _contributorService.Setup(x => x.GetContributorById(It.IsAny<int>(), It.IsAny<int>())).Returns(new Contributor() { Name = "NameContributor" });
 
                     //act
@@ -118,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 case 4:
                     dataentity.OperationModeId = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider;
                     _ = _othersDocsElecContributorService.Setup(x => x.GetDocElecContributorsByContributorId(It.IsAny<int>())).Returns(GetOtherDocElecContributor(4));
-                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
+                    _ = _othersDocsElecContributorService.Setup(x => x.List(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetPagedResult());
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTechnologicalProviders(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(new List<Contributor> { new Contributor() { Id = 1001, Name = "NameContributor" } });
 
                     //act
@@ -137,7 +140,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         [DataRow(1, DisplayName = "Return Index OthersElectronicDocAssociated")]
         [DataRow(2, DisplayName = "response.Code == 500")]
         [DataRow(3, DisplayName = "Finist")]
-        public void AddOrUpdateContributorTest(int input)
+        public async Task AddOrUpdateContributorTest(int input)
         {
             JsonResult jsonResult;
             ResponseMessage result;
@@ -158,7 +161,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _ = _othersDocsElecContributorService.Setup(x => x.GetTestResult(It.IsAny<int>(), It.IsAny<int>())).Returns((GlobalTestSetOthersDocuments)null);
 
                     //act
-                    jsonResult = (JsonResult)_current.AddOrUpdateContributor(model);
+                    jsonResult = (JsonResult) await _current.AddOrUpdateContributor(model);
                     result = jsonResult.Data as ResponseMessage;
 
                     //Assert
@@ -170,7 +173,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _ = _othersElectronicDocumentsService.Setup(x => x.AddOtherDocElecContributorOperation(It.IsAny<OtherDocElecContributorOperations>(), It.IsAny<OtherDocElecSoftware>(), It.IsAny<bool>(), It.IsAny<bool>())).Returns(new ResponseMessage() { Code = 500, Message = "PruebaCode500" });
 
                     //act
-                    _redirectToRouteResult = _current.AddOrUpdateContributor(model) as RedirectToRouteResult;
+                    _redirectToRouteResult = await _current.AddOrUpdateContributor(model) as RedirectToRouteResult;
 
                     //assert
                     Assert.IsNotNull(_redirectToRouteResult);
@@ -186,7 +189,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _ = _othersElectronicDocumentsService.Setup(x => x.ChangeParticipantStatus(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
                     //act
-                    _redirectToRouteResult = _current.AddOrUpdateContributor(model) as RedirectToRouteResult;
+                    _redirectToRouteResult = await _current.AddOrUpdateContributor(model) as RedirectToRouteResult;
 
                     //assert
                     Assert.IsNotNull(_redirectToRouteResult);
