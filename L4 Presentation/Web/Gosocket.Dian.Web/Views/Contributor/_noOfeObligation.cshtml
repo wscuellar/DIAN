@@ -1,0 +1,42 @@
+﻿@model Gosocket.Dian.Web.Models.ContributorViewModel
+@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure
+@{
+    var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "readonly" } };
+    var env = ConfigurationManager.GetValue("Environment");
+    var readOnlyHtmlAttr = new Dictionary<string, object> { { "class", "form-control" }, { "readonly", "readonly" } };
+    if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
+    {
+        readOnlyHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };
+    }
+    var resolutionGloss = ConfigurationManager.GetValue("ResolutionGloss");
+}
+
+<div class="row">
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.AcceptanceStatusName, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.AcceptanceStatusName, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.PrincipalActivityCode, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.PrincipalActivityCode, defaultHtmlAttr)
+        </div>
+    </div>
+    <div class="col-sm-3 padding-xs-0">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ExchangeEmail, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.ExchangeEmail, readOnlyHtmlAttr)
+            @Html.ValidationMessageFor(m => m.ExchangeEmail, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="alert custom-alert-primary" role="alert">
+        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+        @Html.Raw(resolutionGloss)
+        <strong><a class="custom-alert-link" href="@Url.Action("DownloadResolutions", "Contributor")">Para mayor información descargue la resolución aquí.</a></strong>
+    </div>
+</div>

@@ -254,8 +254,7 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> Export(ExportDocumentTableViewModel model)
         {
             await CreateGlobalTask(model);
-
-            return RedirectToAction(nameof(Export));
+            return Json(true);
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1108,6 +1107,12 @@ namespace Gosocket.Dian.Web.Controllers
             model.IsNextPage = cosmosResponse.hasMoreResults;
             Session["Continuation_Token_" + (model.Page + 1)] = cosmosResponse.continuation;
 
+            model.ContributorTypeId = User.ContributorTypeId() ?? 0;
+
+            model.DocumentTypes = model.ContributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged
+                ? model.DocumentTypes.Where(t => t.Code != "04").ToList()
+                : model.DocumentTypes;
+
             return View("Index", model);
         }
 
@@ -1231,10 +1236,12 @@ namespace Gosocket.Dian.Web.Controllers
                 case 2:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentSent;
                     ViewBag.ViewType = "Sent";
+                    ViewBag.ViewTypeSpanish = "enviados";
                     break;
                 case 3:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentReceived;
                     ViewBag.ViewType = "Received";
+                    ViewBag.ViewTypeSpanish = "recibidos";
                     break;
                 case 4:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentProvider;

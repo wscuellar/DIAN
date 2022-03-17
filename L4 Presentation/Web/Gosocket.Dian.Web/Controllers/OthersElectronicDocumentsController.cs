@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
-        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;    
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
@@ -376,9 +376,9 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
-            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;                
 
-            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+        ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             var tipo = model.OperationModeId;
             if (model.OperationModeId == 0)
             {
@@ -536,6 +536,9 @@ namespace Gosocket.Dian.Web.Controllers
                     ContributorId = User.ContributorId()
                 });
             }
+
+            NotificationsController notification = new NotificationsController();
+            await notification.EventNotificationsAsync("04", User.ContributorCode());
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
