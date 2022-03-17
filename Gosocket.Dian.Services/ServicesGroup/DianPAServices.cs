@@ -9,6 +9,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -513,13 +514,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var validations = new List<GlobalDocValidatorTracking>();
                     List<Task> arrayTasks = new List<Task>();
 
-                    //Task firstLocalRun = Task.Run(() =>
-                    //{
-                    //    var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                    //    response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                    //    if (!applicationResponse.Success)
-                    //        Debug.WriteLine(applicationResponse.Message);
-                    //});
+                    Task firstLocalRun = Task.Run(() =>
+                    {
+                        var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
+                        response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
+                        if (!applicationResponse.Success)
+                            Debug.WriteLine(applicationResponse.Message);
+                    });
 
                     Task secondLocalRun = Task.Run(() =>
                     {
@@ -535,13 +536,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
                     });
 
-                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(firstLocalRun);
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(fourLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
 
-                    var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
+                    //var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
+                    //response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
@@ -563,8 +564,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.StatusMessage = message;
                     }
 
-                    //if (failed.Any() && !applicationResponseExist)
-                    if (failed.Any())
+                    if (failed.Any() && !applicationResponseExist)
+                    //if (failed.Any())
                     {
                         var failedList = new List<string>();
                         foreach (var f in failed)
@@ -586,7 +587,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.ErrorMessage.AddRange(notificationList);
                     }
 
-                    //if (response.IsValid || applicationResponseExist)
+                    if (response.IsValid || applicationResponseExist)
                     if (response.IsValid)
                     {
                         response.IsValid = true;
