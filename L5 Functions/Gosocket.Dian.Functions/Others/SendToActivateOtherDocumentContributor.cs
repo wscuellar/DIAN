@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using Gosocket.Dian.Domain;
 using System.Globalization;
+using Gosocket.Dian.Web.Controllers;
 
 namespace Gosocket.Dian.Functions.Others
 {
@@ -35,6 +36,8 @@ namespace Gosocket.Dian.Functions.Others
             //Solo en ambiente de habilitacion.
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
+                NotificationsController notification = new NotificationsController();
+                await notification.EventNotificationsAsync("03", "2019043070");
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                 if (data == null)
@@ -95,7 +98,14 @@ namespace Gosocket.Dian.Functions.Others
 
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
+                    {
+                        await notification.EventNotificationsAsync("02", contributor.Code);
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
+                    }
+                    else
+                    {
+                        await notification.EventNotificationsAsync("03", contributor.Code);
+                    }
 
                     SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
@@ -164,6 +174,8 @@ namespace Gosocket.Dian.Functions.Others
                         Action = "finish SendToActivateOtherDocument"
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
+                    await notification.EventNotificationsAsync("01", contributor.Code);
+
 
                 }
                 catch (Exception ex)
