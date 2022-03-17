@@ -31,6 +31,11 @@
                     <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
                 </a>
 
+                <!-- Not oblige to invoice -->
+                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
+                    <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
+                </a>
+
                 <!-- certificate -->
                 <a href="#" class="list-group-item text-center certificate-login-link active">
                     <h4 class="glyphicon glyphicon-star"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)

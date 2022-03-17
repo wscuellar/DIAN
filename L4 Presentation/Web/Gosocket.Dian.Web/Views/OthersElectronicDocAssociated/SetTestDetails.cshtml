@@ -1,216 +1,149 @@
 ﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @{
-    ViewBag.Title = "Detalle de Set de Pruebas";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.Title = "Gráfico del SET de Pruebas";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
- 
 
 
-<div class="page-content radian-view margin-15">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
-        <div class="back-button"><a href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
-    </div>
-    <div class="margin-horizontal-0">
-        <div class="panel">
-            <div class="panel-body padding-top-20">
-                <div class="row warning-wrapper">
-                    <div class="col-sm-1 icon-warning">
-                        <i class="fa fa-exclamation-circle"></i>
-                    </div>
-                    <div class="col-sm-11">
-                        <span class="warning-title">¡Importante!</span>
-                        <p>
-                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@(ViewBag.OtherDocElecSoftwareStatusName)</b>.<br>
-                            Usted debe proporcinar el identificador del set de pruebas (TestSetld) <b>@(ViewBag.TestSetId)</b> en el web service  para el envío de su set de pruebas.
-                        </p>
-                    </div>
-                </div>
-                <div class="row margin-horizontal-0 margin-top-20">
-                    <p class="title-view" style="padding-top: 5px; font-size: 18px !important;">
-                        Resumen documentos recibidos y aceptados para el Set de Pruebas
-                    </p>
-                    <div class="underline-title underline-title-grey"></div>
 
-                    <figure class="highcharts-figure-settest">
-                        <div id="setTestDetails"></div>
-                    </figure>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="page-content radian-view margin-15 margin-page-content">
+	<div class="title-container">
+		<p class="title-view">
+			@ViewBag.title
+		</p>
+		<div class="underline-title"></div>
+		<div class="back-button"><a href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
+	</div>
+	<div class="margin-horizontal-0">
+		<div class="panel">
+			<div class="panel-body padding-top-20">
+				<div class="row warning-wrapper">
+					<div class="col-sm-1 icon-warning">
+						<i class="fa fa-exclamation-circle"></i>
+					</div>
+					<div class="col-sm-11">
+						<span class="warning-title">¡Importante!</span>
+						<p>
+							Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@(ViewBag.OtherDocElecSoftwareStatusName)</b>.<br>
+							Usted debe proporcinar el identificador del set de pruebas (TestSetld) <b>@(ViewBag.TestSetId)</b> en el web service  para el envío de su set de pruebas.
+						</p>
+					</div>
+				</div>
+				<div class="row margin-horizontal-0 margin-top-20">
+					<p class="title-view" style="padding-top: 5px; font-size: 18px !important;">
+						Resumen documentos recibidos y aceptados para el Set de Pruebas
+					</p>
+					<div class="underline-title underline-title-grey"></div>
+
+					<figure class="highcharts-figure-settest">
+						<div id="setTestDetails"></div>
+					</figure>
+				</div><div class="row margin-horizontal-0 margin-top-20">
+                          <div class="panel-footer text-right">
+
+
+                              <a class="btn btn-success btn-radian-success" href="@Url.Action("GetSetTestResult", new { Id = ViewBag.Id })">Detalles</a>
+                              @if (Model.EsElectronicDocNomina)
+                              {
+                                  @Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+                            }
+                            else
+                            {
+                              @Html.ActionLink("Cerrar", "GetSetTestResult", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+                            }
+                          </div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts{
 
     <script>
         $(document).ready(function () {
-
             var data = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model,Newtonsoft.Json.Formatting.Indented));
+            showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
+        });
 
-            if ('@Model.EsElectronicDocNomina'== 'True')
-                showChartNomina(data.GTestSetOthersDocumentsResult, data.TitleDoc1, data.TitleDoc2);
-            else
-                showChart(data.GTestSetOthersDocumentsResult, data.TitleDoc1);
-
-            function showChartNomina(data, TitleDoc1, TitleDoc2) {
-                            var dataChart = data;
-                            Highcharts.chart('setTestDetails', {
-                                chart: {
-                                    type: 'bar'
-                                },
-                                title: {
-                                    text: ''
-                                },
-                                xAxis: {
-                                    alternateGridColor: '#EBEEEC',
-                                    categories: [
-                                        TitleDoc1,
-                                        TitleDoc2
-                                    ]
-                                },
-                                yAxis: {
-                                    min: 0,
-                                    title: {
-                                        text: ''
-                                    }
-                                },
-                                legend: {
-                                    align: 'right',
-                                    verticalAlign: 'top',
-                                    x: 0,
-                                    y: 15
-                                },
-                                plotOptions: {
-                                    series: {
-                                        stacking: 'normal',
-                                        borderRadius: 8
-                                    }
-                                },
-                                series: [
-                                    {
-                                        name: 'Requeridos',
-                                        color: '#6A197D',
-                                        data: [
-                                            dataChart.OthersDocumentsRequired,
-                                            dataChart.ElectronicPayrollAjustmentRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Min requerido aceptado',
-                                        color: '#D9F489',
-                                        data: [
-                                            dataChart.OthersDocumentsAcceptedRequired,
-                                            dataChart.ElectronicPayrollAjustmentAcceptedRequired
-                                        ]
-                                    },
-                                    {
-                                        name: 'Recibidos',
-                                        color: '#FFD271',
-                                        data: [
-                                            dataChart.TotalOthersDocumentsSent,
-                                            dataChart.TotalElectronicPayrollAjustmentSent
-                                        ]
-                                    },
-                                    {
-                                        name: 'Aceptados',
-                                        color: '#348441',
-                                        data: [
-                                            dataChart.OthersDocumentsAccepted,
-                                            dataChart.ElectronicPayrollAjustmentAccepted
-                                        ]
-                                    },
-                                    {
-                                        name: 'Rechazados',
-                                        color: '#FF414D',
-                                        data: [
-                                            dataChart.OthersDocumentsRejected,
-                                            dataChart.ElectronicPayrollAjustmentRejected
-                                        ]
-                                    }
-                                ]
-                            });
-                        }
-
-            function showChart(data, TitleDoc1) {
-                    var dataChart = data;
-                    Highcharts.chart('setTestDetails', {
-                        chart: {
-                            type: 'bar'
-                        },
-                        title: {
-                            text: ''
-                        },
-                        xAxis: {
-                            alternateGridColor: '#EBEEEC',
-                            categories: [
-                                TitleDoc1
-                            ]
-                        },
-                        yAxis: {
-                            min: 0,
-                            title: {
-                                text: ''
-                            }
-                        },
-                        legend: {
-                            align: 'right',
-                            verticalAlign: 'top',
-                            x: 0,
-                            y: 15
-                        },
-                        plotOptions: {
-                            series: {
-                                stacking: 'normal',
-                                borderRadius: 8
-                            }
-                        },
-                        series: [
-                            {
-                                name: 'Requeridos',
-                                color: '#6A197D',
-                                data: [
-                                    dataChart.OthersDocumentsRequired
-                                ]
-                            },
-                            {
-                                name: 'Min requerido aceptado',
-                                color: '#D9F489',
-                                data: [
-                                    dataChart.OthersDocumentsAcceptedRequired
-                                ]
-                            },
-                            {
-                                name: 'Recibidos',
-                                color: '#FFD271',
-                                data: [
-                                    dataChart.TotalOthersDocumentsSent
-                                ]
-                            },
-                            {
-                                name: 'Aceptados',
-                                color: '#348441',
-                                data: [
-                                    dataChart.OthersDocumentsAccepted
-                                ]
-                            },
-                            {
-                                name: 'Rechazados',
-                                color: '#FF414D',
-                                data: [
-                                    dataChart.OthersDocumentsRejected
-                                ]
-                            }
+        function showChart(data, TitleDoc1, TitleDoc2) {
+            var dataChart = data;
+            Highcharts.chart('setTestDetails', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    alternateGridColor: '#EBEEEC',
+                    categories: [
+                        TitleDoc1,
+                        TitleDoc2
+                    ]
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    }
+                },
+                legend: {
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: 0,
+                    y: 15
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal',
+                        borderRadius: 8
+                    }
+                },
+                series: [
+                    {
+                        name: 'Requeridos',
+                        color: '#6A197D',
+                        data: [
+                            dataChart.OthersDocumentsRequired,
+                            dataChart.ElectronicPayrollAjustmentRequired
                         ]
-                    });
-                }
+                    },
+                    {
+                        name: 'Min requerido aceptado',
+                        color: '#D9F489',
+                        data: [
+                            dataChart.OthersDocumentsAcceptedRequired,
+                            dataChart.ElectronicPayrollAjustmentAcceptedRequired
+                        ]
+                    },
+                    {
+                        name: 'Recibidos',
+                        color: '#FFD271',
+                        data: [
+                            dataChart.TotalOthersDocumentsSent,
+                            dataChart.TotalElectronicPayrollAjustmentSent
+                        ]
+                    },
+                    {
+                        name: 'Aceptados',
+                        color: '#348441',
+                        data: [
+                            dataChart.OthersDocumentsAccepted,
+                            dataChart.ElectronicPayrollAjustmentAccepted
+                        ]
+                    },
+                    {
+                        name: 'Rechazados',
+                        color: '#FF414D',
+                        data: [
+                            dataChart.OthersDocumentsRejected,
+                            dataChart.ElectronicPayrollAjustmentRejected
+                        ]
+                    }
+                ]
             });
-
+        }
     </script>
 }
-
-

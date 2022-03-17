@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 
 namespace Gosocket.Dian.Domain.Entity
 {
@@ -53,5 +54,8 @@ namespace Gosocket.Dian.Domain.Entity
         public string Id { get; set; }
         // Estado: En Proceso, etc.
         public string State { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

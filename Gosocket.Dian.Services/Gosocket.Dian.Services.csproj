@@ -67,6 +67,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InstanceCache.cs" />
+    <Compile Include="Cude\DocumentoEquivalente.cs" />
+    <Compile Include="Cude\DocumentoEquivalenteXpath.cs" />
+    <Compile Include="Cude\XmlToDocumentoEquivalenteParser.cs" />
+    <Compile Include="Cuds\DocumentoSoporte.cs" />
+    <Compile Include="Cuds\DocumentoSoporteXpath.cs" />
+    <Compile Include="Cuds\XmlToDocumentoSoporteParser.cs" />
     <Compile Include="Models\CufeModel.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
     <Compile Include="Models\ValidatePayroll.cs" />
