@@ -136,5 +136,14 @@ namespace Gosocket.Dian.Web.Services
         [OperationContract]
         [CustomOperation]
         DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup);
+
+        /// <summary>
+        /// Consulta el estado de una solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
+        /// </summary>
+        /// <param name="trackId" type="string"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]
+        DianResponse GetStatusBulkDocumentDownload(string trackId);
     }
 }

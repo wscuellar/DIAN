@@ -949,5 +949,56 @@ namespace Gosocket.Dian.Web.Services
                 return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
             }
         }
+
+        /// <summary>
+        /// Consult the status of report of Send or Received Documents
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <returns></returns>
+        public DianResponse GetStatusBulkDocumentDownload(string trackId)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if (string.IsNullOrEmpty(authCode))
+                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
+
+                if (string.IsNullOrWhiteSpace(trackId))
+                {
+                    Log($"{authCode} {email} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, "El trackId de la solciitud es obligatorio.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El trackId de la solciitud es obligatorio." };
+                }
+
+                DianPAServices customerDianPa = new DianPAServices();
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                var result = customerDianPa.GetStatusBulkDocumentsDownload(trackId);
+
+                stopwatch.Stop();
+                double ms = stopwatch.ElapsedMilliseconds;
+                double seconds = ms / 1000;
+
+                stopwatch.Reset();
+                Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatusBulkDocumentDownload " + seconds);
+                if (seconds >= 10)
+                {
+                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
+                    tableManagerGlobalLogger.InsertOrUpdate(logger);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log($"{trackId} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"GetStatusBulkDocumentDownloadException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusBulkDocumentDownload, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+            }
+        }
     }
 }

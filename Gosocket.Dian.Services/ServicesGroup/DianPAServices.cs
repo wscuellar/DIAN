@@ -1769,6 +1769,40 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             return dianResponse;
         }
+
+        public DianResponse GetStatusBulkDocumentsDownload(string trackId)
+        {
+            var timer = new Stopwatch();
+            DianResponse dianResponse = new DianResponse
+            {
+                IsValid = false,
+                StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
+                StatusDescription = "",
+                ErrorMessage = new List<string>()
+            };
+
+            timer.Start();
+            var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("GetStatusBulkDocumentsDownloadUrl"), new { trackId });
+            timer.Stop();
+            if (response.IsCorrect)
+            {
+                dianResponse.StatusDescription = $"----";
+            }
+            else
+            {
+                dianResponse.StatusCode = "89";
+                dianResponse.StatusDescription = "";
+            }
+
+            var globalEnd = timer.ElapsedMilliseconds / 1000;
+            if (globalEnd >= 10)
+            {
+                var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
+                TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+            }
+
+            return dianResponse;
+        }
     }
 
     public class BulkDocumentDownloadRequest
