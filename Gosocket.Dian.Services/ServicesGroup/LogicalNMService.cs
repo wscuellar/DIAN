@@ -148,7 +148,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // Duplicity
             start = DateTime.UtcNow;
             var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber);
-            if (response != null)
+            if (!response.IsValid)
             {
                 var log = new GlobalLogger(trackId, "CheckDocumentDuplicity") { Message = sb.ToString(), Action = $"CheckDocumentDuplicity" };
                 TableManagerGlobalLogger.InsertOrUpdate(log);
@@ -364,6 +364,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
             }
+            else
+                response.IsValid = true;
 
             return response;
         }
