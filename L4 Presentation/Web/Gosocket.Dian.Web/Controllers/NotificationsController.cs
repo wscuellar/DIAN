@@ -121,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
                     break;
                 case "04":
                     notification.Menssage = "Estimad@ usuari@ Nombre de la Empresa " + business + " Se informa que se encuentra registrado y ha seleccionado el modo de operación software Solución Gratuita / Proveedor tecnológico / Software Propio, se recuerda que debe surtir el proceso de pruebas para finalizar la habilitación.";
-                    notification.Matters = "Aceptación Expresa";
+                    notification.Matters = "Inicio Modo de Operación";
                     SentEmail(notification);
                     break;        
 
