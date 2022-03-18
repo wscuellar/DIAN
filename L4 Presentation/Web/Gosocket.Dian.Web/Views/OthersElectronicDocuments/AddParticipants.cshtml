@@ -139,7 +139,7 @@
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
-	<script>
+    <script>
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
@@ -187,6 +187,17 @@
                         ContributorId: '@ViewBag.ContributorId'
                     };
 
+                    if (electronicDocumentId == @((int)Gosocket.Dian.Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE)) {
+                        var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                        + `?ElectronicDocumentId=${electronicDocumentId}`
+                        + "&OperationModeId=0"
+                        + "&ContributorIdType=" + ContributorIdType
+                        + "&ContributorId=" + @ViewBag.ContributorId;
+
+                        window.location.href = url;
+                        return;
+                    }
+
                     CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModel,
                         function (param) {
                             // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
@@ -202,12 +213,12 @@
                                             hideLoading('#panel-form');
 
                                            var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
-                                        + "?ElectronicDocumentId=1" 
-                                        + "&OperationModeId=0"
-                                        + "&ContributorIdType=" + ContributorIdType
-                                        + "&ContributorId=" + @ViewBag.ContributorId;
+                                            + `?ElectronicDocumentId=${electronicDocumentId}`
+                                            + "&OperationModeId=0"
+                                            + "&ContributorIdType=" + ContributorIdType
+                                            + "&ContributorId=" + @ViewBag.ContributorId;
 
-                                        window.location.href = url;
+                                            window.location.href = url;
 
                                           //  $("#dialogModeOperation").modal('show');
 
@@ -276,6 +287,6 @@
             }
 
         });
-	</script>
+    </script>
 
 }

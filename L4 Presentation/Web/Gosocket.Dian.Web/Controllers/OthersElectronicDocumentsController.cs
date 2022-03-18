@@ -879,7 +879,15 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult CancelRegister(int id, string description)
         {
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
-            return Json(response, JsonRequestBehavior.AllowGet);
+            return Json(new
+            {
+                response.Code,
+                response.data,
+                response.Message,
+                response.MessageType,
+                response.RedirectTo,
+                ExistOperationModeAsociated = response.ExistOperationModeAsociated
+            }, JsonRequestBehavior.AllowGet);
         }
 
 
