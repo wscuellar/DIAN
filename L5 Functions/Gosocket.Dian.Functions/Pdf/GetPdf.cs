@@ -152,7 +152,7 @@ namespace Gosocket.Dian.Functions.Pdf
             {
                 //return req.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                result.Content = new StringContent("No podemos generar el PDF en este momento debido al siguiente error: " + ex.Message);
+                result.Content = new StringContent("No podemos generar el PDF en este momento debido al siguiente error: " + ex.StackTrace);
                 result.Content.Headers.ContentType =
                     new MediaTypeHeaderValue("text/plain");
 
