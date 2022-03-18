@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using QRCoder;
 using System.Drawing;
 using Gosocket.Dian.DataContext;
+using Newtonsoft.Json;
 
 namespace Gosocket.Dian.Functions.Pdf
 {
@@ -33,17 +34,16 @@ namespace Gosocket.Dian.Functions.Pdf
 		{
 			try
 			{
-				// Definir contenedor de parámetro
-				string base64Xml = req.GetQueryNameValuePairs()
-					.FirstOrDefault(q => string.Compare(q.Key, "base64Xml", true) == 0)
-					.Value;
 
-				// Obtener parámetros de consulta
-				dynamic data = await req.Content.ReadAsAsync<object>();
+
+				param data = await req.Content.ReadAsAsync<param>();
+
+				
 
 				// Establecer nombre para consultar la cadena o los datos del cuerpo
-				base64Xml = base64Xml ?? data?.base64Xml;
-
+				var base64Xml = data.base64Xml;
+				var FechaValidacionDIAN =data.FechaValidacionDIAN;
+				var FechaGeneracionDIAN = data.FechaGeneracionDIAN;
 				if (base64Xml == null)
 					return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a base64Xml on the query string or in the request body");
 
@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				html = CruzarModeloNotasFinales(html, xelement);
 				html = CruzarReferencias(html, xelement);
 
-				if (tipo == "50"|| tipo == "55" )
+				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32")
 				{
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
@@ -98,6 +98,8 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 				html = html.Replace("{QrCodeBase64}", qr);
+				html = html.Replace("{FechaValidacionDIAN}", FechaValidacionDIAN);
+				html = html.Replace("{FechaGeneracionDIAN}", FechaGeneracionDIAN);
 
 
 				byte[] bytes = OpenHtmlToPdf.Pdf
@@ -697,6 +699,66 @@ namespace Gosocket.Dian.Functions.Pdf
 			else
 				Html = Html.Replace("{FechaCumplimiento}", string.Empty);
 
+
+			//espectaculos
+
+			if (IssueDate.Any())
+				Html = Html.Replace("{FechaDocumento}", IssueDate.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{FechaDocumento}", string.Empty);
+
+			if (IssueTime.Any())
+				Html = Html.Replace("{HoraDocumento}", IssueTime.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{HoraDocumento}", string.Empty);
+
+
+			var NombreEvento = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "EventName");
+			if (NombreEvento.Any())
+				Html = Html.Replace("{NombreEvento}", NombreEvento.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{NombreEvento}", string.Empty);
+
+			var PULEP = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "PULEPCode");
+			if (PULEP.Any())
+				Html = Html.Replace("{PULEP}", PULEP.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{PULEP}", string.Empty);
+
+
+			var UbicacionBoleta = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "TicketLocation");
+			if (UbicacionBoleta.Any())
+				Html = Html.Replace("{UbicacionBoleta}", PULEP.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{UbicacionBoleta}", string.Empty);
+
+			var FechaEvento = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "DateEvent");
+			if (FechaEvento.Any())
+				Html = Html.Replace("{FechaEvento}", FechaEvento.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{FechaEvento}", string.Empty);
+
+
+			var HoraEvento = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "TimeEvent");
+			if (HoraEvento.Any())
+				Html = Html.Replace("{HoraEvento}", HoraEvento.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{HoraEvento}", string.Empty);
+
+			var EtapaCompra = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "SalePhase");
+			if (EtapaCompra.Any())
+				Html = Html.Replace("{EtapaCompra}", EtapaCompra.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{EtapaCompra}", string.Empty);
+			var Retefuente = model.Elements(cac + "WithholdingTaxTotal").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
+			if (Retefuente.Any())
+				Html = Html.Replace("{Retefuente}", EtapaCompra.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{Retefuente}", string.Empty);
+
+
+
+
 			return Html;
 		}
 
@@ -721,11 +783,12 @@ namespace Gosocket.Dian.Functions.Pdf
 				{
 
 					var tipo = detalle.Elements(cbc + "ChargeIndicator").FirstOrDefault().Value.ToUpper() == "TRUE" ? "Recargo" : "Descuento";
+					var reason = detalle.Elements(cbc + "AllowanceChargeReasonCode").Any() ? detalle.Elements(cbc + "AllowanceChargeReasonCode").FirstOrDefault().Value : "";
 					rowDescuentosYRecargos.Append($@"
                 <tr>
 		            <td class='text-right'>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td class='text-left'>{tipo}</td>
-		            <td>{detalle.Elements(cbc + "AllowanceChargeReasonCode").FirstOrDefault().Value}</td>
+		            <td>{reason}</td>
 		            <td class='text-left'>{detalle.Elements(cbc + "AllowanceChargeReason").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cbc + "MultiplierFactorNumeric").FirstOrDefault().Value}</td>
 		            <td class='text-right'>{detalle.Elements(cbc + "Amount").FirstOrDefault().Value:n2}</td>
@@ -855,9 +918,20 @@ namespace Gosocket.Dian.Functions.Pdf
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentTransporte_template.html");
 			else if (tipo == "55")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBolsa_template.html");
+			else if (tipo == "45")
+				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentExtracto_template.html");
+			else if (tipo == "32")
+				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
 			else return null;
 		}
 
 
+	}
+
+	 partial class param
+	{
+		public string base64Xml { get; set; }
+		public string FechaValidacionDIAN { get; set; }
+		public string FechaGeneracionDIAN { get; set; }
 	}
 }
