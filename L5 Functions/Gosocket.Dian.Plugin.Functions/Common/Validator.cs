@@ -724,7 +724,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
             if (documentMeta.DocumentTypeId == "05")
+            {
                 errorCode = "DSAD06";
+                prop = "CUDS";
+            }
             else if (documentMeta.DocumentTypeId == "91")
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
