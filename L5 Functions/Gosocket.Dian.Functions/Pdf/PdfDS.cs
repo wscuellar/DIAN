@@ -38,11 +38,11 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				param data = await req.Content.ReadAsAsync<param>();
 
-				
+
 
 				// Establecer nombre para consultar la cadena o los datos del cuerpo
 				var base64Xml = data.base64Xml;
-				var FechaValidacionDIAN =data.FechaValidacionDIAN;
+				var FechaValidacionDIAN = data.FechaValidacionDIAN;
 				var FechaGeneracionDIAN = data.FechaGeneracionDIAN;
 				if (base64Xml == null)
 					return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a base64Xml on the query string or in the request body");
@@ -166,6 +166,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
+				var taxt = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
+				var tax = taxt.Any() ? taxt.FirstOrDefault().Value : "";
 				rowDetalleProductosBuilder.Append($@"
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
@@ -175,7 +177,7 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
 		            <td class='text-right'>{detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount").FirstOrDefault().Value:n2}</td>
-                    <td class='text-right'>{detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent").FirstOrDefault().Value:n2}</td>
+                    <td class='text-right'>{tax:n2}</td>
 
 
 		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
@@ -928,7 +930,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 	}
 
-	 partial class param
+	partial class param
 	{
 		public string base64Xml { get; set; }
 		public string FechaValidacionDIAN { get; set; }
