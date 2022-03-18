@@ -3,9 +3,11 @@ using Org.BouncyCastle.Utilities.Collections;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Store;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application.Common
 {
@@ -22,9 +24,25 @@ namespace Gosocket.Dian.Application.Common
         /// <returns></returns>
         public static bool IsRevoked(this X509Certificate certificate, IEnumerable<X509Crl> crls)
         {
+            //
             if (crls == null || !crls.Any()) return false;
+            ConcurrentBag<bool> b=new ConcurrentBag<bool>();
+            Parallel.ForEach(crls,
+                (c, state) => {
+                    if (c.IsRevoked(certificate))
+                    {
+                        b.Add(true);
+                        state.Break();
+                    }
+                }
+                );
 
-            if (crls.Any(c => c.IsRevoked(certificate))) return true;
+            if (b.Count > 0)
+            {
+                return true;
+            }
+
+            //if (crls.AsParallel().Any(c => c.IsRevoked(certificate))) return true;
 
             return false;
         }
