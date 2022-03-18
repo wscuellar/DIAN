@@ -928,14 +928,14 @@ namespace Gosocket.Dian.Web.Controllers
             throw new Exception(response.Message);
         }
 
-        public static ResponseDownloadXml DownloadXml<T>(T requestObj)
+        public static async Task<ResponseDownloadXml> DownloadXml<T>(T requestObj)
         {
-            return ApiHelpers.ExecuteRequest<ResponseDownloadXml>(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+            return await ApiHelpers.ExecuteRequestAsync<ResponseDownloadXml>(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
         }
 
-        public static List<GlobalDocValidatorTracking> GetValidations<T>(T requestObj)
+        public static async Task<List<GlobalDocValidatorTracking>> GetValidations<T>(T requestObj)
         {
-            return ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
+            return await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
         }
 
         private static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)

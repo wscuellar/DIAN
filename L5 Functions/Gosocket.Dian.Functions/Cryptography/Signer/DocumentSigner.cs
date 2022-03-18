@@ -66,27 +66,27 @@ namespace Gosocket.Dian.Functions.Cryptography.Signer
             return certificate;
         }
 
-        public ExportCertificatResult GetCertificatFromKeyVault()
-        {
-            ExportCertificatResult certificate = null;
-            var cacheItem = InstanceCache.CertificateInstanceCache.GetCacheItem("Certificate");
+        //public ExportCertificatResult GetCertificatFromKeyVault()
+        //{
+        //    ExportCertificatResult certificate = null;
+        //    var cacheItem = InstanceCache.CertificateInstanceCache.GetCacheItem("Certificate");
 
-            if (cacheItem == null)
-            {
-                var requestObj = new { Name = ConfigurationManager.GetValue("KeyVaultCertificateName") };
-                certificate = ApiHelpers.ExecuteRequest<ExportCertificatResult>(ConfigurationManager.GetValue("ExportCertificateUrl"), requestObj);
-                if (certificate == null) return null;
-                CacheItemPolicy policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
-                };
-                InstanceCache.CertificateInstanceCache.Set(new CacheItem("Certificate", certificate), policy);
-            }
-            else
-                certificate = (ExportCertificatResult)cacheItem.Value;
+        //    if (cacheItem == null)
+        //    {
+        //        var requestObj = new { Name = ConfigurationManager.GetValue("KeyVaultCertificateName") };
+        //        certificate = ApiHelpers.ExecuteRequest<ExportCertificatResult>(ConfigurationManager.GetValue("ExportCertificateUrl"), requestObj);
+        //        if (certificate == null) return null;
+        //        CacheItemPolicy policy = new CacheItemPolicy
+        //        {
+        //            AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(24)
+        //        };
+        //        InstanceCache.CertificateInstanceCache.Set(new CacheItem("Certificate", certificate), policy);
+        //    }
+        //    else
+        //        certificate = (ExportCertificatResult)cacheItem.Value;
 
-            return certificate;
-        }
+        //    return certificate;
+        //}
 
         private X509Certificate2 GetCertificateByThumbprint()
         {

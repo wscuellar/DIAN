@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -1265,11 +1266,11 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int id)
+        public async Task<JsonResult> SyncToProduction(int id)
         {
             try
             {
-                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
                 if (!response.Success)
                     return Json(new
                     {
@@ -1295,7 +1296,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
-        public JsonResult SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
+        public async Task<JsonResult> SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
         {
 
             DateTime.TryParseExact(habilitationDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _habilitationDate);
@@ -1328,7 +1329,7 @@ namespace Gosocket.Dian.Web.Controllers
                     // Get token
                     var result = GetAssignResponsabilityToken();
                     // Assign responsoabilty
-                    var response = AssignResponsability(contributor, result);
+                    var response = await AssignResponsability(contributor, result);
                     int.TryParse(response.Code, out int statusCode);
                     if (statusCode == (int)HttpStatus.Success)
                     {
@@ -1804,15 +1805,15 @@ namespace Gosocket.Dian.Web.Controllers
                     return "text-red";
             }
         }
-        private ResponseAssignResponsabilityToken GetAssignResponsabilityToken()
+        private async Task<ResponseAssignResponsabilityToken> GetAssignResponsabilityToken()
         {
             var loginUrl = ConfigurationManager.GetValue("AssignResponsabilityLoginUrl").Replace("#", "&");
             //loginUrl = loginUrl.Replace("#", "&");
             var obj = new { };
-            var response = ApiHelpers.ExecuteRequest<ResponseAssignResponsabilityToken>(loginUrl, obj);
+            var response = await ApiHelpers.ExecuteRequestAsync<ResponseAssignResponsabilityToken>(loginUrl, obj);
             return response;
         }
-        private ResponseAssignResponsability AssignResponsability(Contributor contributor, ResponseAssignResponsabilityToken responseAssignResponsabilityToken)
+        private async Task<ResponseAssignResponsability> AssignResponsability(Contributor contributor, ResponseAssignResponsabilityToken responseAssignResponsabilityToken)
         {
             var headers = new Dictionary<string, string>
                 {
@@ -1824,7 +1825,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var assignResponsabilityUrl = ConfigurationManager.GetValue("AssignResponsabilityUrl");
             var request = new { idTransaccion = StringUtil.GenerateRandomString(), nroIdentificacion = contributor.Code, fechaCambio = contributor.ProductionDate?.ToString("yyyyMMdd") };
-            var response = ApiHelpers.ExecuteRequestWithHeader<ResponseAssignResponsability>(assignResponsabilityUrl, request, headers);
+            var response = await ApiHelpers.ExecuteRequestWithHeaderAsync<ResponseAssignResponsability>(assignResponsabilityUrl, request, headers);
             return response;
         }
         private void SetView(string type)

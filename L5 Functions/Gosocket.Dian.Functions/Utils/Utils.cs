@@ -100,25 +100,25 @@ namespace Gosocket.Dian.Functions.Utils
             }
         }
 
-        public static List<GlobalDocValidatorTracking> GetValidationsByTrackId(string trackId)
-        {
-            try
-            {
+        //public static List<GlobalDocValidatorTracking> GetValidationsByTrackId(string trackId)
+        //{
+        //    try
+        //    {
 
-                return ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+        //        return ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
 
-                //dynamic requestObj = new ExpandoObject();
-                //requestObj.trackId = trackId;
-                //var response = ConsumeApi(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
-                //var result = response.Content.ReadAsStringAsync().Result;
-                //var validations = (List<GlobalDocValidatorTracking>)JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
-                //return validations;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+        //        //dynamic requestObj = new ExpandoObject();
+        //        //requestObj.trackId = trackId;
+        //        //var response = ConsumeApi(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
+        //        //var result = response.Content.ReadAsStringAsync().Result;
+        //        //var validations = (List<GlobalDocValidatorTracking>)JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
+        //        //return validations;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
 
         public static async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {

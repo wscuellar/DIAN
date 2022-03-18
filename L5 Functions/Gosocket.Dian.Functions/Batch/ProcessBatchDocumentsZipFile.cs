@@ -110,7 +110,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 //Obtener xpath tipo documento
                 var xpathRequest = requestObjects.FirstOrDefault();
-                var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                var xpathResponse = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
                 Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
@@ -168,7 +168,7 @@ namespace Gosocket.Dian.Functions.Batch
                 if (setResultOther == null && string.IsNullOrEmpty(testSetId))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
-                    xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                    xpathResponse = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
                     var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];                  
 
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
