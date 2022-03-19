@@ -8,6 +8,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.ServicesGroup;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -63,6 +64,12 @@ namespace Gosocket.Dian.Web.Controllers
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+
+        private static readonly FileManager fileManager = new FileManager();
+        private static readonly string blobContainer = "global";
+        private static readonly string blobContainerFolder = "docvalidator";
+        private static readonly string blobContainerFolderTwo = "new-dian-ubl21";
+        private static readonly string blobContainerResponse = "batchValidator";
 
         private readonly IRadianContributorService _radianContributorService;
 
@@ -211,6 +218,55 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Debug.WriteLine(ex.Message);
                 return File(new byte[1], "application/zip", $"error");
+            }
+        }
+
+        public ActionResult DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+
+                var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
+                var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
+
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
+
+                var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
+                //var xmlBytes = DownloadXml(trackId);
+
+                var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
+                {
+                    new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
+                    xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
+                }, trackId);
+
+                return File(zipFile, "application/zip", $"{trackId}.zip");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+        }
+
+        public byte[] SearchXmlEquivalente(string trackId, string GenerationDate)
+        {
+            try
+            {
+                //UploadDocumentResponse result;
+                //var check = CheckTrackIdFormat(trackId, authCode, email);
+
+                DianPAServices customerDianPa = new DianPAServices();
+                {
+                    var resp = fileManager.GetBytes(blobContainer, $"{blobContainerFolder}/{blobContainerFolderTwo}/{GenerationDate.Substring(6, 4)}/{GenerationDate.Substring(3, 2)}/{trackId}.xml");
+                    return resp;                    
+                }                
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
         }
 
