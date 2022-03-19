@@ -247,7 +247,7 @@ namespace Gosocket.Dian.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return File(new byte[1], "application/zip", $"error");
+                return File(new byte[1], "application/zip", $"error"+ ex.Message);
             }
         }
 
