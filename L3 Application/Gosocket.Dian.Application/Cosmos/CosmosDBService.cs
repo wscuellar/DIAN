@@ -524,6 +524,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 e.DocumentTypeId == "09" ||
                 e.DocumentTypeId == "11" ||
                 e.DocumentTypeId == "12" ||
+                e.DocumentTypeId == "20" ||
                 e.DocumentTypeId == "101"||
                 e.DocumentTypeId == "91" ||
                 e.DocumentTypeId == "92"
