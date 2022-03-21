@@ -116,7 +116,14 @@
 <div class="page-content margin-15 margin-page-content">
     <div class="row title-container" style="margin-left: 1px;">
         <p class="title-view">
-            @ViewBag.title
+            @if (Model.ElectronicDocumentId == 14)
+            {
+                <span style="font-size:22px">Registro y habilitación / Documentos electronicos / Documentos equivalentes / @ViewBag.title</span>
+            }
+            else
+            {
+                @ViewBag.title
+            }
         </p>
         <div class="underline-title"></div>
         <div class="divBackTop">
@@ -460,14 +467,26 @@
 
 
 
-		function EliminarRegistro(id) {
-			$("#dialogcancelarregistro").modal('show');
+        function EliminarRegistro(id) {
+            if (@Model.ElectronicDocumentId == 14) {
+                let confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
 
-			("#Btnsavecancel")[0].onclick = null;
-			$("#Btnsavecancel").click(function () {
-				ElimnarOp(id)
+                showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
+                    function () {
+                        removeOperationAsociated(id);
+                    }
+                , "", () => hideLoading('#panel-wrapper')));
+            }
+            else
+            {
+                $("#dialogcancelarregistro").modal('show');
 
-			});
+                ("#Btnsavecancel")[0].onclick = null;
+                $("#Btnsavecancel").click(function () {
+                    ElimnarOp(id)
+
+                });
+            }
 		}
 
 		function ElimnarOp(id)
@@ -522,9 +541,13 @@
                         }
 
                         bootbox.dialog({
-                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
+                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
                             onEscape: () => {
                                 var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                                if (@Model.ElectronicDocumentId == 14) {
+                                    window.location.reload();
+                                    return;
+                                }
                                 if (@Model.ElectronicDocumentId == 3) {
                                     window.location.reload();
                                     return;
