@@ -7593,8 +7593,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {
+            DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
-            ValidatorEngine validatorEngine = new ValidatorEngine();
+            ValidatorEngine validatorEngine = new ValidatorEngine();          
             NitModel nitModel = new NitModel();
             XmlParser xmlParserCude = null;
             string totalInvoice = string.Empty;
@@ -7607,6 +7608,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    if (string.IsNullOrWhiteSpace(eventPrev.TrackId))
+                    {
+                         validateResponses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_042"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                        return validateResponses;
+                    }
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
@@ -7767,7 +7781,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
                             || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38")
+                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38" 
+                            || itemResponsesTacita.ErrorCode == "AAH06")
                             validEventPrev = false;
                     }
                     validateResponses.AddRange(responses);
