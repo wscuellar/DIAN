@@ -247,7 +247,7 @@ namespace Gosocket.Dian.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                throw ex;
+                return Json(new { status = "error", message = ex.Message+" "+ex.StackTrace });
             }
         }
 
