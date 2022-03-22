@@ -220,15 +220,37 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+        public static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
+        {
 
-        public ActionResult DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return await client.PostAsync(url, byteContent);
+
+        }
+
+        public static async Task<ResponseDownloadXml> DownloadXmlAsync<T>(T requestObj)
+        {
+            var response = await ConsumeApiAsync(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+            var result = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ResponseDownloadXml>(result);
+        }
+
+        public async Task< ActionResult> DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
         {
             try
             {
 
-                var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
-                var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
+                //var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
+                //var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
+                
 
+                var requestObj2 = new { trackId };
+                var response = await DownloadXmlAsync(requestObj2);
+
+                var base64Xml = response.XmlBase64;
+                var xmlEquivalenteBytes = Convert.FromBase64String(response.XmlBase64);
                 string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
                 var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
                 HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
