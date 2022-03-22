@@ -10,6 +10,8 @@
         public int ElectronicDocumentId { get; set; }
         public string ComplementoTexto { get; set; }
 
+        public string Message { get; set; }
+
         public Domain.Common.OtherDocElecContributorType ContributorIdType { get; set; }
 
         public Domain.Common.OtherDocElecOperationMode OperationModeId { get; set; }

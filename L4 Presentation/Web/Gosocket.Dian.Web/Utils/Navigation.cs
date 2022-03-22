@@ -32,6 +32,7 @@ namespace Gosocket.Dian.Web.Utils
             DocumentSent,
             DocumentReceived,
             DocumentProvider,
+            ElectronicDocuments,
             ClientIndex,
             Client,
             Provider,

@@ -1,7 +1,8 @@
-﻿@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
+﻿@using Gosocket.Dian.Infrastructure;
+@model Gosocket.Dian.Web.Models.OthersElectronicDocAssociatedViewModel
 @using Newtonsoft.Json
 @{
-    ViewBag.Title = Model.ContributorType + " de " + Model.ElectronicDoc;
+    ViewBag.Title = Model.EsElectronicDocNomina ? Model.ContributorType + " de " + Model.ElectronicDoc : "Pruebas de aceptación";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -215,14 +216,22 @@
             padding: 15px 15px !important;
         }
 
+        .margin-right-20 {
+            margin-right: 30px !important;
+        }
+        
+        .margin-page-content {
+            margin-top: 50px !important;
+        }
     </style>
 }
-<div class="page-content radian-view margin-20">
+<div class="page-content radian-view margin-20 margin-page-content">
     <div class="title-container">
         <p class="title-view">
             @ViewBag.title
         </p>
         <div class="underline-title"></div>
+        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
@@ -232,35 +241,47 @@
                         <div class="radian-personal-info">
                             @Html.Partial("_personalInfo")
                         </div>
+                        @if (Model.Step > 0)
+                        {
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="text-right">
+
+                                        <button name="SubmitPrueba"
+                                                class="margin-right-20 btn btn-radian-success Set-Prueba">
+                                            Set de pruebas
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
+                                                id="btnReiniciarSerPruebas">
+                                            Reiniciar SET de pruebas
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
+                                                id="btnSincronizarAProduccion">
+                                            Sincronizar a Producción
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
                         <h3><span class="name-state">Ingreso de solicitud</span></h3>
                         <section>
                         </section>
-                        @*<h3><span class="name-state">En Pruebas</span></h3>
-                        <section>
-                            <div class="panel-footer text-right">
-                                <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                <button name="Submit" class="btn btn-radian-success submit-button">Enviar</button>
-                            </div>
-                        </section>*@
+
                         <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section class="test-redirect">
-                            @if (Model.Step == 2)
-                            {
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="text-right">
-                                            <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                            <button name="SubmitPrueba" class="btn btn-radian-success Set-Prueba">Set de pruebas</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                        <section>
                         </section>
+
                         <h3></h3>
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
                     </div>
+
                     @if (Model.Step == 3)
                     {
                         @Html.Partial("_finish")
@@ -277,27 +298,7 @@
         </div>
 
         @*Modal*@
-        <div class="modal fade prompt-comment" id="dialogcancelarregistro" tabindex="-1" aria-labelledby="dialogcancelarregistroLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
 
-                    <div class="modal-header">
-                        <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
-                        <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Cancelación @Model.ContributorType de @Model.ElectronicDoc</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="bootbox-body">
-                            <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la cancelación del registro</Label>
-                            <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
-                                      maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
-
-                        </div>
-                    </div><div class="modal-footer">
-                        <button id="savecancel-register" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </div>
 </div>
@@ -410,7 +411,38 @@
             $('.Set-Prueba').click(function (e) {
                  var url = "@Url.Action("GetSetTestResult", "OthersElectronicDocAssociated")" + "/" + @ViewBag.Id;
                  window.location.href = url;
-            });
+			});
+
+            $('#btnReiniciarSerPruebas').click(function (e) {
+                showConfirmation(`¿Estás seguro que deseas reiniciar el SET de pruebas?`, ConfirmExec(
+                    () => {
+                        showLoading('#panel-form', 'Configuración', 'Reiniciando Set de pruebas, por favor espere.');
+				        $.ajax({
+                            url: "@Url.Action("RestartSetTestResultV2", "OthersElectronicDocAssociated")",
+                            method: "Post",
+                            data: {
+                                Id: "@ViewBag.Id"
+                            },
+				            error: function (a, b, c) {
+						            alert("Error");
+                                hideLoading('#panel-form');
+                                showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                            },
+				            success: function (data) {
+                                hideLoading('#panel-form');
+                                if (data.Code == 200) {
+                                    showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.Message);
+                                    window.location.reload();
+                                }
+                                else {
+                                    showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.Message);
+                                }
+                            }
+                        });
+                    }
+                    , "", () => hideLoading('#panel-form'))
+                );
+			});
 
 
             $("#view-costumers").click(function () {
@@ -456,20 +488,13 @@
                 })
             });
 
-            $('.btn-sync-to-production').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                syncToProduction(@Model.Nit, @Model.ContributorId,"@Model.SoftwareId","@Model.SoftwareIdBase")
-                            }
-                        },
+            $('#btnSincronizarAProduccion').click(function () {
+                showConfirmation(`¿Estás seguro que deseas sincronizar a producción?`, ConfirmExec(
+                    () => {
+                        syncToProduction(@Model.Nit, @Model.ContributorId, "@Model.SoftwareId", "@Model.SoftwareIdBase");
                     }
-                });
+                    , "", () => hideLoading('#panel-form'))
+                );
             });
 
              function RenderStepsOtherDoc(index) {
@@ -478,7 +503,8 @@
                      headerTag: "h3",
                      bodyTag: "section",
                      transitionEffect: "slideLeft",
-                     autoFocus: true,
+					 autoFocus: true,
+					 href:"#",
                      startIndex: index,
                      enablePagination: false,
                      enableKeyNavigation: false,
@@ -491,31 +517,35 @@
 
 
             syncToProduction = (code, contributorId, softwareId, softwareIdBase) => {
-            showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
-            var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
-            $.ajax({
-                url: "@Url.Action("SyncToProduction", "OthersElectronicDocAssociated")",
-                method: "Post",
-                data: {
-                    __RequestVerificationToken: __RequestVerificationToken,
-                    code: code,                    
-                    contributorId: contributorId,
-                    softwareId:softwareId,
-                    softwareIdBase:softwareIdBase
-                },
-                error: function (a, b, c) {
-                    hideLoading('#panel-form');
-                    showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
-                },
-                success: function (data) {
-                    hideLoading('#panel-form');
-                    if (data.success)
-                        showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
-                    if (!data.success)
-                        showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
-                }
-            });
-        }
+                showLoading('#panel-form', 'Configuración', 'Enviando a sincronizar datos, por favor espere.');
+                var __RequestVerificationToken = $('input[name="__RequestVerificationToken"]').val();
+                $.ajax({
+                    url: "@Url.Action("SyncToProduction", "OthersElectronicDocAssociated")",
+                    method: "Post",
+                    data: {
+                        __RequestVerificationToken: __RequestVerificationToken,
+                        code: code,
+                        contributorId: contributorId,
+                        softwareId:softwareId,
+                        softwareIdBase:softwareIdBase
+                    },
+                    error: function (a, b, c) {
+                        hideLoading('#panel-form');
+                        showNotification('danger', 'fa fa-bolt fa-2x', 'floating', '', b + ': ' + c);
+                    },
+                    success: function (data) {
+                        hideLoading('#panel-form');
+                        if (data.success)
+                            showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
+                        if (!data.success)
+                            showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
+                    }
+                });
+            }
+
+			$('#steps-otherdocELectAssociate-t-0').removeAttr("href");
+			$('#steps-otherdocELectAssociate-t-1').removeAttr("href");
+			$('#steps-otherdocELectAssociate-t-2').removeAttr("href");
 
      });
 

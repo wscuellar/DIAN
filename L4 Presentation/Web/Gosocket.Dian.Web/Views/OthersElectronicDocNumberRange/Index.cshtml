@@ -1,0 +1,152 @@
+﻿@model Gosocket.Dian.Web.Models.NumberRangeTableViewModel
+@{
+    /**/
+
+    ViewBag.Title = "Rangos de numeración de prueba";
+}
+
+@section css
+{
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+
+    <style>
+        /*.bootstrap-select {
+            margin-bottom: 0;
+        }
+
+            .bootstrap-select .dropdown-menu > .active > a,
+            .bootstrap-select .dropdown-menu > .active > a:focus,
+            .bootstrap-select .dropdown-menu > .active > a:hover {
+                background-color: #348441;
+            }
+
+        .company-logo {
+            max-width: 64px;
+            max-height: 32px;
+        }
+
+        .modal-header:after {
+            border-bottom: 2px solid #348441;
+        }
+
+        .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+            width: 150px;
+        }
+
+        .tab-content .panel {
+            -webkit-box-shadow: none !important;
+            -ms-box-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        .bootstrap-filestyle {
+            margin-bottom: 5px;
+        }
+
+        .divider {
+            border-top: 1px solid #29b570;
+            display: block;
+            line-height: 1px;
+            margin: 15px 0;
+            position: relative;
+            text-align: center;
+        }
+
+            .divider .divider-title {
+                background: #fff;
+                font-size: 12px;
+                letter-spacing: 1px;
+                padding: 0 20px;
+                text-transform: uppercase;
+                color: #29b570;
+            }
+
+        .iffyTip {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .hideText2 {
+            max-width: 150px;
+        }*/
+    </style>
+}
+
+<div class="page-content margin-15" style="margin-top: 50px !important">
+    <div class="row margin-horizontal-0">
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">@ViewBag.Title</h3>
+            </div>
+
+            <div class="panel-body padding-top-20">
+                <div class="pad-btm padding-bottom-0">
+                    <div class="row margin-horizontal-0">
+                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                            <div class="col-md-12 padding-horizontal-0">
+
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+                                    <div class="panel-body padding-top-10 padding-left-5 padding-right-5 padding-bottom-0">
+                                        <div class="row">
+                                            <div class="col-sm-12 padding-xs-0">
+                                                <div class="form-group">
+                                                    @Html.Partial("_Items")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel-footer-grey text-right">
+                                        <button class="btn btn-default btn-hover-gosocket" onclick="javascript: history.go(-1);">Volver</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $("#Code").focus();
+
+            if (@Model.NumberRanges.Count == 0) {
+                $('.table-responsive').css('display', 'none');
+                if ('@Model.SearchFinished' === 'True')
+                    $('.number-range-alert').css('display', '');
+            }
+
+            $('.btn-search').click(function () {
+                $('#page').val(0);
+                showLoading('#panel-form', 'Cargando', 'Buscando datos, por favor espere.');
+                $(this).attr('disabled', 'disabled');
+                $(this).html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                $('.table-pagination').css('display', 'none');
+                $('.table-responsive').css('display', 'none');
+                $('#number-range-form').submit();
+            });
+
+            // Pagination
+            $('.next-page').click(function () {
+                $('#Page').val(@Model.Page + 1);
+                $('#number-range-form').submit();
+            });
+
+            $('.prev-page').click(function () {
+                $('#Page').val(@Model.Page - 1);
+                $('#number-range-form').submit();
+            });
+            // Pagination
+        });
+    </script>
+}

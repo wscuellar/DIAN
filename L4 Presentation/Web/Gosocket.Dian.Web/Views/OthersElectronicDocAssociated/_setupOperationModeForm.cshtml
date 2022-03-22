@@ -37,10 +37,11 @@
                         </div>
                         <div class="col-sm-5 col-md-3 padding-xs-0">
                             <div class="form-group">
-                                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" })
+                                @Html.LabelFor(m => m.SoftwareName, new { @class = "control-label" }) 
                                 @*@Html.DropDownListFor(m => m.SoftwareId, new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })*@
                                 @Html.DropDownList("ddlsoftware", new SelectList(ViewBag.ListSoftwares, "Id", "Name"), "Seleccione...", new { @class = "form-control selectpicker" })
                                 @*@Html.ValidationMessageFor(m => m.SoftwareId, "", new { @class = "text-danger" })*@
+                                <div id="validddlSoftwareName" class="text-danger"></div>
                             </div>
                         </div>
                     </div>
@@ -68,7 +69,7 @@
                                 <div id="validSoftwarePin" class="text-danger"></div>
                             </div>
                         </div>
-                        <div class="col-sm-3 padding-xs-0">
+                        <div class="col-sm-3 padding-xs-0" id="DivSoftwareId">
                             <div class="form-group">
                                 @Html.Label("ID del Software", new { @class = "control-label" })
                                 @Html.TextBox("txtsoftware", Model.SoftwareId, new { @class = "form-control input-general", @readonly = "readonly" })

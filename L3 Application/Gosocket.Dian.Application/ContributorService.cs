@@ -164,6 +164,51 @@ namespace Gosocket.Dian.Application
             return sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(p => p.OtherDocElecContributorId == OtherDocContributorId && p.SoftwareId == SoftId);
         }
 
+        public List<OtherDocElecContributor> GetOtherDocElecContributor(int OtherDocContributorId)
+        {
+            
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId && p.OtherDocElecOperationModeId==3).ToList();
+        }
+
+        public List<OtherDocElecContributor> GetOtherDocElecContributorPermisos(int OtherDocContributorId)
+        {
+
+            return sqlDBContext.OtherDocElecContributors.Where(p => p.ContributorId == OtherDocContributorId ).ToList();
+        }
+
+        public ContributorOperations GetContributorOperations(int OtherDocContributorId)
+        {
+
+            ContributorOperations contributorOp = null;
+            var re = (from c in sqlDBContext.ContributorOperations
+                      where c.ContributorId == OtherDocContributorId
+                      select c).FirstOrDefault();
+
+            if (re != null)
+            {
+                contributorOp = new ContributorOperations()
+                {
+                    Id = re.Id,
+                    ContributorId = re.ContributorId,
+                    OperationModeId = re.OperationModeId,
+                    ProviderId = re.ProviderId,
+                    SoftwareId = re.SoftwareId,
+                    Deleted = re.Deleted,
+                    Timestamp = re.Timestamp,
+                    ContributorTypeId = re.ContributorTypeId
+                };
+            }
+
+            return contributorOp;
+        }
+        public bool GetOtherDocElecContributorOperations(int OtherDocContributorId)
+        {
+
+            var resp = sqlDBContext.OtherDocElecContributorOperations.Where(p => p.OtherDocElecContributorId == OtherDocContributorId && p.Deleted==false).Count();
+            return resp > 0 ? true : false;
+        }
+
+
         public Contributor GetByCode(string code, string connectionString)
         {
             using (var context = new SqlDBContext(connectionString))
@@ -628,19 +673,21 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributorId">Id a ubicar</param>
         /// <returns>Un objeto RadianCotributor buscado</returns>
-        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId, bool enabled)
+        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId, bool enabled, int contributorOpertaionModeId)
         {
             using (var context = new SqlDBContext())
             {
                 if (enabled)
                 {
                     return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "Habilitado");
+                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "Habilitado" 
+                    && rc.OtherDocElecOperationModeId == contributorOpertaionModeId);
                 }
                 else
                 {
                     return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "En pruebas");
+                    && rc.OtherDocElecContributorTypeId == contributorTypeId
+                    && rc.OtherDocElecOperationModeId == contributorOpertaionModeId);
                 }
             }
         }
@@ -831,6 +878,7 @@ namespace Gosocket.Dian.Application
                     EndDate = re.EndDate,
                     StartDateNumber = re.StartDateNumber,
                     AcceptanceStatus = re.AcceptanceStatus,
+                    AcceptanceStatusId = re.AcceptanceStatusId,
                     Status = re.Status,
                     Deleted = re.Deleted,
                     Timestamp = re.Timestamp,

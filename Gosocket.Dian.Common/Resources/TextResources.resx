@@ -322,4 +322,7 @@
   <data name="SessionExpired" xml:space="preserve">
     <value>Por favor inicie sesión nuevamente e intente de nuevo</value>
   </data>
+  <data name="ElectronicBillerNoEnabled" xml:space="preserve">
+    <value>Para poder continuar, realiza el proceso de habilitación como Facturador Electrónico.</value>
+  </data>
 </root>
