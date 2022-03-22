@@ -87,13 +87,7 @@ namespace Gosocket.Dian.Functions.Activation
                         || Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     {
                        
-                        //Consigue informacion del trackId nomina individual y nomina de ajuste
-                        GlobalDocPayroll teachProviderPayroll = TableManagerGlobalDocPayroll.FindByPartition<GlobalDocPayroll>(itemMeta.TrackId).FirstOrDefault();
-
-                        SetLogger(null, " Step 1.2 ", " **globalTestSetTracking.TestSetId * " + globalTestSetTracking.TestSetId
-                           + " RowKey " + teachProviderPayroll.RowKey + " NIT " + teachProviderPayroll.NIT + " Emp_NIT " + teachProviderPayroll.Emp_NIT, globalTestSetTracking.TestSetId);
-
-                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(teachProviderPayroll.RowKey, globalTestSetTracking.TestSetId);
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.SenderCode, globalTestSetTracking.TestSetId);
                         if (setResultOther != null) break;
                     }                        
                 }
