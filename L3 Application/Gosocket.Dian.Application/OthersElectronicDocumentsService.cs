@@ -227,7 +227,7 @@ namespace Gosocket.Dian.Application
             bool contributorIsOfe = contributor.ContributorTypeId == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = ODEContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
+            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperationByElectronicDocumentId(contributor.Code, software.SoftwareId, ODEContributor.ElectronicDocumentId);
             if (operation == null)
                 operation = new GlobalOtherDocElecOperation(contributor.Code, software.SoftwareId.ToString());
 

@@ -11,6 +11,7 @@ using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data.Entity;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
@@ -386,7 +387,9 @@ namespace Gosocket.Dian.Application
         {
             ResponseMessage result = new ResponseMessage();
 
-            var operation = sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(c => c.Id == operationId);
+            var operation = sqlDBContext.OtherDocElecContributorOperations
+                .Include(t => t.OtherDocElecContributor.Contributor.OtherDocElecContributors)
+                .FirstOrDefault(c => c.Id == operationId);
             if (operation != null)
             {
                 operation.Deleted = true;
@@ -396,6 +399,9 @@ namespace Gosocket.Dian.Application
                 int re1 = sqlDBContext.SaveChanges();
                 result.Code = System.Net.HttpStatusCode.OK.GetHashCode();
                 result.Message = "Se canceló el registro exitosamente";
+
+                result.ExistOperationModeAsociated = operation.OtherDocElecContributor.Contributor.OtherDocElecContributors
+                    .Any(t => t.ElectronicDocumentId == operation.OtherDocElecContributor.ElectronicDocumentId && !t.OtherDocElecContributorOperations.Any(x => x.Deleted));
 
                 if (re1 > 0) //Update operations state
                 {

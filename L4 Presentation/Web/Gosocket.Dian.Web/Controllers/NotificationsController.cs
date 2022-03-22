@@ -67,10 +67,10 @@ namespace Gosocket.Dian.Web.Controllers
             var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
-            notification.PetitionName = contributor.Email;
+            notification.PetitionName = contributor.ExchangeEmail;
             notification.UserName = contributor.Code;
             notification.PartitionKey = accountId.ToString();
-            notification.RecipientEmail = contributor.Email; 
+            notification.RecipientEmail = contributor.ExchangeEmail; 
 
             switch (type)
             {
@@ -121,7 +121,7 @@ namespace Gosocket.Dian.Web.Controllers
                     break;
                 case "04":
                     notification.Menssage = "Estimad@ usuari@ Nombre de la Empresa " + business + " Se informa que se encuentra registrado y ha seleccionado el modo de operación software Solución Gratuita / Proveedor tecnológico / Software Propio, se recuerda que debe surtir el proceso de pruebas para finalizar la habilitación.";
-                    notification.Matters = "Aceptación Expresa";
+                    notification.Matters = "Inicio Modo de Operación";
                     SentEmail(notification);
                     break;        
 

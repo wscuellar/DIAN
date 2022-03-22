@@ -129,7 +129,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "08", Name = "Nota de débito electrónica" },
                 new DocumentTypeModel() { Code = "09", Name = "Factura AIU" },
                 new DocumentTypeModel() { Code = "11", Name = "Factura Mandato" },
-                new DocumentTypeModel() { Code = "12", Name = "Documento equivalente POS electrónico" },
+                new DocumentTypeModel() { Code = "20", Name = "Documento equivalente POS electrónico" },
                 new DocumentTypeModel() { Code = "101", Name = "Documento importación" }
                // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
                 //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },

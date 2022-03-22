@@ -399,7 +399,7 @@
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
                                     {
-                                                                         <li>
+                                    <li>
                                         <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
                                             <i class="fa fa-users"></i>
                                             <span class="menu-title">
@@ -417,6 +417,16 @@
                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
                                             }
                                         </ul>
+                                        <ul>
+                                            @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                            {
+                                                if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
+                                                }
+                                            }
+                                        </ul>
+
                                     </li>
                                      }
 
