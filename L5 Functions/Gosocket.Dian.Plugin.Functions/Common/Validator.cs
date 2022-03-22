@@ -4271,8 +4271,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if(validateNumberID)
                 {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado..", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no existe para el número de autorización..", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
                 DateTime.TryParse(numberRangeModel.EmissionDate, out DateTime numberEmisionDate);
