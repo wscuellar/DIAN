@@ -228,22 +228,11 @@ namespace Gosocket.Dian.Web.Controllers
 
                 var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
                 var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
-                HttpResponseMessage responseMessage = new HttpResponseMessage();
+
                 string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
                 var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
-				try
-				{
-                     responseMessage = ConsumeApi(url, requestObj);
-                }
-				catch (Exception ex)
-				{
-                    var exe = new Exception("Error consumiendo api", ex.InnerException);
-  
-                    throw exe;
+                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
 
-                }
-
-				try { 
                 var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
                 //var xmlBytes = DownloadXml(trackId);
 
@@ -254,21 +243,11 @@ namespace Gosocket.Dian.Web.Controllers
                 }, trackId);
 
                 return File(zipFile, "application/zip", $"{trackId}.zip");
-                }
-                catch (Exception ex)
-                {
-                    var exe = new Exception("Error consumiendo creando zip", ex.InnerException);
-
-                    throw exe;
-
-                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                //return File(new byte[1], "application/zip", $"error");
-   
-                throw ex;
+                return File(new byte[1], "application/zip", $"error");
             }
         }
 
@@ -287,8 +266,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
-                //return null;
-                throw ex;
+                return null;
             }
         }
 
