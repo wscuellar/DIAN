@@ -225,16 +225,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-
                 var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
                 var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
 
-                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
                 var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
-                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
+                HttpResponseMessage responseMessage = ConsumeApi(GetUrlDocEquivalente(documentTypeId), requestObj);
 
                 var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
-                //var xmlBytes = DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -251,20 +248,51 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
+       public string GetUrlDocEquivalente(string documentTypeId)
+        {
+            try
+            {
+                if (documentTypeId != null)
+                    return null;
+
+                switch (documentTypeId)
+                {
+                    case "20":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "21":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "22":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "23":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "24":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "25":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "26":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                    case "27":
+                        return ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return "DocumentController/GetUrlDocEquivalent" + "-" + ex;
+            }
+        }
+
         public byte[] SearchXmlEquivalente(string trackId, string GenerationDate)
         {
             try
             {
-                //UploadDocumentResponse result;
-                //var check = CheckTrackIdFormat(trackId, authCode, email);
-
                 DianPAServices customerDianPa = new DianPAServices();
                 {
                     var resp = fileManager.GetBytes(blobContainer, $"{blobContainerFolder}/{blobContainerFolderTwo}/{GenerationDate.Substring(6, 4)}/{GenerationDate.Substring(3, 2)}/{trackId}.xml");
                     return resp;                    
                 }                
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
