@@ -47,7 +47,6 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly TableManager globalDocValidatorTrackingTableManager = new TableManager("GlobalDocValidatorTracking");
         private readonly TableManager globalTaskTableManager = new TableManager("GlobalTask");
         private readonly TableManager payrollTableManager = new TableManager("GlobalDocPayRoll");
-        private static readonly TableManager tableManager = new TableManager("GlobalLogger");
         private readonly TableManager municipalitiesTableManager = new TableManager("Municipalities");
         private readonly TableManager globalDocPayrollEmployeesTableManager = new TableManager("GlobalDocPayrollEmployees");
         private readonly IRadianPdfCreationService _radianPdfCreationService;
@@ -248,10 +247,8 @@ namespace Gosocket.Dian.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                var logger = new GlobalLogger("ZD05-WEB", "2019043067") { Action = "DownloadZipFilesEquivalente", Controller = "DocumentController", Message = ex.Message+" "+ex.StackTrace };
-
-                tableManager.InsertOrUpdate(logger);
-                return File(new byte[1], "application/zip", $"error");
+                //return File(new byte[1], "application/zip", $"error");
+                throw ex;
             }
         }
 
@@ -270,7 +267,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
-                return null;
+                //return null;
+                throw ex;
             }
         }
 
