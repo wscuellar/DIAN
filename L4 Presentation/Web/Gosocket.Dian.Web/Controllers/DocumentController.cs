@@ -266,7 +266,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception ex)
             {
-                return null;
+                throw ex;
             }
         }
 
