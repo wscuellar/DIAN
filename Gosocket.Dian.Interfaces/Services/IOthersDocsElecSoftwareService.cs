@@ -10,6 +10,7 @@ namespace Gosocket.Dian.Interfaces.Services
         OtherDocElecSoftware Get(Guid id);
 
         OtherDocElecSoftware GetBySoftwareId(Guid id);
+        OtherDocElecSoftware GetBySoftwareIdV2(Guid id);
         List<Software> GetSoftwares(int contributorId);
         OtherDocElecSoftware CreateSoftware(OtherDocElecSoftware software);
         Guid DeleteSoftware(Guid id);

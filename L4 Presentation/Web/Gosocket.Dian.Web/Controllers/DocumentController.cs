@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Cosmos;
+using Gosocket.Dian.Domain;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
@@ -17,6 +18,9 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -59,6 +63,8 @@ namespace Gosocket.Dian.Web.Controllers
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+
+        private readonly IRadianContributorService _radianContributorService;
 
         public List<GlobalDocPayroll> PayrollList
         {
@@ -1520,6 +1526,61 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
             return result;
+        }
+
+
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a ElectronicDocuments, Consulta la informacion del contribuyente postulante, para los modos de Facturador Electronico.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ElectronicInvoiceView()
+        {
+            return ElectronicDocuments();
+        }
+
+        /// <summary>
+        /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ElectronicDocuments()
+        {
+            ViewBag.UserCode = User.UserCode();
+            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
+            return View();
+        }
+
+        public string GetContributorOperation(int code)
+        {
+
+            try
+            {
+                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
+                                      "WHERE C.Contributorid = " + code +
+                                      " AND C.Deleted <> 1";
+              
+                SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
+                conn.Open();
+                DataTable table = new DataTable();
+                SqlCommand command = new SqlCommand(sqlQuery, conn);
+
+                using (var da = new SqlDataAdapter(command))
+                {
+                    da.Fill(table);
+                }
+                conn.Close();
+
+                var conteo = table.Rows.Count;
+
+                return conteo.ToString();
+                //return contributorType;
+
+            }
+            catch (Exception exc)
+            {
+                return  null;
+            }
         }
     }
 }

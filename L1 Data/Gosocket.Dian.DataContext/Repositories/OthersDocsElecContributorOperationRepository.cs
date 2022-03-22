@@ -79,6 +79,10 @@ namespace Gosocket.Dian.DataContext.Repositories
 
         public int Add(OtherDocElecContributorOperations contributorOperation)
         {
+			try
+			{
+
+			
             int affectedRecords = 0;
             using (var context = new SqlDBContext())
             {
@@ -86,6 +90,12 @@ namespace Gosocket.Dian.DataContext.Repositories
                 affectedRecords = context.SaveChanges();
             }
             return affectedRecords > 0 ? contributorOperation.Id : 0;
+            }
+            catch (Exception e)
+            {
+
+                throw e;
+            }
         }
     }
 }

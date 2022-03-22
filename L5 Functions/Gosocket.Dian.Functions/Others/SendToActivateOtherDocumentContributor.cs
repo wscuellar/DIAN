@@ -33,7 +33,7 @@ namespace Gosocket.Dian.Functions.Others
             SetLogger(null, "Step STA-00", ConfigurationManager.GetValue("Environment"));
 
             //Solo en ambiente de habilitacion.
-            if (ConfigurationManager.GetValue("Environment") == "Hab")
+            if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
             {
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
