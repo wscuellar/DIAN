@@ -1327,7 +1327,7 @@ namespace Gosocket.Dian.Web.Controllers
                 try
                 {
                     // Get token
-                    var result = GetAssignResponsabilityToken();
+                    var result = await GetAssignResponsabilityToken();
                     // Assign responsoabilty
                     var response = await AssignResponsability(contributor, result);
                     int.TryParse(response.Code, out int statusCode);
