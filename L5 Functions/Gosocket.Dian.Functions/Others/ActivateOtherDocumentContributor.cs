@@ -127,7 +127,7 @@ namespace Gosocket.Dian.Functions.Others
                             SoftwarePassword = requestObject.SoftwarePassword,
                             Status = true,
                             OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted,
-                            Url = requestObject.Url,
+                            Url = ConfigurationManager.GetValue("URLServiceProd"),
                             CreatedBy = requestObject.CreatedBy,
                             OtherDocElecContributorId = otherDocContributorId,
                             SoftwareId = new Guid(requestObject.SoftwareProvider),
@@ -139,10 +139,31 @@ namespace Gosocket.Dian.Functions.Others
 
                         SetLogger(newSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
                     }
+                    else
+                    {
+                        otherDocElecSoftware.Deleted = false;
+                        otherDocElecSoftware.Name = requestObject.SoftwareName;
+                        otherDocElecSoftware.Pin = requestObject.Pin;
+                        otherDocElecSoftware.SoftwareDate = DateTime.Now;
+                        otherDocElecSoftware.SoftwareUser = requestObject.SoftwareUser;
+                        otherDocElecSoftware.SoftwarePassword = requestObject.SoftwarePassword;
+                        otherDocElecSoftware.Status = true;
+                        otherDocElecSoftware.OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted;
+                        otherDocElecSoftware.Url = ConfigurationManager.GetValue("URLServiceProd");
+                        otherDocElecSoftware.OtherDocElecContributorId = otherDocContributorId;
+                        otherDocElecSoftware.SoftwareId = new Guid(requestObject.SoftwareProvider);
+                        otherDocElecSoftware.ProviderId = requestObject.ProviderId;
+                        
+                        if (IsProduction)
+                            softwareService.AddOrUpdateOtherDocSoftware(otherDocElecSoftware);
+
+                        SetLogger(otherDocElecSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
+                    }
+
 
                     // Crear Software en TableSTorage
                     var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
-                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
+                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.Id.ToString())
                     {
                         Id = new Guid(requestObject.SoftwareId),
                         Deleted = false,
