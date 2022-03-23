@@ -728,6 +728,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 errorCode = "DSAD06";
                 prop = "CUDS";
             }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                errorCode = "NSAD06";
+                prop = "CUDS";
+            }
             else if (documentMeta.DocumentTypeId == "91")
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
@@ -4509,9 +4514,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 response.ErrorCode = "DSAB27b";
                 response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
-
             }
-                
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                response.ErrorCode = "NSAB27b";
+                response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
+            }
+
 
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                 || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
