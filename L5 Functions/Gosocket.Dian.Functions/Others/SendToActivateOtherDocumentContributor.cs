@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Functions.Others
                         ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
-                        OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
+                        OtherDocOperationModeId = data.ContributorOpertaionModeId, //(int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
                         SoftwarePassword = data.SoftwarePassword,
                         SoftwareUser = data.SoftwareUser,
                         Pin = data.Pin,

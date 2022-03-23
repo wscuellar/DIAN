@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Functions.Others
                     //Contributorid = OtherDocumentActivateContributorID
                     int otherDocContributorId = 0;
                     otherDocElecContributor = contributorService.GetOtherDocElecContributorID(requestObject.ContributorId, requestObject.OtherDocContributorTypeId, requestObject.OtherDocOperationModeId);
-                    SetLogger(null, "Step ActOther-1", otherDocElecContributor == null ? "vacio" : "radiancontributor no es null", "ACT-02");
+                    SetLogger(null, "Step ActOther-1", otherDocElecContributor == null ? "vacio" : "OtherDocContributor no es null", "ACT-02");                    
 
                     if (otherDocElecContributor != null)
                     {
@@ -103,6 +103,27 @@ namespace Gosocket.Dian.Functions.Others
                         otherDocContributorId = otherDocElecContributor.Id;
                         SetLogger(null, "Step OtherDoc-5", " -- contributorService.AddOrUpdateOtherDocContributor -- ", "ACT-05");
                     }
+
+                    try
+                    {
+                        var guid = Guid.NewGuid().ToString();
+                        contributorActivation = new GlobalContributorActivation(requestObject.Code.ToString(), guid)
+                        {
+                            Success = true,
+                            Message = "Contribuyente se activó en producción con éxito.",
+                            TestSetId = requestObject.TestSetOthersDocumentsResultObj.Id,
+                            ContributorCode = requestObject.Code,
+                            ContributorTypeId = requestObject.OtherDocContributorTypeId,
+                            OperationModeId = requestObject.OtherDocOperationModeId,
+                            SentToActivateBy = "SendToActivateOtherDocumentContributor",
+                            Request = myQueueItem,
+                            SendDate = DateTime.UtcNow,
+                            SoftwareId = requestObject.SoftwareProvider,
+                            OperationModeName = requestObject.TestSetOthersDocumentsResultObj.OperationModeName,
+                            OtherDocContributorId = otherDocContributorId
+                        };
+                    }
+                    catch { }
 
                     start = DateTime.UtcNow;
                     var OtherDocSW = new GlobalLogger(requestObject.SoftwareId, "ACTSEND-05.1")
@@ -157,7 +178,7 @@ namespace Gosocket.Dian.Functions.Others
                         if (IsProduction)
                             softwareService.AddOrUpdateOtherDocSoftware(otherDocElecSoftware);
 
-                        SetLogger(otherDocElecSoftware, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06");
+                        SetLogger(null, "Step OtherDoc-5", " -- softwareService.AddOrUpdateOtherDocSoftware -- ", "ACT-06.1");
                     }
 
                     // Crear Software en TableSTorage
@@ -252,6 +273,8 @@ namespace Gosocket.Dian.Functions.Others
                     };
                     var resultEndACT = TableManagerGlobalLogger.InsertOrUpdateAsync(endACT);
 
+
+                    contributorActivationTableManager.InsertOrUpdate(contributorActivation);                    
                     log.Info($"Activation OtherDocument successfully completed. Contributor with given id: {otherDocElecContributor.Id}");
 
                 }
@@ -261,12 +284,19 @@ namespace Gosocket.Dian.Functions.Others
                     SetLogger(null, "OtherDocument-Exception", ex.StackTrace, "Excep-01");
 
                     if (contributorActivation == null)
-                        contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
+                        contributorActivation = new GlobalContributorActivation(requestObject.Code, Guid.NewGuid().ToString());
 
                     contributorActivation.Success = false;
                     contributorActivation.Message = "Error al activar contribuyente en producción.";
                     contributorActivation.Detail = ex.Message;
                     contributorActivation.Trace = ex.StackTrace;
+                    contributorActivation.TestSetId = requestObject.TestSetOthersDocumentsResultObj.Id;
+                    contributorActivation.ContributorCode = requestObject.Code;
+                    contributorActivation.ContributorTypeId = requestObject.OtherDocContributorTypeId;
+                    contributorActivation.OperationModeId = requestObject.OtherDocOperationModeId;
+                    contributorActivation.SentToActivateBy = "SendToActivateOtherDocumentContributor";
+                    contributorActivation.SoftwareId = requestObject.SoftwareProvider;
+                    contributorActivation.OperationModeName = requestObject.TestSetOthersDocumentsResultObj.OperationModeName;                    
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
 
 
