@@ -1252,6 +1252,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string sender2DvErrorCode = "FAJ47";
                     if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
                     else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
+                    else if (documentMeta.DocumentTypeId == "95") sender2DvErrorCode = "NSAJ47";
 
                     sender2 = GetContributorInstanceCache(senderCodeProvider);
                     if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
