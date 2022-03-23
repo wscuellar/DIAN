@@ -83,7 +83,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				html = CruzarModeloNotasFinales(html, xelement);
 				html = CruzarReferencias(html, xelement);
 
-				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32")
+				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" || tipo == "30")
 				{
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
@@ -270,7 +270,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			if (EmisorCorreo.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorCorreo}", EmisorCorreo.FirstOrDefault().Value);
 
-
+			var EmisorTelefono = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "Contact").Elements(cbc + "Telephone");
+			if (EmisorTelefono.Any())
+				plantillaHtml = plantillaHtml.Replace("{EmisorTelefono}", EmisorTelefono.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorTelefono}", string.Empty);
 
 
 
@@ -284,9 +288,15 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			var AccountingCustomerPartyName = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "RegistrationName");
 			if (AccountingCustomerPartyName.Any())
+			{
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteRazon}", AccountingCustomerPartyName.FirstOrDefault().Value);
+				plantillaHtml = plantillaHtml.Replace("{NombreEntidad}", AccountingCustomerPartyName.FirstOrDefault().Value);
+			}
 			else
+			{
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteRazon}", string.Empty);
+				plantillaHtml = plantillaHtml.Replace("{NombreEntidad}", string.Empty);
+			}
 
 			//var AdquirienteTipoDocumento = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "CompanyID");
 			//if (AdquirienteTipoDocumento.Any())
@@ -298,11 +308,15 @@ namespace Gosocket.Dian.Functions.Pdf
 			{
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNumeroDocumento}", VendedorNumeroDocumento.FirstOrDefault().Value);
+				plantillaHtml = plantillaHtml.Replace("{EntidadTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
+				plantillaHtml = plantillaHtml.Replace("{AdquirienteNit}", VendedorNumeroDocumento.FirstOrDefault().Value);
 			}
 			else
 			{
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", string.Empty);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNumeroDocumento}", string.Empty);
+				plantillaHtml = plantillaHtml.Replace("{EntidadTipoDocumento}", string.Empty);
+				plantillaHtml = plantillaHtml.Replace("{AdquirienteNit}", string.Empty);
 			}
 
 			var AdquirienteRegimenFiscal = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "TaxLevelCode");
@@ -499,7 +513,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{AdquirienteNit}", CompanyID.FirstOrDefault().Value);
 
 			var AdquirienteTipoContribuyente = model.Elements(cac + "AccountingCustomerParty").Elements(cbc + "AdditionalAccountID");
-			Html = Html.Replace("{AdquirienteTipoContribuyente}", AdquirienteTipoContribuyente.FirstOrDefault().Value == "3" ? "NO IDENTIFICADO" : AdquirienteTipoContribuyente.FirstOrDefault().Value == "2" ? "Persona Natural" : "Persona Juridica");
+			if (AdquirienteTipoContribuyente.Any())
+				Html = Html.Replace("{AdquirienteTipoContribuyente}", AdquirienteTipoContribuyente.FirstOrDefault().Value == "3" ? "NO IDENTIFICADO" : AdquirienteTipoContribuyente.FirstOrDefault().Value == "2" ? "Persona Natural" : "Persona Juridica");
 
 			var AccountingSupplierPartyName = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyName").Elements(cbc + "Name");
 			if (AccountingSupplierPartyName.Any())
@@ -581,7 +596,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value) - decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value)).ToString());
 
 			var TotalNetoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
-			Html = Html.Replace("{TotalNetoDocumento}", TotalIVA.FirstOrDefault().Value);
+			Html = Html.Replace("{TotalNetoDocumento}", TotalNetoDocumento.FirstOrDefault().Value);
 
 			var DescuentoGlobal = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "AllowanceTotalAmount");//resta subtotal ? 
 			if (DescuentoGlobal.Any())
@@ -730,7 +745,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			var UbicacionBoleta = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "PublicShowsInformation").Elements(def + "EventInformation").Elements(def + "TicketLocation");
 			if (UbicacionBoleta.Any())
-				Html = Html.Replace("{UbicacionBoleta}", PULEP.FirstOrDefault().Value);
+				Html = Html.Replace("{UbicacionBoleta}", UbicacionBoleta.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{UbicacionBoleta}", string.Empty);
 
@@ -754,12 +769,44 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{EtapaCompra}", string.Empty);
 			var Retefuente = model.Elements(cac + "WithholdingTaxTotal").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
 			if (Retefuente.Any())
-				Html = Html.Replace("{Retefuente}", EtapaCompra.FirstOrDefault().Value);
+				Html = Html.Replace("{Retefuente}", Retefuente.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{Retefuente}", string.Empty);
 
+			//Juegos
 
+			var DireccionJuegos = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "InfoPoint").Elements(def + "EstablishmentAddress");
+			if (DireccionJuegos.Any())
+				Html = Html.Replace("{DireccionJuegos}", DireccionJuegos.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{DireccionJuegos}", string.Empty);
 
+			var ValorJuegos = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "InfoPoint").Elements(def + "MoneyDeposit");
+			if (ValorJuegos.Any())
+				Html = Html.Replace("{ValorJuegos}", ValorJuegos.FirstOrDefault().Value);
+			else
+				Html = Html.Replace("{ValorJuegos}", string.Empty);
+
+			var NumeroMesas = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "GameTypeTotal");
+			if (NumeroMesas.Any())
+			{
+				var type = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "TypeOfGame");
+				if (type.Any())
+					if (type.FirstOrDefault().Value == "Mesa")
+						Html = Html.Replace("{NumeroMesas}", NumeroMesas.FirstOrDefault().Value);
+					else
+						Html = Html.Replace("{NumeroMesas}", string.Empty);
+				if (type.FirstOrDefault().Value == "Bingo")
+					Html = Html.Replace("{NumeroBingo}", NumeroMesas.FirstOrDefault().Value);
+				else
+					Html = Html.Replace("{NumeroBingo}", string.Empty);
+
+			}
+			else
+			{
+				Html = Html.Replace("{NumeroMesas}", string.Empty);
+				Html = Html.Replace("{NumeroBingo}", string.Empty);
+			}
 
 			return Html;
 		}
@@ -786,13 +833,15 @@ namespace Gosocket.Dian.Functions.Pdf
 
 					var tipo = detalle.Elements(cbc + "ChargeIndicator").FirstOrDefault().Value.ToUpper() == "TRUE" ? "Recargo" : "Descuento";
 					var reason = detalle.Elements(cbc + "AllowanceChargeReasonCode").Any() ? detalle.Elements(cbc + "AllowanceChargeReasonCode").FirstOrDefault().Value : "";
+					var porc = detalle.Elements(cbc + "MultiplierFactorNumeric");
+					var porce = porc.Any() ? porc.FirstOrDefault().Value : "";
 					rowDescuentosYRecargos.Append($@"
                 <tr>
 		            <td class='text-right'>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td class='text-left'>{tipo}</td>
 		            <td>{reason}</td>
 		            <td class='text-left'>{detalle.Elements(cbc + "AllowanceChargeReason").FirstOrDefault().Value}</td>
-		            <td>{detalle.Elements(cbc + "MultiplierFactorNumeric").FirstOrDefault().Value}</td>
+		            <td>{porce}</td>
 		            <td class='text-right'>{detalle.Elements(cbc + "Amount").FirstOrDefault().Value:n2}</td>
 	            </tr>");
 				}
@@ -924,6 +973,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentExtracto_template.html");
 			else if (tipo == "32")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
+			else if (tipo == "30")
+				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentJuegos_template.html");
 			else return null;
 		}
 
