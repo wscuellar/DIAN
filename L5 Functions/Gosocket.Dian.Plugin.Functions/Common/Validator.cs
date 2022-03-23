@@ -4582,7 +4582,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                       || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
                 else
-                    hash = $"{software.Id}{software.Pin}{number}".EncryptSHA384();
+                    hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
 
             }
 
