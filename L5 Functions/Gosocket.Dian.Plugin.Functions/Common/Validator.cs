@@ -5270,10 +5270,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
                     if (documentMetaRef.SerieAndNumber != documentMeta.DocumentReferencedId)
                     {
-                        string message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                        string message = String.Empty;
+                        if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                        {
+                            message = ConfigurationManager.GetValue("ErrorMessage_AAH06_042");
+                        }
+                        else
+                        {
+                            message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                             || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
                             ? ConfigurationManager.GetValue("ErrorMessage_AAH06_043")
                             : ConfigurationManager.GetValue("ErrorMessage_AAH06");
+
+                        }
 
                         responses.Add(new ValidateListResponse
                         {
@@ -7452,6 +7461,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
             GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
             NitModel nitModel = new NitModel();
+            List<InvoiceWrapper> InvoiceWrapper = null;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (eventCode == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -7487,15 +7497,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
                     nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
                 }
+
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
             }
 
             bool valid = true;
 
             // ...
             List<string> issuerAttorneyList = null;
-
-            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
-
+           
             if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
                 List<GlobalDocReferenceAttorney> attorneyList = InvoiceWrapper.Select(s => s.Documents).ToList()[0].Where(w => w.Attorney != null).Select(x => x.Attorney).ToList();
@@ -7823,7 +7833,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         validateResponses.AddRange(responses);
                     }
                 }
-                else
+                
+                if(!validateEventAproveCufe)
                 {
                     //Mandato Abierto ListId = 3
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
