@@ -808,6 +808,20 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{NumeroBingo}", string.Empty);
 			}
 
+			var CodigoComprador = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements("BeneficiosComprador").Elements("InformacionBeneficiosComprador").Elements("Value");
+
+			if (CodigoComprador.Count()==3)
+			{
+				Html = Html.Replace("{CodigoComprador}", CodigoComprador.ElementAt(0).Value);
+				Html = Html.Replace("{NombresComprador}", CodigoComprador.ElementAt(1).Value);
+				Html = Html.Replace("{Puntos}", CodigoComprador.ElementAt(2).Value);
+			}
+			else
+			{
+				Html = Html.Replace("{CodigoComprador}", string.Empty);
+				Html = Html.Replace("{NombresComprador}", string.Empty);
+				Html = Html.Replace("{Puntos}", string.Empty);
+			}
 			return Html;
 		}
 
