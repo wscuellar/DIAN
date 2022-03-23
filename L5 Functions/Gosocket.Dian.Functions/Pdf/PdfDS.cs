@@ -822,6 +822,21 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{NombresComprador}", string.Empty);
 				Html = Html.Replace("{Puntos}", string.Empty);
 			}
+
+			var Soft = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements("FabricanteSoftware").Elements("InformacionDelFabricanteDelSoftware").Elements("Value");
+
+			if (Soft.Count() == 3)
+			{
+				Html = Html.Replace("{FabricanteRazon}", Soft.ElementAt(0).Value);
+				Html = Html.Replace("{FabricanteNombre}", Soft.ElementAt(1).Value);
+				Html = Html.Replace("{FabricanteSoftware}", Soft.ElementAt(2).Value);
+			}
+			else
+			{
+				Html = Html.Replace("{FabricanteRazon}", string.Empty);
+				Html = Html.Replace("{FabricanteNombre}", string.Empty);
+				Html = Html.Replace("{FabricanteSoftware}", string.Empty);
+			}
 			return Html;
 		}
 
