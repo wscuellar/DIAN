@@ -67,6 +67,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				XElement xelement = XElement.Load(new StringReader(xmldecoded));
 				XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
 				XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+				XNamespace ext = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
+				XNamespace def = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
+				XNamespace sts = "dian:gov:co:facturaelectronica:Structures-2-1";
 				var tipo = xelement.Elements(cbc + "InvoiceTypeCode").FirstOrDefault().Value;
 				var invoiceLineNodes = xelement.Elements(cac + "InvoiceLine");
 				var html = GetTemplate(tipo);
@@ -99,8 +102,12 @@ namespace Gosocket.Dian.Functions.Pdf
 				if (tipo == "60")
 				{
 
+
+					var contador = xelement.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "SubscriberConsumption").Elements(def + "ConsumptionSection")
+						.Elements(def + "SPDDebitsForPartialConsumption").Elements(def + "SPDDebitForPartialConsumption").Elements(def + "UtilityMeter").Elements(def + "MeterNumber");
+					var cont = contador.Any() ? contador.FirstOrDefault().Value : "";
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
-					html = await CruzarModeloDetallesProductosContador(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosContador(html, invoiceLineNodes.ToList(),xelement );
 				}
 					html = html.Replace("{QrCodeBase64}", qr);
 				html = html.Replace("{FechaValidacionDIAN}", FechaValidacionDIAN);
@@ -470,7 +477,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
 			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
 			return plantillaHtml;
-		}private static async Task<string> CruzarModeloDetallesProductosContador(string plantillaHtml, List<XElement> model, string fecha)
+		}private static async Task<string> CruzarModeloDetallesProductosContador(string plantillaHtml, List<XElement> model, XElement Medidor)
 		{
 			var rowDetalleProductosBuilder = new StringBuilder();
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
@@ -532,8 +539,8 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
-					<td>{Descrip}</td>
-		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
+					<td>{Medidor}</td>
+		    
 	            </tr>");
 
 				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value) *

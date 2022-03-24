@@ -246,7 +246,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 var xmlEquivalenteBytes = Convert.FromBase64String(response.XmlBase64);
                 var requestObj = new { response.XmlBase64, FechaValidacionDIAN, FechaGeneracionDIAN };
-                HttpResponseMessage responseMessage = ConsumeApi(ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos"), requestObj);
+                HttpResponseMessage responseMessage = await  ConsumeApiAsync(ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos"), requestObj);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
