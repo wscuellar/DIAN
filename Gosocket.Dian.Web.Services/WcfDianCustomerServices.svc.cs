@@ -867,9 +867,9 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="endDate" type="DateTime"></param>
         /// <param name="documentGroup" type="string"></param>
         /// <returns></returns>
-        public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate , DateTime endDate, string documentGroup)
+        public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup)
         {
-            string[] allowedDocumentGroups = new string[]{ "Todos", "Emitido", "Recibido" };
+            string[] allowedDocumentGroups = new string[] { "Todos", "Emitido", "Recibido" };
             try
             {
                 var authCode = GetAuthCode();
@@ -907,7 +907,7 @@ namespace Gosocket.Dian.Web.Services
                     documentGroup = "Todos";
                 }
 
-                if(!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
+                if (!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, $"El grupo de documento solicitado ({documentGroup}) es inválido.");
                     return new DianResponse { StatusCode = "89", StatusDescription = $"El grupo de documento solicitado({ documentGroup }) es inválido." };
@@ -921,7 +921,7 @@ namespace Gosocket.Dian.Web.Services
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
-                
+
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
