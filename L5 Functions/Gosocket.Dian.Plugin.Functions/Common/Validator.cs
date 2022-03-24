@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private string[] _equivalentDocumentTypes = new string[]{ "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
+        private readonly string[] _equivalentDocumentTypes = new string[]{ "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
 
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
@@ -4563,7 +4563,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "DSAB24b";
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
                     }
-
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        response.ErrorCode = "DEAB24b";
+                    }
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                          || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
