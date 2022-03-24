@@ -73,7 +73,8 @@
                         }
                         else
                         {
-                            if (document.DocumentTypeId == "20")
+                            // 20 = pos - 35 = transporte pasajeros - 40 = Cobro Peaje - 55 = Bolas Valor Y Agropecuario - 45 = extractos - 50 = Aereo - 32 = espectaculos publicos 
+                            if (document.DocumentTypeId == "20" || document.DocumentTypeId == "35" || document.DocumentTypeId == "40" || document.DocumentTypeId == "55" || document.DocumentTypeId == "50" || document.DocumentTypeId == "45" || document.DocumentTypeId == "32")
                             {
                                 <span class="fa fa fa-download add-tooltip download-equivalente-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")"></span>
                             }
