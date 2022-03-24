@@ -69,9 +69,18 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1 || x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
-            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            
+            if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+            else 
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+
+            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
         }
