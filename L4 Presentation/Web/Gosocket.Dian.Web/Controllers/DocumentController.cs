@@ -241,26 +241,16 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-
-                //var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
-                //var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
-                
-
                 var requestObj2 = new { trackId };
                 var response = await DownloadXmlAsync(requestObj2);
 
-                var base64Xml = response.XmlBase64;
                 var xmlEquivalenteBytes = Convert.FromBase64String(response.XmlBase64);
-                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
-                var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
-                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
-
-                var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
-                //var xmlBytes = DownloadXml(trackId);
+                var requestObj = new { response.XmlBase64, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = ConsumeApi(ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos"), requestObj);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
-                    new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
+                    new Tuple<string, byte[]>(trackId + ".pdf", responseMessage.Content.ReadAsByteArrayAsync().Result),
                     xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
                 }, trackId);
 
@@ -270,25 +260,6 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Debug.WriteLine(ex.Message);
                 return File(new byte[1], "application/zip", $"error");
-            }
-        }
-
-        public byte[] SearchXmlEquivalente(string trackId, string GenerationDate)
-        {
-            try
-            {
-                //UploadDocumentResponse result;
-                //var check = CheckTrackIdFormat(trackId, authCode, email);
-
-                DianPAServices customerDianPa = new DianPAServices();
-                {
-                    var resp = fileManager.GetBytes(blobContainer, $"{blobContainerFolder}/{blobContainerFolderTwo}/{GenerationDate.Substring(6, 4)}/{GenerationDate.Substring(3, 2)}/{trackId}.xml");
-                    return resp;                    
-                }                
-            }
-            catch (Exception ex)
-            {
-                return null;
             }
         }
 
