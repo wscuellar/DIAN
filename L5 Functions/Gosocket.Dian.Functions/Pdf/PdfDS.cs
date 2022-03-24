@@ -96,8 +96,13 @@ namespace Gosocket.Dian.Functions.Pdf
 					html = FillTransporteT(html, xelement);
 				}
 
+				if (tipo == "60")
+				{
 
-				html = html.Replace("{QrCodeBase64}", qr);
+					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosContador(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+				}
+					html = html.Replace("{QrCodeBase64}", qr);
 				html = html.Replace("{FechaValidacionDIAN}", FechaValidacionDIAN);
 				html = html.Replace("{FechaGeneracionDIAN}", FechaGeneracionDIAN);
 
@@ -391,6 +396,81 @@ namespace Gosocket.Dian.Functions.Pdf
 			return plantillaHtml;
 		}
 		private static async Task<string> CruzarModeloDetallesProductosComplete(string plantillaHtml, List<XElement> model, string fecha)
+		{
+			var rowDetalleProductosBuilder = new StringBuilder();
+			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+			var cosmos = new CosmosDbManagerPayroll();
+			decimal subTotal = 0;
+			decimal DescDet = 0;
+			decimal RecDet = 0;
+
+			foreach (var detalle in model)
+			{
+				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
+				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
+
+				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount");
+				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
+
+				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
+				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
+				var Desc = "";
+				var Reca = "";
+				var recargos = detalle.Elements(cac + "AllowanceCharge").ToList();
+				foreach (var item in recargos)
+				{
+					var tipo = item.Elements(cbc + "ChargeIndicator").FirstOrDefault().Value;
+					if (tipo.ToUpper() == "TRUE")
+					{
+						Reca = item.Elements(cbc + "Amount").FirstOrDefault().Value;
+
+						RecDet = RecDet + decimal.Parse(Reca);
+					}
+					else
+					{
+						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
+						DescDet = DescDet + decimal.Parse(Desc);
+					}
+				}
+				var fechaPeriodo = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "StartDate");
+
+				var FechaPeriodo = fechaPeriodo.Any() ? fechaPeriodo.FirstOrDefault().Value : "";
+				var Descr = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "Description");
+
+				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
+
+
+
+				rowDetalleProductosBuilder.Append($@"
+                <tr>
+		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
+		            <td>{unit.CompositeName}</td>
+		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
+					 <td class='text-right'>{Desc:n2}</td>
+                    <td class='text-right'>{Reca:n2}</td>
+		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td class='text-right'>{IvaPor:n2}</td>
+
+
+		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+					<td>{Descrip}</td>
+		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
+	            </tr>");
+
+				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value) *
+										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
+			}
+			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
+
+			plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString());
+			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
+			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
+			return plantillaHtml;
+		}private static async Task<string> CruzarModeloDetallesProductosContador(string plantillaHtml, List<XElement> model, string fecha)
 		{
 			var rowDetalleProductosBuilder = new StringBuilder();
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
@@ -1047,6 +1127,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
 			else if (tipo == "30")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentJuegos_template.html");
+			else if (tipo == "60")
+				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentSPD_template.html");
 			else return null;
 		}
 
