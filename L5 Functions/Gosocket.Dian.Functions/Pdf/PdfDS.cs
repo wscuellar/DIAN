@@ -235,8 +235,17 @@ namespace Gosocket.Dian.Functions.Pdf
 				var regim = new StringBuilder();
 				for (int i = 0; i < regimen.Count(); i++)
 				{
+					try
+					{
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+					}
+					catch (Exception)
+					{
 
-					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+						regim.Append (regimen[i]+";");
+					}
+
+					
 
 				}
 				plantillaHtml = plantillaHtml.Replace("{EmisorRegimenFiscal}", regim.ToString().Substring(0, regim.ToString().Length - 1));
@@ -551,8 +560,18 @@ namespace Gosocket.Dian.Functions.Pdf
 				var regim = new StringBuilder();
 				for (int i = 0; i < regimen.Count(); i++)
 				{
+					try
+					{
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + "\n ");
 
-					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + "\n ");
+					}
+					catch (Exception)
+					{
+
+						regim.Append(regimen[i]+"\n ");
+					}
+
+				
 
 				}
 				Html = Html.Replace("{VendedorRegimenFiscal}", regim.ToString());
@@ -837,6 +856,30 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{FabricanteNombre}", string.Empty);
 				Html = Html.Replace("{FabricanteSoftware}", string.Empty);
 			}
+
+			// aereo
+			var rese = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def+"Interoperabilidad").Elements(def+"Group").Elements(def+"Collection").Elements(def+ "AdditionalInformation").Elements(def+ "Value");
+			if (rese.Any())
+			{
+				Html = Html.Replace("{NumeroReserva}", rese.FirstOrDefault().Value);
+			}
+			else
+			{
+				Html = Html.Replace("{NumeroReserva}", string.Empty);
+			}
+
+			var Pasa = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Interoperabilidad").Elements(def + "Group").Elements(def + "Collectiontraveler").Elements(def + "AdditionalInformation").Elements(def + "Value");
+			if (Pasa.Count()==3)
+			{
+				Html = Html.Replace("{PasajeroNombre}", Pasa.ElementAt(1).Value);
+				Html = Html.Replace("{PasajeroNumeroDocumento}", Pasa.ElementAt(0).Value);
+			}
+			else
+			{
+				Html = Html.Replace("{PasajeroNombre}", string.Empty);
+				Html = Html.Replace("{PasajeroNumeroDocumento}", string.Empty);
+			}
+
 			return Html;
 		}
 
