@@ -58,6 +58,18 @@ namespace Gosocket.Dian.Functions.Payroll
                 GlobalDocPayroll docGlobalPayroll = xmlParser.globalDocPayrolls;
                 docGlobalPayroll.Timestamp = DateTime.Now;
 
+                docGlobalPayroll.FechaIngreso = ValidateFechaAnio(docGlobalPayroll.FechaIngreso);
+                //docGlobalPayroll.CreateDate = ValidateFechaAnio(docGlobalPayroll.CreateDate); timestamp
+                docGlobalPayroll.FechaFin = ValidateFechaAnio(docGlobalPayroll.FechaFin);
+                docGlobalPayroll.FechaPagoFin = ValidateFechaAnio(docGlobalPayroll.FechaPagoFin);
+                docGlobalPayroll.FechaGen = ValidateFechaAnio(docGlobalPayroll.FechaGen);
+                docGlobalPayroll.FechaGenPred = ValidateFechaAnio(docGlobalPayroll.FechaGenPred);
+                docGlobalPayroll.Info_FechaGen = ValidateFechaAnio(docGlobalPayroll.Info_FechaGen);
+                docGlobalPayroll.FechaLiquidacion = ValidateFechaAnio(docGlobalPayroll.FechaLiquidacion);
+                docGlobalPayroll.FechaInicio = ValidateFechaAnio(docGlobalPayroll.FechaInicio);
+                docGlobalPayroll.FechaPagoInicio = ValidateFechaAnio(docGlobalPayroll.FechaPagoInicio);
+                docGlobalPayroll.FechaRetiro = ValidateFechaAnio(docGlobalPayroll.FechaRetiro);
+
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 

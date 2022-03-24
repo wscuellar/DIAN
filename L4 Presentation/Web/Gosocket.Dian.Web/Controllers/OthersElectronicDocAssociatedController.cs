@@ -815,9 +815,6 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-
-
-
                 var data = new OtherDocumentActivationRequest();
                 data.Code = code.ToString();
                 data.ContributorId = contributorId;
@@ -830,6 +827,9 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
+                data.TestSetId = testSetResult.Id;
+                data.ContributorOpertaionModeId = globalRadianOperations.OperationModeId;
+                data.OtherDocElecContributorId = testSetResult.OtherDocElecContributorId;
 
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
@@ -1054,6 +1054,12 @@ namespace Gosocket.Dian.Web.Controllers
 
         [JsonProperty(PropertyName = "enabled")]
         public bool Enabled { get; set; }
+
+        [JsonProperty(PropertyName = "contributorOpertaionModeId")]
+        public int ContributorOpertaionModeId { get; set; }
+
+        [JsonProperty(PropertyName = "otherDocElecContributorId")]
+        public int OtherDocElecContributorId { get; set; }
 
     }
 }
