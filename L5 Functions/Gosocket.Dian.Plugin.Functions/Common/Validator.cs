@@ -1136,7 +1136,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (documentMeta.DocumentTypeId == "91") receiver2DvErrorCode = "CAK47";
                     else if (documentMeta.DocumentTypeId == "92") receiver2DvErrorCode = "DAK47";
                     else if (documentMeta.DocumentTypeId == "96") receiver2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK47;
-
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        receiver2DvErrorCode = "DEAJ47";
+                        receiver2DvrErrorDescription = "DV del NIT emisor no informado";
+                    }
                     var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
 
                     long numberReceiver2CodeDigit = 0;
@@ -1238,6 +1242,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
                     else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        senderDvErrorCode = "DEAK24";
+                        senderDvrErrorDescription = "No está informado el DV del NIT";
+                    }
 
                     if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
                     if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
@@ -1268,7 +1277,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            {
+                softwareproviderDvErrorCode = "DEAB22b";
+            }
             // Is Radian
             var isRadian = false;
             if (documentMeta.DocumentTypeId == "96")
@@ -1362,7 +1374,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
-
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            {
+                softwareProviderErrorCode = "DEAB19b";
+            }
             //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
