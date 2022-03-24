@@ -853,7 +853,7 @@ namespace Gosocket.Dian.Functions.Batch
                             bool existOperationEmp = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
                             if (!existOperationProv || !existOperationEmp)
                             {
-                                nitNomina = nitNomina != nitNominaProv ? nitNomina : nitNominaProv;
+                                nitNomina = !existOperationProv ? nitNominaProv : nitNomina;
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"El NIT {nitNomina} no cuenta con el software con id {softwareIdNomina} asociado al proceso de habilitación Otros documentos" });
                             }
 
