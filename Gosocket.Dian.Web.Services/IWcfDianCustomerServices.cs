@@ -126,7 +126,7 @@ namespace Gosocket.Dian.Web.Services
         DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber);
 
         /// <summary>
-        /// Generar solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
+        /// Genera la solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
         /// </summary>
         /// <param name="nit" type="string"></param>
         /// <param name="startDate" type="DateTime"></param>
