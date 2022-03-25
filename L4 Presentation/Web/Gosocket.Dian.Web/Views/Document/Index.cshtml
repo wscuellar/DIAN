@@ -228,6 +228,14 @@
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
             })
 
+            $(".download-equivalente-document").click(function () {
+                var cufe = this.id;
+                var typeId = $(this).context.getAttribute('documenTypeId');
+                var emissionDate = $(this).context.getAttribute('EmissionDate');
+                var generationDate = $(this).context.getAttribute('GenerationDate');
+                window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&documentTypeId=" + typeId + "&FechaValidacionDIAN=" + emissionDate + "&FechaGeneracionDIAN=" + generationDate;
+            })
+
             $(".download-support-document").click(function () {
                 var cufe = this.id;
                 var element = '#' +cufe;

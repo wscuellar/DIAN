@@ -8,6 +8,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
+using Gosocket.Dian.Services.ServicesGroup;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -63,6 +64,12 @@ namespace Gosocket.Dian.Web.Controllers
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+
+        private static readonly FileManager fileManager = new FileManager();
+        private static readonly string blobContainer = "global";
+        private static readonly string blobContainerFolder = "docvalidator";
+        private static readonly string blobContainerFolderTwo = "new-dian-ubl21";
+        private static readonly string blobContainerResponse = "batchValidator";
 
         private readonly IRadianContributorService _radianContributorService;
 
@@ -203,6 +210,48 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
                     xmlBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlBytes) : null
+                }, trackId);
+
+                return File(zipFile, "application/zip", $"{trackId}.zip");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+        }
+        public static async Task<HttpResponseMessage> ConsumeApiAsync<T>(string url, T requestObj)
+        {
+
+            var buffer = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return await client.PostAsync(url, byteContent);
+
+        }
+
+        public static async Task<ResponseDownloadXml> DownloadXmlAsync<T>(T requestObj)
+        {
+            var response = await ConsumeApiAsync(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+            var result = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<ResponseDownloadXml>(result);
+        }
+
+        public async Task< ActionResult> DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+                var requestObj2 = new { trackId };
+                var response = await DownloadXmlAsync(requestObj2);
+
+                var xmlEquivalenteBytes = Convert.FromBase64String(response.XmlBase64);
+                var requestObj = new { response.XmlBase64, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await  ConsumeApiAsync(ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos"), requestObj);
+
+                var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
+                {
+                    new Tuple<string, byte[]>(trackId + ".pdf", responseMessage.Content.ReadAsByteArrayAsync().Result),
+                    xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
                 }, trackId);
 
                 return File(zipFile, "application/zip", $"{trackId}.zip");

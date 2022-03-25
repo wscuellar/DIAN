@@ -857,5 +857,148 @@ namespace Gosocket.Dian.Web.Services
                 return "";
             }
         }
+
+
+        /// <summary>
+        /// Generate report of Send or Received Documents
+        /// </summary>
+        /// <param name="nit" type="string"></param>
+        /// <param name="startDate" type="DateTime"></param>
+        /// <param name="endDate" type="DateTime"></param>
+        /// <param name="documentGroup" type="string"></param>
+        /// <returns></returns>
+        public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup)
+        {
+            string[] allowedDocumentGroups = new string[] { "Todos", "Emitido", "Recibido" };
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if (string.IsNullOrEmpty(authCode))
+                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
+
+                if (startDate.Date <= DateTime.MinValue)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha inicio es obligatoria.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "La fecha inicio es obligatoria." };
+                }
+
+                if (endDate.Date <= DateTime.MinValue)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final es obligatoria.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final es obligatoria." };
+                }
+
+                if (endDate.Date < startDate.Date)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final debe ser mayor o igual a la fecha inicial.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final debe ser mayor o igual a la fecha inicial." };
+                }
+                int maxQuantyDays = Convert.ToInt32(ConfigurationManager.GetValue("BulkDocumentsDownload_QuantyMaxDaysFoDateRange"));
+                if ((endDate.Date - startDate.Date).TotalDays > maxQuantyDays)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses).");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
+                }
+
+                if (string.IsNullOrWhiteSpace(documentGroup))
+                {
+                    documentGroup = "Todos";
+                }
+
+                if (!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, $"El grupo de documento solicitado ({documentGroup}) es inválido.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"El grupo de documento solicitado({ documentGroup }) es inválido." };
+                }
+
+                /*agregar validacion de que la fecha inicial no debe ser mayor a 3 meses a partir de hoy*/
+                if ((DateTime.Now.Date - startDate.Date).TotalDays > maxQuantyDays)
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "la fecha de inicio supera el rango máximo de fechas permitido (3 meses).");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
+                }
+
+                DianPAServices customerDianPa = new DianPAServices();
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                var result = customerDianPa.SendRequestBulkDocumentsDownload(authCode, email, nit, startDate, endDate, documentGroup);
+
+                stopwatch.Stop();
+                double ms = stopwatch.ElapsedMilliseconds;
+                double seconds = ms / 1000;
+
+                stopwatch.Reset();
+                Log($"{authCode} {email}", (int)InsightsLogType.Info, "BulkDocumentDownloadAsync " + seconds);
+                if (seconds >= 10)
+                {
+                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
+                    tableManagerGlobalLogger.InsertOrUpdate(logger);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log($"{nit} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"BulkDocumentDownloadAsyncException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"BulkDocumentDownloadAsync, Nit: {nit}, StartDate: {startDate:dd/MM/yyyy}, EndDate: {endDate:dd/MM/yyyy}, DocumentGroup: {documentGroup}", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+            }
+        }
+
+        /// <summary>
+        /// Consult the status of report of Send or Received Documents
+        /// </summary>
+        /// <param name="trackId"></param>
+        /// <returns></returns>
+        public DianResponse GetStatusBulkDocumentDownload(string trackId)
+        {
+            try
+            {
+                var authCode = GetAuthCode();
+                var email = GetAuthEmail();
+
+                if (string.IsNullOrEmpty(authCode))
+                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
+
+                if (string.IsNullOrWhiteSpace(trackId))
+                {
+                    Log($"{authCode} {email} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, "El trackId de la solciitud es obligatorio.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El trackId de la solciitud es obligatorio." };
+                }
+
+                DianPAServices customerDianPa = new DianPAServices();
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                var result = customerDianPa.GetStatusBulkDocumentsDownload(trackId);
+
+                stopwatch.Stop();
+                double ms = stopwatch.ElapsedMilliseconds;
+                double seconds = ms / 1000;
+
+                stopwatch.Reset();
+                Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatusBulkDocumentDownload " + seconds);
+                if (seconds >= 10)
+                {
+                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
+                    tableManagerGlobalLogger.InsertOrUpdate(logger);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Log($"{trackId} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, ex.Message);
+                var exception = new GlobalLogger($"GetStatusBulkDocumentDownloadException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusBulkDocumentDownload, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
+                tableManagerGlobalLogger.InsertOrUpdate(exception);
+                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+            }
+        }
     }
 }

@@ -966,7 +966,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(documentKey))
                 {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDE no está calculado correctamente.");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDS no está calculado correctamente.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -974,7 +974,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05d" + txtRechazo + "Número de documento soporte no está contenido en el rango de numeración autorizado.");                                      
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05d" + txtRechazo + "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado.");                                      
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -982,7 +982,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {                   
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05e" + txtRechazo + "Número de documento soporte no existe para el número de autorización.");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05e" + txtRechazo + "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no existe para el número de autorización.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;

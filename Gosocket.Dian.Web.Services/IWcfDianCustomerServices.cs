@@ -1,6 +1,7 @@
 ﻿using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Web.Services.Filters;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 
@@ -123,5 +124,26 @@ namespace Gosocket.Dian.Web.Services
         [OperationContract]
         [CustomOperation]
         DocIdentifierWithEventsResponse GetDocIdentifierWithEvents(string contributorCode, string dateNumber);
+
+        /// <summary>
+        /// Genera la solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
+        /// </summary>
+        /// <param name="nit" type="string"></param>
+        /// <param name="startDate" type="DateTime"></param>
+        /// <param name="endDate" type="DateTime"></param>
+        /// <param name="documentGroup" type="string"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]   
+        DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup);
+
+        /// <summary>
+        /// Consulta el estado de una solicitud de descarga de documentos emitidos/recibidos de facturas electrónicas
+        /// </summary>
+        /// <param name="trackId" type="string"></param>
+        /// <returns></returns>
+        [OperationContract]
+        [CustomOperation]
+        DianResponse GetStatusBulkDocumentDownload(string trackId);
     }
 }

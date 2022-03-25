@@ -40,7 +40,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
-        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;    
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
@@ -69,9 +69,18 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1 || x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
-            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            
+            if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+            else 
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+
+            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
         }
@@ -289,12 +298,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsEquivalent = electronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
 
             List<Contributor> providersList;
             var providersListDto = new List<ContributorViewModel>();
 
-            if (electronicDocumentIsSupport)
+            if (electronicDocumentIsSupport || electronicDocumentIsEquivalent)
             {
                 /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
                 * en el modo de operación de facturación electrónica*/
@@ -376,9 +386,9 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
-            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;                
 
-            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+        ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             var tipo = model.OperationModeId;
             if (model.OperationModeId == 0)
             {
@@ -536,6 +546,9 @@ namespace Gosocket.Dian.Web.Controllers
                     ContributorId = User.ContributorId()
                 });
             }
+
+            NotificationsController notification = new NotificationsController();
+            await notification.EventNotificationsAsync("04", User.UserCode());
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
@@ -876,7 +889,15 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult CancelRegister(int id, string description)
         {
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
-            return Json(response, JsonRequestBehavior.AllowGet);
+            return Json(new
+            {
+                response.Code,
+                response.data,
+                response.Message,
+                response.MessageType,
+                response.RedirectTo,
+                ExistOperationModeAsociated = response.ExistOperationModeAsociated
+            }, JsonRequestBehavior.AllowGet);
         }
 
 
