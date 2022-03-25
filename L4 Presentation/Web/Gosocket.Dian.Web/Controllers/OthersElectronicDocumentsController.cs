@@ -298,12 +298,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsEquivalent = electronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
 
             List<Contributor> providersList;
             var providersListDto = new List<ContributorViewModel>();
 
-            if (electronicDocumentIsSupport)
+            if (electronicDocumentIsSupport || electronicDocumentIsEquivalent)
             {
                 /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
                 * en el modo de operación de facturación electrónica*/
