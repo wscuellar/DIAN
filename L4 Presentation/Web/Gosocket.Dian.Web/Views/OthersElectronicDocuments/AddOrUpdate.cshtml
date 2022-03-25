@@ -6,6 +6,7 @@
     var electronicDocumentName = (string)ViewBag.ElectronicDocumentName;
     var message = (string)ViewBag.Message;
     var isElectronicPayroll = (bool)ViewBag.IsElectronicPayroll;
+    var isElectronicPayrollNoOfe = (bool)ViewBag.IsElectronicPayrollNoOfe;
     var dianUrlEventReception = Model.UrlEventReception;
     var softwareIdPrInitial = Model.SoftwareIdPr;
 }
@@ -169,7 +170,7 @@
                                                     <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
-                                                    @if (!isElectronicPayroll)
+                                                    @if (ViewBag.IsSupportDocument)
                                                     {
                                                         <th class="text-center">Rangos de Pruebas</th>
                                                     }
@@ -194,7 +195,7 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            @if (!isElectronicPayroll)
+                                                            @if (ViewBag.IsSupportDocument)
                                                             {
                                                                 <td class="text-center">
                                                                     <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
@@ -202,16 +203,20 @@
                                                                     </a>
                                                                 </td>
                                                             }
-                                                        <td class="text-center" style="width:70px">
+                                                        <td nowrap class="text-center">
                                                             @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
                                                             <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-                                                            @if (isElectronicPayroll)
+                                                            @if (isElectronicPayroll || isElectronicPayrollNoOfe)
                                                             {
                                                                 <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
                                                             }
                                                             else
                                                             {
                                                                 <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                            }
+                                                            @if (ViewBag.IsEquivalentDocument)
+                                                            {
+                                                                <a onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)" title="Documentos habilitados"><i class="fa fa-check-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
                                                             }
                                                         </td>
                                                         </tr>
@@ -260,17 +265,47 @@
                         <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
                         <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="width:100%">
                         <div class="bootbox-body">
                             <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
                             <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
                                       maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
                         </div>
-                    </div><div class="modal-footer">
-                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                    <div class="modal-footer" style="position:relative;width:initial;">
+                        <button type="button" class="btn btn-radian-default" style="display:block; padding: 8px 13px;" data-dismiss="modal">Cancelar</button>
+                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Aceptar</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade prompt-comment" id="dialog-equivalents-documents-enabled" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px;">×</button>
+                <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Documentos equivalentes habilitados</h4>
+            </div>
+            <div class="modal-body" style="width: 100%;">
+                <div class="table-responsive" style="width:inherit">
+                    <table id="equivalents-documents-enabled-table" class="documents-table table table-striped table-hover align-middle margin-bottom-0" style="margin-bottom: 50px; font-size:14px">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">Documento</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="position:relative">
+                <button type="button" data-dismiss="modal" class="btn btn-success btn-radian-success" style="padding: 8px 13px;">Cerrar</button>
             </div>
         </div>
     </div>
@@ -678,6 +713,38 @@
 
                         }
                     });
+                }
+            });
+        }
+
+        function OpenModalShowEquivalentDocumentsEnabled(otherDocElecContributor) {
+            var tableContent = $("#equivalents-documents-enabled-table").find("tbody");
+            tableContent.html(`<tr><td colspan="2">No se encontraron documentos equivalentes habilitados</td></tr>`);
+
+            showLoading('#panel-wrapper', 'Cargando', 'Consultando los documentos equivalentes habilitados, por favor espere.');
+            $.ajax({
+                url: `@Url.Action("GetTestSetResultAcepted", "OthersElectronicDocuments")?otherDocElecContributorOperationsId=${otherDocElecContributor}`,
+                type: "GET",
+                datatype: "json",
+                success: function (result) {
+                    hideLoading("#panel-wrapper");
+                    $("#dialog-equivalents-documents-enabled").modal("show");
+                    if (!result) return;
+                    if (result.length <= 0) return;
+                    tableContent.html('');
+                    result.forEach(t => {
+                        tableContent.append(`<tr><td style="text-align: left;">${t.EquivalentElectronicDocumentName}</td><td><label class="label" style="background:green; color: #fff; border-radius:4px;"> ${t.EquivalentElectronicDocumentState}</label></td></tr>`)
+                    });
+
+                },
+                complete: function () {
+                    hideLoading("#panel-wrapper");
+                },
+                error: function (result) {
+                    hideLoading("#panel-wrapper");
+                    bootbox.alert("Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
                 }
             });
         }

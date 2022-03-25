@@ -61,8 +61,9 @@ namespace Gosocket.Dian.Functions.Batch
 			var trackIdReferenceRadian = string.Empty;
 			var trackIdCude = string.Empty;
 			var listId = string.Empty;
-
-
+			var payrollProvider = string.Empty;
+			var payrollTypeXml = string.Empty;
+			
 			try
 			{
 				var data = string.Empty;
@@ -117,8 +118,19 @@ namespace Gosocket.Dian.Functions.Batch
 				trackIdReferenceRadian = xpathResponse.XpathsValues["AppResDocumentReferenceKeyXpath"];
 				listId = string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResListIDXpath"]) ? "1" : xpathResponse.XpathsValues["AppResListIDXpath"];
 				trackIdCude = xpathResponse.XpathsValues["AppResDocumentKeyXpath"];
+				Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
 
-				var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(testSetId);
+				//if (!flagApplicationResponse && !flagInvoice)
+				//{
+				//	payrollTypeXml = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["NominaTipoXML"]) ? xpathResponse.XpathsValues["NominaTipoXML"] : xpathResponse.XpathsValues["NominaAjusteTipoXML"];
+				//	payrollProvider = payrollTypeXml == "102" ? xpathResponse.XpathsValues["NominaProviderCodeXpath"] : xpathResponse.XpathsValues["NominaAjusteProviderCodeXpath"];
+			
+
+				//}
+
+
+
+				var setResultOther = tableManagerGlobalTestSetOthersDocumentResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(obj.AuthCode, testSetId);
 
 				start = DateTime.UtcNow;
 				var flagAppResponse = new GlobalLogger(zipKey, "2 flagApplicationResponse")
@@ -659,7 +671,7 @@ namespace Gosocket.Dian.Functions.Batch
 			SetLogger(null, "Step-validateReferenceAttorney", " listId " + listId + " eventCode " + eventCode + " senderCode " + senderCode + " IssuerAttorney " + issuerAttorney + " operationCode " + operationCode, "ATT-1");
 
 			//Se busca el set de pruebas procesado para el testsetid en curso
-			RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(testSetId);
+			RadianTestSetResult radianTesSetResult = tableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(issuerAttorney,testSetId);
 
 			//Evento Mandato el provider es el mandatario
 			if (Convert.ToInt32(eventCode) == (int)EventStatus.Mandato && listId == "3")

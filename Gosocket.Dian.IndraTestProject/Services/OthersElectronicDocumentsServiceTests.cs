@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
         private readonly Mock<IOthersDocsElecContributorRepository> _othersDocsElecContributorRepository = new Mock<IOthersDocsElecContributorRepository>();
         private readonly Mock<IOthersDocsElecContributorOperationRepository> _othersDocsElecContributorOperationRepository = new Mock<IOthersDocsElecContributorOperationRepository>();
+        private readonly Mock<IEquivalentElectronicDocumentRepository> _equivalentElectronicDocumentRepository = new Mock<IEquivalentElectronicDocumentRepository>();
 
         [TestInitialize]
         public void TestInitialize()
@@ -35,7 +36,8 @@ namespace Gosocket.Dian.Application.Tests
                         _othersDocsElecContributorOperationRepository.Object,
                         _othersDocsElecContributorRepository.Object,
                         _globalOtherDocElecOperationService.Object,
-                        _testSetOthersDocumentsResultService.Object);
+                        _testSetOthersDocumentsResultService.Object,
+                        _equivalentElectronicDocumentRepository.Object);
         }
 
 

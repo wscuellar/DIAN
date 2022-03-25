@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Interfaces.Services
         /// <returns></returns>
         NameValueCollection Summary(string userCode);
         List<OtherDocElecOperationMode> GetOperationModes();
+        OtherDocElecOperationMode GetOperationModeById(int operationModeId);
         OtherDocElecContributor CreateContributor(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
         OtherDocElecContributor CreateContributorNew(int contributorId, Domain.Common.OtherDocElecState State, int ContributorType, int OperationMode, int ElectronicDocumentId, string createdBy);
         List<OtherDocElecContributor> ValidateExistenciaContribuitor(int ContributorId, int contributorTypeId, int OperationModeId, string state);
@@ -22,6 +23,7 @@ namespace Gosocket.Dian.Interfaces.Services
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId, int electronicDocumentId);
         PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
+        int NumHabilitadosOtherDocsElect(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
 
     

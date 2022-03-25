@@ -57,34 +57,49 @@
 
             <div class="row-fluid">
 
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
-                        <div class="RadianImgContainer" style="margin:10px;">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Emisor</p>
-                            <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
+                @if (ViewBag.electronicDocumentId == 13)
+                {
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
+                            <div class="RadianImgContainer" style="margin:10px;">
+                                <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
+                            </div>
+                            <div class="card-body">
+                                <p class="RadianTittleCard">Emisor</p>
+                                <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
+                            <div class="RadianImgContainer" style="margin:10px;">
+                                <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
+                            </div>
+                            <div class="card-body">
+                                <p class="RadianTittleCard">Emisor</p>
+                                <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer pull-right" style="width: 90% !important; height: 244px !important;" ContributorIdType="2" Participantetexto="Proveedor de Servicios Tecnológicos">
-                        <div class="RadianImgContainer" style="margin:10px;">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Proveedor de Servicios Tecnológicos</p>
-                            <p class="RadianTittleCard2" tyle="margin-top: -8px !important;">Otros Documentos Electrónicos</p>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="card RadianCardContainer pull-right" style="width: 90% !important; height: 244px !important;" ContributorIdType="2" Participantetexto="Proveedor de Servicios Tecnológicos">
+                            <div class="RadianImgContainer" style="margin:10px;">
+                                <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
+                            </div>
+                            <div class="card-body">
+                                <p class="RadianTittleCard">Proveedor de Servicios Tecnológicos</p>
+                                <p class="RadianTittleCard2" tyle="margin-top: -8px !important;">Otros Documentos Electrónicos</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
+
             </div>
-
         </div>
-
-
 
         @*<div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -156,6 +171,7 @@
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionParticipante',
                         ElectronicDocument: electronicDocumentId,
+                        ElectronicDocumentId: electronicDocumentId,
                         complementoTexto: complementoTexto,
                         ContributorIdType: ContributorIdType,
                         ContributorId: '@ViewBag.ContributorId'
@@ -165,6 +181,7 @@
                         UserCode: '@ViewBag.UserCode',
                         Accion: 'SeleccionParticipanteEmisor',
                         ElectronicDocument: electronicDocumentId,
+                        ElectronicDocumentId: electronicDocumentId,
                         complementoTexto: complementoTexto,
                         ContributorIdType: ContributorIdType,
                         ContributorId: '@ViewBag.ContributorId'

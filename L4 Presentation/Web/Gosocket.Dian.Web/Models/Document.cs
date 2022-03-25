@@ -31,6 +31,7 @@ namespace Gosocket.Dian.Web.Models
         public List<DocumentRadianStatusViewModel> RadianStatusList { get; set; }
 
 
+        public int ContributorTypeId { get; set; }
         public int Status { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

@@ -140,7 +140,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> StartNewValidationEventRadianAsync(string trackId)
         {
             var validateResponses = new List<ValidateListResponse>();
-            var validator = new Validator();           
+            var validator = new Validator();
 
             validateResponses.AddRange(validator.NewValidateEventRadianAsync(trackId));
 
@@ -230,7 +230,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             EventStatus code;
             string trackIdAvailability = null;
             string originalTrackId = data.TrackId;
-            
+
             switch (int.Parse(data.EventCode))
             {
                 case (int)EventStatus.Receipt:
@@ -268,16 +268,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
 
                 if (InvoiceWrapper.Any())
-                {                                      
-                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch 
+                {
+                    var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse );
                     if (trackIdEvent != null)
                     {
                         existDisponibilizaExpresa = true;
                         data.TrackId = trackIdEvent.DocumentMeta.PartitionKey;
                     }
-                }                                                  
-               
+                }
+
                 // Validación de la Sección Signature - Fechas valida transmisión evento Solicitud Disponibilizacion
                 if (Convert.ToInt32(data.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && !existDisponibilizaExpresa)
                 {
@@ -286,7 +286,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     string eventSearchTacita = "0" + (int)code;
                     List<InvoiceWrapper> InvoiceWrapperTacita = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
                     if (InvoiceWrapperTacita.Any())
-                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita).DocumentMeta.PartitionKey;                             
+                        data.TrackId = InvoiceWrapperTacita[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearchTacita).DocumentMeta.PartitionKey;
                 }
             }
             else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.NegotiatedInvoice || Convert.ToInt32(data.EventCode) == (int)EventStatus.Avales)
@@ -299,12 +299,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     data.TrackId = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse
                     && (x.DocumentMeta.CustomizationID == "361" || x.DocumentMeta.CustomizationID == "362" )).DocumentMeta.PartitionKey;
-                   
+
             }
-            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad 
+            else if (Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
-            {               
+            {
                 //Servicio GlobalDocAssociate
                 string eventSearch = "0" + (int)code;
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
@@ -317,14 +317,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         trackIdAvailability = respTrackIdAvailability.DocumentMeta.PartitionKey;
                     }
-                }                                  
+                }
             }
 
             var xmlBytes = await GetXmlFromStorageAsync(data.TrackId);
             var xmlParser = new XmlParser(xmlBytes);
             if (!xmlParser.Parser())
                 throw new Exception(xmlParser.ParserError);
-            
+
             // Por el momento solo para el evento 036 se conserva el trackId original, con el fin de traer el PaymentDueDate del CUFE
             // y enviarlo al validator para una posterior validación contra la fecha de vencimiento del evento (036).
             string parameterPaymentDueDateFE = null;
@@ -512,8 +512,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var nitModel = xmlParserCufe.Fields.ToObject<NitModel>();
             bool valid = true;
-                     
-          
+
+
             // ...
             List<string> issuerAttorneyList = null;
             var eventCode = int.Parse(party.ResponseCode);
@@ -536,13 +536,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
             else if (Convert.ToInt32(party.ResponseCode) == (int)EventStatus.EndosoPropiedad)
-            {               
+            {
                 string eventDisponibiliza = "0" + (int)EventStatus.SolicitudDisponibilizacion;
                 List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
-                                           
+
                 if(InvoiceWrapper.Any())
                     trackIdAvailability = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventDisponibiliza
-                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;               
+                    && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse).DocumentMeta.PartitionKey;
             }
 
             string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
@@ -562,7 +562,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (eventCode == (int)EventStatus.TerminacionMandato)
             {
                 var attorney = documentAttorneyTableManager.FindByPartition<GlobalDocReferenceAttorney>(party.TrackId).ToList();
-             
+
                 if (attorney != null && attorney.Count > 0)
                 {
                     foreach (var item in attorney)
@@ -632,11 +632,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             if (xmlParser.PaymentMeansID != "2")
             {
-                ValidateListResponse response = new ValidateListResponse();               
-                response.IsValid = false;                
+                ValidateListResponse response = new ValidateListResponse();
+                response.IsValid = false;
                 response.Mandatory = true;
                 response.ErrorCode = "LGC62";
-                response.ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62");                
+                response.ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC62");
                 response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
                 validateResponses.Add(response);
                 return validateResponses;
@@ -766,7 +766,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentParsed = new DocumentParsedNomina();
 
             GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
-                        
+
             documentParsed.EmpleadorNIT = documentMeta.SenderCode;
             documentParsed.SerieAndNumber = documentMeta.SerieAndNumber;
             documentParsed.DocumentTypeId = documentMeta.DocumentTypeId;
@@ -810,6 +810,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateNamespacePayrollAsync(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+
+            XmlParseNomina xmlParserNomina = null;
+            var xmlBytes = await GetXmlFromStorageAsync(trackId);
+
+            xmlParserNomina = new XmlParseNomina(xmlBytes);
+            if (!xmlParserNomina.Parser())
+                throw new Exception(xmlParserNomina.ParserError);
+
+            var validator = new Validator();
+            validateResponses.AddRange(validator.ValidateNamespacePayroll(xmlParserNomina));
+             
+            return validateResponses;
+        }
         public async Task<List<ValidateListResponse>> StartValidateCuds(RequestObjectCuds cuds)
         {
             var validateResponses = new List<ValidateListResponse>();

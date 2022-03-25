@@ -609,10 +609,13 @@ namespace Gosocket.Dian.Domain.Common
         SupportDocument = 3,
 
         [Description("Documento equivalente electrónico")]
-        ElectronicEquivalent = 4,
+        ElectronicEquivalent = 14,
 
         [Description("POS electrónico")]
-        ElectronicPOS = 5
+        ElectronicPOS = 5,
+
+        [Description("Nómina electrónica No OFE")]
+        ElectronicPayrollNoOFE = 13
     }
 
     public enum OtherDocElecSoftwaresStatus
