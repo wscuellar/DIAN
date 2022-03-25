@@ -178,6 +178,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 				var taxt = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var tax = taxt.Any() ? taxt.FirstOrDefault().Value : "";
+				var TaxableAmount = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount");
+				var taxAmo = TaxableAmount.Any() ? TaxableAmount.FirstOrDefault().Value : "";
 				rowDetalleProductosBuilder.Append($@"
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
@@ -186,7 +188,7 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-		            <td class='text-right'>{detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount").FirstOrDefault().Value:n2}</td>
+		            <td class='text-right'>{taxAmo:n2}</td>
                     <td class='text-right'>{tax:n2}</td>
 
 
