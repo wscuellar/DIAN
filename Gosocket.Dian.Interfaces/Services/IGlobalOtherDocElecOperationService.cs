@@ -8,6 +8,7 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IGlobalOtherDocElecOperationService
     {
         GlobalOtherDocElecOperation GetOperation(string code, Guid softwareId);
+        GlobalOtherDocElecOperation GetOperationByElectronicDocumentId(string code, Guid softwareId, int electronicDocumentId);
         bool Insert(GlobalOtherDocElecOperation item, OtherDocElecSoftware software);
         bool Update(GlobalOtherDocElecOperation item);
         bool IsActive(string code, Guid softwareId);

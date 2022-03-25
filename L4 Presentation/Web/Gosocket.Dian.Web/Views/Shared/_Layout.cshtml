@@ -121,7 +121,16 @@
                             <li>
                                 <center>
                                     <h4>
-                                        <b>Sistema de facturación electrónica – Ambiente de Habilitación</b>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod" )
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
+                                        }
+
                                     </h4>
                                 </center>
                             </li>
@@ -294,7 +303,11 @@
                                                 <li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
                                                 @if (User.ContributorTypeId() == (int)ContributorType.Provider)
                                                 {
-                                                    <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    if (new string[] { "Dev", "Local", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    }
+                                                    
                                                 }
                                                 <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
                                             </ul>
@@ -311,7 +324,7 @@
                                         </a>
                                         <!--Submenu-->
                                         <ul class="collapse">
-                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
                                         </ul>
                                         <ul class="collapse">
                                             <!--Rol Administrador-->
@@ -335,15 +348,8 @@
                                             Rol Facturador and Proveedor*@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
-                                                if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-                                                {
-                                                    if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-                                                    {
-                                                        <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar prefijos</a></li>
-                                                    }
-                                                }
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }
@@ -393,7 +399,7 @@
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
                                     {
-                                                                         <li>
+                                    <li>
                                         <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
                                             <i class="fa fa-users"></i>
                                             <span class="menu-title">
@@ -411,6 +417,16 @@
                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
                                             }
                                         </ul>
+                                        <ul>
+                                            @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                            {
+                                                if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
+                                                }
+                                            }
+                                        </ul>
+
                                     </li>
                                      }
 

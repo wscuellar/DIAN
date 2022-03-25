@@ -35,18 +35,22 @@
                 <th>Resultado</th>
                 <th>Estado RADIAN</th>
                 <th style="text-align:center">Valor Total</th>
+                @if (Model.ContributorTypeId == 4)
+                {
+                    <th>Creado desde</th>
+                }
             </tr>
         </thead>
         <tbody>
             @if (Model.Documents.Count == 0)
             {
                 <tr style="background-color: transparent !important;">
-                    <td class="text-nowrap text-center" colspan="13" style="padding-left: 0 !important; padding-right: 0 !important;">
+                    <td class="text-nowrap text-center" colspan="@(Model.ContributorTypeId != 4 ? 13 : 14)" style="padding-left: 0 !important; padding-right: 0 !important;">
                         <div class="alert panel-footer-grey">
                             Ningún documento disponible para mostrar.
                         </div>
                     </td>
-                </tr>
+                </tr> 
             }
             @foreach (var document in Model.Documents)
             {
@@ -69,13 +73,21 @@
                         }
                         else
                         {
-                            if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
+                            // 20 = pos - 35 = transporte pasajeros - 40 = Cobro Peaje - 55 = Bolas Valor Y Agropecuario - 45 = extractos - 50 = Aereo - 32 = espectaculos publicos 
+                            if (document.DocumentTypeId == "20" || document.DocumentTypeId == "35" || document.DocumentTypeId == "40" || document.DocumentTypeId == "55" || document.DocumentTypeId == "50" || document.DocumentTypeId == "45" || document.DocumentTypeId == "32")
                             {
-                                <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                <span class="fa fa fa-download add-tooltip download-equivalente-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")"></span>
                             }
                             else
                             {
-                                <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
+                                {
+                                    <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                }
+                                else
+                                {
+                                    <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                }
                             }
                         }
 
@@ -119,6 +131,12 @@
                         <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                             @document.TotalAmount.ToString("C0")
                         </td>
+                        if (Model.ContributorTypeId == 4)
+                        {
+                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                
+                            </td>
+                        }
                     }
                     else
                     {
@@ -159,11 +177,17 @@
                         <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
                             @document.TotalAmount.ToString("C0")
                         </td>
+                        if (Model.ContributorTypeId == 4)
+                        {
+                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                
+                            </td>
+                        }
                     }
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
 </div>
 

@@ -121,6 +121,10 @@ namespace Gosocket.Dian.Functions.Utils
             {
                 htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
             }
+            else if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "formato tipo tirilla")
+            {
+                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE_Tirilla.xslt");
+            }
             else
             {
                 htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE_customizable.xslt");

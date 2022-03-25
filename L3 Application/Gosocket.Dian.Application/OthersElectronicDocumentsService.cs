@@ -188,6 +188,17 @@ namespace Gosocket.Dian.Application
             return result;
         }
 
+        public ResponseMessage ValidaSoftwareDelete(int ODEContributorId)
+        {
+            OtherDocElecContributorOperations operationToDelete = _othersDocsElecContributorOperationRepository.Get(t => t.Id == ODEContributorId);
+
+            OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operationToDelete.SoftwareId);
+            if (software != null && software.OtherDocElecSoftwareStatusId == (int)OtherDocElecSoftwaresStatus.Accepted)
+                return new ResponseMessage() { Message = "El software encuentra en estado aceptado.", Code = 500 };
+ 
+            return null;
+        }
+
         #region Private methods Cancel Participant
 
         private void CancelParticipant(OtherDocElecContributor entity)
@@ -216,7 +227,7 @@ namespace Gosocket.Dian.Application
             bool contributorIsOfe = contributor.ContributorTypeId == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = ODEContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
+            GlobalOtherDocElecOperation operation = _globalOtherDocElecOperationService.GetOperationByElectronicDocumentId(contributor.Code, software.SoftwareId, ODEContributor.ElectronicDocumentId);
             if (operation == null)
                 operation = new GlobalOtherDocElecOperation(contributor.Code, software.SoftwareId.ToString());
 

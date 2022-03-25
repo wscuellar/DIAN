@@ -116,7 +116,14 @@
 <div class="page-content margin-15 margin-page-content">
     <div class="row title-container" style="margin-left: 1px;">
         <p class="title-view">
-            @ViewBag.title
+            @if (Model.ElectronicDocumentId == 14)
+            {
+                <span style="font-size:22px">Registro y habilitación / Documentos electronicos / Documentos equivalentes / @ViewBag.title</span>
+            }
+            else
+            {
+                @ViewBag.title
+            }
         </p>
         <div class="underline-title"></div>
         <div class="divBackTop">
@@ -265,15 +272,17 @@
                         <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
                         <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Eliminación modo de Operación</h4>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="width:100%">
                         <div class="bootbox-body">
                             <Label id="lbldangercancelregister" class="control-label">Describa el motivo de la eliminación del modo de operación</Label>
                             <textarea class="form-control  input-general fields captureFields" id="txtCancelRegistro" placeholder="Escriba aqui."
                                       maxlength="300" name="txtCancelRegistro" rows="5" style="height: auto !important;background: white !important;"></textarea>
 
                         </div>
-                    </div><div class="modal-footer">
-                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Cancelar Registro</button>
+                    </div>
+                    <div class="modal-footer" style="position:relative;width:initial;">
+                        <button type="button" class="btn btn-radian-default" style="display:block; padding: 8px 13px;" data-dismiss="modal">Cancelar</button>
+                        <button id="Btnsavecancel" name="savecancel-register" type="button" class="btn btn-success btn-radian-success savecancel-register" style="padding: 8px 13px;">Aceptar</button>
                     </div>
                 </div>
             </div>
@@ -285,13 +294,24 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="padding-right: 31px; top: 20px;">×</button>
+                <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px;">×</button>
                 <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Documentos equivalentes habilitados</h4>
             </div>
-            <div class="modal-body">
-                /*Acá hacer una tabla para visualizar los documentos equivalentes que han sido habilitados*/
+            <div class="modal-body" style="width: 100%;">
+                <div class="table-responsive" style="width:inherit">
+                    <table id="equivalents-documents-enabled-table" class="documents-table table table-striped table-hover align-middle margin-bottom-0" style="margin-bottom: 50px; font-size:14px">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left;">Documento</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="position:relative">
                 <button type="button" data-dismiss="modal" class="btn btn-success btn-radian-success" style="padding: 8px 13px;">Cerrar</button>
             </div>
         </div>
@@ -349,8 +369,8 @@
 			$('#PinSW').val('')
 
             $("#btnBackTop").click(() => {
-                 let url = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = 1 })";
-                 if (@Model.ElectronicDocumentId == 3) {
+                 let url = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
+                 if (@Model.ElectronicDocumentId != @((int)Gosocket.Dian.Domain.Common.ElectronicsDocuments.ElectronicPayroll) && @Model.ElectronicDocumentId != @((int)Gosocket.Dian.Domain.Common.ElectronicsDocuments.ElectronicPayrollNoOFE)) {
                      url = "@Url.Action("ElectronicDocuments", "Document")";
                  }
                  window.location.href = url;
@@ -447,14 +467,26 @@
 
 
 
-		function EliminarRegistro(id) {
-			$("#dialogcancelarregistro").modal('show');
+        function EliminarRegistro(id) {
+            if (@Model.ElectronicDocumentId == 14) {
+                let confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
 
-			("#Btnsavecancel")[0].onclick = null;
-			$("#Btnsavecancel").click(function () {
-				ElimnarOp(id)
+                showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
+                    function () {
+                        removeOperationAsociated(id);
+                    }
+                , "", () => hideLoading('#panel-wrapper')));
+            }
+            else
+            {
+                $("#dialogcancelarregistro").modal('show');
 
-			});
+                ("#Btnsavecancel")[0].onclick = null;
+                $("#Btnsavecancel").click(function () {
+                    ElimnarOp(id)
+
+                });
+            }
 		}
 
 		function ElimnarOp(id)
@@ -465,65 +497,87 @@
             }
 
             $("#dialogcancelarregistro").modal('hide');
+
+            if (@Model.ElectronicDocumentId == 13) {
+                removeOperationAsociated(id);
+                return;
+            }
+
             let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
             if (@Model.ElectronicDocumentId == 3) {
                 confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
             }
             showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
                 function () {
-                    showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
-                    $.ajax({
-                        url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
-                        type: "POST",
-                            data: { id: id, description: $("#txtCancelRegistro").val() },
-                        datatype: "json",
-                        success: function (result) {
-                            hideLoading("#panel-wrapper");
-                            if (result != null) {
-
-							    if (result.Code != 200) {
-
-								    $('.close').click()
-								    bootbox.dialog({
-									    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
-									    onEscape: () => {
-										    var url = window.location.href.split('&');
-										    var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
-										    window.location.href = ret
-									    }
-								    });
-								    //
-                                    return;
-                                }
-
-                                bootbox.dialog({
-                                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
-                                    onEscape: () => {
-                                        var url = "@Url.Action("Index", "OthersElectronicDocuments")";
-                                        if (@Model.ElectronicDocumentId == 3) {
-                                            window.location.reload();
-                                            return;
-                                        }
-                                        window.location.href = url;
-                                    }
-                                });
-                            }
-                            else
-                                bootbox.alert("No se pudo realizar la Cancelación");
-                        },
-                        complete: function () {
-                            hideLoading("#panel-wrapper");
-                        },
-                        error: function (result) {
-                            hideLoading("#panel-wrapper");
-                            bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                            console.log(result.status + ' ' + result.statusText);
-                            return false;
-                        }
-                    });  //ajax
+                    removeOperationAsociated(id);
                 }
             , "", () => hideLoading('#panel-wrapper')));
 		}
+
+        function removeOperationAsociated(id) {
+            showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
+            $.ajax({
+                url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
+                type: "POST",
+                    data: { id: id, description: $("#txtCancelRegistro").val() },
+                datatype: "json",
+                success: function (result) {
+                    hideLoading("#panel-wrapper");
+                    if (result != null) {
+
+						if (result.Code != 200) {
+
+							$('.close').click()
+							bootbox.dialog({
+								message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
+								onEscape: () => {
+									var url = window.location.href.split('&');
+									var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+									window.location.href = ret
+								}
+							});
+							//
+                            return;
+                        }
+
+                        bootbox.dialog({
+                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
+                            onEscape: () => {
+                                var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                                if (@Model.ElectronicDocumentId == 14) {
+                                    window.location.reload();
+                                    return;
+                                }
+                                if (@Model.ElectronicDocumentId == 3) {
+                                    window.location.reload();
+                                    return;
+                                }
+                                if (@Model.ElectronicDocumentId == 13) {
+                                    if (result.ExistOperationModeAsociated) {
+                                        window.location.reload();
+                                    } else {
+                                        window.location.href = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
+                                    }
+                                    return;
+                                }
+                                window.location.href = url;
+                            }
+                        });
+                    }
+                    else
+                        bootbox.alert("No se pudo realizar la Cancelación");
+                },
+                complete: function () {
+                    hideLoading("#panel-wrapper");
+                },
+                error: function (result) {
+                    hideLoading("#panel-wrapper");
+                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+        }
 
         function ReiniciarFormulario() {
             $('#UrlEventReception').val('@dianUrlEventReception');
@@ -705,8 +759,35 @@
         }
 
         function OpenModalShowEquivalentDocumentsEnabled(otherDocElecContributor) {
-            /*Consultar los documentos equivalentes que han sido habilitados y listarlos*/
-            $("#dialog-equivalents-documents-enabled").modal("show");
+            var tableContent = $("#equivalents-documents-enabled-table").find("tbody");
+            tableContent.html(`<tr><td colspan="2">No se encontraron documentos equivalentes habilitados</td></tr>`);
+
+            showLoading('#panel-wrapper', 'Cargando', 'Consultando los documentos equivalentes habilitados, por favor espere.');
+            $.ajax({
+                url: `@Url.Action("GetTestSetResultAcepted", "OthersElectronicDocuments")?otherDocElecContributorOperationsId=${otherDocElecContributor}`,
+                type: "GET",
+                datatype: "json",
+                success: function (result) {
+                    hideLoading("#panel-wrapper");
+                    $("#dialog-equivalents-documents-enabled").modal("show");
+                    if (!result) return;
+                    if (result.length <= 0) return;
+                    tableContent.html('');
+                    result.forEach(t => {
+                        tableContent.append(`<tr><td style="text-align: left;">${t.EquivalentElectronicDocumentName}</td><td><label class="label" style="background:green; color: #fff; border-radius:4px;"> ${t.EquivalentElectronicDocumentState}</label></td></tr>`)
+                    });
+
+                },
+                complete: function () {
+                    hideLoading("#panel-wrapper");
+                },
+                error: function (result) {
+                    hideLoading("#panel-wrapper");
+                    bootbox.alert("Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });
         }
 
     </script>

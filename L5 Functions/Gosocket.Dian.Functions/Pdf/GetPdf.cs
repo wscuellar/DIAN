@@ -118,6 +118,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 if (documentApplication != null)
                 {
                     documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
+                    documentSigningTime = DateNormalized(documentSigningTime, "Documento generado el:");
                     Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
@@ -173,7 +174,8 @@ namespace Gosocket.Dian.Functions.Pdf
             int hour = Convert.ToInt32(rest[0]);
             int min = Convert.ToInt32(hours[1]);
             int sec = Convert.ToInt32(hours[2]);
-            return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
+            return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("yyyy-MM-dd HH:mm:ss");
+            //return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
 
         }
 
@@ -235,10 +237,23 @@ namespace Gosocket.Dian.Functions.Pdf
         {
             string stylesMiddleLetter = @"
                 .titleSecundario {
-                    margin: 0 35px 0 !important;
+                    margin: 0 15px 0 !important;
+                    font-size: 15px !important;
                 }
                 .divDetalle {
-                    margin: 10px 50px 20px !important;
+                    margin: 10px 30px 10px !important;
+                }
+                body {
+                    font-size: 13px !important;
+                }
+                table thead tr:nth-child(1) td {
+                    font-size: 18px !important;
+                }
+                table thead tr:nth-child(2) td {
+                    font-size: 15px !important;
+                }
+                .divDetalleTotales table table:last-child td {
+                    font-size: 11px !important;
                 }
             ";
             Html_Content = Html_Content.Replace("#stylesForHalfLetter#", stylesMiddleLetter);
@@ -253,9 +268,9 @@ namespace Gosocket.Dian.Functions.Pdf
                 case "Formato tipo parametrizable":
                     return PaperSize.A4;
                 case "Formato tipo media carta":
-                    return PaperSize.A5;
+                    return new PaperSize(Length.Inches(5.5), Length.Inches(8.5));
                 case "Formato tipo tirilla":
-                    return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
+                    //return new PaperSize(Length.Millimeters(57), Length.Millimeters(110));
                 default:
                     return PaperSize.A4;
             }

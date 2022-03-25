@@ -23,6 +23,7 @@ namespace Gosocket.Dian.Interfaces.Services
         PagedResult<OtherDocsElectData> List(int contributorId, int contributorTypeId, int operationModeId, int electronicDocumentId);
         PagedResult<OtherDocsElectData> List3(int contributorId, int contributorTypeId, int electronicDocumentId);
         PagedResult<OtherDocsElectData> List2(int contributorId);
+        int NumHabilitadosOtherDocsElect(int contributorId);
         OtherDocsElectData GetCOntrinutorODE(int Id);
 
     

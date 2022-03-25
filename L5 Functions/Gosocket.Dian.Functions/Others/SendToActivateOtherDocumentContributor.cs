@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Functions.Others
 
             //Solo en ambiente de habilitacion.
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-            {
+            {                
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                 if (data == null)
@@ -50,7 +50,7 @@ namespace Gosocket.Dian.Functions.Others
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
 
                 //Se obtiene participante otros documentos habilitacion
-                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled);
+                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled, data.ContributorOpertaionModeId);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
                     throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}, ContributorTypeId {data.ContributorTypeId} and Enabled {data.Enabled} .");
@@ -87,15 +87,22 @@ namespace Gosocket.Dian.Functions.Others
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
                     // Se obtiene el set de pruebas par el cliente
-                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    string key = data.SoftwareType + '|' + data.SoftwareId + (data.EquivalentDocumentId.HasValue ? $"|{data.EquivalentDocumentId}":"");
                     SetLogger(null, "Step STA-4.1", data.Code,"SEND-06");
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
                     GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
                     SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
-
+                  //  NotificationsController notification = new NotificationsController();
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
+                    {
+                        //await notification.EventNotificationsAsync("02", contributor.Code);
                         throw new Exception("Contribuyente no a pasado set de pruebas.");
+                    }
+                    //else
+                    //{
+                    //    await notification.EventNotificationsAsync("03", contributor.Code);
+                    //}
 
                     SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
@@ -114,7 +121,9 @@ namespace Gosocket.Dian.Functions.Others
                         " OtherDocElecContributorTypeId: " + otherDocElecContributor.OtherDocElecContributorTypeId +
                         " OtherDocElecOperationModeId: " + otherDocElecContributor.OtherDocElecOperationModeId +
                         " SoftwareId: " + data.SoftwareId +
-                        " SoftwareType: " + data.SoftwareType
+                        " SoftwareType: " + data.SoftwareType +
+                        " results.SoftwareId: " + results.SoftwareId +
+                        " data.Code: " + data.Code
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
 
@@ -132,8 +141,8 @@ namespace Gosocket.Dian.Functions.Others
                     //Se recolecta la informacion para la creacion en prod.
                     OtherDocumentActivateContributorRequestObject activateOtherDocumentContributorRequestObject = new OtherDocumentActivateContributorRequestObject()
                     {
-                        Code = data.Code,
-                        ContributorId = otherDocElecContributor.ContributorId,
+                        Code = data.Code,                        
+                        ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
                         OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
@@ -162,6 +171,8 @@ namespace Gosocket.Dian.Functions.Others
                         Action = "finish SendToActivateOtherDocument"
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
+                  //await notification.EventNotificationsAsync("01", contributor.Code);
+
 
                 }
                 catch (Exception ex)
@@ -263,7 +274,13 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "enabled")]
             public bool Enabled { get; set; }
-            
+
+            [JsonProperty(PropertyName = "equivalentDocumentId")]
+            public int? EquivalentDocumentId { get; set; }
+
+
+            [JsonProperty(PropertyName = "contributorOpertaionModeId")]
+            public int ContributorOpertaionModeId { get; set; }
         }
 
         class OtherDocumentActivateContributorRequestObject

@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
 
 @{
-    ViewBag.Title = "Consultar documentos";
+    ViewBag.Title = "Consultar documentos" + $" {ViewBag.ViewTypeSpanish}";
     var view = ViewBag.ViewType;
 
     var columnSize = 3;
@@ -226,6 +226,14 @@
             $(".download-document").click(function(){
                 var cufe = this.id;
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
+            })
+
+            $(".download-equivalente-document").click(function () {
+                var cufe = this.id;
+                var typeId = $(this).context.getAttribute('documenTypeId');
+                var emissionDate = $(this).context.getAttribute('EmissionDate');
+                var generationDate = $(this).context.getAttribute('GenerationDate');
+                window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&documentTypeId=" + typeId + "&FechaValidacionDIAN=" + emissionDate + "&FechaGeneracionDIAN=" + generationDate;
             })
 
             $(".download-support-document").click(function () {

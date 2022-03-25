@@ -8,6 +8,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -38,13 +39,17 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IElectronicDocumentService _electronicDocumentService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IContributorOperationsService _contributorOperationsService;
+        private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;    
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
             IContributorService contributorService,
             IElectronicDocumentService electronicDocumentService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
-            IContributorOperationsService contributorOperationsService)
+            IContributorOperationsService contributorOperationsService,
+            ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
+            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -52,6 +57,8 @@ namespace Gosocket.Dian.Web.Controllers
             _electronicDocumentService = electronicDocumentService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
             _contributorOperationsService = contributorOperationsService;
+            _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
+            _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
         }
 
         /// <summary>
@@ -62,9 +69,18 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1 || x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
-            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
+            
+            if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+            else 
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+
+            ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
         }
@@ -282,12 +298,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsEquivalent = electronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
 
             List<Contributor> providersList;
             var providersListDto = new List<ContributorViewModel>();
 
-            if (electronicDocumentIsSupport)
+            if (electronicDocumentIsSupport || electronicDocumentIsEquivalent)
             {
                 /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
                 * en el modo de operación de facturación electrónica*/
@@ -369,9 +386,9 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
-            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;                
 
-            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+        ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             var tipo = model.OperationModeId;
             if (model.OperationModeId == 0)
             {
@@ -529,6 +546,9 @@ namespace Gosocket.Dian.Web.Controllers
                     ContributorId = User.ContributorId()
                 });
             }
+
+            NotificationsController notification = new NotificationsController();
+            await notification.EventNotificationsAsync("04", User.UserCode());
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
@@ -869,7 +889,15 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult CancelRegister(int id, string description)
         {
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
-            return Json(response, JsonRequestBehavior.AllowGet);
+            return Json(new
+            {
+                response.Code,
+                response.data,
+                response.Message,
+                response.MessageType,
+                response.RedirectTo,
+                ExistOperationModeAsociated = response.ExistOperationModeAsociated
+            }, JsonRequestBehavior.AllowGet);
         }
 
 
@@ -903,6 +931,43 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 return null;
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetTestSetResultAcepted(int otherDocElecContributorOperationsId)
+        {
+            var response = new List<TestSetResultAceptedModel>();
+
+            var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
+
+            var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResultAcepted(
+                User.UserCode(),
+                otherDocElecContributorOperation.OtherDocElecContributor.ElectronicDocumentId,
+                otherDocElecContributorOperation.OtherDocElecContributorId,
+                otherDocElecContributorOperation.SoftwareId.ToString());
+
+            var equivalentElectronicDocuments = _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocuments().ToDictionary(t => t.Id);
+
+            foreach(var test in testSetResult)
+            {
+                var nameEquivalentElectronicDocument = "";
+                if (equivalentElectronicDocuments.ContainsKey(test.EquivalentElectronicDocumentId.Value))
+                {
+                    nameEquivalentElectronicDocument = equivalentElectronicDocuments[test.EquivalentElectronicDocumentId.Value].Name;
+                }
+
+                var testResponse = new TestSetResultAceptedModel()
+                {
+                    EquivalentElectronicDocumentId = test.EquivalentElectronicDocumentId.Value,
+                    EquivalentElectronicDocumentName = nameEquivalentElectronicDocument,
+                    EquivalentElectronicDocumentState = test.State == TestSetStatus.Accepted.GetDescription() ? "Habilitado" : test.State
+                };
+
+                response.Add(testResponse);
+            }
+
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
     }
 }

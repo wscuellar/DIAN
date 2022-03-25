@@ -495,6 +495,24 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public IEnumerable<T> FindBy<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("RowKey",
+                    QueryComparisons.Equal,
+                    rowKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
 
         public T FindSoftwareId<T>(string partitionKey, string softwareId) where T : ITableEntity, new()
         {
@@ -550,11 +568,21 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-        public T FindGlobalTestOtherDocumentId<T>(string testSetId) where T : ITableEntity, new()
-        {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, testSetId));
 
-            var entities = CloudTable.ExecuteQuery(query);
+        public T FindGlobalTestOtherDocumentId<T>(string partitionKey, string testSetId) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("Id",
+                    QueryComparisons.Equal,
+                    testSetId));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.FirstOrDefault();
         }
@@ -1043,15 +1071,24 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
-
-        public T FindByTestSetId<T>(string TestSetId) where T : ITableEntity, new()
+        public T FindByTestSetId<T>(string partitionKey, string testSetId) where T : ITableEntity, new()
         {
-            var query = new TableQuery<T>().Where(TableQuery.GenerateFilterCondition("Id", QueryComparisons.Equal, TestSetId));
+            var query = new TableQuery<T>();
 
-            var entities = CloudTable.ExecuteQuery(query);
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("Id",
+                    QueryComparisons.Equal,
+                    testSetId));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
 
             return entities.FirstOrDefault();
         }
+
 
 
         public T FindByGlobalDocumentId<T>(string globalDocumentId) where T : ITableEntity, new()
