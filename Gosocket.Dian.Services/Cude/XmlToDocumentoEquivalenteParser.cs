@@ -68,7 +68,5 @@ namespace Gosocket.Dian.Services.Cude
         {
             return xmlDocument.SelectSingleNode(xpath)?.InnerText ?? "";
         }
-     
     }
-
 }
