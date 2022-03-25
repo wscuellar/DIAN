@@ -4538,7 +4538,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
             {
-                response.ErrorCode = "DEAB24b";
+                response.ErrorCode = "DEAB27b";
             }
 
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
