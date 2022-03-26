@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				if (tipo == "20")
 					html = await CruzarModeloDetallesProductos(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 				else if (tipo == "40")
-					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), tipo);
 
 				html = FillReferenceData(html, xelement);
 				html = CruzarModeloNotasFinales(html, xelement);
@@ -89,13 +89,13 @@ namespace Gosocket.Dian.Functions.Pdf
 				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" || tipo == "30")
 				{
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
-					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), tipo);
 				}
 
 				if (tipo == "35")
 				{
 					//html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
-					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), tipo);
 					html = FillTransporteT(html, xelement);
 				}
 
@@ -402,7 +402,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			return plantillaHtml;
 		}
-		private static async Task<string> CruzarModeloDetallesProductosComplete(string plantillaHtml, List<XElement> model, string fecha)
+		private static async Task<string> CruzarModeloDetallesProductosComplete(string plantillaHtml, List<XElement> model, string tipoD)
 		{
 			var rowDetalleProductosBuilder = new StringBuilder();
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
@@ -448,8 +448,29 @@ namespace Gosocket.Dian.Functions.Pdf
 				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
 
 
+				if (tipoD == "50")
+				{
+					rowDetalleProductosBuilder.Append($@"
+                <tr>
+		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
+		            <td>{unit.CompositeName}</td>
+		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
+					 <td class='text-right'>{Desc:n2}</td>
+                    <td class='text-right'>{Reca:n2}</td>
+		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td class='text-right'>{IvaPor:n2}</td>
 
-				rowDetalleProductosBuilder.Append($@"
+
+		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+
+	            </tr>");
+				}
+				else
+				{
+					rowDetalleProductosBuilder.Append($@"
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
@@ -467,7 +488,7 @@ namespace Gosocket.Dian.Functions.Pdf
 					<td>{Descrip}</td>
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 	            </tr>");
-
+				}
 				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value) *
 										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
 			}
@@ -997,6 +1018,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{PasajeroNumeroDocumento}", string.Empty);
 			}
 
+			//SPD
+
+			//var NumeroPago
 			return Html;
 		}
 
