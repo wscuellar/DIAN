@@ -241,11 +241,6 @@ namespace Gosocket.Dian.Web.Controllers
         {
             try
             {
-
-                //var xmlEquivalenteBytes = SearchXmlEquivalente(trackId, FechaGeneracionDIAN);
-                //var base64Xml = Convert.ToBase64String(xmlEquivalenteBytes);
-
-
                 var requestObj2 = new { trackId };
                 var response = await DownloadXmlAsync(requestObj2);
 
@@ -256,12 +251,10 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
-                //var xmlBytes = DownloadXml(trackId);
-
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
-                {
-                    new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
-                    xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
+{
+                new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
+                xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
                 }, trackId);
 
                 return File(zipFile, "application/zip", $"{trackId}.zip");
