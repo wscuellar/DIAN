@@ -90,7 +90,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				else
 					html = CruzarReferenciasNota(html, xelement);
 
-				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" || tipo == "30" || tipo == "Nota")
+				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" ||tipo == "27" || tipo == "30" || tipo == "Nota")
 				{
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), tipo);
@@ -1261,7 +1261,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBolsa_template.html");
 			else if (tipo == "45")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentExtracto_template.html");
-			else if (tipo == "32")
+			else if (tipo == "32"	|| tipo == "27")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
 			else if (tipo == "30")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentJuegos_template.html");
