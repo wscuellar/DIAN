@@ -138,6 +138,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "25", Name = "Documento equivalente Boleta de Ingreso a Espectaculos Publicos" },
                 new DocumentTypeModel() { Code = "60", Name = "Documento equivalente Servicios Publicos y Domiciliarios" },
                 new DocumentTypeModel() { Code = "55", Name = "Documento equivalente Bolsa Valor Y Agropecuario" },
+                new DocumentTypeModel() { Code = "034", Name = "Evento Acetacion tacita" },
                 new DocumentTypeModel() { Code = "101", Name = "Documento importación" }
                // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
                 //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },
@@ -157,6 +158,8 @@ namespace Gosocket.Dian.Web.Models
         public string SenderName { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
+        public string CustomizationID { get; set; }
+        public string prefijo { get; set; }
     }
 
     public class ReferenceViewModel
