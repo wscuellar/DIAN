@@ -216,7 +216,7 @@
                 var id = $(this).context.getAttribute('data-id');
                 var partitionKey = $(this).context.getAttribute('data-partitionKey');
                 var documentType = $(this).context.getAttribute('data-type');
-                if (documentType != "101" && documentType != "12") //ignora documento exportacion 
+                if (documentType != "101" && documentType != "12") //ignora documento exportacion
                 {
                     showLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
                     window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
@@ -228,12 +228,10 @@
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
             })
 
-            $(".download-equivalente-document").click(function () {
+            $(".download-eventos").click(function () {
                 var cufe = this.id;
-                var typeId = $(this).context.getAttribute('documenTypeId');
-                var emissionDate = $(this).context.getAttribute('EmissionDate');
-                var generationDate = $(this).context.getAttribute('GenerationDate');
-                window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&documentTypeId=" + typeId + "&FechaValidacionDIAN=" + emissionDate + "&FechaGeneracionDIAN=" + generationDate;
+                var code = $(this).context.getAttribute('code');
+                window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code" + code;
             })
 
             $(".download-support-document").click(function () {

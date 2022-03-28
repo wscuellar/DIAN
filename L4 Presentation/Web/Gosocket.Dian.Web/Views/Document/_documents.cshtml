@@ -50,12 +50,14 @@
                             Ningún documento disponible para mostrar.
                         </div>
                     </td>
-                </tr> 
+                </tr>
+
             }
             @foreach (var document in Model.Documents)
             {
                 var status = "success";
                 var isDisabled = "";
+                
                 if (document.Status == 10)
                 {
                     status = "primary";
@@ -65,6 +67,60 @@
                     status = "danger";
                     isDisabled = "disabled";
                 }
+                if (document.Events.Count() >= 1)
+                {
+                    foreach (var item in document.Events)
+                    {
+                        var prefijo = item.CustomizationID.Split('_');
+                        <tr>
+                            <td>
+                                @if (item.Code == "030" || item.Code == "031" || item.Code == "032" || item.Code == "033" || item.Code == "034")
+                                {
+
+                                    <span class="fa fa fa-download add-tooltip download-eventos" data-id="@document.Id" id="@document.Id" code="@item.Code"></span>
+                                }
+                            </td>
+                            <td class="text-nowrap">
+                                <a>@item.TimeStamp.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                            </td>
+                            <td class="text-nowrap text-center ">
+                                <a>@item.Date.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                            </td>
+                            <td class="text-center text-nowrap">
+                                @item.prefijo
+                            </td>
+                            <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                @item.CustomizationID
+                            </td>
+                            <td class="text-center ">
+                                <div class="iffyTip hideText2">@item.Description</div>
+                            </td>
+                            <td class="text-nowrap ">
+                                @item.SenderCode
+                            </td>
+                            <td class="text-nowrap">
+                                <div class="iffyTip hideText2">@item.SenderName</div>
+                            </td>
+                            <td class="text-nowrap ">
+                                @item.ReceiverCode
+                            </td>
+                            <td class="">
+                                <div class="iffyTip hideText2">@item.ReceiverName</div>
+                            </td>
+                            <td class="text-nowrap ">
+                                @document.StatusName
+                            </td>
+                            <td class="text-nowrap">
+                                <i class="fa fa-circle radian-status-circle"></i>
+                                 No Aplica
+                            </td>
+                            <td class="text-center text-nowrap ">
+                                @document.TotalAmount.ToString("C0")
+                            </td>                      
+                            
+                        </tr>
+                    }
+                } 
                 <tr>
                     <td>
                         @if (document.DocumentTypeId == "05")
@@ -136,7 +192,6 @@
                         if (Model.ContributorTypeId == 4)
                         {
                             <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                                
                             </td>
                         }
                     }
@@ -182,13 +237,12 @@
                         if (Model.ContributorTypeId == 4)
                         {
                             <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                                
                             </td>
                         }
                     }
                 </tr>
             }
-            </tbody>
+        </tbody>
         </table>
 
 </div>

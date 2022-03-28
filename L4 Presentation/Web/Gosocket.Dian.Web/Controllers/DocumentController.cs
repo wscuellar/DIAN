@@ -265,6 +265,31 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+        public async Task<ActionResult> DownloadZipFilesEvenetos(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+                var requestObj2 = new { trackId };
+                var response = await DownloadXmlAsync(requestObj2);
+                var base64Xml = response.XmlBase64;
+
+
+
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
+
+
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+        }
+
 
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult DownloadPDF(string trackId, string recaptchaToken)
@@ -1135,7 +1160,16 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             Code = e.Code,
                             Date = e.Date,
-                            Description = e.Description
+                            Description = e.Description,
+                            DocumentKey = e.DocumentKey,
+                            DateNumber = e.DateNumber,
+                            SenderCode = e.SenderCode,
+                            SenderName =e.SenderName,
+                            ReceiverCode =e.ReceiverCode,
+                            ReceiverName = e.ReceiverName,
+                            TimeStamp = e.TimeStamp,
+                            CustomizationID = e.CustomizationID,
+                            prefijo =e.prefijo
                         }).ToList()
                 }).ToList();
 
