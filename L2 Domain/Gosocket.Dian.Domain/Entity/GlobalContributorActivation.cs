@@ -22,5 +22,6 @@ namespace Gosocket.Dian.Domain.Entity
         public string Detail { get; set; }
         public string Trace { get; set; }
         public string Request { get; set; }
+        public int OtherDocContributorId { get; set; }
     }
 }
