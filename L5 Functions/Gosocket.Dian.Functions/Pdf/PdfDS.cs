@@ -892,11 +892,11 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			//bolsa
 
-			var FechaCumplimiento = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
-			if (FechaCumplimiento.Any())
-				Html = Html.Replace("{FechaCumplimiento}", FechaCumplimiento.FirstOrDefault().Value);
-			else
-				Html = Html.Replace("{FechaCumplimiento}", string.Empty);
+			//var FechaCumplimiento = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "CustomTagGeneral").Elements(def + "Group").Elements(def + "AdditionalCollection").Elements(def + "Value");
+			//if (FechaCumplimiento.Any())
+			//	Html = Html.Replace("{FechaCumplimiento}", FechaCumplimiento.FirstOrDefault().Value);
+			//else
+			//	Html = Html.Replace("{FechaCumplimiento}", string.Empty);
 
 
 			//espectaculos
@@ -1037,6 +1037,18 @@ namespace Gosocket.Dian.Functions.Pdf
 			else
 			{
 				Html = Html.Replace("{NumeroReserva}", string.Empty);
+			}
+			
+			var Consecutivo = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "CustomTagGeneral").Elements(def + "Group").Elements(def + "AdditionalCollection").Elements(def + "Value");
+			if (Consecutivo.Count()==2)
+			{
+				Html = Html.Replace("{Consecutivo}", Consecutivo.FirstOrDefault().Value);
+				Html = Html.Replace("{FechaCumplimiento}", Consecutivo.ElementAt(1).Value);
+			}
+			else
+			{
+				Html = Html.Replace("{Consecutivo}", string.Empty);
+				Html = Html.Replace("{FechaCumplimiento}", string.Empty);
 			}
 
 			var Pasa = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Interoperabilidad").Elements(def + "Group").Elements(def + "Collectiontraveler").Elements(def + "AdditionalInformation").Elements(def + "Value");
