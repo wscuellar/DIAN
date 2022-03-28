@@ -86,11 +86,19 @@ namespace Gosocket.Dian.Functions.Pdf
 				html = FillReferenceData(html, xelement);
 				html = CruzarModeloNotasFinales(html, xelement);
 				if (tipo != "Nota")
-					html = CruzarReferencias(html, xelement);
-				else
-					html = CruzarReferenciasNota(html, xelement);
+				{
 
-				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" ||tipo == "27" || tipo == "30" || tipo == "Nota")
+					html = CruzarReferencias(html, xelement);
+				}
+				else
+				{
+					var CreditLineNodes = xelement.Elements(cac + "CreditNoteLine");
+					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
+					html = await CruzarModeloDetallesProductosComplete(html, CreditLineNodes.ToList(), tipo);
+					html = CruzarReferenciasNota(html, xelement);
+				}
+
+				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" ||tipo == "27" || tipo == "30" )
 				{
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosComplete(html, invoiceLineNodes.ToList(), tipo);
@@ -493,6 +501,11 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 	            </tr>");
 				}
+				if(tipoD=="Nota")
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value) *
+										decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value);
+				else
+
 				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value) *
 										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
 			}
@@ -1234,15 +1247,18 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			foreach (var detalle in model)
 			{
-				var tip = detalle.Elements(cac + "CreditNoteDocumentReference").Elements(cbc + "DocumentType");
+				var tip = detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "DocumentType");
 				var tipo = tip.Any() ? tip.FirstOrDefault().Value : "";
 				rowReferencias.Append($@"
                 <tr>
 		            <td colspan='1'>{tipo}</td>
-					<td colspan='1'>{detalle.Elements(cac + "CreditNoteDocumentReference").Elements(cbc + "ID").FirstOrDefault().Value}</td>
-					<td colspan='1'>{detalle.Elements(cac + "CreditNoteDocumentReference").Elements(cbc + "IssueDate").FirstOrDefault().Value}</td>
-	            </tr>");
-			}
+					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "IssueDate").FirstOrDefault().Value}</td>
+				 </tr>
+				 <tr>
+					<td class='text-left' colspan='3'>Cude: {detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "UUID").FirstOrDefault().Value}</td>
+				 </tr>");
+				}
 			Html = Html.Replace("{RowsReferencias}", rowReferencias.ToString());
 			return Html;
 		}
