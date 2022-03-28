@@ -48,7 +48,7 @@
     "RegistrateCompletedPayrollUrl": "http://localhost:7071/api/RegistrateCompletedPayroll",
     "ApplicationResponseProcessUrl": "https://gtpa-function-commons-test-dian.azurewebsites.net/api/ApplicationResponseProcess?code=5SHyBIyddHZQ8aT2Ve7SmR5jaqaDHYdLD3hmHdB1oW5OvBoCDxXmOg==",
     "SoftwareByNitUrl": "https://gtpa-biller-functions-test-utnxse.azurewebsites.net/api/AccountByNit?code=4j1C6ixtNjpQUWspR5unprptT1ojkyPQmIWwTLJmin88/qguO9vc4A==",
-    "RegisterCompletedPayrollCosmosUrl": "http://localhost:7071/api/RegisterCompletedPayrollCosmos"
+    "RegisterCompletedPayrollCosmosUrl": "http://localhost:7071/api/RegisterCompletedPayrollCosmos",
 
 
     //"Environment": "Hab",
@@ -85,6 +85,7 @@
     //"CosmosDbAuthorizationKey": "N5bybhDIhjjysvnPUOmQr5N1a4HvJiiuIV7q1yJpbZV8saCFPze0mzT26w5X0l8ssb8tuP92JNw3BEuW4Y2VOQ==",
     //"CosmosDbCollectionID": "Documents",
     //"CosmosDbDataBaseId": "DocumentsData",
-    //"CosmosDbEndpointUrl": "https://gtpa-cosmosdb-document-prod.documents.azure.com:443/"
+    //"CosmosDbEndpointUrl": "https://gtpa-cosmosdb-document-prod.documents.azure.com:443/",
+    //"URLServiceProd": "https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl"
   }
 }
