@@ -1086,8 +1086,14 @@ namespace Gosocket.Dian.Functions.Pdf
 			if (Recargos.Count == 0)
 			{
 
-				Html = Html.Replace("{RowsDescuentosYRecargos}", String.Empty);
+				Html = Html.Replace(@"{RowsDescuentosYRecargos}", String.Empty);
+				var rowDescuentosYRecargos = new StringBuilder();
+				var rep = "CTx0cj4NCgkJPHRoID5Ocm8uPC90aD4NCgkJPHRoID5UaXBvPC90aD4NCgkJPHRoPkPDs2RpZ288L3RoPg0KCQk8dGg+RGVzY3JpcGNpw7NuPC90aD4NCgkJPHRoPiU8L3RoPg0KCQk8dGg+VmFsb3I8L3RoPg0KCTwvdHI+	";
+				byte[] data = Convert.FromBase64String(rep);
+				string decodedString = Encoding.UTF8.GetString(data);
 
+				Html = Html.Replace(decodedString, String.Empty);
+				//rep = Convert.FromBase64String(rep);
 			}
 			else
 			{
@@ -1199,7 +1205,14 @@ namespace Gosocket.Dian.Functions.Pdf
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 			var rowReferencias = new StringBuilder();
 			var model = obj.Elements(cac + "Note").ToList();
+			if (!model.Any())
+			{
+				
+				Html = Html.Replace("<td>{LineaNegocio}</td>", string.Empty);
+				Html = Html.Replace("<td>Línea de negocio</td>", string.Empty);
+				Html = Html.Replace("{RowsNotasFinales}", string.Empty);
 
+			}
 			foreach (var detalle in model)
 			{
 				rowReferencias.Append($@"
@@ -1223,7 +1236,17 @@ namespace Gosocket.Dian.Functions.Pdf
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 			var rowReferencias = new StringBuilder();
 			var model = obj.Elements(cac + "BillingReference").ToList();
+			if (!model.Any())
+			{
+				Html = Html.Replace(@"{RowsReferencias}", String.Empty);
+				var rowDescuentosYRecargos = new StringBuilder();
+				var rep = "PHRyIGNsYXNzPSAic2VjdGlvbi1TdWJ0aXRsZSI+DQoJCTx0aCA+VGlwbyBkZSBkb2N1bWVudG88L3RoPg0KCQk8dGg+TsO6bWVybyByZWZlcmVuY2lhIDwvdGg+DQoJCTx0aD5GZWNoYSByZWZlcmVuY2lhPC90aD4NCg0KCTwvdHI+";
+				byte[] data = Convert.FromBase64String(rep);
+				string decodedString = Encoding.UTF8.GetString(data);
 
+				Html = Html.Replace(decodedString, String.Empty);
+
+			}
 			foreach (var detalle in model)
 			{
 				var tip = detalle.Elements(cac + "CreditNoteDocumentReference").Elements(cbc + "DocumentType");
@@ -1244,7 +1267,17 @@ namespace Gosocket.Dian.Functions.Pdf
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 			var rowReferencias = new StringBuilder();
 			var model = obj.Elements(cac + "BillingReference").ToList();
+			if (!model.Any())
+			{
+				Html = Html.Replace(@"{RowsReferencias}", String.Empty);
+				var rowDescuentosYRecargos = new StringBuilder();
+				var rep = "PHRyIGNsYXNzPSAic2VjdGlvbi1TdWJ0aXRsZSI+DQoJCTx0aCA+VGlwbyBkZSBkb2N1bWVudG88L3RoPg0KCQk8dGg+TsO6bWVybyByZWZlcmVuY2lhIDwvdGg+DQoJCTx0aD5GZWNoYSByZWZlcmVuY2lhPC90aD4NCg0KCTwvdHI+";
+				byte[] data = Convert.FromBase64String(rep);
+				string decodedString = Encoding.UTF8.GetString(data);
 
+				Html = Html.Replace(decodedString, String.Empty);
+
+			}
 			foreach (var detalle in model)
 			{
 				var tip = detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "DocumentType");
