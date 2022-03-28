@@ -234,6 +234,12 @@
                 window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code" + code;
             })
 
+             $(".download-equivalente-document").click(function () {
+                var cufe = this.id;
+                var code = $(this).context.getAttribute('code');
+                 window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&code" + code;
+            })
+
             $(".download-support-document").click(function () {
                 var cufe = this.id;
                 var element = '#' +cufe;
