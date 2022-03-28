@@ -459,6 +459,8 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
 
+				var desc2 = detalle.Elements(cac + "Item").Elements(cbc + "Description");
+				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
 
 				if (tipoD == "50" || tipoD == "Nota"|| tipoD == "55")
 				{
@@ -466,7 +468,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
-		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
+		            <td>{des2}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
