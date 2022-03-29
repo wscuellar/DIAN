@@ -229,9 +229,11 @@
             })
 
             $(".download-eventos").click(function () {
+                
                 var cufe = this.id;
-                var code = $(this).context.getAttribute('code');
-                window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code" + code;
+                var fecha = $(this).context.getAttribute('code');
+                var code = $(this).context.getAttribute('data-id');
+                window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code=" + code + "&fecha=" + fecha;
             })
 
              $(".download-equivalente-document").click(function () {
