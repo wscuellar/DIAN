@@ -609,8 +609,8 @@ namespace Gosocket.Dian.Functions.Pdf
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
-					<td>{conta}</td>
+		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+					<td style='word-wrap: break-word;'>{conta}</td>
 		    
 	            </tr>");
 
