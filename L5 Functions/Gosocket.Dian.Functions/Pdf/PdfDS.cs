@@ -472,7 +472,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				var desc2 = detalle.Elements(cac + "Item").Elements(cbc + "Description");
 				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
 
-				if (tipoD == "50" || tipoD == "Nota"|| tipoD == "55")
+				if (tipoD == "50" || tipoD == "Nota"|| tipoD == "55"|| tipoD == "27")
 				{
 					rowDetalleProductosBuilder.Append($@"
                 <tr>
