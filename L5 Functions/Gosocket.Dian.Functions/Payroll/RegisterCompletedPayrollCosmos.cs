@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Functions.Payroll
 				var PaymentMethod = await cosmos.getPaymentMethod();
 				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo, objNomina.TipoXML, account);
 
-				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString());
+				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString(), account);
 
 
 				//var numeric = await cosmos
