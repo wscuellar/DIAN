@@ -471,6 +471,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var desc2 = detalle.Elements(cac + "Item").Elements(cbc + "Description");
 				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
+				var de4cim = decimal.Parse(IvaPor.ToString().Split('.')[0]).ToString("N0");
 
 				if (tipoD == "50" || tipoD == "Nota"|| tipoD == "55"|| tipoD == "27"|| tipoD == "32")
 				{
@@ -482,10 +483,10 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")}</td>
-					 < td class='text-right'>{Desc:n2}</td>
+					<td class='text-right'>{Desc:n2}</td>
                     <td class='text-right'>{Reca:n2}</td>
 		            <td class='text-right'>{IvaVal:n2}</td>
-                    <td class='text-right'>{decimal.Parse(IvaPor.ToString().Split('.')[0]).ToString("N0")}</td>
+                    <td class='text-right'>{de4cim:n2}</td>
 
 
 		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
