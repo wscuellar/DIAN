@@ -285,23 +285,33 @@ namespace Gosocket.Dian.Functions.Pdf
 			var EmisorPais = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "Country").Elements(cbc + "Name");
 			if (EmisorPais.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorPais}", EmisorPais.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorPais}", string.Empty);
 
 			var EmisorDepartamento = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CountrySubentityCode");
 			if (EmisorDepartamento.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorDepartamento}", Depto.Where(x => x.IdDepartament == EmisorDepartamento.FirstOrDefault().Value).FirstOrDefault().NameDepartament);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorDepartamento}", string.Empty);
 			//AdquirienteRegimenFiscal
 
 			var EmisorCiudad = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CityName");
 			if (EmisorCiudad.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorCiudad}", EmisorCiudad.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorCiudad}", string.Empty);
 
 			var EmisorDireccion = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
 			if (EmisorDireccion.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorDireccion}", EmisorDireccion.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorDireccion}", string.Empty);
 
 			var EmisorCorreo = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "Contact").Elements(cbc + "ElectronicMail");
 			if (EmisorCorreo.Any())
 				plantillaHtml = plantillaHtml.Replace("{EmisorCorreo}", EmisorCorreo.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{EmisorCorreo}", string.Empty);
 
 			var EmisorTelefono = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "Contact").Elements(cbc + "Telephone");
 			if (EmisorTelefono.Any())
