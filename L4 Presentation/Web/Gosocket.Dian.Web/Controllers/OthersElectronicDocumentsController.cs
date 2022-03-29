@@ -73,7 +73,7 @@ namespace Gosocket.Dian.Web.Controllers
             
             if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
             {
-                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name.Replace("No OFE",""))).ToList();
             }
             else 
             {
