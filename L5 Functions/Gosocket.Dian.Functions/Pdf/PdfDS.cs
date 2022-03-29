@@ -439,7 +439,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
-				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount");
+				var ivaValor =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount") : detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount"); ;
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
@@ -1253,6 +1253,10 @@ namespace Gosocket.Dian.Functions.Pdf
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 			var rowReferencias = new StringBuilder();
 			var model = obj.Elements(cac + "Note").ToList();
+			if (model.Count() == 0)
+			{ 
+			model= obj.Elements(cbc + "Note").ToList();
+			}
 			if (!model.Any())
 			{
 				
@@ -1330,11 +1334,15 @@ namespace Gosocket.Dian.Functions.Pdf
 			{
 				var tip = detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "DocumentType");
 				var tipo = tip.Any() ? tip.FirstOrDefault().Value : "";
+
+				var desc = obj.Elements(cac + "DiscrepancyResponse").Elements(cbc + "Description");
+				var des = desc.Any() ? desc.FirstOrDefault().Value : "";
 				rowReferencias.Append($@"
                 <tr>
 		            <td colspan='1'>{tipo}</td>
 					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "ID").FirstOrDefault().Value}</td>
 					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "IssueDate").FirstOrDefault().Value}</td>
+					<td colspan='1'>{des}</td>
 				 </tr>
 				 <tr>
 					<td class='text-left' colspan='3'>Cude: {detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "UUID").FirstOrDefault().Value}</td>
