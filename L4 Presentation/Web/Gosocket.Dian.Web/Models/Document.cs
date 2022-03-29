@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "031", Name = "Reclamo de la FEV" },
                 new DocumentTypeModel() { Code = "032", Name = "Recibo del bien o prestación del servicio" },
                 new DocumentTypeModel() { Code = "033", Name = "Aceptacion expresa" },
-                new DocumentTypeModel() { Code = "034", Name = "Evento Aceptacion tacita" },
+                new DocumentTypeModel() { Code = "034", Name = "Evento Aceptacion tácita" },
                 new DocumentTypeModel() { Code = "101", Name = "Documento importación" }
                // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
                 //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },
