@@ -35,10 +35,10 @@ namespace Gosocket.Dian.Web.Controllers
         public NotificationsController()
         {
         }       
-        public  Task<JsonResult> EventNotificationsAsync(string type, string id)    
+        public async Task<JsonResult> EventNotificationsAsync(string type, string id)    
         {
             RequestNotification notification = new RequestNotification();
-            var accountId =  ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
+            var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
             notification.PetitionName = contributor.ExchangeEmail;
