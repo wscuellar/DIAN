@@ -265,23 +265,14 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
-        public async Task<ActionResult> DownloadZipFilesEvenetos(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code,string fecha)
         {
             try
             {
-                var requestObj2 = new { trackId };
-                var response = await DownloadXmlAsync(requestObj2);
-                var base64Xml = response.XmlBase64;
-
-
-
-                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
-                var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
-                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
-
-
-
-                return null;
+                
+                var bytes = DownloadExportedFiles(trackId,DateTime.Parse(fecha));
+               // var zipFile = ZipExtensions.CreateZip(bytes, rk, "xlsx");
+                return File(bytes, "application/zip", $"{trackId}.zip");
             }
             catch (Exception ex)
             {
@@ -996,7 +987,16 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
         }
-
+        private byte[] DownloadExportedFiles(string rk,DateTime fecha)
+        {
+            var me = "";
+            var año = fecha.Year;
+            var mes = fecha.ToString("MM");
+            var dia = fecha.ToString("dd");
+       
+            FileManager fileManager = new FileManager();
+            return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
+        }
         private byte[] DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
@@ -1034,7 +1034,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             SetView(filterType);
             string continuationToken = (string)Session["Continuation_Token_" + model.Page];
-
+            var idevento = "";
             if (string.IsNullOrEmpty(continuationToken))
                 continuationToken = "";
 
@@ -1056,7 +1056,13 @@ namespace Gosocket.Dian.Web.Controllers
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
-
+            if (model.DocumentTypeId=="030" || model.DocumentTypeId == "031"|| model.DocumentTypeId == "032"|| model.DocumentTypeId == "033"|| model.DocumentTypeId == "034")
+            {
+                model.MaxItemCount = 100;
+                idevento = model.DocumentTypeId;
+                ViewBag.idevento = model.DocumentTypeId;
+                model.DocumentTypeId = "00";
+            }
             if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
@@ -1082,6 +1088,7 @@ namespace Gosocket.Dian.Web.Controllers
                                                                                                                       model.RadianStatus);
                     break;
                 case 2:
+                 
                     cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
                                                                                                                       model.StartDate,
                                                                                                                       model.EndDate,
@@ -1186,7 +1193,33 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
             }
+            if (idevento!="")
+            {
 
+                for (int i = 0; i < model.Documents.Count; i++)
+                {
+                    bool bandera_ = false;
+
+                    foreach (var evento in model.Documents[i].Events)
+                    {
+                        if (evento.Code == idevento)
+                        {
+                            bandera_ = true;
+                        }
+
+                    }
+                    if (bandera_ == false)
+                    {
+                        model.Documents.Remove(model.Documents[i]);
+                        i--;
+                    }
+                }
+                foreach (var item in model.Documents)
+                {
+                    
+                }
+               
+            }
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 

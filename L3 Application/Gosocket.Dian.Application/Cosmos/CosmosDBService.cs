@@ -536,7 +536,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 e.DocumentTypeId == "50" ||
                 e.DocumentTypeId == "55" ||
                 e.DocumentTypeId == "45" ||
-                e.DocumentTypeId == "60"
+                e.DocumentTypeId == "60" 
                 )).AsDocumentQuery();
 
                 result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
