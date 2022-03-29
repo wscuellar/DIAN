@@ -396,11 +396,16 @@
                         if ($('#PinSW').val().trim() == '') {
 						    $('#ErrorPinSW').show()
                         } else {
-							$('#ErrorSoftwareName').hide()
-							$('#ErrorPinSW').hide()
-                            showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
-                            form.submit();
-                            hideLoading("#panel-wrapper");
+                            if (@Model.ElectronicDocumentId == 14 && $('#PinSW').val().trim().length != 5) {
+                                $('#ErrorPinSW-length').show()
+                            } else {
+							    $('#ErrorSoftwareName').hide()
+							    $('#ErrorPinSW').hide()
+                                $('#ErrorPinSW-length').hide()
+                                showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                                form.submit();
+                                hideLoading("#panel-wrapper");
+                            }
                         }
 
                     }
@@ -462,7 +467,15 @@
 				$('select[name=OperationModeSelectedId]').val(0);
                 }
 			$('.selectpicker').selectpicker('refresh');
-			$('#OperationModeSelectedId').change();
+            $('#OperationModeSelectedId').change();
+
+            $('#PinSW').blur(function () {
+                $('#ErrorPinSW').hide();
+                $('#ErrorPinSW-length').hide();
+                if (!$(this).val()) {
+                    $('#ErrorPinSW').show();
+                }
+            })
 		});//ready
 
 
