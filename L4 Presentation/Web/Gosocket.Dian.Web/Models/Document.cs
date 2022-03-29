@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "60", Name = "Documento equivalente Servicios Publicos y Domiciliarios" },
                 new DocumentTypeModel() { Code = "55", Name = "Documento equivalente Bolsa de valor y agropecuario" },
                 new DocumentTypeModel() { Code = "45", Name = "Documento equivalente Extractos" },
-                new DocumentTypeModel() { Code = "95", Name = "Documento equivalente Nota de ajuste" },
+                new DocumentTypeModel() { Code = "94", Name = "Documento equivalente Nota de ajuste" },
                 new DocumentTypeModel() { Code = "030", Name = "Acuse de recibo de la FEV" },
                 new DocumentTypeModel() { Code = "031", Name = "Reclamo de la FEV" },
                 new DocumentTypeModel() { Code = "032", Name = "Recibo del bien o prestación del servicio" },
