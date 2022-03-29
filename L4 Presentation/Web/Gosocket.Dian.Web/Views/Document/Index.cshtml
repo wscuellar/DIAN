@@ -236,10 +236,12 @@
                 window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code=" + code + "&fecha=" + fecha;
             })
 
-             $(".download-equivalente-document").click(function () {
+            $(".download-equivalente-document").click(function () {
                 var cufe = this.id;
-                var code = $(this).context.getAttribute('code');
-                 window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&code" + code;
+                var typeId = $(this).context.getAttribute('documenTypeId');
+                var emissionDate = $(this).context.getAttribute('EmissionDate');
+                var generationDate = $(this).context.getAttribute('GenerationDate');
+                window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&documentTypeId=" + typeId + "&FechaValidacionDIAN=" + emissionDate + "&FechaGeneracionDIAN=" + generationDate;
             })
 
             $(".download-support-document").click(function () {
