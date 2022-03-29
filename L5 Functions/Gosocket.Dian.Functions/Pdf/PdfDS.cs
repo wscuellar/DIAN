@@ -482,13 +482,13 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")}</td>
-					 < td class='text-right'>{Desc:n2}</td>
+					<td class='text-right'>{Desc:n2}</td>
                     <td class='text-right'>{Reca:n2}</td>
 		            <td class='text-right'>{IvaVal:n2}</td>
-                    <td class='text-right'>{decimal.Parse(IvaPor.ToString().Split('.')[0]).ToString("N0")}</td>
+                    <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")}</td>
 
 	            </tr>");
 				}
