@@ -861,6 +861,17 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{FechaOrdenPedido}", string.Empty);
 				Html = Html.Replace("{FechaOrdenCompra}", string.Empty);
 			}
+			var OrdenPedido = model.Elements(cac + "OrderReference").Elements(cbc + "ID");
+			if (OrdenPedido.Any())
+			{
+				Html = Html.Replace("{OrdenPedido}", OrdenPedido.FirstOrDefault().Value);
+			
+			}
+			else
+			{
+				Html = Html.Replace("{OrdenPedido}", string.Empty);
+			
+			}
 
 			var AdquirienteRegimenFiscal = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "TaxLevelCode");
 
@@ -1324,9 +1335,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBolsa_template.html");
 			else if (tipo == "45")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentExtracto_template.html");
-			else if (tipo == "32"	|| tipo == "27")
+			else if ( tipo == "27")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
-			else if (tipo == "30")
+			else if (tipo == "32")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentJuegos_template.html");
 			else if (tipo == "60")
 				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentSPD_template.html");
