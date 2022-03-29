@@ -57,7 +57,7 @@
             {
                 var status = "success";
                 var isDisabled = "";
-                
+                bool badera_ = false;
                 if (document.Status == 10)
                 {
                     status = "primary";
@@ -67,181 +67,196 @@
                     status = "danger";
                     isDisabled = "disabled";
                 }
-                if (document.Events.Count() >= 1)
+                if (ViewBag.idevento != null)
                 {
-                    foreach (var item in document.Events)
+                    if (document.Events.Count() >= 1)
                     {
-                        var prefijo = item.CustomizationID.Split('_');
-                        <tr>
-                            <td>
-                                @if (item.Code == "030" || item.Code == "031" || item.Code == "032" || item.Code == "033" || item.Code == "034")
-                                {
-
-                                    <span class="fa fa fa-download add-tooltip download-eventos" data-id="@document.Id" id="@document.Id" code="@item.Code"></span>
-                                }
-                            </td>
-                            <td class="text-nowrap">
-                                <a>@item.TimeStamp.AddHours(-5).ToString("dd-MM-yyyy")</a>
-                            </td>
-                            <td class="text-nowrap text-center ">
-                                <a>@item.Date.AddHours(-5).ToString("dd-MM-yyyy")</a>
-                            </td>
-                            <td class="text-center text-nowrap">
-                                @item.prefijo
-                            </td>
-                            <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                                @item.CustomizationID
-                            </td>
-                            <td class="text-center ">
-                                <div class="iffyTip hideText2">@item.Description</div>
-                            </td>
-                            <td class="text-nowrap ">
-                                @item.SenderCode
-                            </td>
-                            <td class="text-nowrap">
-                                <div class="iffyTip hideText2">@item.SenderName</div>
-                            </td>
-                            <td class="text-nowrap ">
-                                @item.ReceiverCode
-                            </td>
-                            <td class="">
-                                <div class="iffyTip hideText2">@item.ReceiverName</div>
-                            </td>
-                            <td class="text-nowrap ">
-                                @document.StatusName
-                            </td>
-                            <td class="text-nowrap">
-                                <i class="fa fa-circle radian-status-circle"></i>
-                                 No Aplica
-                            </td>
-                            <td class="text-center text-nowrap ">
-                                @document.TotalAmount.ToString("C0")
-                            </td>                      
-                            
-                        </tr>
-                    }
-                } 
-                <tr>
-                    <td>
-                        @if (document.DocumentTypeId == "05")
+                        foreach (var item in document.Events)
                         {
-                            <span class="fa fa fa-download add-tooltip download-support-document" data-original-title="Documento soporte" data-id="@document.Id" id="@document.Id"></span>
+                            badera_ = true;
+                            if (item.Code == ViewBag.idevento) {
+
+                                <tr>
+                                    <td>                                     
+
+                                            <span class="fa fa fa-download add-tooltip download-eventos" data-id="@item.Code" id="@item.DocumentKey" code="@item.Date"></span>
+                                      
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <a>@item.TimeStamp.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                                    </td>
+                                    <td class="text-nowrap text-center ">
+                                        <a>@item.Date.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        @item.prefijo
+                                    </td>
+                                    <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                        @item.CustomizationID
+                                    </td>
+                                    <td class="text-center ">
+                                        <div class="iffyTip hideText2">@item.Description</div>
+                                    </td>
+                                    <td class="text-nowrap ">
+                                        @item.SenderCode
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <div class="iffyTip hideText2">@item.SenderName</div>
+                                    </td>
+                                    <td class="text-nowrap ">
+                                        @item.ReceiverCode
+                                    </td>
+                                    <td class="">
+                                        <div class="iffyTip hideText2">@item.ReceiverName</div>
+                                    </td>
+                                    <td class="text-nowrap ">
+                                        @document.StatusName
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <i class="fa fa-circle radian-status-circle"></i>
+                                        No Aplica
+                                    </td>
+                                    <td class="text-center text-nowrap ">
+                                        @document.TotalAmount.ToString("C0")
+                                    </td>
+
+                                </tr>
+                            }
+
+                            }
                         }
                         else
                         {
-                            // 20 = pos - 35 = transporte pasajeros terreste - 40 = Cobro Peaje - 55 = Bolsa de  Valor Y Agropecuario - 27 = espectaculos publicos  -
-                            // 60 = Servicios publicos -  25 = Boleta de Ingreso a Espectaculos Publicos - 32 = documento de juego -  50 = t. Aereo
-                            if (document.DocumentTypeId == "20" || document.DocumentTypeId == "35" || document.DocumentTypeId == "40" || document.DocumentTypeId == "55" ||
-                                document.DocumentTypeId == "27" || document.DocumentTypeId == "25" || document.DocumentTypeId == "50" || document.DocumentTypeId == "60" || document.DocumentTypeId == "32")
-                            {
-                                <span class="fa fa fa-download add-tooltip download-equivalente-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")"></span>
-                            }
-                            else
-                            {
-                                if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
+                            badera_ = false;
+                        }
+                    }
+
+
+                    if (!badera_)
+                    {
+                        <tr>
+                            <td>
+                                @if (document.DocumentTypeId == "05")
                                 {
-                                    <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                    <span class="fa fa fa-download add-tooltip download-support-document" data-original-title="Documento soporte" data-id="@document.Id" id="@document.Id"></span>
                                 }
                                 else
                                 {
-                                    <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                    //20=pos - 35=t. pasajeros terreste - 40=Cobro Peaje - 55=Bolsa de Valor Y Agropecuario - 27=espectaculos publicos  -
+                                    //60=S. publicos -  25=Boleta de Ingreso a Espectaculos Publicos - 32=Juego localizados -  50=t. Aereo - 45=Extracto
+                                    if (document.DocumentTypeId == "20" || document.DocumentTypeId == "35" || document.DocumentTypeId == "40" || document.DocumentTypeId == "55" ||
+                                        document.DocumentTypeId == "27" || document.DocumentTypeId == "50" || document.DocumentTypeId == "60" ||
+                                        document.DocumentTypeId == "95" || document.DocumentTypeId == "45" || document.DocumentTypeId == "32")
+                                    {
+                                        <span class="fa fa fa-download add-tooltip download-equivalente-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")"></span>
+                                    }
+                                    else
+                                    {
+                                        if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
+                                        {
+                                            <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                        }
+                                    }
+                                }
+
+                            </td>
+                            @if (document.DocumentTypeId == "05" || document.DocumentTypeId == "101")
+                            {
+                                <td class="text-nowrap" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                                </td>
+                                <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
+                                </td>
+                                <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.Serie
+                                </td>
+                                <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.SerieAndNumber
+                                </td>
+                                <td class="text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.DocumentTypeName</div>
+                                </td>
+                                <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.SenderCode
+                                </td>
+                                <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.SenderName</div>
+                                </td>
+                                <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.ReceiverCode
+                                </td>
+                                <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.ReceiverName</div>
+                                </td>
+                                <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.StatusName
+                                </td>
+                                <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <i class="fa fa-circle radian-status-circle"></i>
+                                    @document.RadianStatusName
+                                </td>
+                                <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.TotalAmount.ToString("C0")
+                                </td>
+                                if (Model.ContributorTypeId == 4)
+                                {
+                                    <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    </td>
                                 }
                             }
-                        }
-
-                    </td>
-                    @if (document.DocumentTypeId == "05" || document.DocumentTypeId == "101")
-                    {
-                        <td class="text-nowrap" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
-                        </td>
-                        <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
-                        </td>
-                        <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.Serie
-                        </td>
-                        <td class="text-nowrap text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.SerieAndNumber
-                        </td>
-                        <td class="text-center " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.DocumentTypeName</div>
-                        </td>
-                        <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.SenderCode
-                        </td>
-                        <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.SenderName</div>
-                        </td>
-                        <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.ReceiverCode
-                        </td>
-                        <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.ReceiverName</div>
-                        </td>
-                        <td class="text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.StatusName
-                        </td>
-                        <td class="" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <i class="fa fa-circle radian-status-circle"></i>
-                            @document.RadianStatusName
-                        </td>
-                        <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.TotalAmount.ToString("C0")
-                        </td>
-                        if (Model.ContributorTypeId == 4)
-                        {
-                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            </td>
-                        }
+                            else
+                            {
+                                <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
+                                </td>
+                                <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
+                                </td>
+                                <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.Serie
+                                </td>
+                                <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.SerieAndNumber
+                                </td>
+                                <td class="text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.DocumentTypeName</div>
+                                </td>
+                                <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.SenderCode
+                                </td>
+                                <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.SenderName</div>
+                                </td>
+                                <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.ReceiverCode
+                                </td>
+                                <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <div class="iffyTip hideText2">@document.ReceiverName</div>
+                                </td>
+                                <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.StatusName
+                                </td>
+                                <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    <i class="fa fa-circle radian-status-circle"></i>
+                                    @document.RadianStatusName
+                                </td>
+                                <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    @document.TotalAmount.ToString("C0")
+                                </td>
+                                if (Model.ContributorTypeId == 4)
+                                {
+                                    <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
+                                    </td>
+                                }
+                            }
+                        </tr>
                     }
-                    else
-                    {
-                        <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <a>@document.ReceptionDate.AddHours(-5).ToString("dd-MM-yyyy")</a>
-                        </td>
-                        <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <a>@document.EmissionDate.ToString("dd-MM-yyyy")</a>
-                        </td>
-                        <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.Serie
-                        </td>
-                        <td class="text-nowrap text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.SerieAndNumber
-                        </td>
-                        <td class="text-center document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.DocumentTypeName</div>
-                        </td>
-                        <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.SenderCode
-                        </td>
-                        <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.SenderName</div>
-                        </td>
-                        <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.ReceiverCode
-                        </td>
-                        <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <div class="iffyTip hideText2">@document.ReceiverName</div>
-                        </td>
-                        <td class="text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.StatusName
-                        </td>
-                        <td class="document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            <i class="fa fa-circle radian-status-circle"></i>
-                            @document.RadianStatusName
-                        </td>
-                        <td class="text-center text-nowrap document-row" data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            @document.TotalAmount.ToString("C0")
-                        </td>
-                        if (Model.ContributorTypeId == 4)
-                        {
-                            <td class="text-center text-nowrap " data-id="@document.Id" data-partitionKey="@document.PartitionKey" data-type="@document.DocumentTypeId">
-                            </td>
-                        }
-                    }
-                </tr>
-            }
+                }
         </tbody>
         </table>
 
