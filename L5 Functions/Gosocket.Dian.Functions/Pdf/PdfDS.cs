@@ -784,7 +784,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 			var TotalImpuestos = decimal.Parse(OtrosImp.Any() ? OtrosImp.FirstOrDefault().Value : "0") + decimal.Parse(TotalIVA.Any() ? TotalIVA.FirstOrDefault().Value : "0");
-
+			Html = Html.Replace("{TotalImpuestos}", TotalImpuestos.ToString("N0"));
 
 			var TotalNetoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
 			Html = Html.Replace("{TotalNetoDocumento}", Decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")); ;
