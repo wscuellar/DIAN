@@ -67,15 +67,15 @@
                     status = "danger";
                     isDisabled = "disabled";
                 }
-                if (ViewBag.idevento != "")
+                if (ViewBag.idevento != null)
                 {
                     if (document.Events.Count() >= 1)
                     {
                         foreach (var item in document.Events)
                         {
                             badera_ = true;
-                            if (item.Code == ViewBag.idevento) { 
-                            
+                            if (item.Code == ViewBag.idevento) {
+
                                 <tr>
                                     <td>                                     
 
