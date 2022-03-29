@@ -237,21 +237,24 @@ namespace Gosocket.Dian.Web.Controllers
             return JsonConvert.DeserializeObject<ResponseDownloadXml>(result);
         }
 
-        public async Task< ActionResult> DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        public async Task<ActionResult> DownloadZipFilesEquivalente(string trackId, string documentTypeId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
         {
             try
             {
                 var requestObj2 = new { trackId };
                 var response = await DownloadXmlAsync(requestObj2);
 
+                var base64Xml = response.XmlBase64;
                 var xmlEquivalenteBytes = Convert.FromBase64String(response.XmlBase64);
-                var requestObj = new { response.XmlBase64, FechaValidacionDIAN, FechaGeneracionDIAN };
-                HttpResponseMessage responseMessage = await  ConsumeApiAsync(ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos"), requestObj);
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObj = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
+                var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
-                {
-                    new Tuple<string, byte[]>(trackId + ".pdf", responseMessage.Content.ReadAsByteArrayAsync().Result),
-                    xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
+{
+                new Tuple<string, byte[]>(trackId + ".pdf", pdfbytes),
+                xmlEquivalenteBytes != null ? new Tuple<string, byte[]>(trackId + ".xml", xmlEquivalenteBytes) : null
                 }, trackId);
 
                 return File(zipFile, "application/zip", $"{trackId}.zip");
@@ -262,6 +265,22 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+        public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code,string fecha)
+        {
+            try
+            {
+                
+                var bytes = DownloadExportedFiles(trackId,DateTime.Parse(fecha));
+               // var zipFile = ZipExtensions.CreateZip(bytes, rk, "xlsx");
+                return File(bytes, "application/zip", $"{trackId}.zip");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+        }
+
 
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult DownloadPDF(string trackId, string recaptchaToken)
@@ -968,7 +987,16 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
         }
-
+        private byte[] DownloadExportedFiles(string rk,DateTime fecha)
+        {
+            var me = "";
+            var año = fecha.Year;
+            var mes = fecha.ToString("MM");
+            var dia = fecha.ToString("dd");
+       
+            FileManager fileManager = new FileManager();
+            return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
+        }
         private byte[] DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
@@ -1006,7 +1034,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             SetView(filterType);
             string continuationToken = (string)Session["Continuation_Token_" + model.Page];
-
+            var idevento = "";
             if (string.IsNullOrEmpty(continuationToken))
                 continuationToken = "";
 
@@ -1028,7 +1056,13 @@ namespace Gosocket.Dian.Web.Controllers
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
-
+            if (model.DocumentTypeId=="030" || model.DocumentTypeId == "031"|| model.DocumentTypeId == "032"|| model.DocumentTypeId == "033"|| model.DocumentTypeId == "034")
+            {
+                model.MaxItemCount = 100;
+                idevento = model.DocumentTypeId;
+                ViewBag.idevento = model.DocumentTypeId;
+                model.DocumentTypeId = "00";
+            }
             if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
@@ -1054,6 +1088,7 @@ namespace Gosocket.Dian.Web.Controllers
                                                                                                                       model.RadianStatus);
                     break;
                 case 2:
+                 
                     cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
                                                                                                                       model.StartDate,
                                                                                                                       model.EndDate,
@@ -1132,7 +1167,16 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             Code = e.Code,
                             Date = e.Date,
-                            Description = e.Description
+                            Description = e.Description,
+                            DocumentKey = e.DocumentKey,
+                            DateNumber = e.DateNumber,
+                            SenderCode = e.SenderCode,
+                            SenderName =e.SenderName,
+                            ReceiverCode =e.ReceiverCode,
+                            ReceiverName = e.ReceiverName,
+                            TimeStamp = e.TimeStamp,
+                            CustomizationID = e.CustomizationID,
+                            prefijo =e.prefijo
                         }).ToList()
                 }).ToList();
 
@@ -1149,7 +1193,33 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
             }
+            if (idevento!="")
+            {
 
+                for (int i = 0; i < model.Documents.Count; i++)
+                {
+                    bool bandera_ = false;
+
+                    foreach (var evento in model.Documents[i].Events)
+                    {
+                        if (evento.Code == idevento)
+                        {
+                            bandera_ = true;
+                        }
+
+                    }
+                    if (bandera_ == false)
+                    {
+                        model.Documents.Remove(model.Documents[i]);
+                        i--;
+                    }
+                }
+                foreach (var item in model.Documents)
+                {
+                    
+                }
+               
+            }
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 

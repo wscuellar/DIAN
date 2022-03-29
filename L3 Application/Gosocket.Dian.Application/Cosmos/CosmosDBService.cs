@@ -524,15 +524,19 @@ namespace Gosocket.Dian.Application.Cosmos
                 e.DocumentTypeId == "09" ||
                 e.DocumentTypeId == "11" ||
                 e.DocumentTypeId == "12" ||
-                e.DocumentTypeId == "20" ||
                 e.DocumentTypeId == "101"||
                 e.DocumentTypeId == "91" ||
-                e.DocumentTypeId == "92"||
+                e.DocumentTypeId == "92" ||
+                e.DocumentTypeId == "20" ||
+                e.DocumentTypeId == "25" ||
+                e.DocumentTypeId == "27" ||
+                e.DocumentTypeId == "32" ||
+                e.DocumentTypeId == "35" ||
                 e.DocumentTypeId == "40" ||
                 e.DocumentTypeId == "50" ||
-                e.DocumentTypeId == "35" ||
                 e.DocumentTypeId == "55" ||
-                e.DocumentTypeId == "32"
+                e.DocumentTypeId == "45" ||
+                e.DocumentTypeId == "60" 
                 )).AsDocumentQuery();
 
                 result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
@@ -622,7 +626,19 @@ namespace Gosocket.Dian.Application.Cosmos
                 g.DocumentTypeId == "09" ||
                 g.DocumentTypeId == "11" ||
                 g.DocumentTypeId == "12" ||
-                g.DocumentTypeId == "101"
+                g.DocumentTypeId == "101"||
+                g.DocumentTypeId == "20" ||
+                g.DocumentTypeId == "25" ||
+                g.DocumentTypeId == "27" ||
+                g.DocumentTypeId == "32" ||
+                g.DocumentTypeId == "35" ||
+                g.DocumentTypeId == "40" ||
+                g.DocumentTypeId == "50" ||
+                g.DocumentTypeId == "55" ||
+                g.DocumentTypeId == "45" ||
+                g.DocumentTypeId == "55" ||
+                g.DocumentTypeId == "95" ||
+                g.DocumentTypeId == "60"
                 );
             }
 

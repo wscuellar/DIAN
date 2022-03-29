@@ -32,39 +32,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             return View();
         }
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
-        public NotificationsController(IOthersElectronicDocumentsService othersElectronicDocumentsService, IOthersDocsElecContributorService othersDocsElecContributorService, IContributorService contributorService)
-        {
-            _othersElectronicDocumentsService = othersElectronicDocumentsService;
-            _othersDocsElecContributorService = othersDocsElecContributorService;
-        }
-
         public NotificationsController()
         {
-        }
-        class Envio
-        {
-            string Nit;
-            public string Objeto
-            {
-                get { return Nit; }
-                set { Nit = value; }
-            }
-        }
-        public async Task<JsonResult> EventNotificationsAsync(string type, string id)    
+        }       
+        public  Task<JsonResult> EventNotificationsAsync(string type, string id)    
         {
             RequestNotification notification = new RequestNotification();
-            var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
+            var accountId =  ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
             notification.PetitionName = contributor.ExchangeEmail;
