@@ -64,5 +64,40 @@ namespace Gosocket.Dian.Services.Test
             //Assert.AreEqual(invoceDe.Cude, invoceDe.ToCombinacionToCude().EncryptSHA384());
         }
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;
+
+        [TestMethod]
+        public void Should_ValidateCude_Ok_Case_Bug_13620()
+        {
+            Console.WriteLine("Nuevo Test [Bug 13620]");
+            var invoiceDsTest = new DocumentoEquivalente()
+            {
+                NumFac = "DBV01",
+                FecFac = "2022-03-14",
+                HorFac = "15:05:40-05:00",
+                ValFac = "20753.80",
+                CodImp1 = "01",
+                ValImp1 = "19.00",
+                CodImp2 = "04",
+                ValImp2 = "0.00",
+                CodImp3 = "03",
+                ValImp3 = "0.00",
+                ValTol = "24697.02",
+                NumOfe = "800197268",
+                NitAdq = "856987456",
+                SoftwarePin = "12345",
+                TipoAmb = "2"
+            };
+
+            var composicionCudsEsperada = "DBV012022-03-1415:05:40-05:0020753.800119.00040.00030.0024697.02800197268856987456123452";
+            Console.WriteLine($"Combinación Cude esperado:{composicionCudsEsperada}");
+            Console.WriteLine($"Combinación Cude real    :{invoiceDsTest.ToCombinacionToCude()}");
+            Assert.AreEqual(composicionCudsEsperada, invoiceDsTest.ToCombinacionToCude());
+
+            var cudsEsperado = "6b0ea6e48a74ce59faeed218f96b5e1af55101bcfdc60db549f77d5a4e0046a03d36b0189dfef671aef1904f6baf4a3b";
+            Console.WriteLine($"Cuds esperado:{cudsEsperado}");
+            Console.WriteLine($"Cuds real    :{invoiceDsTest.ToCombinacionToCude().EncryptSHA384()}");
+
+            Assert.AreEqual(cudsEsperado, invoiceDsTest.ToCombinacionToCude().EncryptSHA384());
+        }
     }
 }

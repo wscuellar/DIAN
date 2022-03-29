@@ -33,9 +33,7 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
         private UserService userService = new UserService();
-        private ApplicationUserManager _userManager;
-        private static NotificationsController notification = new NotificationsController();
-        private NotificationEntity dataNotification = new NotificationEntity();
+        private ApplicationUserManager _userManager; 
         private IContributorService object1;
         private IOthersDocsElecContributorService object2;
         private IOthersElectronicDocumentsService object3;
@@ -213,7 +211,6 @@ namespace Gosocket.Dian.Web.Controllers
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);
-
             model.Software = new OtherDocElecSoftwareViewModel()
             {
                 Id = software.Id,
@@ -946,7 +943,6 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
-                dataNotification.AccountId = code.ToString();
                 data.EquivalentDocumentId = equivalentDocumentId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
