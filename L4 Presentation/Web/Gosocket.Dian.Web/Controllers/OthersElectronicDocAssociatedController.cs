@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
         private UserService userService = new UserService();
+        private NotificationsController notification = new NotificationsController();
         private ApplicationUserManager _userManager; 
         private IContributorService object1;
         private IOthersDocsElecContributorService object2;
@@ -957,7 +958,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
                 telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
-               
+                notification.EventNotificationsAsync("01", code.ToString());
                 return Json(new
                 {
                     success = true,
@@ -1178,6 +1179,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
             var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
+            //await notification.EventNotificationsAsync("01", contributor.Code);
             return isUpdate;
         }
 

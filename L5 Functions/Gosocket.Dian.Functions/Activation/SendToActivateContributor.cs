@@ -99,12 +99,12 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Error al enviar a activar contribuyente con id {contributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
-                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
+                    log.Error($"Error al enviar a activar contribuyente con id {contributor?.Id} en producciï¿½n _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producciï¿½n.", detail = ex.Message, trace = ex.StackTrace };
                     return req.CreateResponse(HttpStatusCode.InternalServerError, failResponse);
                 }
 
-                var response = new { success = true, message = "Contribuyente se envió a activar a producción con éxito." };
+                var response = new { success = true, message = "Contribuyente se enviï¿½ a activar a producciï¿½n con ï¿½xito." };
                 return req.CreateResponse(HttpStatusCode.OK, response);
             }
 

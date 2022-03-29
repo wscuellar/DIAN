@@ -3,9 +3,12 @@ using Org.BouncyCastle.Utilities.Collections;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Store;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Caching;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Application.Common
 {
@@ -13,7 +16,8 @@ namespace Gosocket.Dian.Application.Common
     {
         private const string CertificatesCollection = "Certificate/Collection";
         private static readonly string[] witheListPkixCertPathBuilderException = { "Certificate has unsupported critical extension.", "Subject alternative name extension could not be decoded." };
-
+        private static readonly MemoryCache cache=MemoryCache.Default;
+        private static readonly string CACHE_KEY = "CERT-";
         /// <summary>
         /// 
         /// </summary>
@@ -22,11 +26,47 @@ namespace Gosocket.Dian.Application.Common
         /// <returns></returns>
         public static bool IsRevoked(this X509Certificate certificate, IEnumerable<X509Crl> crls)
         {
+            /**
+             * 1. Verificar si el serialnumber del certificado está en caché
+             *      a. Si está en caché, retornar el resultado de la validación guardada
+             * 2. de lo contrario
+             *      a. Verificar si el certificado ha sido revicado en alguna de las CRLs
+             *      b. Crear tupla con el resultado de la validación
+             *      c. Enviar tupla a caché con un tiempo de vigencia
+             *      d. Retornar resultado de validación
+             * 3.  La próxima vez retornará lo guardado en caché si aún está en vigencia
+             *      
+             * 
+             * 
+             */
+            
             if (crls == null || !crls.Any()) return false;
 
-            if (crls.Any(c => c.IsRevoked(certificate))) return true;
+            string key = CACHE_KEY + certificate.SerialNumber.ToString();
+            Tuple<string, bool> value=cache.Get(key) as Tuple<string, bool>;
 
-            return false;
+            if (value != null)
+            {
+                return value.Item2;
+            }
+            else
+            {
+                if (crls.Any(c => c.IsRevoked(certificate)))
+                {
+                    value = new Tuple<string, bool>(key,true);
+                }
+                else
+                {
+                    value = new Tuple<string, bool>(key,false);
+                }
+                CacheItemPolicy policy = new CacheItemPolicy
+                {
+                    AbsoluteExpiration = DateTimeOffset.Now.AddHours(2)
+                };
+                cache.Set(key, value, policy);
+                return value.Item2;
+
+            }           
         }
 
         /// <summary>
