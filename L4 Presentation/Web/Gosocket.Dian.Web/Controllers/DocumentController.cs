@@ -110,10 +110,10 @@ namespace Gosocket.Dian.Web.Controllers
 
         private static HttpClient client = new HttpClient();
 
-        private List<DocValidatorTrackingModel> GetValidatedRules(string trackId)
+        private async Task<List<DocValidatorTrackingModel>> GetValidatedRules(string trackId)
         {
             var requestObj = new { trackId };
-            var validations = GetValidations(requestObj);
+            var validations = await GetValidations(requestObj);
 
             return validations.Select(d => new DocValidatorTrackingModel
             {
@@ -188,15 +188,15 @@ namespace Gosocket.Dian.Web.Controllers
             }
         }
 
-        public ActionResult DownloadZipFiles(string trackId)
+        public async Task<ActionResult> DownloadZipFiles(string trackId)
         {
             try
             {
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
                 var requestObj = new { trackId };
-                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
-                var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
+                var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
                 var xmlBytes = DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
@@ -215,7 +215,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [ExcludeFilter(typeof(Authorization))]
-        public ActionResult DownloadPDF(string trackId, string recaptchaToken)
+        public async Task<ActionResult> DownloadPDF(string trackId, string recaptchaToken)
         {
             try
             {
@@ -223,9 +223,9 @@ namespace Gosocket.Dian.Web.Controllers
                 string url = ConfigurationManager.GetValue("GetPdfUrl");
 
                 var requestObj = new { trackId };
-                HttpResponseMessage responseMessage = ConsumeApi(url, requestObj);
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
-                var pdfbytes = responseMessage.Content.ReadAsByteArrayAsync().Result;
+                var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
 
                 return File(pdfbytes, "application/pdf", $"{trackId}.pdf");
             }
@@ -271,7 +271,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Search", searchViewModel);
             }
 
-            DocValidatorModel model = ReturnDocValidationModel(documentKey, globalDataDocument);
+            DocValidatorModel model = await ReturnDocValidationModel (documentKey, globalDataDocument);
 
             return View(model);
         }
@@ -570,7 +570,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         private async Task<DocValidatorModel> ReturnDocValidatorModelByCufe(string trackId, GlobalDataDocument globalDataDocument = null)
         {
-            List<DocValidatorTrackingModel> validations = GetValidatedRules(trackId);
+            List<DocValidatorTrackingModel> validations = await GetValidatedRules(trackId);
             GlobalDocValidatorDocumentMeta globalDocValidatorDocumentMeta;
 
             List<InvoiceWrapper> invoiceData = _associateDocuments.GetEventsByTrackId(trackId);
@@ -803,10 +803,10 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return _event;
         }
-        private DocValidatorModel ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
+        private async  Task<DocValidatorModel> ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
         {
             var model = new DocValidatorModel();
-            model.Validations.AddRange(GetValidatedRules(documentKey));
+            model.Validations.AddRange(await GetValidatedRules(documentKey));
 
             model.Document = new DocumentViewModel
             {
@@ -934,24 +934,25 @@ namespace Gosocket.Dian.Web.Controllers
             throw new Exception(response.Message);
         }
 
-        public static ResponseDownloadXml DownloadXml<T>(T requestObj)
+        public static async Task<ResponseDownloadXml> DownloadXml<T>(T requestObj)
         {
-            return ApiHelpers.ExecuteRequest<ResponseDownloadXml>(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+            return await ApiHelpers.ExecuteRequestAsync<ResponseDownloadXml>(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
         }
 
-        public static List<GlobalDocValidatorTracking> GetValidations<T>(T requestObj)
+        public static async Task<List<GlobalDocValidatorTracking>> GetValidations<T>(T requestObj)
         {
-            return ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
+            return await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
         }
 
-        private static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
+        
+        private static async Task<HttpResponseMessage> ConsumeApiAsync(string url, dynamic requestObj)
         {
-            
+
             var buffer = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestObj));
             var byteContent = new ByteArrayContent(buffer);
             byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            return client.PostAsync(url, byteContent).Result;
-            
+            return await client.PostAsync(url, byteContent);
+
         }
 
         private async Task<ActionResult> GetDocuments(SearchDocumentViewModel model, int filterType)

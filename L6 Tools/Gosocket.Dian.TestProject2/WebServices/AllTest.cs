@@ -15,7 +15,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         public void GetExchangeEmails_Success_Test()
         {
             var authCode = "11111111";
-            var response = service.GetExchangeEmails(authCode);
+            var response = service.GetExchangeEmails(authCode).Result;
             Assert.IsTrue(response.Success);
             Assert.AreEqual(response.StatusCode, "0");
             Assert.IsNotNull(response.CsvBase64Bytes);
@@ -25,7 +25,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         public void GetExchangeEmails_Fail_Test()
         {
             var authCode = "0001000010001";
-            var response = service.GetExchangeEmails(authCode);
+            var response = service.GetExchangeEmails(authCode).Result;
             Assert.IsFalse(response.Success);
             Assert.AreEqual(response.StatusCode, "89");
             Assert.IsNull(response.CsvBase64Bytes);
@@ -87,7 +87,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             }
 
             file.Close();
-            var response = service.SendEventUpdateStatus(bytes, "11111111");
+            var response = service.SendEventUpdateStatus(bytes, "11111111").Result;
             Assert.IsTrue(response.IsValid);
             Assert.AreEqual("00", response.StatusCode);
             Assert.AreEqual("Procesado Correctamente.", response.StatusDescription);
@@ -106,7 +106,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             }
 
             file.Close();
-            var response = service.SendEventUpdateStatus(bytes, "11111111");
+            var response = service.SendEventUpdateStatus(bytes, "11111111").Result;
             Assert.IsFalse(response.IsValid);
             Assert.AreNotEqual("00", response.StatusCode);
             Assert.IsNotNull(response.ErrorMessage);
@@ -145,7 +145,7 @@ namespace Gosocket.Dian.TestProject.WebServices
             }
 
             file.Close();
-            var response = service.UploadDocumentSync(fileName, bytes, "11111111");
+            var response = service.UploadDocumentSync(fileName, bytes, "11111111").Result;
             Assert.IsFalse(response.IsValid);
             Assert.AreNotEqual("00", response.StatusCode);
             Assert.IsNotNull(response.ErrorMessage);
