@@ -506,6 +506,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 //var isFinished = DianServicesUtils.CheckIfDocumentValidationsIsFinished(trackId);
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
                 {
+                    string messageDescription = string.Empty;
                     start = DateTime.UtcNow;
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
@@ -557,6 +558,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var failed = validations.Where(r => r.Mandatory && !r.IsValid).ToList();
                     var notifications = validations.Where(r => r.IsNotification).ToList();
                     var message = (string.IsNullOrEmpty(documentMeta.Serie)) ? $"La {documentMeta.DocumentTypeName} {documentMeta.Number}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {documentMeta.Serie}-{documentMeta.Number}, ha sido autorizada.";
+                    var document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+
 
                     if (!failed.Any() && !notifications.Any())
                     {
@@ -566,11 +569,40 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     if (failed.Any() && !applicationResponseExist)
                     //if (failed.Any())
-                    {
+                    {                        
                         var failedList = new List<string>();
                         foreach (var f in failed)
+                        {
                             failedList.Add($"Regla: {f.ErrorCode}, Rechazo: {f.ErrorMessage}");
-
+                            if (f.ErrorCode == "90")
+                            {
+                                switch (f.DocumentTypeCode)
+                                {
+                                    case "01":
+                                    case "91":
+                                    case "92":
+                                        {
+                                            messageDescription = document != null ? $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUFE {document.DocumentKey} " : null ;
+                                            break;
+                                        }
+                                    case "96":
+                                        {
+                                            messageDescription = document != null ? $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUDE {document.DocumentKey} " : null;
+                                            break;
+                                        }
+                                    case "102":
+                                    case "103":
+                                        {
+                                            messageDescription = document != null ?  $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUNE  {document.DocumentKey} " : null;
+                                            break;
+                                        }
+                                    default:
+                                        break;
+                                }
+                                response.StatusDescription = messageDescription;
+                            }
+                        }
+                                                   
                         response.IsValid = false;
                         response.StatusMessage = "Documento con errores en campos mandatorios.";
                         response.ErrorMessage.AddRange(failedList);
