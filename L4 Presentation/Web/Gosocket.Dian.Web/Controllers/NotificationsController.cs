@@ -23,10 +23,7 @@ namespace Gosocket.Dian.Web.Controllers
 {
     public class NotificationsController : Controller
     {
-        private ApplicationUserManager _userManager;
         private readonly ContributorService contributorService = new ContributorService();
-        private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
-        private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         // GET: Notifications
         public ActionResult Index() 
         {
@@ -35,7 +32,7 @@ namespace Gosocket.Dian.Web.Controllers
         public NotificationsController()
         {
         }       
-        public  Task<JsonResult> EventNotificationsAsync(string type, string id)    
+        public void EventNotificationsAsync(string type, string id)    
         {
             RequestNotification notification = new RequestNotification();
             var accountId =  ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
@@ -100,8 +97,7 @@ namespace Gosocket.Dian.Web.Controllers
                     break;        
 
             }
-            
-            return null;
+            return;
         }
 
         public JsonResult SentEmail(RequestNotification notification)

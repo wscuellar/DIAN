@@ -92,17 +92,9 @@ namespace Gosocket.Dian.Functions.Others
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
                     GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
                     SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
-                  //  NotificationsController notification = new NotificationsController();
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
-                    {
-                        //await notification.EventNotificationsAsync("02", contributor.Code);
-                        throw new Exception("Contribuyente no a pasado set de pruebas.");
-                    }
-                    //else
-                    //{
-                    //    await notification.EventNotificationsAsync("03", contributor.Code);
-                    //}
+                        throw new Exception("Contribuyente no a pasado set de pruebas.");                 
 
                     SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
@@ -169,8 +161,6 @@ namespace Gosocket.Dian.Functions.Others
                         Action = "finish SendToActivateOtherDocument"
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(finishSendContributorId);
-                  //await notification.EventNotificationsAsync("01", contributor.Code);
-
 
                 }
                 catch (Exception ex)

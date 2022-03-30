@@ -1499,6 +1499,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var digit = documentMeta.DocumentTypeId == "91" ? "C" : "D";
+            if (documentMeta.DocumentTypeId == "05")
+            {
+                digit = "DS";
+            }
+            if (documentMeta.DocumentTypeId == "94")
+            {
+                digit = "NA";
+            }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                digit = "NS";
+            }
 
             if (string.IsNullOrEmpty(documentMeta.DocumentReferencedKey))
                 return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Se requiere obligatoriamente referencia a documento.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
@@ -1510,7 +1522,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 referencedDocument = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(referencedDocumentData?.DocumentKey, referencedDocumentData?.DocumentKey);
                 if (referencedDocument == null)
-                    return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG04a", ErrorMessage = "Documento referenciado no existe en los registros de la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                {
+                    string errorCode = documentMeta.DocumentTypeId == "05" ? "DSBH04" : $"{digit}BG04a";
+                    string errorMessage = documentMeta.DocumentTypeId == "05" ? "CUDS de la nota de ajuste referenciada no existe" : "Documento referenciado no existe en los registros de la DIAN.";
+                    return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessage, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                }
             }
 
             if (referencedDocumentData.SenderCode != documentMeta.SenderCode)
