@@ -1498,7 +1498,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
-            var digit = new string[] { "91","94","95" }.Contains(documentMeta.DocumentTypeId) ? "C" : "D";
+            var digit = documentMeta.DocumentTypeId == "91" ? "C" : "D";
+            if (documentMeta.DocumentTypeId == "94")
+            {
+                digit = "NA";
+            }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                digit = "NS";
+            }
 
             if (string.IsNullOrEmpty(documentMeta.DocumentReferencedKey))
                 return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Se requiere obligatoriamente referencia a documento.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
