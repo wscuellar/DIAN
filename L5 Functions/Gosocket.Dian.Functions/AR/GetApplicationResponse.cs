@@ -93,7 +93,7 @@ namespace Gosocket.Dian.Functions.AR
 
                 Stopwatch stopwatch3 = new Stopwatch();
                 stopwatch3.Start();
-                var applicationResponse = await XmlUtil.GetApplicationResponseIfExist(documentMetaEntity);
+                var applicationResponse = await XmlUtil.GetApplicationResponseIfExist(documentMetaEntity, docValidatorEntity);
                 stopwatch3.Stop();
                 double ms3 = stopwatch3.ElapsedMilliseconds;
                 double seconds3 = ms3 / 1000;
