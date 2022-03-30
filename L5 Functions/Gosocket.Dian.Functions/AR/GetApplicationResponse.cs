@@ -108,7 +108,7 @@ namespace Gosocket.Dian.Functions.AR
                     var response1 = await Utils.Utils.DownloadXmlAsync(requestObj);
                     Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(response1.XmlBase64, "InvoiceValidation");
                     string pathServiceData = ConfigurationManager.GetValue("GetXpathDataValuesUrl");
-                    var tributaryValues = ApiHelpers.ExecuteRequest<Domain.Domain.ResponseXpathDataValue>(pathServiceData, newXpathRequest);
+                    var tributaryValues = await ApiHelpers.ExecuteRequestAsync<Domain.Domain.ResponseXpathDataValue>(pathServiceData, newXpathRequest);
 
                     Stopwatch stopwatch4 = new Stopwatch();
                     stopwatch4.Start();

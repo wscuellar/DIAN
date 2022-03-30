@@ -3370,7 +3370,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateReferenceAttorney
-        private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser, XmlNamespaceManager ns)
+        private async Task<List<ValidateListResponse>> ValidateCufeReferenceAttorney(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -3585,8 +3585,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
-                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
-                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                var xmlBytesCufe = await validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
+                var xmlParserCufe = new XmlParser(xmlBytesCufe);
                 if (!xmlParserCufe.Parser())
                     throw new Exception(xmlParserCufe.ParserError);
 
@@ -3620,7 +3620,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate Reference Attorney
-        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId, XmlNamespaceManager ns)
+        public async  Task<List<ValidateListResponse>> ValidateReferenceAttorney(XmlParser xmlParser, string trackId, XmlNamespaceManager ns)
         {
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
@@ -3668,7 +3668,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Validaciones previas secciones DocumentResponse / DocumentReference 1 y 2
             if (listID != "3")
             {
-                var validateCufeReferenceAttorney = ValidateCufeReferenceAttorney(xmlParser, ns);
+                var validateCufeReferenceAttorney = await ValidateCufeReferenceAttorney(xmlParser, ns);
                 if (validateCufeReferenceAttorney != null)
                 {
                     validate = false;
@@ -5903,7 +5903,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
-        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
+        public async Task<List<ValidateListResponse>> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
             bool eventTV = false;
@@ -5949,8 +5949,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida si FE es contado no permite realizar la primera incripción
                     if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
                     {
-                        var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-                        var xmlParser = new XmlParser(xmlBytes.Result);
+                        var xmlBytes = await validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                        var xmlParser = new XmlParser(xmlBytes);
                         if (!xmlParser.Parser())
                             throw new Exception(xmlParser.ParserError);
 
@@ -7268,7 +7268,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateSigningTime
 
-        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
+        public async Task<List<ValidateListResponse>> RequestValidateSigningTimeAsync(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
         {
             var validateResponses = new List<ValidateListResponse>();
             string originalTrackId = data.TrackId;
@@ -7395,8 +7395,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string dateTimeStamp = documentMeta.SigningTimeStamp.ToString("yyyy-MM-ddTHH:mm:ss");
                 if (dateTimeStamp.Equals("0001-01-01T00:00:00"))
                 {
-                    var xmlBytes = GetXmlFromStorageAsync(documentMetaRef.PartitionKey);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    var xmlBytes = await GetXmlFromStorageAsync(documentMetaRef.PartitionKey);
+                    var xmlParser = new XmlParser(xmlBytes);
                     if (!xmlParser.Parser())
                         throw new Exception(xmlParser.ParserError);
 
@@ -7419,8 +7419,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 if (string.IsNullOrEmpty(documentMetaOriginal.PaymentDueDate))
                 {
-                    var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
-                    var originalXmlParser = new XmlParser(originalXmlBytes.Result);
+                    var originalXmlBytes = await validatorEngine.GetXmlFromStorageAsync(originalTrackId);
+                    var originalXmlParser = new XmlParser(originalXmlBytes);
                     if (!originalXmlParser.Parser())
                         throw new Exception(originalXmlParser.ParserError);
 
@@ -7624,7 +7624,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateEmitionEventPrev
 
-        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
+        public async Task<List<ValidateListResponse>> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -7664,8 +7664,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalInvoice = documentMeta.TotalAmount.ToString();
 
                 ////Obtiene XML ApplicationResponse CUDE
-                var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                var xmlBytesCude = await validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
@@ -7681,7 +7681,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion      
 
         #region NewValidateEventRADIAN
-        public List<ValidateListResponse> NewValidateEventRadianAsync(string trackId)
+        public async Task <List<ValidateListResponse>> NewValidateEventRadianAsync(string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -7762,7 +7762,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //Valida FE Activa como Titulo Valor y que exista la UUID
                     EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
-                    responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    responses = await EventApproveCufe(nitModel, eventApproveCufe);
                     foreach (var itemEventAproveCufe in responses)
                     {
                         if (!itemEventAproveCufe.IsValid)
@@ -7776,14 +7776,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                     && validEventRadian)
                 {
-                    var xmlBytes = GetXmlFromStorageAsync(trackId);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    var xmlBytes = await GetXmlFromStorageAsync(trackId);
+                    var xmlParser = new XmlParser(xmlBytes);
                     if (!xmlParser.Parser())
                         throw new Exception(xmlParser.ParserError);
 
-                    validatorDocumentNameSpaces(xmlBytes.Result);
+                    validatorDocumentNameSpaces(xmlBytes);
 
-                    responses = ValidateReferenceAttorney(xmlParser, trackId, _ns);
+                    responses = await ValidateReferenceAttorney(xmlParser, trackId, _ns);
                     foreach (var itemReferenceAttorney in responses)
                     {
                         if (itemReferenceAttorney.ErrorCode == "AAH07")
@@ -7812,7 +7812,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
                     EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
 
-                    responses = RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
+                    responses = await RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
                     foreach (var itemResponsesTacita in responses)
                     {
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
@@ -7829,7 +7829,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
                         validateResponses.AddRange(responses);
 
-                        responses = RequestValidateSigningTime(signingTime, documentMetaRef);
+                        responses = await RequestValidateSigningTimeAsync (signingTime, documentMetaRef);
                         validateResponses.AddRange(responses);
                     }
                 }
