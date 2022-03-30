@@ -147,7 +147,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
      
             // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber);
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber, trackId);
             if (!response.IsValid)
             {
                 var log = new GlobalLogger(trackId, "CheckDocumentDuplicity") { Message = sb.ToString(), Action = $"CheckDocumentDuplicity" };
@@ -337,7 +337,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         #region CheckDocumentDuplicity
 
-        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber)
+        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber, string trackId)
         {
             GlobalDocValidatorDocumentMeta meta = new GlobalDocValidatorDocumentMeta();
             List<string> failedList = new List<string>();
@@ -357,11 +357,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.IsValid = false;
                 response.StatusCode = "99";
                 response.StatusMessage = "Documento con errores en campos mandatorios.";
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                response.StatusDescription = $"Documento {serieAndNumber} procesado anteriormente. CUNE {document.DocumentKey}";
                 response.ErrorMessage.AddRange(failedList);
                 var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
                 response.XmlBase64Bytes = xmlBytes;
-                response.XmlDocumentKey = document.DocumentKey;
+                response.XmlDocumentKey = trackId;
                 response.XmlFileName = meta.FileName;
             }
             else
