@@ -221,6 +221,8 @@ namespace Gosocket.Dian.Domain.Common
         InvalidResponseCode = 298,
         [Description("Error al registrar evento")]
         Error = 299,
+        [Description("Error al registrar nomina")]
+        ErrorNomina = 99,
     }
 
     public enum EventStatus

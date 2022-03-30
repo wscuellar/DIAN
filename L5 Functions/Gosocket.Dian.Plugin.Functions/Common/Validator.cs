@@ -2354,16 +2354,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
 
                 case (int)EventStatus.Mandato:
-
-                    responses.Add(new ValidateListResponse
+                    if (!documentMetaCude.SendTestSet)
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = errorMessageParty,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
+                        //Valida mandante habilitado en RADIAN
+                        var responseVal = ValidateRadianEnabled(documentMetaCude);
+                        if (responseVal != null)
+                        {
+                            foreach (var item in responseVal)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = item.IsValid,
+                                    Mandatory = item.Mandatory,
+                                    ErrorCode = item.ErrorCode,
+                                    ErrorMessage = item.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                   
                     return responses;
 
                 case (int)EventStatus.Avales:
@@ -4619,7 +4639,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                       || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
                 else
-                    hash = $"{software.Id}{software.Pin}{number}".EncryptSHA384();
+                    hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
 
             }
 
@@ -5197,6 +5217,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorCodeReglaUUID = "AAH07";
             //string trackidRef = documentMeta.DocumentReferencedKey;
 
+            var typeListInstance = GetTypeOperation_InvoiceCache();
+            var typeListvalues = typeListInstance.Value.Split(';');
+
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
 
@@ -5304,10 +5327,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
                     if (documentMetaRef.SerieAndNumber != documentMeta.DocumentReferencedId)
                     {
-                        string message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                        string message = String.Empty;
+                        if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                        {
+                            message = ConfigurationManager.GetValue("ErrorMessage_AAH06_042");
+                        }
+                        else
+                        {
+                            message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                             || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
                             ? ConfigurationManager.GetValue("ErrorMessage_AAH06_043")
                             : ConfigurationManager.GetValue("ErrorMessage_AAH06");
+
+                        }
 
                         responses.Add(new ValidateListResponse
                         {
@@ -5318,7 +5350,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    //Valida DocumentTypeCode coincida con el documento informado
+                    //Valida DocumentTypeCode coincida con el documento informado                    
+                    if(typeListvalues.Contains(documentMetaRef.DocumentTypeId)) documentMetaRef.DocumentTypeId = "01";
+
                     if (documentMetaRef.DocumentTypeId != documentMeta.DocumentReferencedTypeId)
                     {
                         responses.Add(new ValidateListResponse
@@ -7410,8 +7444,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            if (documentMeta == null || string.IsNullOrEmpty(documentMeta.PartitionKey))
-            {
+            if ( documentMeta == null || string.IsNullOrWhiteSpace(documentMeta.PartitionKey))
+             {
                 documentMeta = documentMetaRef;
 
                 //Si no retorna fecha campo SigningTimeStamp //Date = { 1 / 1 / 0001 12:00:00 AM}
@@ -7484,6 +7518,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
             GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
             NitModel nitModel = new NitModel();
+            List<InvoiceWrapper> InvoiceWrapper = null;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (eventCode == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -7500,31 +7535,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //Obtiene XML Factura Electornica CUFE
-            if (string.IsNullOrEmpty(cufeDocumentMeta.PartitionKey))
+            if(eventCode != (int)EventStatus.Mandato)
             {
-                nitModel.SenderCode = documentMeta.SenderCode;
-                nitModel.ReceiverCode = documentMeta.ReceiverCode;
-                nitModel.ReceiverName = documentMeta.ReceiverName;
-                nitModel.DocumentKey = documentMeta.DocumentKey;
-                nitModel.DocumentTypeId = documentMeta.DocumentTypeId;
-            }
-            else
-            {
-                nitModel.SenderCode = cufeDocumentMeta.SenderCode;
-                nitModel.ReceiverCode = cufeDocumentMeta.ReceiverCode;
-                nitModel.ReceiverName = cufeDocumentMeta.ReceiverName;
-                nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
-                nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
+                //Obtiene XML Factura Electornica CUFE
+                if (string.IsNullOrEmpty(cufeDocumentMeta.PartitionKey))
+                {
+                    nitModel.SenderCode = documentMeta.SenderCode;
+                    nitModel.ReceiverCode = documentMeta.ReceiverCode;
+                    nitModel.ReceiverName = documentMeta.ReceiverName;
+                    nitModel.DocumentKey = documentMeta.DocumentKey;
+                    nitModel.DocumentTypeId = documentMeta.DocumentTypeId;
+                }
+                else
+                {
+                    nitModel.SenderCode = cufeDocumentMeta.SenderCode;
+                    nitModel.ReceiverCode = cufeDocumentMeta.ReceiverCode;
+                    nitModel.ReceiverName = cufeDocumentMeta.ReceiverName;
+                    nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
+                    nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
+                }
+
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
             }
 
             bool valid = true;
 
             // ...
             List<string> issuerAttorneyList = null;
-
-            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
-
+           
             if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
                 List<GlobalDocReferenceAttorney> attorneyList = InvoiceWrapper.Select(s => s.Documents).ToList()[0].Where(w => w.Attorney != null).Select(x => x.Attorney).ToList();
@@ -7645,8 +7683,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {
+            DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
-            ValidatorEngine validatorEngine = new ValidatorEngine();
+            ValidatorEngine validatorEngine = new ValidatorEngine();          
             NitModel nitModel = new NitModel();
             XmlParser xmlParserCude = null;
             string totalInvoice = string.Empty;
@@ -7659,6 +7698,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    if (string.IsNullOrWhiteSpace(eventPrev.TrackId))
+                    {
+                         validateResponses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_042"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                        return validateResponses;
+                    }
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
@@ -7715,6 +7767,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 RequestObjectParty requestParty = new RequestObjectParty();
                 RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
                 RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
+                GlobalDocValidatorDocumentMeta documentMetaRef = null;
 
                 EventRadianModel eventRadian = new EventRadianModel(
                      documentMeta.DocumentReferencedKey,
@@ -7753,13 +7806,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     eventRadian.TrackId = documentMeta.CancelElectronicEvent;
                 }
 
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;
+                bool validateEventAproveCufe = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;
+                
+                //Valida documento procesado anteriormente regla 90
                 responses = ValidateSerieAndNumber(nitModel, documentMeta);
                 validateResponses.AddRange(responses);
 
 
-                if (validaMandatoListID)
+                if (validateEventAproveCufe)
                 {
+                    documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());
+
                     //Valida FE Activa como Titulo Valor y que exista la UUID
                     EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
                     responses = EventApproveCufe(nitModel, eventApproveCufe);
@@ -7770,6 +7827,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
+              
 
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
@@ -7790,9 +7848,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
-
-                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());
-
+               
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
@@ -7805,9 +7861,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
-
+                
                 //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID && validEventRadian && validEventReference)
+                if (validateEventAproveCufe && validEventRadian && validEventReference)
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
@@ -7819,7 +7875,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
                             || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38")
+                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38" 
+                            || itemResponsesTacita.ErrorCode == "AAH06")
                             validEventPrev = false;
                     }
                     validateResponses.AddRange(responses);
@@ -7832,6 +7889,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses = RequestValidateSigningTime(signingTime, documentMetaRef);
                         validateResponses.AddRange(responses);
                     }
+                }
+                
+                if(!validateEventAproveCufe)
+                {
+                    //Mandato Abierto ListId = 3
+                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
+                    responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
+                    validateResponses.AddRange(responses);
                 }
 
                 UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
@@ -7914,7 +7979,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-        #region Evento Cudeq
+        #region Evento ValidateCude
 
         public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCuds, RequestObjectCude data)
         {
@@ -7948,7 +8013,97 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return response;
         }
         #endregion
+
+        #region GetTypeOperation_InvoiceCache
+
+        private GlobalTypeList GetTypeOperation_InvoiceCache()
+        {
+            GlobalTypeList typeList = null;
+            List<GlobalTypeList> typesList;
+            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
+            var cacheItem = InstanceCache.TypesListInstanceCache.GetCacheItem("TypesList");
+            if (cacheItem == null)
+            {
+                typesList = typeListTableManager.FindByPartition<GlobalTypeList>("new-dian-ubl21");
+                CacheItemPolicy policy = new CacheItemPolicy
+                {
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(typesListInstanceCacheTimePolicyInMinutes)
+                };
+                InstanceCache.TypesListInstanceCache.Set(new CacheItem("TypesList", typesList), policy);
+            }
+            else
+                typesList = (List<GlobalTypeList>)cacheItem.Value;
+
+            typeList = typesList.FirstOrDefault(t => t.Name == "TypeOperation_Invoice");
+            return typeList;
+
+        }
+
+        #endregion
+
+        #region ValidateRadianEnabled
+
+        private List<ValidateListResponse> ValidateRadianEnabled(GlobalDocValidatorDocumentMeta documentMetaCude)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            GlobalRadianOperations softwareProviderRadian = null;
+            bool radianEnabled = false;
+
+            //Valida sender mandante habilitado en RADIAN
+            softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                            documentMetaCude.SenderCode, false, documentMetaCude.SoftwareId);
+            if (softwareProviderRadian != null)
+            {
+                switch (softwareProviderRadian.SoftwareType)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                            || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                            radianEnabled = true;
+                        break;
+                }
+            }
+            if (!radianEnabled)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC64",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida SW Mandante igual al SW Mandatario habilitado RADIAN            
+            softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                            documentMetaCude.TechProviderCode, false, documentMetaCude.SoftwareId);
+            if (softwareProviderRadian == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC93",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC93"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                return responses;
+            }
+
+            if (radianEnabled)
+                responses = null;
+
+            return responses;
+
+        }
+
+        #endregion
+
     }
-
-
 }

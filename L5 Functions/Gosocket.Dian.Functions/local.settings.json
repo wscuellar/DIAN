@@ -90,6 +90,7 @@
     //"CosmosDbAuthorizationKey": "N5bybhDIhjjysvnPUOmQr5N1a4HvJiiuIV7q1yJpbZV8saCFPze0mzT26w5X0l8ssb8tuP92JNw3BEuW4Y2VOQ==",
     //"CosmosDbCollectionID": "Documents",
     //"CosmosDbDataBaseId": "DocumentsData",
-    //"CosmosDbEndpointUrl": "https://gtpa-cosmosdb-document-prod.documents.azure.com:443/"
+    //"CosmosDbEndpointUrl": "https://gtpa-cosmosdb-document-prod.documents.azure.com:443/",
+    //"URLServiceProd": "https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl"
   }
 }

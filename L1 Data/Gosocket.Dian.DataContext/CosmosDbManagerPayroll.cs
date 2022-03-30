@@ -408,7 +408,7 @@ namespace Gosocket.Dian.DataContext
         public async Task<NumberingRangeCos> ConsumeNumberingRange(string IdNumberingRange, string account)
         {
             var ret = new List<NumberingRangeCos>();
-            string sql = "SELECT * FROM c where  c.id='" + IdNumberingRange + " and c.PartitionKey= '" + account + "'";
+            string sql = "SELECT * FROM c where  c.id='" + IdNumberingRange + "' and c.PartitionKey='" + account + "'";
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
             IDocumentQuery<NumberingRangeCos> query = client.CreateDocumentQuery<NumberingRangeCos>(UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
 
