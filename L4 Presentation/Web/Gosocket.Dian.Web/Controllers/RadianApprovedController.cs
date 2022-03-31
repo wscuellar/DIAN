@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Gosocket.Dian.Web.Controllers
@@ -530,7 +531,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]  
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorTypeId, int contributorId)
+        public async Task<JsonResult> SyncToProduction(int code, int contributorTypeId, int contributorId)
         {
             try
             {
@@ -583,7 +584,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.Enabled = true;
 
                 var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
-                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
 
                 if (!response.Success) { 
                     telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);

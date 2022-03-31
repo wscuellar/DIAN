@@ -67,28 +67,28 @@ namespace Gosocket.Dian.Application
 
             List<Task> arrayTasks = new List<Task>();
 
-            Task hilo1 = Task.Run(() =>
+            Task hilo1 = Task.Run(async() =>
             {
                 #region hilo1
                 // load xml
                 byte[] xmlBytes = RadianSupportDocument.GetXmlFromStorageAsync(eventItemIdentifier);
                 Dictionary<string, string> xpathRequest = CreateGetXpathData(Convert.ToBase64String(xmlBytes), "RepresentacionGrafica");
-                fieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, xpathRequest);
+                fieldValues = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(pathServiceData, xpathRequest);
                 #endregion
 
             });
 
-            Task hilo2 = Task.Run(() =>
+            Task hilo2 = Task.Run(async () =>
             {
                 #region hilo2
                 byte[] xmlBytes2 = GetXmlFromStorageAsync(eventItemIdentifier, documentMeta);
                 Dictionary<string, string> newXpathRequest = CreateGetXpathValidation(Convert.ToBase64String(xmlBytes2), "InvoiceValidation");
-                newFieldValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(pathServiceData, newXpathRequest);
+                newFieldValues = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(pathServiceData, newXpathRequest);
                 #endregion
 
             });
 
-            Task hilo3 = Task.Run(() =>
+            Task hilo3 = Task.Run(async() =>
             {
                 #region hilo3
                 //storageEvents = _globalDocValidationDocumentMetaService.FindDocumentByReference(documentMeta.DocumentKey);
@@ -98,7 +98,7 @@ namespace Gosocket.Dian.Application
                 if(storageEvents != null)
                     storageEvents = storageEvents.Where(t => int.Parse(t.DocumentTypeId) == (int)DocumentType.ApplicationResponse).ToList();
 
-                GlobalDataDocument cosmosDocument = DocumentInfoFromCosmos(documentMeta).Result;
+                GlobalDataDocument cosmosDocument = await DocumentInfoFromCosmos(documentMeta);
                 List<Event> eventsCosmos = cosmosDocument != null ? cosmosDocument.Events : new List<Event>() ;
                 events = ListEvents(eventsCosmos, storageEvents);
                 #endregion
@@ -143,7 +143,7 @@ namespace Gosocket.Dian.Application
             arrayTasks.Add(hilo4);
             arrayTasks.Add(hilo5);
             arrayTasks.Add(hilo7);
-            Task.WhenAll(arrayTasks).Wait();
+            await Task.WhenAll(arrayTasks);
 
             int eventCount = events.Count;
             events.Insert(0, new Event()
