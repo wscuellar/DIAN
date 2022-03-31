@@ -58,7 +58,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="contentFile"></param>
         /// <returns></returns>
         //public async Task<DianResponse> SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
-        public DianResponse SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
+        public async Task<DianResponse> SendNominaUpdateStatusAsync(byte[] contentFile, string authCode)
         {
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
@@ -147,7 +147,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
      
             // Duplicity
             start = DateTime.UtcNow;
-            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber);
+            var response = CheckDocumentDuplicity(senderCode, docTypeCode, serieAndNumber, trackId);
             if (!response.IsValid)
             {
                 var log = new GlobalLogger(trackId, "CheckDocumentDuplicity") { Message = sb.ToString(), Action = $"CheckDocumentDuplicity" };
@@ -173,7 +173,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             start = DateTime.UtcNow;
             bool sendTestSet = false;
             var uploadXmlRequest = new { xmlBase64, filename, documentTypeId = documentParsed.DocumentTypeId, trackId, eventNomina = true, sendTestSet };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            var uploadXmlResponse = await ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
             //var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>("http://localhost:7071/api/UploadXml", uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
@@ -192,7 +192,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             // send to validate document sync
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);            
+            var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);            
             sb.AppendLine($"{Properties.Settings.Default.Param_ValidateDocumentUrl} {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture)} ValidateDocument ");
             // send to validate document sync
 
@@ -311,7 +311,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     //} 
                     #endregion
 
-                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
+                    var processRegistrateComplete = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;
@@ -337,7 +337,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         #region CheckDocumentDuplicity
 
-        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber)
+        private DianResponse CheckDocumentDuplicity(string senderCode, string documentType, string serieAndNumber, string trackId)
         {
             GlobalDocValidatorDocumentMeta meta = new GlobalDocValidatorDocumentMeta();
             List<string> failedList = new List<string>();
@@ -357,11 +357,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.IsValid = false;
                 response.StatusCode = "99";
                 response.StatusMessage = "Documento con errores en campos mandatorios.";
-                response.StatusDescription = "Validación contiene errores en campos mandatorios.";
+                response.StatusDescription = $"Documento {serieAndNumber} procesado anteriormente. CUNE {document.DocumentKey}";
                 response.ErrorMessage.AddRange(failedList);
                 var xmlBytes = XmlUtil.GetApplicationResponseIfExist(meta);
                 response.XmlBase64Bytes = xmlBytes;
-                response.XmlDocumentKey = document.DocumentKey;
+                response.XmlDocumentKey = trackId;
                 response.XmlFileName = meta.FileName;
             }
             else
