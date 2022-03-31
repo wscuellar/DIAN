@@ -10,6 +10,8 @@ using System.ServiceModel;
 using System.Text.RegularExpressions;
 using Manager = Gosocket.Dian.Application.Managers;
 using X509Certificate = Org.BouncyCastle.X509.X509Certificate;
+using static Gosocket.Dian.Logger.Logger;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Gosocket.Dian.Web.Services.Validator
 {
@@ -26,12 +28,18 @@ namespace Gosocket.Dian.Web.Services.Validator
 
         public void ValidateCertificate(X509Certificate2 certificate)
         {
-
+            
             ////Valida vigencia
             if (DateTime.Now < certificate.NotBefore)
+            {
+                LogValidacion("ValidateCertificate", "Certificado aún no se encuentra vigente", certificate);
                 throw new FaultException("Certificado aún no se encuentra vigente.", new FaultCode("Client"));
+            }
             if (DateTime.Now > certificate.NotAfter)
+            {
+                LogValidacion("ValidateCertificate", "Certificado se encuentra expirado", certificate);
                 throw new FaultException("Certificado se encuentra expirado.", new FaultCode("Client"));
+            }
 
             // Get all crt certificates
             var crts = Manager.CertificateManager.Instance.GetRootCertificates();
@@ -52,7 +60,11 @@ namespace Gosocket.Dian.Web.Services.Validator
                         fileManager.Upload("certificates", $"untrusted/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
-                catch { }
+                catch (Exception e) {
+                    Log(e);                   
+                }
+                
+                LogValidacion("ValidateCertificate", "Certificado no pasó validaciones contra crts ", certificate);
                 throw new FaultException(ConfigurationManager.GetValue("UnTrustedCertificateMessage"), new FaultCode("Client"));
             }
 
@@ -67,7 +79,10 @@ namespace Gosocket.Dian.Web.Services.Validator
                         fileManager.Upload("certificates", $"revoked/{authCode}/{certificate.SerialNumber}.cer", certificate.RawData);
                     }
                 }
-                catch { }
+                catch (Exception e) {
+                    Log(e);
+                }
+                LogValidacion("ValidateCertificate", "Certificado se encuentra revocado en crls", certificate);                
                 throw new FaultException("Certificado se encuentra revocado.", new FaultCode("Client"));
             }
         }
@@ -97,6 +112,20 @@ namespace Gosocket.Dian.Web.Services.Validator
             catch { return result; }
             return result;
         }
+
+
+        private static void LogValidacion(string id, string mensaje, X509Certificate2 certificate)
+        {
+            var datos = new Dictionary<string, string>()
+                {
+                    {"certificate.Subject",certificate.Subject},
+                    {"certificate.SerialNumber",certificate.SerialNumber }
+                };
+            Log(id, (int)SeverityLevel.Error, mensaje, datos);
+        }
+
+
+
         private string GetAuthCode(X509Certificate2 certificate)
         {
             var parts = GetSubjectInfo(certificate.Subject);
