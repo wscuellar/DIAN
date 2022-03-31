@@ -548,7 +548,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             NotificationsController notification = new NotificationsController();
-            notification.EventNotificationsAsync("04", User.UserCode());
+            await notification.EventNotificationsAsync("04", User.UserCode());
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }

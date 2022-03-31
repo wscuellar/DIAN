@@ -22,6 +22,7 @@ using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -885,7 +886,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
+        public async Task<JsonResult> SyncToProductionAsync(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
         {
             try
             {
@@ -958,7 +959,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
                 telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
-                notification.EventNotificationsAsync("01", code.ToString());
+                await notification.EventNotificationsAsync("01", code.ToString());
                 return Json(new
                 {
                     success = true,

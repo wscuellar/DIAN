@@ -446,7 +446,7 @@
                 const isEquivalentDocument = "@Model.EsEquivalentDocument".toLowerCase() == "true",
                     equivalentDocumentSelected = $("#equivalentElectronicDocumentId").val();
 
-                if (!equivalentDocumentSelected) {
+                if (isEquivalentDocument && !equivalentDocumentSelected) {
                     bootbox.dialog({
                         message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
                             + "Debe especificar un documento equivalente para poder reiniciar el set de pruebas"
@@ -534,7 +534,7 @@
                 const isEquivalentDocument = "@Model.EsEquivalentDocument".toLowerCase() == "true",
                     equivalentDocumentSelected = $("#equivalentElectronicDocumentId").val();
 
-                if (!equivalentDocumentSelected) {
+                if (isEquivalentDocument && !equivalentDocumentSelected) {
                     bootbox.dialog({
                         message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
                             + "Debe especificar un documento equivalente para poder sincronizarlo a producción"
