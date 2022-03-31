@@ -31,11 +31,11 @@ namespace Gosocket.Dian.Web.Controllers
         }
         public NotificationsController()
         {
-        }       
-        public void EventNotificationsAsync(string type, string id)    
+        }
+        public async Task<ActionResult> EventNotificationsAsync(string type, string id)
         {
             RequestNotification notification = new RequestNotification();
-            var accountId =  ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
+            var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
             notification.PetitionName = contributor.ExchangeEmail;
@@ -50,17 +50,17 @@ namespace Gosocket.Dian.Web.Controllers
                     notification.Subject = "Traslado de certificado digital al ambiente de Producción";
                     notification.NotificationId = 5;
                     notification.NoticationType = 6;
-                    SentEvent(notification);
+                    SentEventNotification(notification);
                     notification.Description = "Recuerde asociar y/o crear la numeración -Ruta Configuración/Rangos de numeración";
                     notification.Subject = "Solicitud de Numeración";
                     notification.NotificationId = 5;
                     notification.NoticationType = 3;
-                    SentEvent(notification);
+                    SentEventNotification(notification);
                     notification.Description = "Por favor crear sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). - Ruta Configuración.  N  trabajadores Nomina";
                     notification.Subject = "Creación de Insumos";
                     notification.NotificationId = 5;
                     notification.NoticationType = 4;
-                    SentEvent(notification);
+                    SentEventNotification(notification);
 
                     break;
                 case "02":
@@ -97,7 +97,7 @@ namespace Gosocket.Dian.Web.Controllers
                     break;        
 
             }
-            return;
+            return null;
         }
 
         public JsonResult SentEmail(RequestNotification notification)
@@ -126,6 +126,30 @@ namespace Gosocket.Dian.Web.Controllers
             var responsee = clienteEmail.Execute(requestEmail);
             Console.WriteLine(responsee.Content);
 
+            var insertNotification = ConfigurationManager.GetValue("InsertNotification");
+            var clientNot = new RestClient(insertNotification);
+            var requestNot = new RestRequest();
+            requestNot.Method = Method.POST;
+            requestNot.AddHeader("Content-Type", "application/json");
+            requestNot.Parameters.Clear();
+            requestNot.AddParameter("application/json", JsonConvert.SerializeObject(notification), ParameterType.RequestBody);
+            var responseNot = clientNot.Execute(requestNot);
+            Console.WriteLine(responseNot.Content);
+
+            var logNotification = ConfigurationManager.GetValue("LogNotification");
+            var clientLog = new RestClient(logNotification);
+            var requestLog = new RestRequest();
+            requestLog.Method = Method.POST;
+            requestLog.AddHeader("Content-Type", "application/json");
+            requestLog.Parameters.Clear();
+            requestLog.AddParameter("application/json", JsonConvert.SerializeObject(notification), ParameterType.RequestBody);
+            var responseLog = clientLog.Execute(requestLog);
+            Console.WriteLine(responseLog.Content);
+
+            return null;
+        }
+        public JsonResult SentEventNotification(RequestNotification notification)
+        {
             var insertNotification = ConfigurationManager.GetValue("InsertNotification");
             var clientNot = new RestClient(insertNotification);
             var requestNot = new RestRequest();
