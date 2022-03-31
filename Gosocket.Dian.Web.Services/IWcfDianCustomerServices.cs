@@ -54,7 +54,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "SendBillAsync")]
         [CustomOperation]
         Task<UploadDocumentResponse> SendBillAsync(string fileName, byte[] contentFile);
 
@@ -65,7 +65,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="contentFile"></param>
         /// <param name="testSetId"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "SendTestSetAsync")]
         [CustomOperation]
         Task<UploadDocumentResponse> SendTestSetAsync(string fileName, byte[] contentFile, string testSetId);
 
@@ -75,7 +75,7 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract]        
         [CustomOperation]
         Task<DianResponse> SendBillSync(string fileName, byte[] contentFile);
 
