@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private readonly string[] _equivalentDocumentTypes = new string[]{ "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
+        private readonly string[] _equivalentDocumentTypes = new string[]{"20", "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
 
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
