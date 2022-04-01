@@ -7982,8 +7982,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var software = GetSoftwareInstanceCache(softwareId);
                 invoceCuds.SoftwarePin = software?.Pin;
             }
-            //invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}                        
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"Valor del CUDS no está calculado correctamente." };
+
+            var error = new { Code = "DSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            if (invoceCuds.IsAdjustmentNote())
+            {
+                error = new { Code = "NSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            }
+
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = error.Code, ErrorMessage = error.Message };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {
