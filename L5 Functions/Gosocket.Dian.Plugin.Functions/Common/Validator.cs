@@ -1374,6 +1374,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            else if (documentMeta.DocumentTypeId == "95") softwareProviderErrorCode = "NSAB19b";
             if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
             {
                 softwareProviderErrorCode = "DEAB19b";
@@ -1397,7 +1398,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                 {
-                    var mensajeError = documentMeta.DocumentTypeId == "05" ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
+                    var mensajeError = (documentMeta.DocumentTypeId == "05" || documentMeta.DocumentTypeId == "95") ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = mensajeError, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
