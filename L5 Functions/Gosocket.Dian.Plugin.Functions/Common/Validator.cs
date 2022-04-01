@@ -4616,6 +4616,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         response.ErrorCode = "DSAB24b";
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
                     }
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        response.ErrorCode = "NSAB24b";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
+                    }
                     if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
                     {
                         response.ErrorCode = "DEAB24b";
