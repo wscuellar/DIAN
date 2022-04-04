@@ -122,8 +122,19 @@ namespace Gosocket.Dian.Functions.Pdf
 				html = html.Replace("{QrCodeBase64}", qr);
 				html = html.Replace("{FechaValidacionDIAN}", FechaValidacionDIAN);
 				html = html.Replace("{FechaGeneracionDIAN}", FechaGeneracionDIAN);
+				if (ConfigurationManager.GetValue("Environment") != "Prod")
+				{
 
+					var rep = "PHRhYmxlIGNsYXNzPSJoZWFkZXItdGFibGUiPg==";
+					var rep2 = "ICA8cCBzdHlsZT0nY29sb3I6bGlnaHRncmV5Ow0KICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtmb250LXNpemU6MTIwcHg7DQogICAgdHJhbnNmb3JtOnJvdGF0ZSgzMDBkZWcpOw0KICAgIC13ZWJraXQtdHJhbnNmb3JtOnJvdGF0ZSgzMDBkZWcpO3otaW5kZXg6IC0xO3BhZGRpbmctdG9wOiA1MCU7JyA+U2luIHZhbG9yIGZpc2NhbCA8L3A+";
+					byte[] dataa = Convert.FromBase64String(rep);
+					byte[] dataa2 = Convert.FromBase64String(rep2);
+					string decodedString = Encoding.UTF8.GetString(dataa);
+					string decodedString2 = Encoding.UTF8.GetString(dataa2);
 
+					html = html.Replace(decodedString, decodedString2 + decodedString);
+
+				}
 				byte[] bytes = OpenHtmlToPdf.Pdf
 					   .From(html)
 					   .WithGlobalSetting("orientation", "Portrait")

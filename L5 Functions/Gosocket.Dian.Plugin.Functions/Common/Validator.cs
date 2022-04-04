@@ -43,7 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
-        private readonly string[] _equivalentDocumentTypes = new string[]{ "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
+        private readonly string[] _equivalentDocumentTypes = new string[]{"20", "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
 
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
@@ -1274,6 +1274,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Software provider
             string softwareproviderDvErrorCode = string.Empty;
             if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
+            if (documentMeta.DocumentTypeId == "95") softwareproviderDvErrorCode = "NSAB22b";
             //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
@@ -1374,6 +1375,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
+            else if (documentMeta.DocumentTypeId == "95") softwareProviderErrorCode = "NSAB19b";
             if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
             {
                 softwareProviderErrorCode = "DEAB19b";
@@ -1397,7 +1399,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                 {
-                    var mensajeError = documentMeta.DocumentTypeId == "05" ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
+                    var mensajeError = (documentMeta.DocumentTypeId == "05" || documentMeta.DocumentTypeId == "95") ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = mensajeError, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
@@ -4612,6 +4614,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
                     {
                         response.ErrorCode = "DSAB24b";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
+                    }
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        response.ErrorCode = "NSAB24b";
                         response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
                     }
                     if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
@@ -7982,8 +7989,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var software = GetSoftwareInstanceCache(softwareId);
                 invoceCuds.SoftwarePin = software?.Pin;
             }
-            //invoceCuds.SoftwarePin {invoceCuds.SoftwarePin}, invoceCuds.SoftwareId {invoceCuds.SoftwareId}, Variable Config Azure {billerSoftwarePin}                        
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD06", ErrorMessage = $"Valor del CUDS no está calculado correctamente." };
+
+            var error = new { Code = "DSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            if (invoceCuds.IsAdjustmentNote())
+            {
+                error = new { Code = "NSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            }
+
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = error.Code, ErrorMessage = error.Message };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {

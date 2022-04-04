@@ -128,6 +128,13 @@
                 operationClick = true;
 
                 var electronicDocumentId = 3;
+
+                if ("@ViewBag.ContributorIsOfe".toLowerCase() == "true") {
+                    var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
+                    window.location.href = url;
+                    return;
+                }
+
                 var ValidacionOtherDocsElecViewModel = {
                     UserCode: '@ViewBag.UserCode',
                     ContributorId: '@ViewBag.ContributorId',

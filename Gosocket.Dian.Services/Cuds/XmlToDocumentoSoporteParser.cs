@@ -30,6 +30,11 @@ namespace Gosocket.Dian.Services.Cuds
                     invoiceDs.NumSno = SelectSingleNode(DocumentoSoporteXpath.NumSno);
                     invoiceDs.NitAbs = SelectSingleNode(DocumentoSoporteXpath.NitAbs);
                     invoiceDs.TipoAmb = SelectSingleNode(DocumentoSoporteXpath.TipoAmb);
+
+                    if (string.IsNullOrWhiteSpace(invoiceDs.DocumentType))
+                    {
+                        invoiceDs.DocumentType = SelectSingleNode(DocumentoSoporteXpath.AdjustmentNoteTypeCode);
+                    }
                 }
             } 
             return invoiceDs;
