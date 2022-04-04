@@ -1675,6 +1675,7 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
+            ViewBag.ContributorIsOfe = User.ContributorTypeId() != (int)Domain.Common.ContributorType.BillerNoObliged;
             return View();
         }
 
