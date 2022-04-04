@@ -142,7 +142,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var validateResponses = new List<ValidateListResponse>();
             var validator = new Validator();
 
-            validateResponses.AddRange(validator.NewValidateEventRadianAsync(trackId));
+            validateResponses.AddRange(await  validator.NewValidateEventRadianAsync(trackId));
 
             return validateResponses;
         }
@@ -643,7 +643,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.EventApproveCufe(nitModel, eventApproveCufe));
+            validateResponses.AddRange(await validator.EventApproveCufe(nitModel, eventApproveCufe));
             return validateResponses;
         }
 
@@ -755,7 +755,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             validatorDocumentNameSpaces(xmlBytes);
 
             var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateReferenceAttorney(xmlParser, data.TrackId, _ns));
+            validateResponses.AddRange(await validator.ValidateReferenceAttorney(xmlParser, data.TrackId, _ns));
 
             return validateResponses;
         }

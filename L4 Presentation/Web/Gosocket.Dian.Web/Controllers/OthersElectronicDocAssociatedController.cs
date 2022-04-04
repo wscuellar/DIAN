@@ -886,7 +886,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> SyncToProductionAsync(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
+        public async Task<JsonResult> SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase)
         {
             try
             {
@@ -948,7 +948,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.EquivalentDocumentId = equivalentDocumentId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
-                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
 
                 if (!response.Success) {
                     telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);

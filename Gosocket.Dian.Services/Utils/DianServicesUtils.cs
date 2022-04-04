@@ -31,145 +31,145 @@ namespace Gosocket.Dian.Services.Utils
 
         public static object ApiHelepers { get; private set; }
 
-        public static DianResponse GenerateApplicationResponse(long nsu, string trackId, GlobalDocValidatorDocumentMeta docMetadataEntity, List<GlobalDocValidatorTracking> validatorTrackings = null)
-        {
-            var response = new DianResponse();
-            var fileManager = new FileManager();
+        //public static DianResponse GenerateApplicationResponse(long nsu, string trackId, GlobalDocValidatorDocumentMeta docMetadataEntity, List<GlobalDocValidatorTracking> validatorTrackings = null)
+        //{
+        //    var response = new DianResponse();
+        //    var fileManager = new FileManager();
 
-            var docTypeCode = docMetadataEntity.DocumentTypeId;
+        //    var docTypeCode = docMetadataEntity.DocumentTypeId;
 
-            var messageIdNode = XmlUtil.SerieNumberMessageFromDocType(docMetadataEntity);
-            var series = messageIdNode.Item1;
-            var number = messageIdNode.Item2;
-            var messDocType = messageIdNode.Item3;
+        //    var messageIdNode = XmlUtil.SerieNumberMessageFromDocType(docMetadataEntity);
+        //    var series = messageIdNode.Item1;
+        //    var number = messageIdNode.Item2;
+        //    var messDocType = messageIdNode.Item3;
 
-            var results = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
-            var rulesFound = validatorTrackings ?? results;
+        //    var results = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
+        //    var rulesFound = validatorTrackings ?? results;
 
-            if (rulesFound == null || (rulesFound != null && !rulesFound.Any())) return null;
+        //    if (rulesFound == null || (rulesFound != null && !rulesFound.Any())) return null;
 
-            var listMandatoryFailedRules = new List<GlobalDocValidatorTracking>();
-            var listNotificationRules = new List<GlobalDocValidatorTracking>();
+        //    var listMandatoryFailedRules = new List<GlobalDocValidatorTracking>();
+        //    var listNotificationRules = new List<GlobalDocValidatorTracking>();
 
-            listMandatoryFailedRules = rulesFound.Where(r => r.Mandatory && !r.IsValid).ToList();
-            listNotificationRules = rulesFound.Where(r => r.IsNotification).ToList();
+        //    listMandatoryFailedRules = rulesFound.Where(r => r.Mandatory && !r.IsValid).ToList();
+        //    listNotificationRules = rulesFound.Where(r => r.IsNotification).ToList();
 
-            bool mandatoryInvalid = false;
-            bool priorityInvalid = false;
+        //    bool mandatoryInvalid = false;
+        //    bool priorityInvalid = false;
 
-            if (listMandatoryFailedRules.Count > 0) mandatoryInvalid = true;
+        //    if (listMandatoryFailedRules.Count > 0) mandatoryInvalid = true;
 
-            if (!mandatoryInvalid && listNotificationRules.Count > 0) priorityInvalid = true;
+        //    if (!mandatoryInvalid && listNotificationRules.Count > 0) priorityInvalid = true;
 
-            XElement root = XmlUtil.BuildRootNode(docMetadataEntity);
-            root.Add(XmlUtil.BuildSenderNode(docMetadataEntity));
-            root.Add(XmlUtil.BuildReceiverNode(docMetadataEntity));
+        //    XElement root = XmlUtil.BuildRootNode(docMetadataEntity);
+        //    root.Add(XmlUtil.BuildSenderNode(docMetadataEntity));
+        //    root.Add(XmlUtil.BuildReceiverNode(docMetadataEntity));
 
-            XElement docResponse = new XElement("DocumentResponse");
+        //    XElement docResponse = new XElement("DocumentResponse");
 
-            List<XElement> notesListObservations = new List<XElement>();
-            List<XElement> notesListErrors = new List<XElement>();
+        //    List<XElement> notesListObservations = new List<XElement>();
+        //    List<XElement> notesListErrors = new List<XElement>();
 
-            int lineId = 1;
+        //    int lineId = 1;
 
-            #region CONSTRUYENDO NODO APROBADO SIN OBSERVACIONES
-            if (!mandatoryInvalid && !priorityInvalid)
-            {
-                docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, false, false);
-                var firstLineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
-                docResponse.Add(firstLineResponse);
+        //    #region CONSTRUYENDO NODO APROBADO SIN OBSERVACIONES
+        //    if (!mandatoryInvalid && !priorityInvalid)
+        //    {
+        //        docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, false, false);
+        //        var firstLineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
+        //        docResponse.Add(firstLineResponse);
 
-                lineId++;
+        //        lineId++;
 
-                response = new DianResponse
-                {
-                    IsValid = true,
-                    StatusCode = "0",
-                    StatusMessage = messDocType
-                };
+        //        response = new DianResponse
+        //        {
+        //            IsValid = true,
+        //            StatusCode = "0",
+        //            StatusMessage = messDocType
+        //        };
 
-                var lineResponse = XmlUtil.BuildResponseNode(lineId, string.Empty, string.Empty, false, false, docMetadataEntity);
-                docResponse.Add(lineResponse);
-                root.Add(docResponse);
-            }
-            #endregion
+        //        var lineResponse = XmlUtil.BuildResponseNode(lineId, string.Empty, string.Empty, false, false, docMetadataEntity);
+        //        docResponse.Add(lineResponse);
+        //        root.Add(docResponse);
+        //    }
+        //    #endregion
 
-            if (!mandatoryInvalid && priorityInvalid)
-            {
-                List<string> obsMessageList = new List<string>();
+        //    if (!mandatoryInvalid && priorityInvalid)
+        //    {
+        //        List<string> obsMessageList = new List<string>();
 
-                #region CONSTRUYENDO NODO CON OBSERVACIONES
-                docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, true, false);
-                var lineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
-                docResponse.Add(lineResponse);
+        //        #region CONSTRUYENDO NODO CON OBSERVACIONES
+        //        docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, true, false);
+        //        var lineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
+        //        docResponse.Add(lineResponse);
 
-                foreach (var i in listNotificationRules)
-                {
-                    lineId++;
-                    obsMessageList.Add($"Regla: {i.ErrorCode}, Notificación: {i.ErrorMessage}");
-                    notesListObservations.Add(XmlUtil.BuildResponseNode(lineId, i.ErrorCode, i.ErrorMessage, true, false, docMetadataEntity));
-                }
+        //        foreach (var i in listNotificationRules)
+        //        {
+        //            lineId++;
+        //            obsMessageList.Add($"Regla: {i.ErrorCode}, Notificación: {i.ErrorMessage}");
+        //            notesListObservations.Add(XmlUtil.BuildResponseNode(lineId, i.ErrorCode, i.ErrorMessage, true, false, docMetadataEntity));
+        //        }
 
-                #endregion
+        //        #endregion
 
-                response = new DianResponse
-                {
-                    IsValid = true,
-                    StatusCode = "0",
-                    StatusMessage = messDocType,
-                    ErrorMessage = obsMessageList
-                };
+        //        response = new DianResponse
+        //        {
+        //            IsValid = true,
+        //            StatusCode = "0",
+        //            StatusMessage = messDocType,
+        //            ErrorMessage = obsMessageList
+        //        };
 
-                docResponse.Add(notesListObservations);
-                root.Add(docResponse);
-            }
-            if (mandatoryInvalid)
-            {
-                docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, false, true);
-                var lineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
-                docResponse.Add(lineResponse);
+        //        docResponse.Add(notesListObservations);
+        //        root.Add(docResponse);
+        //    }
+        //    if (mandatoryInvalid)
+        //    {
+        //        docResponse = XmlUtil.BuildDocumentResponseNode(lineId, docMetadataEntity, false, true);
+        //        var lineResponse = XmlUtil.BuildResponseLineResponse(lineId, nsu);
+        //        docResponse.Add(lineResponse);
 
-                List<string> errorsList = new List<string>();
-                List<string> errorsMessageList = new List<string>();
-                foreach (var ruleItem in listMandatoryFailedRules)
-                {
-                    lineId++;
+        //        List<string> errorsList = new List<string>();
+        //        List<string> errorsMessageList = new List<string>();
+        //        foreach (var ruleItem in listMandatoryFailedRules)
+        //        {
+        //            lineId++;
 
-                    errorsList.Add(ruleItem.ErrorCode);
-                    errorsMessageList.Add($"Regla: {ruleItem.ErrorCode}, Rechazo: {ruleItem.ErrorMessage}");
+        //            errorsList.Add(ruleItem.ErrorCode);
+        //            errorsMessageList.Add($"Regla: {ruleItem.ErrorCode}, Rechazo: {ruleItem.ErrorMessage}");
 
-                    #region CONSTRUYENDO NODO CON ERRORES
+        //            #region CONSTRUYENDO NODO CON ERRORES
 
-                    notesListErrors.Add(XmlUtil.BuildResponseNode(lineId, ruleItem.ErrorCode, ruleItem.ErrorMessage, false, true, docMetadataEntity));
+        //            notesListErrors.Add(XmlUtil.BuildResponseNode(lineId, ruleItem.ErrorCode, ruleItem.ErrorMessage, false, true, docMetadataEntity));
 
-                    #endregion
-                }
+        //            #endregion
+        //        }
 
-                docResponse.Add(notesListErrors);
-                root.Add(docResponse);
+        //        docResponse.Add(notesListErrors);
+        //        root.Add(docResponse);
 
-                response = new DianResponse
-                {
-                    IsValid = false,
-                    StatusDescription = "Documento con errores en campos mandatorios.",
-                    ErrorMessage = errorsMessageList
-                };
-            }
+        //        response = new DianResponse
+        //        {
+        //            IsValid = false,
+        //            StatusDescription = "Documento con errores en campos mandatorios.",
+        //            ErrorMessage = errorsMessageList
+        //        };
+        //    }
 
-            var xml = XmlUtil.FormatterXml(root);
-            response.XmlBase64Bytes = Encoding.UTF8.GetBytes(xml);
+        //    var xml = XmlUtil.FormatterXml(root);
+        //    response.XmlBase64Bytes = Encoding.UTF8.GetBytes(xml);
 
-            var cdrSigned = Encoding.UTF8.GetString(response.XmlBase64Bytes);
+        //    var cdrSigned = Encoding.UTF8.GetString(response.XmlBase64Bytes);
 
-            response.XmlDocumentKey = trackId;
-            response.XmlFileName = docMetadataEntity.FileName;
+        //    response.XmlDocumentKey = trackId;
+        //    response.XmlFileName = docMetadataEntity.FileName;
 
-            response = SendCdrToSign(response, cdrSigned);
+        //    response = SendCdrToSign(response, cdrSigned);
 
-            if (response.XmlBase64Bytes == null) return response;
+        //    if (response.XmlBase64Bytes == null) return response;
 
-            return response;
-        }
+        //    return response;
+        //}
 
         public static GlobalOseProcessResult InstanceGlobalOseProcessResultObject(string fileName, dynamic trackId,
             string docTypeCode, ResponseXpathDataValue responseXpathValues)
@@ -192,117 +192,117 @@ namespace Gosocket.Dian.Services.Utils
             return trackIdProcessResultEntity;
         }
 
-        public static void GetUploadXmlRequestObject(XmlBytesArrayParams contentXmlFile, string newTrackId, string xmlBase64, out ResponseXpathDataValue responseXpathValues, out string docTypeCode, out dynamic sendRequestObj)
-        {
-            var requestObj = new Dictionary<string, string>
-            {
-                { "XmlBase64", xmlBase64},
-                { "UblVersionXpath", "//cbc:UBLVersionID" },
-                { "EmissionDateXpath", "//cbc:IssueDate" },
-                { "SenderCodeXpath", "//fe:AccountingSupplierParty/fe:Party/cac:PartyIdentification/cbc:ID" },
-                { "ReceiverCodeXpath", "//fe:AccountingCustomerParty/fe:Party/cac:PartyIdentification/cbc:ID" },
-                { "DocumentTypeXpath", "//cbc:InvoiceTypeCode" },
-                { "NumberXpath", "//campoString[@name='FOLIO'][1]|//campoString[@name='Folio'][1]" },
-                { "SeriesXpath", "//campoString[@name='SERIE'][1]|//campoString[@name='Serie'][1]" },
-                { "TransactionIdXpath", "fe:Invoice/cbc:UUID" }
-            };
-            //responseXpathValues = DianServicesUtils.GetXpathDataValues(requestObj);
-            responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestObj);
-            _ublVersion = int.Parse(StractUblVersion(responseXpathValues.XpathsValues["UblVersionXpath"]));
-            responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}-{responseXpathValues.XpathsValues["NumberXpath"]}";
-            docTypeCode = responseXpathValues.XpathsValues["DocumentTypeXpath"];
-            sendRequestObj = new ExpandoObject();
-            sendRequestObj.category = GetEnumDescription((Category)_ublVersion);
-            sendRequestObj.xmlBase64 = xmlBase64;
-            sendRequestObj.fileName = contentXmlFile.XmlFileName;
-            sendRequestObj.documentTypeId = docTypeCode;
-            sendRequestObj.trackId = newTrackId;
-            sendRequestObj.fileMapperTable = "DianFileMapper";
-        }
+        //public static void GetUploadXmlRequestObject(XmlBytesArrayParams contentXmlFile, string newTrackId, string xmlBase64, out ResponseXpathDataValue responseXpathValues, out string docTypeCode, out dynamic sendRequestObj)
+        //{
+        //    var requestObj = new Dictionary<string, string>
+        //    {
+        //        { "XmlBase64", xmlBase64},
+        //        { "UblVersionXpath", "//cbc:UBLVersionID" },
+        //        { "EmissionDateXpath", "//cbc:IssueDate" },
+        //        { "SenderCodeXpath", "//fe:AccountingSupplierParty/fe:Party/cac:PartyIdentification/cbc:ID" },
+        //        { "ReceiverCodeXpath", "//fe:AccountingCustomerParty/fe:Party/cac:PartyIdentification/cbc:ID" },
+        //        { "DocumentTypeXpath", "//cbc:InvoiceTypeCode" },
+        //        { "NumberXpath", "//campoString[@name='FOLIO'][1]|//campoString[@name='Folio'][1]" },
+        //        { "SeriesXpath", "//campoString[@name='SERIE'][1]|//campoString[@name='Serie'][1]" },
+        //        { "TransactionIdXpath", "fe:Invoice/cbc:UUID" }
+        //    };
+        //    responseXpathValues = DianServicesUtils.GetXpathDataValues(requestObj);
+        //    responseXpathValues = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestObj);
+        //    _ublVersion = int.Parse(StractUblVersion(responseXpathValues.XpathsValues["UblVersionXpath"]));
+        //    responseXpathValues.XpathsValues["SeriesAndNumberXpath"] = $"{responseXpathValues.XpathsValues["SeriesXpath"]}-{responseXpathValues.XpathsValues["NumberXpath"]}";
+        //    docTypeCode = responseXpathValues.XpathsValues["DocumentTypeXpath"];
+        //    sendRequestObj = new ExpandoObject();
+        //    sendRequestObj.category = GetEnumDescription((Category)_ublVersion);
+        //    sendRequestObj.xmlBase64 = xmlBase64;
+        //    sendRequestObj.fileName = contentXmlFile.XmlFileName;
+        //    sendRequestObj.documentTypeId = docTypeCode;
+        //    sendRequestObj.trackId = newTrackId;
+        //    sendRequestObj.fileMapperTable = "DianFileMapper";
+        //}
 
-        public static DianResponse SendCdrToSign(DianResponse response, string xml)
-        {
-            var requestObj = new { trackId = response.XmlDocumentKey };
+        //public static DianResponse SendCdrToSign(DianResponse response, string xml)
+        //{
+        //    var requestObj = new { trackId = response.XmlDocumentKey };
 
-            var getAppResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), requestObj);
+        //    var getAppResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), requestObj);
 
-            response.XmlBase64Bytes = !getAppResponse.Success ? null : getAppResponse.Content;
+        //    response.XmlBase64Bytes = !getAppResponse.Success ? null : getAppResponse.Content;
 
-            return response;
-        }
+        //    return response;
+        //}
 
-        [Obsolete]
-        public static ResponseXpathDataValue GetXpathDataValues<T>(T requestXpathData)
-        {
-            var responseXpathData = new ResponseXpathDataValue();
-            try
-            {
-                var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestXpathData);
-                var result = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<ResponseXpathDataValue>(result);
-            }
-            catch (Exception ex)
-            {
-                responseXpathData.Success = false;
-                responseXpathData.Message = $"Error al obtener xpath data values. {ex.Message}";
-            }
+        //[Obsolete]
+        //public static ResponseXpathDataValue GetXpathDataValues<T>(T requestXpathData)
+        //{
+        //    var responseXpathData = new ResponseXpathDataValue();
+        //    try
+        //    {
+        //        var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), requestXpathData);
+        //        var result = response.Content.ReadAsStringAsync().Result;
+        //        return JsonConvert.DeserializeObject<ResponseXpathDataValue>(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        responseXpathData.Success = false;
+        //        responseXpathData.Message = $"Error al obtener xpath data values. {ex.Message}";
+        //    }
 
-            return responseXpathData;
-        }
+        //    return responseXpathData;
+        //}
 
-        public static List<GlobalDocValidatorTracking> ValidateDocument<T>(T requestObj)
-        {
-            var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObj);
-            var result = response.Content.ReadAsStringAsync().Result;
-            var validations = JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
-            return validations;
-        }
+        //public static List<GlobalDocValidatorTracking> ValidateDocument<T>(T requestObj)
+        //{
+        //    var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObj);
+        //    var result = response.Content.ReadAsStringAsync().Result;
+        //    var validations = JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
+        //    return validations;
+        //}
 
-        [Obsolete]
-        public static bool CheckIfDocumentValidationsIsFinished(string trackId)
-        {
-            try
-            {
-                dynamic requestObj = new ExpandoObject();
-                requestObj.trackId = trackId;
-                var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("CheckIfDocumentValidationsIsFinishedUrl"), requestObj);
-                var result = response.Content.ReadAsStringAsync().Result;
-                return bool.Parse(result);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return false;
-            }
-        }
+        //[Obsolete]
+        //public static bool CheckIfDocumentValidationsIsFinished(string trackId)
+        //{
+        //    try
+        //    {
+        //        dynamic requestObj = new ExpandoObject();
+        //        requestObj.trackId = trackId;
+        //        var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("CheckIfDocumentValidationsIsFinishedUrl"), requestObj);
+        //        var result = response.Content.ReadAsStringAsync().Result;
+        //        return bool.Parse(result);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e);
+        //        return false;
+        //    }
+        //}
 
-        [Obsolete]
-        public static List<GlobalDocValidatorTracking> GetValidationsByTrackId(string trackId)
-        {
-            try
-            {
-                dynamic requestObj = new ExpandoObject();
-                requestObj.trackId = trackId;
-                var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
-                var result = response.Content.ReadAsStringAsync().Result;
-                var validations = (List<GlobalDocValidatorTracking>)JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
-                return validations;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+        //[Obsolete]
+        //public static List<GlobalDocValidatorTracking> GetValidationsByTrackId(string trackId)
+        //{
+        //    try
+        //    {
+        //        dynamic requestObj = new ExpandoObject();
+        //        requestObj.trackId = trackId;
+        //        var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
+        //        var result = response.Content.ReadAsStringAsync().Result;
+        //        var validations = (List<GlobalDocValidatorTracking>)JsonConvert.DeserializeObject<List<GlobalDocValidatorTracking>>(result);
+        //        return validations;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return null;
+        //    }
+        //}
 
-        [Obsolete]
-        public static string DownloadXmlBase64(string trackId)
-        {
-            dynamic requestObj = new ExpandoObject();
-            requestObj.trackId = trackId;
-            var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
-            var xmlBase64 = response.Content.ReadAsStringAsync().Result.Replace("\"", string.Empty); ;
-            return xmlBase64;
-        }
+        //[Obsolete]
+        //public static string DownloadXmlBase64(string trackId)
+        //{
+        //    dynamic requestObj = new ExpandoObject();
+        //    requestObj.trackId = trackId;
+        //    var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("DownloadXmlUrl"), requestObj);
+        //    var xmlBase64 = response.Content.ReadAsStringAsync().Result.Replace("\"", string.Empty); ;
+        //    return xmlBase64;
+        //}
 
         public static Tuple<string, string> GetCdrPath(string senderCode, int documentType, string series, long number)
         {
@@ -349,68 +349,68 @@ namespace Gosocket.Dian.Services.Utils
         }
 
         //Consulta si todos los parametros para construir la ruta al CDR existe
-        public static DianResponse ParamsExistsFilenameInBlob(GlobalDocValidatorDocumentMeta documentMeta)
-        {
-            var dianResponse = new DianResponse();
-            var fileManager = new FileManager();
+        //public static DianResponse ParamsExistsFilenameInBlob(GlobalDocValidatorDocumentMeta documentMeta)
+        //{
+        //    var dianResponse = new DianResponse();
+        //    var fileManager = new FileManager();
 
-            byte[] xmlBytes = null;
-            bool existsFile = false;
+        //    byte[] xmlBytes = null;
+        //    bool existsFile = false;
 
-            var processDate = documentMeta.Timestamp;
+        //    var processDate = documentMeta.Timestamp;
 
-            var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
+        //    var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
 
-            var isValidFolder = "Success";
+        //    var isValidFolder = "Success";
 
-            var container = CategoryContainerName;
-            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+        //    var container = CategoryContainerName;
+        //    var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-            dianResponse.XmlBase64Bytes = null;
+        //    dianResponse.XmlBase64Bytes = null;
 
-            existsFile = fileManager.Exists(container, fileName);
+        //    existsFile = fileManager.Exists(container, fileName);
 
-            if (existsFile)
-            {
-                xmlBytes = fileManager.GetBytes(container, fileName);
-            }
+        //    if (existsFile)
+        //    {
+        //        xmlBytes = fileManager.GetBytes(container, fileName);
+        //    }
 
-            if (!existsFile)
-            {
-                isValidFolder = "Error";
-                fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+        //    if (!existsFile)
+        //    {
+        //        isValidFolder = "Error";
+        //        fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-                existsFile = fileManager.Exists(container, fileName);
+        //        existsFile = fileManager.Exists(container, fileName);
 
-                if (existsFile)
-                {
-                    xmlBytes = fileManager.GetBytes(container, fileName);
-                }
-            }
+        //        if (existsFile)
+        //        {
+        //            xmlBytes = fileManager.GetBytes(container, fileName);
+        //        }
+        //    }
 
-            if (xmlBytes != null)
-            {
-                var listErrors = new List<string>();
+        //    if (xmlBytes != null)
+        //    {
+        //        var listErrors = new List<string>();
 
-                var requestObj = new { trackId = documentMeta.PartitionKey };
-                var rulesFound = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
+        //        var requestObj = new { trackId = documentMeta.PartitionKey };
+        //        var rulesFound = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
 
-                foreach (var item in rulesFound)
-                    if (!item.IsValid)
-                        listErrors.Add($"Regla: {item.ErrorCode} {item.ErrorMessage}");
+        //        foreach (var item in rulesFound)
+        //            if (!item.IsValid)
+        //                listErrors.Add($"Regla: {item.ErrorCode} {item.ErrorMessage}");
 
-                var trackId = documentMeta.PartitionKey;
-                dianResponse.IsValid = isValidFolder.ToLower().Contains("error") ? false : true;
-                dianResponse.StatusCode = isValidFolder.ToLower().Contains("error") ? "99" : "0";
-                dianResponse.StatusMessage = isValidFolder.ToLower().Contains("error") ? "Validación contiene errores en campos mandatorios." : "Procesado Correctamente.";
-                dianResponse.XmlBase64Bytes = xmlBytes;
-                dianResponse.XmlDocumentKey = documentMeta.DocumentKey;
-                dianResponse.XmlFileName = documentMeta.FileName;
-                dianResponse.ErrorMessage = listErrors;
-            }
+        //        var trackId = documentMeta.PartitionKey;
+        //        dianResponse.IsValid = isValidFolder.ToLower().Contains("error") ? false : true;
+        //        dianResponse.StatusCode = isValidFolder.ToLower().Contains("error") ? "99" : "0";
+        //        dianResponse.StatusMessage = isValidFolder.ToLower().Contains("error") ? "Validación contiene errores en campos mandatorios." : "Procesado Correctamente.";
+        //        dianResponse.XmlBase64Bytes = xmlBytes;
+        //        dianResponse.XmlDocumentKey = documentMeta.DocumentKey;
+        //        dianResponse.XmlFileName = documentMeta.FileName;
+        //        dianResponse.ErrorMessage = listErrors;
+        //    }
 
-            return dianResponse;
-        }
+        //    return dianResponse;
+        //}
 
         public static bool ValidateXpathValuesResponse(ResponseXpathDataValue responseXpathValues, string fileName, ref List<XmlParamsResponseTrackId> trackIdList)
         {
@@ -1282,12 +1282,12 @@ namespace Gosocket.Dian.Services.Utils
         //    return JsonConvert.DeserializeObject<List<ResponseUploadMultipleXml>>(result);
         //}
 
-        public static ResponseUploadXml UploadXml<T>(T requestObj)
-        {
-            var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("UploadXmlUrl"), requestObj);
-            var result = response.Content.ReadAsStringAsync().Result;
-            return JsonConvert.DeserializeObject<ResponseUploadXml>(result);
-        }
+        //public static ResponseUploadXml UploadXml<T>(T requestObj)
+        //{
+        //    var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("UploadXmlUrl"), requestObj);
+        //    var result = response.Content.ReadAsStringAsync().Result;
+        //    return JsonConvert.DeserializeObject<ResponseUploadXml>(result);
+        //}
 
         public static void UploadXml<T>(string fileName, string trackId, T sendRequestObj)
         {
@@ -1339,25 +1339,25 @@ namespace Gosocket.Dian.Services.Utils
             return requestObj;
         }
 
-        public static EventResponse SendEventApplicationResponseProcess<T>(T requestObj)
-        {
-            var errorResponse = new EventResponse();
+        //public static EventResponse SendEventApplicationResponseProcess<T>(T requestObj)
+        //{
+        //    var errorResponse = new EventResponse();
 
-            try
-            {
-                var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), requestObj);
-                var result = response.Content.ReadAsStringAsync().Result;
+        //    try
+        //    {
+        //        var response = RestUtil.ConsumeApi(ConfigurationManager.GetValue("ApplicationResponseProcessUrl"), requestObj);
+        //        var result = response.Content.ReadAsStringAsync().Result;
 
-                return JsonConvert.DeserializeObject<EventResponse>(result);
-            }
-            catch (Exception ex)
-            {
-                errorResponse.Code = "Error";
-                errorResponse.Message = $"{ex.Message}";
-            }
+        //        return JsonConvert.DeserializeObject<EventResponse>(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        errorResponse.Code = "Error";
+        //        errorResponse.Message = $"{ex.Message}";
+        //    }
 
-            return errorResponse;
-        }
+        //    return errorResponse;
+        //}
 
         public enum Category
         {
