@@ -4,6 +4,7 @@ using Gosocket.Dian.Web.Services.Filters;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Web.Services
 {
@@ -19,7 +20,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        ExchangeEmailResponse GetExchangeEmails();
+        Task<ExchangeEmailResponse>  GetExchangeEmails();
 
         /// <summary>
         /// Obtener status de validadación de un documento mediante trackId.
@@ -28,7 +29,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        DianResponse GetStatus(string trackId);
+        Task<DianResponse> GetStatus(string trackId);
 
         /// <summary>
         /// 
@@ -37,7 +38,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        List<DianResponse> GetStatusZip(string trackId);
+        Task<List<DianResponse>> GetStatusZip(string trackId);
 
         /// <summary>
         /// Obtener los eventos asociados a una factura por medio del trackId.
@@ -54,9 +55,9 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "SendBillAsync")]
         [CustomOperation]
-        UploadDocumentResponse SendBillAsync(string fileName, byte[] contentFile);
+        Task<UploadDocumentResponse> SendBillAsync(string fileName, byte[] contentFile);
 
         /// <summary>
         /// 
@@ -65,9 +66,9 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="contentFile"></param>
         /// <param name="testSetId"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract(Name = "SendTestSetAsync")]
         [CustomOperation]
-        UploadDocumentResponse SendTestSetAsync(string fileName, byte[] contentFile, string testSetId);
+        Task<UploadDocumentResponse> SendTestSetAsync(string fileName, byte[] contentFile, string testSetId);
 
         /// <summary>
         /// 
@@ -75,9 +76,9 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="fileName"></param>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        [OperationContract]
+        [OperationContract]        
         [CustomOperation]
-        DianResponse SendBillSync(string fileName, byte[] contentFile);
+        Task<DianResponse> SendBillSync(string fileName, byte[] contentFile);
 
         /// <summary>
         /// 
@@ -96,7 +97,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        DianResponse SendEventUpdateStatus(byte[] contentFile);
+        Task<DianResponse> SendEventUpdateStatus(byte[] contentFile);
 
         /// <summary>
         /// 
@@ -105,7 +106,7 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        DianResponse SendNominaSync(byte[] contentFile);
+        Task<DianResponse> SendNominaSync(byte[] contentFile);
 
         /// <summary>
         /// 
@@ -119,7 +120,7 @@ namespace Gosocket.Dian.Web.Services
 
         [OperationContract]
         [CustomOperation]
-        EventResponse GetXmlByDocumentKey(string trackId);
+        Task<EventResponse> GetXmlByDocumentKey(string trackId);
 
         [OperationContract]
         [CustomOperation]

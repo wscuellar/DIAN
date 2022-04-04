@@ -405,21 +405,26 @@ namespace Gosocket.Dian.Functions.Utils
             return exist;
         }
 
-        public static async Task<byte[]> GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta)
+        public static async Task<byte[]> GetApplicationResponseIfExist(GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocument document = null)
         {
             byte[] responseBytes = null;
             var fileManager = new FileManager();
+            string fileName = string.Empty;
 
             byte[] xmlBytes = null;
 
-            var processDate = documentMeta.Timestamp;
+            var processDate = documentMeta.Timestamp;            
 
             var serieFolder = string.IsNullOrEmpty(documentMeta.Serie) ? "NOTSERIE" : documentMeta.Serie;
 
             var isValidFolder = "Success";
 
             var container = CategoryContainerName;
-            var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+            
+            if(document != null && String.Equals(document.DocumentKey, documentMeta.PartitionKey))
+                fileName = $"responses/{document.Timestamp.Year}/{document.Timestamp.Month.ToString().PadLeft(2, '0')}/{document.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+            else
+                fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
             xmlBytes = await fileManager.GetBytesAsync(container, fileName);
             if (xmlBytes == null)

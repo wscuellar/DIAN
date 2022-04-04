@@ -36,6 +36,10 @@ namespace Gosocket.Dian.Logger
         {
             clientTelemetry.TrackException(ex);
         }
+        public static void LogException(Exception e, IDictionary<string, string> properties)
+        {
+            clientTelemetry.TrackException(e, properties);
+        }
 
         public static void TrackEvent(string eventName, string accountCode, IDictionary<string, string> properties = null)
         {

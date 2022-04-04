@@ -47,7 +47,7 @@ namespace Gosocket.Dian.Web.Utils
             var requestUrl = ConfigurationManager.GetValue("SendEmailFunctionUrl");
             HttpRequestMessage req = EmailSenderInput.CreatePostRequestSendEmailDataWithFile(emaiSenderlData, requestUrl);
 
-            var res = client.SendAsync(req).Result;
+            var res = await client.SendAsync(req);
 
             var content = await res.Content.ReadAsStringAsync();
             string emailSenderResponseString = JsonConvert.DeserializeObject<string>(content);
