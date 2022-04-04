@@ -151,7 +151,7 @@ namespace Gosocket.Dian.Services.Utils.Helpers
         public static async Task<T> ExecuteRequestWithHeaderAsync<T>(string url, dynamic requestObj, Dictionary<string, string> headers)
         {
             var response = await ConsumeApiWithHeaderAsync(url, requestObj, headers);
-            var result = response.Content.ReadAsStringAsync().Result;
+            var result = await response.Content.ReadAsStringAsync();
             return (T)JsonConvert.DeserializeObject<T>(result);
         }
 
