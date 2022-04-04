@@ -886,7 +886,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase)
+        public async Task<JsonResult> SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
         {
             try
             {
