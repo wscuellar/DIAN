@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Functions.Activation
 {
@@ -25,7 +26,7 @@ namespace Gosocket.Dian.Functions.Activation
         private const string queueName = "global-check-contributor-activation-input%Slot%";
 
         [FunctionName("CheckContributorActivation")]
-        public static void Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
+        public static async Task Run([QueueTrigger(queueName, Connection = "GlobalStorage")]string myQueueItem, TraceWriter log)
         {
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
             if (ConfigurationManager.GetValue("Environment") == "Hab")
@@ -74,7 +75,7 @@ namespace Gosocket.Dian.Functions.Activation
                             var id = int.Parse(p.PartitionKey);
 
                             var requestObject = new { contributorId = id };
-                            var activation = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(sendToActivateContributorUrl, requestObject);
+                            var activation = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(sendToActivateContributorUrl, requestObject);
 
                             var guid = Guid.NewGuid().ToString();
                             var contributorActivation = new GlobalContributorActivation(p.Code, guid)
