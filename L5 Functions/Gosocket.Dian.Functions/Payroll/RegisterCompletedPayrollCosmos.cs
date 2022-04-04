@@ -219,7 +219,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						LastName = objNomina.Emp_PrimerApellido,
 						SecondLastName = objNomina.Emp_SegundoApellido,
 						FirstName = objNomina.Emp_PrimerNombre,
-						//Pendiente SecondName - SegundoNombre
+						SecondName = objNomina.Emp_OtrosNombres,
 						NameCompositeEmployer = objNomina.Emp_OtrosNombres,
 						AddressEmployer = objNomina.Emp_Direccion,
 						IdCountryEmployer = objNomina.Emp_Pais,
