@@ -115,7 +115,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 var documentApplication = htmlGDoc.GetDocumentResponse();
                 var documentSigningTime = htmlGDoc.GetDocumentResponse();
                 //bug 14539
-                //var documentSigningTime = htmlGDoc.GetSigningTime();
+
 
                 if (documentApplication != null)
                 {
