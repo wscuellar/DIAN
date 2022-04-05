@@ -113,7 +113,9 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 // Sustituir en el HTML la respuesta de la validación del documento y SigningTime
                 var documentApplication = htmlGDoc.GetDocumentResponse();
-                var documentSigningTime = htmlGDoc.GetSigningTime();
+                var documentSigningTime = htmlGDoc.GetDocumentResponse();
+                //bug 14539
+                //var documentSigningTime = htmlGDoc.GetSigningTime();
 
                 if (documentApplication != null)
                 {
