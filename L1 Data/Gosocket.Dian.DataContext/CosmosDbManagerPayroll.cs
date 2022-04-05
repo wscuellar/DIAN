@@ -383,7 +383,7 @@ namespace Gosocket.Dian.DataContext
             }
         }
 
-        public async Task<List<NumberingRangeCos>> GetNumberingRangeByTypeDocument(string prefijo, decimal range,string tipo,string account)
+        public async Task<List<NumberingRangeCos>> GetNumberingRangeByTypeDocument(string prefijo, string range,string tipo,string account)
         {
             try
             {

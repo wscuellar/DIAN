@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string CompensationE { get; set; }
 		public string CompensationO { get; set; }
 		public string TotalVoucher { get; set; }
-		public decimal Consecutive { get; set; }
+		public string Consecutive { get; set; }
 		public short? DV { get; set; }
 		public string DeductionsTotal { get; set; }
 		public string StateDepartment { get; set; }
