@@ -221,14 +221,16 @@ namespace Gosocket.Dian.Domain.Common
             return new int[] {(int)DocumentType.DocumentSupportInvoice, (int)DocumentType.AdjustmentNoteDocumentSupport, }
                 .Contains(documentType);
         }
+        public static int[] GetAll()
+        {
+            return GetDocumentType().Concat(GetAdjustmentDocumentType()).ToArray();
+        }
         public static int[] GetDocumentType()
         {
             return new int[] {
                 (int)DocumentType.IndividualPayroll,
-                (int)DocumentType.IndividualPayrollAdjustments,
 
-                (int)DocumentType.DocumentSupportInvoice, 
-                (int)DocumentType.AdjustmentNoteDocumentSupport,
+                (int)DocumentType.DocumentSupportInvoice,
 
                 (int)DocumentType.EquivalentDocumentPOS,
                 (int)DocumentType.EquivalentDocumentCine,
@@ -240,6 +242,13 @@ namespace Gosocket.Dian.Domain.Common
                 (int)DocumentType.EquivalentDocumentTransporteAereo,
                 (int)DocumentType.EquivalentDocumentBolsaValores,
                 (int)DocumentType.EquivalentDocumentServiciosPublicos,
+            };
+        }
+        public static int[] GetAdjustmentDocumentType()
+        {
+            return new int[] {
+                (int)DocumentType.IndividualPayrollAdjustments,
+                (int)DocumentType.AdjustmentNoteDocumentSupport,
                 (int)DocumentType.AdjustmentNoteEquivalentDocument,
             };
         }
