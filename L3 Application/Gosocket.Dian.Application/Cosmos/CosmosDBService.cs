@@ -212,12 +212,13 @@ namespace Gosocket.Dian.Application.Cosmos
             };
 
             IOrderedQueryable<GlobalDataDocument> query = null;
-
+            var start = DateTime.UtcNow;
             query = (IOrderedQueryable<GlobalDataDocument>)
                  client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                  .Where(e => e.id == id
                  && e.PartitionKey == partitionKey).AsEnumerable();
-            var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
+            var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();            
+            TrackOperation("FACELCosmosGetAsync_1", start, query.ToString(), result.RequestCharge);            
             return result.FirstOrDefault();
         }
 
@@ -935,8 +936,9 @@ namespace Gosocket.Dian.Application.Cosmos
 
                     string discriminator = document.GlobalDocumentId.ToString().Substring(0, 2);
                     document.PartitionKey = $"co|{document.EmissionDate.Day.ToString().PadLeft(2, '0')}|{discriminator}";
+                    var start = DateTime.UtcNow;
                     var result = client.UpsertDocumentAsync(collections[collectionName].SelfLink, document).Result;
-
+                    TrackOperation("FACELCosmosUpsert_0", start, "upsert Document" , result.RequestCharge);
                     return document;
                 }
             }
@@ -990,7 +992,10 @@ namespace Gosocket.Dian.Application.Cosmos
                 document.DocumentTags.Add(documentTag);
 
                 //
-                await client.UpsertDocumentAsync(collections[collectionName].SelfLink, document);
+                var start = DateTime.UtcNow;
+                var result=await client.UpsertDocumentAsync(collections[collectionName].SelfLink, document);
+
+                TrackOperation("FACELCosmosUpdate_0", start, "update Document", result.RequestCharge);
             }
             catch (Exception ex)
             {
