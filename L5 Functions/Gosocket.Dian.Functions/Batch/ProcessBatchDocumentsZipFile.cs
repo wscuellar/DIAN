@@ -718,7 +718,14 @@ namespace Gosocket.Dian.Functions.Batch
             var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
             var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
             var responseCustomizationID = responseXpathDataValue.Select(x => x.XpathsValues["AppResCustomizationIDXpath"]).Distinct();
-
+            string documentType = responseXpathDataValue.Select(t => t.XpathsValues["DocumentTypeXpath"]).FirstOrDefault();
+            
+            /*Si es un documento soporte o una una nota de ajuste del mismo, 
+             * el emisor del documento está en el customerParty*/
+            if(OtherDocumentsDocumentType.IsSupportDocument(documentType))
+            {
+                codes = responseXpathDataValue.Select(x => x.XpathsValues["ReceiverCodeXpath"]).Distinct();
+            }
             //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
             {
@@ -779,10 +786,14 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-                        }                                              
+                        }
 
                         //Consulta exista testSetID registros Otros Documentos           
-                        List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
+                        nitNomina = !string.IsNullOrWhiteSpace(nitNomina) ? nitNomina : code;
+                        nitNominaProv = !string.IsNullOrWhiteSpace(nitNominaProv) ? nitNominaProv : code;
+                        softwareIdNomina = !string.IsNullOrWhiteSpace(softwareIdNomina) ? softwareIdNomina : softwareId;
+
+                        List <GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
 
                         if (objGlobalTestSetResult != null)
@@ -847,7 +858,6 @@ namespace Gosocket.Dian.Functions.Batch
                             var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
 
                             //Valida software asociado al NIT en GlobalOtherDocElecOperation
-
                             bool existOperationProv = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNominaProv, softwareIdNomina);
 
                             bool existOperationEmp = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
