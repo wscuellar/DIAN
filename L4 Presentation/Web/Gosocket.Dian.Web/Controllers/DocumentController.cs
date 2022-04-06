@@ -55,6 +55,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
+        
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
@@ -197,7 +198,7 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
-                var xmlBytes = DownloadXml(trackId);
+                var xmlBytes = await DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -921,11 +922,12 @@ namespace Gosocket.Dian.Web.Controllers
             return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
         }
 
-        private byte[] DownloadXml(string trackId)
+        private async Task<byte[]> DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response = DownloadXml(requestObj);
+            var response = await DownloadXml(requestObj);
+            
             if (response.Success)
             {
                 byte[] xmlBytes = Convert.FromBase64String(response.XmlBase64);
@@ -1545,10 +1547,17 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         public ActionResult ElectronicDocuments()
         {
+
             ViewBag.UserCode = User.UserCode();
             ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
+
+
+            ContributorOperationsService contributorOperationsService = new ContributorOperationsService();
+            var opes = contributorOperationsService.GetContributor(User.ContributorId());
+            ViewBag.ContributorAcceptanceStatus = opes.AcceptanceStatusId;
+
             return View();
         }
 
