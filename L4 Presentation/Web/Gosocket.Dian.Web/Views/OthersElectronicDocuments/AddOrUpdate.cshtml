@@ -202,18 +202,18 @@
                                                                     </a>
                                                                 </td>
                                                             }
-                                                        <td class="text-center" style="width:70px">
-                                                            @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-                                                            <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-                                                            @if (isElectronicPayroll)
-                                                            {
-                                                                <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                            }
-                                                            else
-                                                            {
-                                                                <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                            }
-                                                        </td>
+                                                            <td class="text-center" style="width:70px">
+                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
+                                                                <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
+                                                                @if (isElectronicPayroll)
+                                                                {
+                                                                    <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                                }
+                                                            </td>
                                                         </tr>
                                                     }
                                                 }
@@ -283,6 +283,7 @@
 
     <script>
         let OperationModesAsociatedInElectronicBiller = [];
+        let SoftwaresIds = [];
 
         @if (!string.IsNullOrWhiteSpace(message))
         {
@@ -315,29 +316,28 @@
 		}
         $(document).ready(function ($) {
             OperationModesAsociatedInElectronicBiller = @Html.Raw(JsonConvert.SerializeObject(Model.OperationModesAsociatedInElectronicBiller));
-
-            if ('@ViewBag.softwareActive' == 'True')
-            {
-                var sms ='No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
+            SoftwaresIds = @Html.Raw(JsonConvert.SerializeObject(Model.ListTable.Select(s => s.SoftwareId)));
+            if ('@ViewBag.softwareActive' == 'True') {
+                var sms = 'No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
                 bootbox.dialog({
                     message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                            onEscape: () => {  }
+                    onEscape: () => { }
                 });
             }
-			$('#PinSW').val('')
+            $('#PinSW').val('')
 
             $("#btnBackTop").click(() => {
-                 let url = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = 1 })";
-                 if (@Model.ElectronicDocumentId == 3) {
-                     url = "@Url.Action("ElectronicDocuments", "Document")";
-                 }
-                 window.location.href = url;
-             })
+                let url = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = 1 })";
+                if (@Model.ElectronicDocumentId == 3) {
+                    url = "@Url.Action("ElectronicDocuments", "Document")";
+                }
+                window.location.href = url;
+            })
 
             $('#btnSave').click(function () {
-                if ($('#OperationModeSelectedId').val()!=2) {
-					$('#ProviderId').append(new Option("", "1"));
-					$('#ProviderId').val("1")
+                if ($('#OperationModeSelectedId').val() != 2) {
+                    $('#ProviderId').append(new Option("", "1"));
+                    $('#ProviderId').val("1")
                 }
 
                 var form = $('#frmOthersElectronicDocuments');
@@ -345,17 +345,17 @@
                 console.log(form.valid());
 
                 if ($('#OperationModeSelectedId').val() == 1) {
-					$('#ErrorSoftwareName').hide()
-    				$('#ErrorPinSW').hide()
+                    $('#ErrorSoftwareName').hide()
+                    $('#ErrorPinSW').hide()
 
                     if ($('#SoftwareName').val().trim() == '') {
-						$('#ErrorSoftwareName').show()
+                        $('#ErrorSoftwareName').show()
                     } else {
                         if ($('#PinSW').val().trim() == '') {
-						    $('#ErrorPinSW').show()
+                            $('#ErrorPinSW').show()
                         } else {
-							$('#ErrorSoftwareName').hide()
-							$('#ErrorPinSW').hide()
+                            $('#ErrorSoftwareName').hide()
+                            $('#ErrorPinSW').hide()
                             showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
                             form.submit();
                             hideLoading("#panel-wrapper");
@@ -373,13 +373,18 @@
                             if ($('#SoftwareId').val() == '') {
                                 $('#ErrorSoftwareId').show();
                             } else {
-								$('input[name="SoftwareName"]').val($('#SoftwareId option:selected').text());
+                                $('input[name="SoftwareName"]').val($('#SoftwareId option:selected').text());
                                 $('#ErrorProviderId').hide();
                                 $('#ErrorSoftwareId').hide();
-
-                                showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
-                                form.submit();
-                                hideLoading("#panel-wrapper");
+                                if (SoftwaresIds.find(s => s == $('#SoftwareId').val())) {
+                                        showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
+                                }
+                                else
+                                {
+                                    showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                                    form.submit();
+                                    hideLoading("#panel-wrapper");
+                                }
                             }
                         }
                     } else {
@@ -394,88 +399,88 @@
             });
 
             $('#ProviderId').change(function () {
-                    if ('@ViewBag.softwareActive' == 'False') {
-                   // $('#UrlEventReception').val('');
+                if ('@ViewBag.softwareActive' == 'False') {
+                    // $('#UrlEventReception').val('');
                     $('#SoftwareType').val('');
-                        getSoftwares($('#ProviderId').val());
-                    }
-                });
+                    getSoftwares($('#ProviderId').val());
+                }
+            });
 
             $('#SoftwareId').change(function (e) {
-                    var $this = $(this);
+                var $this = $(this);
                 $('#SoftwareName').val($('#SoftwareId option:selected').text());
-                    getDataSoftwareSeleccionado($this.val());
-                });
+                getDataSoftwareSeleccionado($this.val());
+            });
 
             $('.delete').click(function () {
                 //alert($(this).data('contributor-id'));
                 $("#txtCancelRegistro").val("");
                 $('#lbldangercancelregister').removeClass("text-danger text-bold");
                 $("#dialogcancelarregistro").modal('show');
-                });
-                if (@Model.ContributorIdType == 2) {
-				$('select[name=OperationModeSelectedId]').val(1);
-                }
-                else {
-				$('select[name=OperationModeSelectedId]').val(0);
-                }
-			$('.selectpicker').selectpicker('refresh');
-			$('#OperationModeSelectedId').change();
-		});//ready
-
-
-
-		function EliminarRegistro(id) {
-			$("#dialogcancelarregistro").modal('show');
-
-			("#Btnsavecancel")[0].onclick = null;
-			$("#Btnsavecancel").click(function () {
-				ElimnarOp(id)
-
-			});
-		}
-
-		function ElimnarOp(id)
-		{
-			if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
-                $('#lbldangercancelregister').addClass("text-danger  text-bold");
-                return;
+            });
+            if (@Model.ContributorIdType == 2) {
+                $('select[name=OperationModeSelectedId]').val(1);
             }
+            else {
+                $('select[name=OperationModeSelectedId]').val(0);
+            }
+            $('.selectpicker').selectpicker('refresh');
+            $('#OperationModeSelectedId').change();
+        });//ready
+
+
+
+        function EliminarRegistro(id) {
+			        $("#dialogcancelarregistro").modal('show');
+
+            ("#Btnsavecancel")[0].onclick = null;
+			        $("#Btnsavecancel").click(function () {
+                ElimnarOp(id)
+
+                    });
+                     }
+
+                     function ElimnarOp(id)
+                     {
+                         if ($("#txtCancelRegistro").val() == null || $("#txtCancelRegistro").val() == '') {
+                $('#lbldangercancelregister').addClass("text-danger  text-bold");
+                             return;
+                         }
 
             $("#dialogcancelarregistro").modal('hide');
-            let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
-            if (@Model.ElectronicDocumentId == 3) {
-                confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
-            }
-            showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
-                function () {
-                    showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
+                         let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
+                         if (@Model.ElectronicDocumentId == 3) {
+                             confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
+                         }
+                         showConfirmation(`¿${confirmMessage}?`, ConfirmExec(
+                             function () {
+                             showLoading('#panel-wrapper', 'Cargando', 'Eliminando el modo de operación solicitado, por favor espere.');
                     $.ajax({
-                        url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
+                             url: "@Url.Action("CancelRegister", "OthersElectronicDocAssociated")",
                         type: "POST",
                             data: { id: id, description: $("#txtCancelRegistro").val() },
                         datatype: "json",
                         success: function (result) {
-                            hideLoading("#panel-wrapper");
-                            if (result != null) {
+                                     hideLoading("#panel-wrapper");
+                                     if (result != null) {
 
-							    if (result.Code != 200) {
+                                         if (result.Code != 200) {
 
 								    $('.close').click()
-								    bootbox.dialog({
-									    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
+                                    bootbox.dialog({
+                                             message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
 									    onEscape: () => {
-										    var url = window.location.href.split('&');
-										    var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
-										    window.location.href = ret
-									    }
-								    });
-								    //
-                                    return;
-                                }
+                                            var url = window.location.href.split('&');
+                                            var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+                                            window.location.href = ret
+                                        }
+                                    });
+                                             //
+                                             return;
+                                         }
 
-                                bootbox.dialog({
-                                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
+                                         bootbox.dialog({
+                                         message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se cancelo el registro exitosamente</h4></div></div>",
                                     onEscape: () => {
                                         var url = "@Url.Action("Index", "OthersElectronicDocuments")";
                                         if (@Model.ElectronicDocumentId == 3) {
@@ -484,26 +489,26 @@
                                         }
                                         window.location.href = url;
                                     }
-                                });
-                            }
-                            else
-                                bootbox.alert("No se pudo realizar la Cancelación");
-                        },
+                                         });
+                                     }
+                                     else
+                                         bootbox.alert("No se pudo realizar la Cancelación");
+                                 },
                         complete: function () {
-                            hideLoading("#panel-wrapper");
-                        },
+                                     hideLoading("#panel-wrapper");
+                                 },
                         error: function (result) {
-                            hideLoading("#panel-wrapper");
-                            bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                            console.log(result.status + ' ' + result.statusText);
-                            return false;
-                        }
-                    });  //ajax
-                }
+                                     hideLoading("#panel-wrapper");
+                                     bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                                     console.log(result.status + ' ' + result.statusText);
+                                     return false;
+                                 }
+                             });  //ajax
+                         }
             , "", () => hideLoading('#panel-wrapper')));
-		}
+                     }
 
-        function ReiniciarFormulario() {
+                     function ReiniciarFormulario() {
             $('#UrlEventReception').val('@dianUrlEventReception');
 
             $('#SoftwareType').val(1);
@@ -527,23 +532,23 @@
             $("#SoftwareId").html('<option value="" selected="selected">Seleccione...</option>');
             $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
                 'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
-            cambiarTextoSelect();
+                     cambiarTextoSelect();
 
             $('#ContributorName').val("@Model.ContributorName");
             $('#SoftwareIdPr').val("@softwareIdPrInitial");
-        }
+                 }
 
 		$('#OperationModeSelectedId').change(function ()
         {
-            const contributorIsOfe = "@Model.ContributorIsOfe".toLowerCase() == "true",
-                isElectronicSupportDocument = "@Model.ElectronicDocumentIsSupport".toLowerCase() == "true";
+                     const contributorIsOfe = "@Model.ContributorIsOfe".toLowerCase() == "true",
+                         isElectronicSupportDocument = "@Model.ElectronicDocumentIsSupport".toLowerCase() == "true";
 
-            ReiniciarFormulario();
+                     ReiniciarFormulario();
 
-            const operationModeAssigned = OperationModesAsociatedInElectronicBiller
-                .find(t => t.OperationModeId == $('#OperationModeSelectedId').val());
+                     const operationModeAssigned = OperationModesAsociatedInElectronicBiller
+                         .find(t => t.OperationModeId == $('#OperationModeSelectedId').val());
 
-            if ($('#OperationModeSelectedId').val() == 1) {
+                     if ($('#OperationModeSelectedId').val() == 1) {
                 /*Modo de operación [Software Propio]*/
                 $('#FormPt').fadeOut();
                 $('#FormPropio').fadeIn();
@@ -552,7 +557,7 @@
                 $('#SoftwareName').removeAttr('disabled');
 				$('#ContributorName').val('@Model.ContributorName');
                 $('#SoftwareName').val('');
-            }
+                     }
             else if ($('#OperationModeSelectedId').val() == 2) {
                 /*Modo de operación [Software Proveedor Tecnológico]*/
                 $('#FormPt').fadeIn();
@@ -571,15 +576,15 @@
                     $('#SoftwareName').attr('disabled', true);
                     $('#DivSoftwareId').fadeOut();
                     $('#DivPin').fadeOut();
-                }
-				else {
+                     }
+                else {
                     $('#FormPt').fadeOut();
                     $('#FormPropio').fadeOut();
-                }
+                     }
 
-            if (contributorIsOfe && isElectronicSupportDocument) {
-                if ($('#OperationModeSelectedId').val() == 2) return;
-                if (!operationModeAssigned) return;
+                     if (contributorIsOfe && isElectronicSupportDocument) {
+                         if ($('#OperationModeSelectedId').val() == 2) return;
+                         if (!operationModeAssigned) return;
 
                 $('#ContributorName').val(operationModeAssigned.Data.ProviderCompanyName);
                 $('#SoftwareName').val(operationModeAssigned.Data.SoftwareName);
@@ -591,8 +596,8 @@
                 $('#SoftwareIdPr').attr('readonly', true);
                 $('#SoftwareIdPr').removeAttr('disabled');
                 $('#PinSW').attr('readonly', true);
-            }
-        })
+                     }
+                 })
 
 
         function getSoftwares(ProviderId){
@@ -601,86 +606,86 @@
             $('#ulSoftwareId').html('<li data-original-index="0" class="selected"><a tabindex="0" class=""' +
                 'data-normalized-text="Seleccione..."><span class="text">Seleccione...</span><span class="fa fa-check check-mark"></span></a></li>');
 
-            cambiarTextoSelect();
+                     cambiarTextoSelect();
 
             $.ajax({
-                url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocuments")",
+                     url: "@Url.Action("GetSoftwaresByContributorId", "OthersElectronicDocuments")",
                 type: "POST",
                 data: { id: ProviderId, electronicDocumentId: @Model.ElectronicDocumentId },
                 datatype: "json",
                 success: function (result) {
 
-                    if (result != null && result.res != null) {
+                             if (result != null && result.res != null) {
 
                         $.each(result.res, function (index, value) {
                             $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
                             $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
                                 ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
                                 '<span class="fa fa-check check-mark"></span></a></li>');
-                        });
-                    }
-                    else
-                        bootbox.alert("No se pudo realizar la consulta");
-                },
+                                 });
+                             }
+                             else
+                                 bootbox.alert("No se pudo realizar la consulta");
+                         },
                 complete: function () {
 
-                },
+                         },
                 error: function (result) {
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                    console.log(result.status + ' ' + result.statusText);
-                    return false;
-                }
-            });  //ajax
+                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                             console.log(result.status + ' ' + result.statusText);
+                             return false;
+                         }
+                     });  //ajax
 
-        }
+                 }
 
-        function getDataSoftwareSeleccionado(SoftwareId){
+                 function getDataSoftwareSeleccionado(SoftwareId){
 
             $.ajax({
-                url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
+                     url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
                 type: "POST",
                 data: { SoftwareId: SoftwareId },
                 datatype: "json",
                 success: function (result) {
-                    if (result != null) {
+                             if (result != null) {
                         $('#UrlEventReception').val(result.url);
                         $('#SoftwareType').val(result.SoftwareType);
                         $('#PinSW').val(result.SoftwarePIN);
-                    }
-                    else
-                        bootbox.alert("No se pudo realizar la consulta");
-                },
+                             }
+                             else
+                                 bootbox.alert("No se pudo realizar la consulta");
+                         },
                 complete: function () {
 
-                },
+                         },
                 error: function (result) {
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                    console.log(result.status + ' ' + result.statusText);
-                    return false;
-                }
-            });  //ajax
+                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                             console.log(result.status + ' ' + result.statusText);
+                             return false;
+                         }
+                     });  //ajax
 
-        }
+                 }
 
-        function cambiarTextoSelect() {
-            var botones = $(":button");
-            var boton;
+                 function cambiarTextoSelect() {
+                     var botones = $(":button");
+                     var boton;
 
             $.each(botones, function (index1, val1) {
-                if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
+                         if (val1.attributes != undefined && $(val1).hasClass("selectpicker")) {
 
-                    boton = val1;
+                             boton = val1;
                     $.each(val1.attributes, function (index, value) {
 
-                        if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
+                                 if (value.localName == "data-id" && value.nodeValue == "SoftwareId") {
 
-                            boton.firstElementChild.textContent = "Seleccione...";
+                                     boton.firstElementChild.textContent = "Seleccione...";
 
-                        }
-                    });
-                }
-            });
-        }
+                                 }
+                             });
+                         }
+                     });
+                 }
 
     </script>
 }
