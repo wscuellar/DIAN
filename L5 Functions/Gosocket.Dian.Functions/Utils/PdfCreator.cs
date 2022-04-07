@@ -44,13 +44,22 @@ namespace Gosocket.Dian.Functions.Utils
             lock (instance)
             {
                 // Convert
-                pdf = OpenHtmlToPdf.Pdf
+                var pdfGenerator = OpenHtmlToPdf.Pdf
                         .From(Html_Content)
                         .WithGlobalSetting("orientation", "Portrait")
                         .WithObjectSetting("web.defaultEncoding", "utf-8")
                         //.WithTitle($"{trackId}.pdf")
-                        .OfSize(paperSize)
-                        .Content();
+                        .OfSize(paperSize);
+
+
+                if (paperSize.Width == "5.5in" && paperSize.Height == "8.5in")
+                {
+                    pdfGenerator = pdfGenerator.Landscape();
+                }
+
+                pdf = pdfGenerator.Content();
+
+
             }
             return pdf;
         }
