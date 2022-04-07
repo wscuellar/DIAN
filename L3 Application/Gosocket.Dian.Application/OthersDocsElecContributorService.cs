@@ -346,7 +346,7 @@ namespace Gosocket.Dian.Application
 
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on new { SoftwareId = s.Id, s.OtherDocElecContributorId  } equals new { oco.SoftwareId, oco.OtherDocElecContributorId } 
                                                     join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
                                                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id

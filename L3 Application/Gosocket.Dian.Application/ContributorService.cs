@@ -89,7 +89,10 @@ namespace Gosocket.Dian.Application
             //return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
             using (var context = new SqlDBContext())
             {
-                return context.Contributors.Include("ContributorOperations").AsNoTracking().FirstOrDefault(x => x.Id == id);
+                return context.Contributors
+                    .Include("ContributorOperations").AsNoTracking()
+                    .Include("Softwares").AsNoTracking()
+                    .FirstOrDefault(x => x.Id == id);
             }
         }
 

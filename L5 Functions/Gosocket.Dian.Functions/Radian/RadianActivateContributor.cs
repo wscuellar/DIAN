@@ -20,6 +20,7 @@ namespace Gosocket.Dian.Functions.Radian
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
+        private static readonly TableManager tableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         // Set queue name
         private const string queueName = "activate-radian-operation-input%Slot%";
@@ -42,6 +43,7 @@ namespace Gosocket.Dian.Functions.Radian
             {
                 SetLogger(null, "Step RA-01", " Ingresamos a ActivateRadianOperation Ambiente Prod ");
 
+                Contributor contributor = null;
                 RadianContributor radianContributor = null;
                 GlobalContributorActivation contributorActivation = null;
                 RadianaActivateContributorRequestObject requestObject = null;
@@ -195,7 +197,20 @@ namespace Gosocket.Dian.Functions.Radian
                     //Se inserta en RadianTestSetResult
                     if (IsProduction)
                         TableManagerRadianTestSetResult.InsertOrUpdateAsync(requestObject.RadianTestSetObj).Wait();
+                    
 
+                    //--Traemos la informacion del software
+                    string softwareId = requestObject.SoftwareId;
+                    RadianSoftware software = softwareService.GetByRadian(Guid.Parse(softwareId));
+                    contributor = contributorService.Get(software.ContributorId);
+                    if(contributor != null)
+                    {
+                        //Se inserta en GlobalAuthorization
+                        var auth = tableManagerGlobalAuthorization.Find<GlobalAuthorization>(contributor.Code, requestObject.Code);
+                        if (auth == null)
+                            tableManagerGlobalAuthorization.InsertOrUpdate(new GlobalAuthorization(contributor.Code, requestObject.Code));
+
+                    }
 
                     SetLogger(null, "Step RA-9", " -- globalRadianOperations -- ");
 
