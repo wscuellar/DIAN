@@ -52,7 +52,9 @@ namespace Gosocket.Dian.Functions.Utils
                         .OfSize(paperSize);
 
 
-                if (paperSize.Width == "5.5in" && paperSize.Height == "8.5in")
+                if (
+                    paperSize.Width == "5.5in" && 
+                    paperSize.Height == "8.5in")
                 {
                     pdfGenerator = pdfGenerator.Landscape();
                 }
