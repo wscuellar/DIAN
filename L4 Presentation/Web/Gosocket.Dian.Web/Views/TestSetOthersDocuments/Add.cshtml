@@ -197,7 +197,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+<script>
 
     var enumElectronicsDocuments =
     {
@@ -271,6 +271,9 @@
             $("#lblOthersDocumentsRequired").text('Nomina electrónica');
             $("#lblOthersDocumentsAcceptedRequired").text('Nomina electrónica');
 
+            $("#divPayrollAjustment").find(".control-label").text("Nomina electrónica de ajuste");
+            $("#divPayrollAjustmentAcepted").find(".control-label").text("Nomina electrónica de ajuste");
+
             if ($("#TestSetId").val() == '' || $("#TestSetId").val() == null) {
                 $("#OthersDocumentsRequired").val('0');
                 $("#ElectronicPayrollAjustmentRequired").val('0');
@@ -279,11 +282,14 @@
             }
         }
         else {
-            $("#divPayrollAjustment").hide();
-            $("#divPayrollAjustmentAcepted").hide();
+            //$("#divPayrollAjustment").hide();
+            //$("#divPayrollAjustmentAcepted").hide();
 
             $("#lblOthersDocumentsRequired").text($('#ElectronicDocumentId option:selected').text());
             $("#lblOthersDocumentsAcceptedRequired").text($('#ElectronicDocumentId option:selected').text());
+
+            $("#divPayrollAjustment").find(".control-label").text("Nota de Ajuste");
+            $("#divPayrollAjustmentAcepted").find(".control-label").text("Nota de Ajuste");
 
             if ($("#TestSetId").val() == '' || $("#TestSetId").val() == null) {
                 $("#OthersDocumentsRequired").val('0');
@@ -381,6 +387,6 @@
 
     }
 
-    </script>
+</script>
 
 }
