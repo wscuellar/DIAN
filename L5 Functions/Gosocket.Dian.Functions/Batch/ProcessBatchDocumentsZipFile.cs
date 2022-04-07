@@ -726,6 +726,13 @@ namespace Gosocket.Dian.Functions.Batch
             {
                 codes = responseXpathDataValue.Select(x => x.XpathsValues["ReceiverCodeXpath"]).Distinct();
             }
+            var log = new GlobalLogger(zipKey, "7.0.1 Validate Data for update set test")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = $@"documentType: {documentType} | senderCode: {string.Join(", ", codes)} | setTestId: {testSetId} | softwareId: {string.Join(", ",softwareIds)}"
+            };
+            TableManagerGlobalLogger.InsertOrUpdateAsync(log);
+
             //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
             {
