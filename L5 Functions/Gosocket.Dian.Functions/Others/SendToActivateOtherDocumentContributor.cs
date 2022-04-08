@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using Gosocket.Dian.Domain;
 using System.Globalization;
+using System.Linq;
 
 namespace Gosocket.Dian.Functions.Others
 {
@@ -90,7 +91,9 @@ namespace Gosocket.Dian.Functions.Others
                     string key = data.SoftwareType + '|' + data.SoftwareId + (data.EquivalentDocumentId.HasValue ? $"|{data.EquivalentDocumentId}":"");
                     SetLogger(null, "Step STA-4.1", data.Code,"SEND-06");
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
-                    GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
+                    GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.FindBy<GlobalTestSetOthersDocumentsResult>(data.Code, key)
+                        .FirstOrDefault(t => t.ElectronicDocumentId == data.ElectronicDocumentId);
+
                     SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
@@ -272,6 +275,9 @@ namespace Gosocket.Dian.Functions.Others
 
             [JsonProperty(PropertyName = "otherDocElecContributorId")]
             public int OtherDocElecContributorId { get; set; }
+
+            [JsonProperty(PropertyName = "electronicDocumentId")]
+            public int ElectronicDocumentId { get; set; }
 
         }
 

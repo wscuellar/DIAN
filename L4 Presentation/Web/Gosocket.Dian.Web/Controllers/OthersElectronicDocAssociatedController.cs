@@ -946,6 +946,7 @@ namespace Gosocket.Dian.Web.Controllers
                 data.ContributorOpertaionModeId = globalRadianOperations.OperationModeId;
                 data.OtherDocElecContributorId = testSetResult.OtherDocElecContributorId;
                 data.EquivalentDocumentId = equivalentDocumentId;
+                data.ElectronicDocumentId = testSetResult.ElectronicDocumentId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
                 var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
@@ -1266,6 +1267,9 @@ namespace Gosocket.Dian.Web.Controllers
         public int OtherDocElecContributorId { get; set; }
 
         public int? EquivalentDocumentId { get; set; }
+
+        [JsonProperty(PropertyName = "electronicDocumentId")]
+        public int ElectronicDocumentId { get; set; }
 
     }
 }
