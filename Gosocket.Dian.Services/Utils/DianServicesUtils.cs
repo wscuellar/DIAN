@@ -876,6 +876,30 @@ namespace Gosocket.Dian.Services.Utils
                         codeMessage = "DIA";
                         break;
                     }
+                case "20":
+                case "25":
+                case "27":
+                case "32":
+                case "35":
+                case "40":
+                case "45":
+                case "50":
+                case "55":
+                case "60":
+                    {
+                        codeMessage = "DEA";
+                        break;
+                    }
+                case "94":
+                    {
+                        codeMessage = "NAA";
+                        break;
+                    }
+                case "95":
+                    {
+                        codeMessage = "NSA";
+                        break;
+                    }
                 default:
                     {
                         codeMessage = "GEN";
