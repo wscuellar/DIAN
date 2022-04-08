@@ -1066,7 +1066,8 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}D05: El ID del Documento no puede estar vacío.");
+                    string codeEnd = _equivalentDocumentTypes.Contains(docTypeCode) ? "b" : "";
+                    stringBuilder.AppendLine($"{codeMessage}D05{codeEnd}: El ID del Documento no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
