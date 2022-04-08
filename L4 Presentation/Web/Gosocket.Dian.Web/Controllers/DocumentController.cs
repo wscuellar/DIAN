@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
-                var xmlBytes = await DownloadXml(trackId);
+                var xmlBytes =  DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -1002,7 +1002,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response = await DownloadXml(requestObj);
+            var response =  DownloadXml(requestObj);
             
             if (response.Success)
             {
