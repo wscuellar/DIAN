@@ -120,7 +120,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 if (documentApplication != null)
                 {
                     documentApplication = DateNormalized(documentApplication, "Documento validado por la DIAN");
-                    documentSigningTime = DateNormalized(documentSigningTime, "Documento generado el:");
+                    documentSigningTime = DateNormalized(documentSigningTime, "Documento generado el:", minusFiveHour: false);
                     Html_Content = Html_Content.Replace("#ApplicationResponse", documentApplication);
                     Html_Content = Html_Content.Replace("#SigningTime", documentSigningTime);
                 }
@@ -162,7 +162,7 @@ namespace Gosocket.Dian.Functions.Pdf
             }
         }
 
-        static string DateNormalized(string currentDate, string dataReplace)
+        static string DateNormalized(string currentDate, string dataReplace, bool minusFiveHour=true)
         {
             if (!currentDate.Contains(dataReplace))
                 return currentDate;
@@ -176,7 +176,9 @@ namespace Gosocket.Dian.Functions.Pdf
             int hour = Convert.ToInt32(rest[0]);
             int min = Convert.ToInt32(hours[1]);
             int sec = Convert.ToInt32(hours[2]);
-            return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("yyyy-MM-dd HH:mm:ss");
+            var newDate = new DateTime(year, month, day, hour, min, sec);
+            if (minusFiveHour) { newDate.AddHours(-5); }
+            return dataReplace + " " + newDate.ToString("yyyy-MM-dd HH:mm:ss");
             //return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
 
         }
