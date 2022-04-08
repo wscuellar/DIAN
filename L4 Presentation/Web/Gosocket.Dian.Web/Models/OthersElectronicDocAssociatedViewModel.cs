@@ -51,7 +51,10 @@ namespace Gosocket.Dian.Web.Models
         public OtherDocElecNumberingRangeViewModel NumberingRange { get; set; }
         public GlobalTestSetOthersDocumentsResult GTestSetOthersDocumentsResult { get; set; }
 
+        public bool EsSupportDocument { get; set; }
+        public bool EsEquivalentDocument { get; set; }
         public bool EsElectronicDocNomina { get; set; }
+        public bool EsElectronicDocNominaNoOFE { get; set; }
         public string TitleDoc1 { get; set; }
         public string TitleDoc2 { get; set; }
 

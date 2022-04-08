@@ -33,19 +33,35 @@ namespace Gosocket.Dian.Functions.Utils
             }
         }
 
-        public byte[] PdfRender(string Html_Content, string trackId)
+        public byte[] PdfRender(string Html_Content, string trackId, PaperSize paperSize)
         {
+            if (paperSize is null)
+            {
+                paperSize = PaperSize.A4;
+            }
+
             byte[] pdf = null;
             lock (instance)
             {
                 // Convert
-                pdf = OpenHtmlToPdf.Pdf
+                var pdfGenerator = OpenHtmlToPdf.Pdf
                         .From(Html_Content)
                         .WithGlobalSetting("orientation", "Portrait")
                         .WithObjectSetting("web.defaultEncoding", "utf-8")
                         //.WithTitle($"{trackId}.pdf")
-                        .OfSize(PaperSize.A4)
-                        .Content();
+                        .OfSize(paperSize);
+
+
+                if (
+                    paperSize.Width == "5.5in" && 
+                    paperSize.Height == "8.5in")
+                {
+                    pdfGenerator = pdfGenerator.Landscape();
+                }
+
+                pdf = pdfGenerator.Content();
+
+
             }
             return pdf;
         }

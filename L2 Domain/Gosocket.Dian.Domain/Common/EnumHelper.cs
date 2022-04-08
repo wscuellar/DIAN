@@ -165,8 +165,6 @@ namespace Gosocket.Dian.Domain.Common
         ContingencyInvoice = 3,
         [Description("Factura electrónica de contingencia DIAN")]
         ContingencyDianInvoice = 4,
-        [Description("Documento Soporte")]
-        DocumentSupportInvoice = 5,
         [Description("Factura electrónica de AIU")]
         AIUInvoice = 9,
         [Description("Factura electrónica de Mandato")]
@@ -183,6 +181,77 @@ namespace Gosocket.Dian.Domain.Common
         DebitNote = 92,
         [Description("Application response")]
         ApplicationResponse = 96,
+
+        /*Documento Soporte*/
+        [Description("Documento Soporte")]
+        DocumentSupportInvoice = 5,
+        [Description("Nota de Ajuste del Documento Soporte")]
+        AdjustmentNoteDocumentSupport = 95,
+
+        /*Documentos Equivalentes*/
+        [Description("Documento equivalente POS")]
+        EquivalentDocumentPOS = 20,
+        [Description("Documento equivalente - Boleta ingreso a cine")]
+        EquivalentDocumentCine = 25,
+        [Description("Documento equivalente - Espectáculos públicos")]
+        EquivalentDocumentEspectaculosPublicos = 27,
+        [Description("Documento equivalente - Juegos localizados")]
+        EquivalentDocumentJuegosLocalizados = 32,
+        [Description("Documento equivalente - Transporte pasajeros terrestre")]
+        EquivalentDocumentTransporteTerrestre = 35,
+        [Description("Documento equivalente - Cobro de peajes")]
+        EquivalentDocumentCobroPeaje = 40,
+        [Description("Documento equivalente - Extractos")]
+        EquivalentDocumentExtracto = 45,
+        [Description("Documento equivalente - Transporte aéreo de pasajeros")]
+        EquivalentDocumentTransporteAereo = 50,
+        [Description("Documento equivalente - Bolsa de valores")]
+        EquivalentDocumentBolsaValores = 55,
+        [Description("Documento equivalente - Servicios públicos domiciliarios")]
+        EquivalentDocumentServiciosPublicos = 60,
+        [Description("Nota de ajuste del documento equivalente")]
+        AdjustmentNoteEquivalentDocument = 94,
+    }
+
+    public static class OtherDocumentsDocumentType
+    {
+        public static bool IsSupportDocument(string documentTypeId)
+        {
+            int documentType = Convert.ToInt32(documentTypeId);
+            return new int[] {(int)DocumentType.DocumentSupportInvoice, (int)DocumentType.AdjustmentNoteDocumentSupport, }
+                .Contains(documentType);
+        }
+        public static int[] GetAll()
+        {
+            return GetDocumentType().Concat(GetAdjustmentDocumentType()).ToArray();
+        }
+        public static int[] GetDocumentType()
+        {
+            return new int[] {
+                (int)DocumentType.IndividualPayroll,
+
+                (int)DocumentType.DocumentSupportInvoice,
+
+                (int)DocumentType.EquivalentDocumentPOS,
+                (int)DocumentType.EquivalentDocumentCine,
+                (int)DocumentType.EquivalentDocumentEspectaculosPublicos,
+                (int)DocumentType.EquivalentDocumentJuegosLocalizados,
+                (int)DocumentType.EquivalentDocumentTransporteTerrestre,
+                (int)DocumentType.EquivalentDocumentCobroPeaje,
+                (int)DocumentType.EquivalentDocumentExtracto,
+                (int)DocumentType.EquivalentDocumentTransporteAereo,
+                (int)DocumentType.EquivalentDocumentBolsaValores,
+                (int)DocumentType.EquivalentDocumentServiciosPublicos,
+            };
+        }
+        public static int[] GetAdjustmentDocumentType()
+        {
+            return new int[] {
+                (int)DocumentType.IndividualPayrollAdjustments,
+                (int)DocumentType.AdjustmentNoteDocumentSupport,
+                (int)DocumentType.AdjustmentNoteEquivalentDocument,
+            };
+        }
     }
 
     public enum DocumentStatus
@@ -611,10 +680,13 @@ namespace Gosocket.Dian.Domain.Common
         SupportDocument = 3,
 
         [Description("Documento equivalente electrónico")]
-        ElectronicEquivalent = 4,
+        ElectronicEquivalent = 14,
 
         [Description("POS electrónico")]
-        ElectronicPOS = 5
+        ElectronicPOS = 5,
+
+        [Description("Nómina electrónica No OFE")]
+        ElectronicPayrollNoOFE = 13
     }
 
     public enum OtherDocElecSoftwaresStatus

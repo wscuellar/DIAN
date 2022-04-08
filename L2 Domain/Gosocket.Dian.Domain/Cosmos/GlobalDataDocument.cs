@@ -72,6 +72,8 @@ namespace Gosocket.Dian.Domain.Cosmos
     }
     public class Event
     {
+        public string prefijo;
+
         public string DocumentKey { get; set; }
         public DateTime Date { get; set; }
         public int DateNumber { get; set; }
