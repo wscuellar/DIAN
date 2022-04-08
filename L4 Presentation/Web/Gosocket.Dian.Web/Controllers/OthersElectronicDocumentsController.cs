@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocumentsController : Controller
     {
+        private static readonly TableManager tableManagerNumberRangeManager = new TableManager("GlobalNumberRange");
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IContributorService _contributorService;
@@ -40,7 +41,7 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
-        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;    
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
@@ -70,12 +71,12 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
-            
+
             if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
             {
-                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name.Replace("No OFE", ""))).ToList();
             }
-            else 
+            else
             {
                 ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
             }
@@ -386,9 +387,9 @@ namespace Gosocket.Dian.Web.Controllers
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
-            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;                
+            bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-        ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
+            ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
             var tipo = model.OperationModeId;
             if (model.OperationModeId == 0)
             {
@@ -498,33 +499,11 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (electronicDocumentIsSupport)
                 {
-                    var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
-                    var rangoDePrueba = new NumberingRange
-                    {
-                        id = Guid.NewGuid(),
-                        OtherDocElecContributorOperation = contributorOperation.Id,
-                        Prefix = "SEDS",
-                        ResolutionNumber = "18760000001",
-                        NumberFrom = 984000000,
-                        NumberTo = 985000000,
-                        CurrentNumber = 984000000,
-                        CreationDate = DateTime.Now,
-                        ExpirationDate = new DateTime(DateTime.Now.Year, 12, 31),
-                        IdDocumentTypePayroll = "104",
-                        DocumentTypePayroll = "Documento Soporte",
-                        Current = "SEDS (984000000 - 985000000)",
-                        N102 = "SEDS (984000000 - 985000000)",
-                        N103 = "SEDS (984000000 - 985000000)",
-                        State = 3,
-                        AccountId = Guid.Parse(accountId),
-                        PartitionKey = accountId.ToString(),
-                    };
-                    var cosmosManager = new CosmosDbManagerNumberingRange();
-                    await cosmosManager.SaveNumberingRange(rangoDePrueba);
+                    await RegisterNumberingRangeForSupportDocument(contributorOperation, software);
                 }
                 if (model.ElectronicDocumentIsEquivalent)
                 {
-                    await RegisterNumberingRangeForEquivalentDocumentPos(contributorOperation.Id);
+                    await RegisterNumberingRangeForEquivalentDocumentPos(contributorOperation, software);
                 }
             }
 
@@ -553,31 +532,116 @@ namespace Gosocket.Dian.Web.Controllers
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
 
-        private async Task RegisterNumberingRangeForEquivalentDocumentPos(long contributorOperationId)
+        private async Task RegisterNumberingRangeForSupportDocument(OtherDocElecContributorOperations contributorOperation, OtherDocElecSoftware software)
         {
-            var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
-            var rangoDePrueba = new NumberingRange
+            var taskRegisterInCosmos = Task.Run(async () =>
             {
-                id = Guid.NewGuid(),
-                OtherDocElecContributorOperation = contributorOperationId,
-                Prefix = "EPOS",
-                ResolutionNumber = "18760000001",
-                NumberFrom = 1,
-                NumberTo = 1000,
-                CurrentNumber = 1,
-                CreationDate = new DateTime(DateTime.Now.Year, 01, 01),
-                ExpirationDate = new DateTime(2030, 01, 01),
-                IdDocumentTypePayroll = "105",
-                DocumentTypePayroll = "Documento Equivalente POS",
-                Current = "EPOS (1 - 1000)",
-                N102 = "EPOS (1 - 1000)",
-                N103 = "EPOS (1 - 1000)",
-                State = 3,
-                AccountId = Guid.Parse(accountId),
-                PartitionKey = accountId.ToString(),
-            };
-            var cosmosManager = new CosmosDbManagerNumberingRange();
-            await cosmosManager.SaveNumberingRange(rangoDePrueba);
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
+                var rangoDePrueba = new NumberingRange
+                {
+                    id = Guid.NewGuid(),
+                    OtherDocElecContributorOperation = contributorOperation.Id,
+                    Prefix = "SEDS",
+                    ResolutionNumber = "18760000001",
+                    NumberFrom = 984000000,
+                    NumberTo = 985000000,
+                    CurrentNumber = 984000000,
+                    CreationDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ExpirationDate = new DateTime(DateTime.Now.Year, 12, 31),
+                    IdDocumentTypePayroll = "104",
+                    DocumentTypePayroll = "Documento Soporte",
+                    Current = "SEDS (984000000 - 985000000)",
+                    N102 = "SEDS (984000000 - 985000000)",
+                    N103 = "SEDS (984000000 - 985000000)",
+                    State = 3,
+                    AccountId = Guid.Parse(accountId),
+                    PartitionKey = accountId.ToString(),
+                };
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                await cosmosManager.SaveNumberingRange(rangoDePrueba);
+            });
+
+            var taskRegisterInAzureTable = Task.Run(async () =>
+            {
+                var softwareProvider = _contributorService.Get(software.ProviderId);
+                var globalNumerRange = new GlobalNumberRange(
+                    User.ContributorCode(), $"SEDS|{((int)DocumentType.DocumentSupportInvoice).ToString().PadLeft(2,'0')}|18760000001")
+                {
+                    Serie = "SEDS",
+                    ResolutionNumber = "18760000001",
+                    AssociationDate = DateTime.Now,
+                    ResolutionDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ValidDateNumberFrom = int.Parse($"{new DateTime(DateTime.Now.Year, 01, 01):yyyyMMdd}"),
+                    ValidDateNumberTo = int.Parse($"{new DateTime(DateTime.Now.Year, 12, 31):yyyyMMdd}"),
+                    FromNumber = 984000000,
+                    ToNumber = 985000000,
+                    SoftwareId = software.SoftwareId.ToString(),
+                    SoftwareName = software.Name,
+                    SoftwareOwnerCode = softwareProvider.Code,
+                    SoftwareOwnerName = softwareProvider.Name,
+                    State = (int)NumberRangeState.Authorized,
+                };
+                await tableManagerNumberRangeManager.InsertOrUpdateAsync(globalNumerRange);
+            });
+
+            await taskRegisterInCosmos;
+            await taskRegisterInAzureTable;
+        }
+
+        private async Task RegisterNumberingRangeForEquivalentDocumentPos(OtherDocElecContributorOperations contributorOperation, OtherDocElecSoftware software)
+        {
+            var taskRegisterInCosmos = Task.Run(async () =>
+            {
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
+                var rangoDePrueba = new NumberingRange
+                {
+                    id = Guid.NewGuid(),
+                    OtherDocElecContributorOperation = contributorOperation.Id,
+                    Prefix = "EPOS",
+                    ResolutionNumber = "18760000001",
+                    NumberFrom = 1,
+                    NumberTo = 1000,
+                    CurrentNumber = 1,
+                    CreationDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ExpirationDate = new DateTime(2030, 01, 01),
+                    IdDocumentTypePayroll = "20",
+                    DocumentTypePayroll = "Documento Equivalente POS",
+                    Current = "EPOS (1 - 1000)",
+                    N102 = "EPOS (1 - 1000)",
+                    N103 = "EPOS (1 - 1000)",
+                    State = 3,
+                    AccountId = Guid.Parse(accountId),
+                    PartitionKey = accountId.ToString(),
+                };
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                await cosmosManager.SaveNumberingRange(rangoDePrueba);
+            });
+
+            var taskRegisterInAzureTable = Task.Run(async () =>
+            {
+                var softwareProvider = _contributorService.Get(software.ProviderId);
+                var globalNumerRange = new GlobalNumberRange(
+                    User.ContributorCode(), $"EPOS|{((int)DocumentType.EquivalentDocumentPOS).ToString().PadLeft(2, '0')}|18760000001")
+                {
+                    Serie = "EPOS",
+                    ResolutionNumber = "18760000001",
+                    AssociationDate = DateTime.Now,
+                    ResolutionDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ValidDateNumberFrom = int.Parse($"{new DateTime(DateTime.Now.Year, 01, 01):yyyyMMdd}"),
+                    ValidDateNumberTo = int.Parse($"{new DateTime(2030, 01, 01):yyyyMMdd}"),
+                    FromNumber = 1,
+                    ToNumber = 100,
+                    SoftwareId = software.SoftwareId.ToString(),
+                    SoftwareName = software.Name,
+                    SoftwareOwnerCode = softwareProvider.Code,
+                    SoftwareOwnerName = softwareProvider.Name,
+                    State = (int)NumberRangeState.Authorized,
+                };
+                await tableManagerNumberRangeManager.InsertOrUpdateAsync(globalNumerRange);
+            });
+
+            await taskRegisterInCosmos;
+            await taskRegisterInAzureTable;
         }
 
         public ActionResult AddParticipants(int electronicDocumentId, string message)
@@ -816,7 +880,7 @@ namespace Gosocket.Dian.Web.Controllers
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
             bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             List<SoftwareViewModel> softwareList;
-            
+
             if (electronicDocumentIsSupport)
             {
                 var provider = _contributorService.Get(id);
@@ -834,11 +898,11 @@ namespace Gosocket.Dian.Web.Controllers
                 softwareList = softwareList.Where(s => softwareIds.Contains(s.Id.ToString())).ToList();
             }
             else if (electronicDocumentIsElectronicPayrollNoOFE)
-            { 
+            {
                 softwareList = _othersDocsElecSoftwareService
                     .GetSoftwaresByProviderTechnologicalServices(
                         id,
-                        (int)ElectronicsDocuments.ElectronicPayroll, 
+                        (int)ElectronicsDocuments.ElectronicPayroll,
                         (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
                         OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
                         {
@@ -853,7 +917,7 @@ namespace Gosocket.Dian.Web.Controllers
                         electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
                         OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
                         {
-                                            Id = s.SoftwareId,
+                            Id = s.SoftwareId,
                             Name = s.Name
                         }).ToList();
             }
@@ -948,7 +1012,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var equivalentElectronicDocuments = _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocuments().ToDictionary(t => t.Id);
 
-            foreach(var test in testSetResult)
+            foreach (var test in testSetResult)
             {
                 var nameEquivalentElectronicDocument = "";
                 if (equivalentElectronicDocuments.ContainsKey(test.EquivalentElectronicDocumentId.Value))

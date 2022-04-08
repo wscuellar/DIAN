@@ -49,6 +49,7 @@ namespace Gosocket.Dian.Functions.Batch
             var testSetId = string.Empty;
             var start = DateTime.UtcNow;
             var zipKey = string.Empty;
+            string nitNominaProv = string.Empty;
             string nitNomina = string.Empty;
             string nitNominaEmp = string.Empty;
             string softwareIdNomina = string.Empty;
@@ -110,7 +111,7 @@ namespace Gosocket.Dian.Functions.Batch
 
                 //Obtener xpath tipo documento
                 var xpathRequest = requestObjects.FirstOrDefault();
-                var xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                var xpathResponse = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
 
                 Boolean flagApplicationResponse = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["AppResDocumentTypeXpath"]);
                 Boolean flagInvoice = !string.IsNullOrWhiteSpace(xpathResponse.XpathsValues["DocumentKeyXpath"]);
@@ -149,17 +150,17 @@ namespace Gosocket.Dian.Functions.Batch
                 {
                     xmlParser = new XmlParseNomina();                   
                     xmlParser = new XmlParseNomina(xmlBytes);
-                    nitNomina = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
+                    nitNominaProv = Convert.ToString(xmlParser.globalDocPayrolls.NIT);
                     nitNominaEmp = Convert.ToString(xmlParser.globalDocPayrolls.Emp_NIT);
                     softwareIdNomina = xmlParser.globalDocPayrolls.SoftwareID;
 
-                    nitNomina = nitNomina != nitNominaEmp ? nitNominaEmp : nitNomina;
+                    nitNomina = nitNominaProv != nitNominaEmp ? nitNominaEmp : nitNominaProv;
 
                     start = DateTime.UtcNow;
                     var flagNomina = new GlobalLogger(zipKey, "3 flagNomina")
                     {
                         Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
-                        Action = "Step prueba nomina Trajo datos testSetId " + testSetId + " nitNomina " + nitNomina
+                        Action = "Step prueba nomina Trajo datos testSetId " + testSetId + " nitNomina " + nitNomina + " nitNominaProv " + nitNominaProv + " nitNominaEmp " + nitNominaEmp
                     };
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(flagNomina);
                 }
@@ -168,7 +169,7 @@ namespace Gosocket.Dian.Functions.Batch
                 if (setResultOther == null && string.IsNullOrEmpty(testSetId))
                 {
                     xpathRequest = requestObjects.FirstOrDefault();
-                    xpathResponse = ApiHelpers.ExecuteRequest<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
+                    xpathResponse = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(ConfigurationManager.GetValue("GetXpathDataValuesUrl"), xpathRequest);
                     var nitBigContributor = xpathResponse.XpathsValues[flagApplicationResponse ? "AppResSenderCodeXpath" : "SenderCodeXpath"];                  
 
                     var bigContributorRequestAuthorization = tableManagerGlobalBigContributorRequestAuthorization.Find<GlobalBigContributorRequestAuthorization>(nitBigContributor, nitBigContributor);
@@ -264,7 +265,7 @@ namespace Gosocket.Dian.Functions.Batch
                 }
 
                 // Check permissions
-                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse, flagInvoice);
+                var result = CheckPermissions(multipleResponsesXpathDataValue, obj.AuthCode, zipKey, testSetId, nitNomina, softwareIdNomina, flagApplicationResponse, flagInvoice, nitNominaProv);
 
                 start = DateTime.UtcNow;
                 var checkPermissions = new GlobalLogger(zipKey, "8 checkPermissions")
@@ -689,7 +690,7 @@ namespace Gosocket.Dian.Functions.Batch
             return null;
         }
 
-        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false, Boolean flagInvoice = false)
+        private static List<XmlParamsResponseTrackId> CheckPermissions(List<ResponseXpathDataValue> responseXpathDataValue, string authCode, string zipKey, string testSetId = null, string nitNomina = null, string softwareIdNomina = null, Boolean flagApplicationResponse = false, Boolean flagInvoice = false, string nitNominaProv = null)
         {
             var start = DateTime.UtcNow;
             var checkPermissions = new GlobalLogger(zipKey, "7 checkPermissions")
@@ -717,6 +718,20 @@ namespace Gosocket.Dian.Functions.Batch
             var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
             var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
             var responseCustomizationID = responseXpathDataValue.Select(x => x.XpathsValues["AppResCustomizationIDXpath"]).Distinct();
+            string documentType = responseXpathDataValue.Select(t => t.XpathsValues["DocumentTypeXpath"]).FirstOrDefault();
+            
+            /*Si es un documento soporte o una una nota de ajuste del mismo, 
+             * el emisor del documento está en el customerParty*/
+            if(OtherDocumentsDocumentType.IsSupportDocument(documentType))
+            {
+                codes = responseXpathDataValue.Select(x => x.XpathsValues["ReceiverCodeXpath"]).Distinct();
+            }
+            var log = new GlobalLogger(zipKey, "7.0.1 Validate Data for update set test")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = $@"documentType: {documentType} | senderCode: {string.Join(", ", codes)} | setTestId: {testSetId} | softwareId: {string.Join(", ",softwareIds)}"
+            };
+            TableManagerGlobalLogger.InsertOrUpdateAsync(log);
 
             //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
@@ -778,10 +793,14 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-                        }                                              
+                        }
 
                         //Consulta exista testSetID registros Otros Documentos           
-                        List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
+                        nitNomina = !string.IsNullOrWhiteSpace(nitNomina) ? nitNomina : code;
+                        nitNominaProv = !string.IsNullOrWhiteSpace(nitNominaProv) ? nitNominaProv : code;
+                        softwareIdNomina = !string.IsNullOrWhiteSpace(softwareIdNomina) ? softwareIdNomina : softwareId;
+
+                        List <GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
 
                         if (objGlobalTestSetResult != null)
@@ -846,9 +865,12 @@ namespace Gosocket.Dian.Functions.Batch
                             var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
 
                             //Valida software asociado al NIT en GlobalOtherDocElecOperation
-                            bool existOperation = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
-                            if (!existOperation)
+                            bool existOperationProv = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNominaProv, softwareIdNomina);
+
+                            bool existOperationEmp = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
+                            if (!existOperationProv || !existOperationEmp)
                             {
+                                nitNomina = !existOperationProv ? nitNominaProv : nitNomina;
                                 result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = nitNomina, ProcessedMessage = $"El NIT {nitNomina} no cuenta con el software con id {softwareIdNomina} asociado al proceso de habilitación Otros documentos" });
                             }
 

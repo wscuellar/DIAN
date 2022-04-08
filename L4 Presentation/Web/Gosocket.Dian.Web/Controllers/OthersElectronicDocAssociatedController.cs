@@ -22,6 +22,7 @@ using Gosocket.Dian.Application;
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -33,6 +34,7 @@ namespace Gosocket.Dian.Web.Controllers
     {
         private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
         private UserService userService = new UserService();
+        private NotificationsController notification = new NotificationsController();
         private ApplicationUserManager _userManager; 
         private IContributorService object1;
         private IOthersDocsElecContributorService object2;
@@ -884,7 +886,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
+        public async Task<JsonResult> SyncToProduction(int code, int contributorId, string softwareId, string softwareIdBase, int? equivalentDocumentId)
         {
             try
             {
@@ -928,9 +930,6 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-
-
-
                 var data = new OtherDocumentActivationRequest();
                 data.Code = code.ToString();
                 data.ContributorId = contributorId;
@@ -943,10 +942,14 @@ namespace Gosocket.Dian.Web.Controllers
                 data.SoftwareUser = software.SoftwareUser;                
                 data.Url = software.Url;                                
                 data.Enabled = true;
+                data.TestSetId = testSetResult.Id;
+                data.ContributorOpertaionModeId = globalRadianOperations.OperationModeId;
+                data.OtherDocElecContributorId = testSetResult.OtherDocElecContributorId;
                 data.EquivalentDocumentId = equivalentDocumentId;
+                data.ElectronicDocumentId = testSetResult.ElectronicDocumentId;
 
                 var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
-                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(function, data);
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
 
                 if (!response.Success) {
                     telemetry.TrackTrace($"Fallo en la sincronización del Code {code}:  Mensaje: {response.Message} ", SeverityLevel.Error);
@@ -957,7 +960,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
                 telemetry.TrackTrace($"Se sincronizó el Code {code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
-               
+                await notification.EventNotificationsAsync("01", code.ToString());
                 return Json(new
                 {
                     success = true,
@@ -1178,6 +1181,7 @@ namespace Gosocket.Dian.Web.Controllers
         {
             var operation = this._othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
             var isUpdate = _othersDocsElecContributorService.HabilitarParaSincronizarAProduccion(operation.OtherDocElecContributorId, Estado);
+            //await notification.EventNotificationsAsync("01", contributor.Code);
             return isUpdate;
         }
 
@@ -1256,7 +1260,16 @@ namespace Gosocket.Dian.Web.Controllers
         [JsonProperty(PropertyName = "enabled")]
         public bool Enabled { get; set; }
 
+        [JsonProperty(PropertyName = "contributorOpertaionModeId")]
+        public int ContributorOpertaionModeId { get; set; }
+
+        [JsonProperty(PropertyName = "otherDocElecContributorId")]
+        public int OtherDocElecContributorId { get; set; }
+
         public int? EquivalentDocumentId { get; set; }
+
+        [JsonProperty(PropertyName = "electronicDocumentId")]
+        public int ElectronicDocumentId { get; set; }
 
     }
 }
