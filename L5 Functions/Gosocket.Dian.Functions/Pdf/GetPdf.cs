@@ -177,7 +177,7 @@ namespace Gosocket.Dian.Functions.Pdf
             int min = Convert.ToInt32(hours[1]);
             int sec = Convert.ToInt32(hours[2]);
             var newDate = new DateTime(year, month, day, hour, min, sec);
-            if (minusFiveHour) { newDate.AddHours(-5); }
+            if (minusFiveHour) { newDate = newDate.AddHours(-5); }
             return dataReplace + " " + newDate.ToString("yyyy-MM-dd HH:mm:ss");
             //return dataReplace + " " + (new DateTime(year, month, day, hour, min, sec).AddHours(-5)).ToString("dd/MM/yyyy HH:mm:ss");
 
