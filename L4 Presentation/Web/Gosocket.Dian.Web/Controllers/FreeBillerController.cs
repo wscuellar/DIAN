@@ -293,7 +293,7 @@ namespace Gosocket.Dian.Web.Controllers
             model.Profiles = this.GetProfiles();
 
             model.IsActive = true;
-
+            ViewBag.ContributorId = User.ContributorId();
             if (model.IsActive)
             {
                 ViewBag.activo = true;
