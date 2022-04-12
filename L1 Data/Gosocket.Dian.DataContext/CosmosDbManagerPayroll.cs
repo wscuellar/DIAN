@@ -17,7 +17,7 @@ namespace Gosocket.Dian.DataContext
         private static readonly string endpointUrl = ConfigurationManager.GetValue("CosmosDbEndpointUrl");
         private static readonly string authorizationKey = ConfigurationManager.GetValue("CosmosDbAuthorizationKey");
         private static readonly string databaseId = "PayrollElectronic";
-       
+
         private static readonly ConnectionPolicy connectionPolicy = new ConnectionPolicy { UserAgentSuffix = " samples-net/3" };
 
 
@@ -389,7 +389,7 @@ namespace Gosocket.Dian.DataContext
             {
 
                 FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
-                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range+ "  AND c.NumberTo >=" + range  + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '"+ account+"'";
+                string sql = "SELECT * FROM c where  c.Prefix='" + prefijo + "'  and  c.NumberFrom  <=" + range + "  AND c.NumberTo >=" + range + "  AND c.IdDocumentTypePayroll  ='" + tipo + "'  and c.State = 1 and c.PartitionKey= '" + account + "'";
                 var DepartamentData = new List<NumberingRangeCos>();
                 IDocumentQuery<NumberingRangeCos> QueryData = client.CreateDocumentQuery<NumberingRangeCos>(
                               UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange"), sql).AsDocumentQuery();
@@ -429,7 +429,111 @@ namespace Gosocket.Dian.DataContext
 
             return null;
         }
+        public async Task<List<List>> getRegimen()
+        {
+            try
+            {
+                var sql = "Select * from List c where  c.IdList=11   and c.PartitionKey=11";
+                var result = new List<List>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
 
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.ToList();
+
+                }
+                return result.ToList();
+
+            }
+            catch (Exception e)
+            {
+                return new List<List>();
+            }
+        }
+        public async Task<List> getUnidad(string id)
+        {
+            try
+            {
+                var sql = "Select * from List c where  c.IdList=14   and c.PartitionKey=14 and  c.IdSubList='" + id + "'  ";
+                var result = new List<List>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
+
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.ToList();
+
+                }
+                return result.FirstOrDefault();
+
+            }
+            catch (Exception e)
+            {
+                return new List();
+            }
+        }
+        public async Task<List<List>> getFormapago()
+        {
+            try
+            {
+                var sql = "Select * from List c where  c.IdList=22   and c.PartitionKey=22";
+                var result = new List<List>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
+
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.ToList();
+
+                }
+                return result.ToList();
+
+            }
+            catch (Exception e)
+            {
+                return new List<List>();
+            }
+        }
+
+        public async Task<List<List>> getTipoOperacion()
+        {
+            try
+            {
+                var sql = "Select * from List c where  c.IdList=24  and c.PartitionKey=24";
+                var result = new List<List>();
+                IDocumentQuery<List> query = client.CreateDocumentQuery<List>(
+                  UriFactory.CreateDocumentCollectionUri("Lists", "List"),
+                  sql)
+                  .AsDocumentQuery();
+
+                while (query.HasMoreResults)
+                {
+                    var r = await query.ExecuteNextAsync<List>();
+                    //						ret.Add(new List< AccountType> { IdAccountType = r.FirstOrDefault().IdSubList, CompositeName = r.FirstOrDefault().CompositeName,NameAccountType=r.FirstOrDefault().ListName });
+                    result = r.ToList();
+
+                }
+                return result.ToList();
+
+            }
+            catch (Exception e)
+            {
+                return new List<List>();
+            }
+        }
     }
     public partial class NumberingRangeCos
     {

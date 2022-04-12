@@ -33,6 +33,7 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IOthersDocsElecContributorRepository, OthersDocsElecContributorRepository>(); 
             container.RegisterType<IOthersDocsElecContributorOperationRepository, OthersDocsElecContributorOperationRepository>();
             container.RegisterType<IOthersDocsElecSoftwareRepository, OthersDocsElecSoftwareRepository>();
+            container.RegisterType<IEquivalentElectronicDocumentRepository, EquivalentElectronicDocumentRepository>();
 
 
             #endregion

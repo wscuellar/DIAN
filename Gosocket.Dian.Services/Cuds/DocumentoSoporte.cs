@@ -75,7 +75,7 @@
 
         }
 
-
+        public bool IsAdjustmentNote() => DocumentType == "95";
     }
 
 }

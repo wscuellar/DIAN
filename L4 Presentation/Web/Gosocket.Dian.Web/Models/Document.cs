@@ -31,6 +31,7 @@ namespace Gosocket.Dian.Web.Models
         public List<DocumentRadianStatusViewModel> RadianStatusList { get; set; }
 
 
+        public int ContributorTypeId { get; set; }
         public int Status { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -128,11 +129,24 @@ namespace Gosocket.Dian.Web.Models
                 new DocumentTypeModel() { Code = "08", Name = "Nota de débito electrónica" },
                 new DocumentTypeModel() { Code = "09", Name = "Factura AIU" },
                 new DocumentTypeModel() { Code = "11", Name = "Factura Mandato" },
-                new DocumentTypeModel() { Code = "12", Name = "Documento equivalente POS electrónico" },
+                new DocumentTypeModel() { Code = "20", Name = "Documento equivalente POS electrónico" },
+                new DocumentTypeModel() { Code = "50", Name = "Documento equivalente Transporte Aereo" },
+                new DocumentTypeModel() { Code = "32", Name = "Documento equivalente De Juegos localizado" },
+                new DocumentTypeModel() { Code = "35", Name = "Documento equivalente Transporte Pasajeros Terrestre" },
+                new DocumentTypeModel() { Code = "40", Name = "Documento equivalente Cobro Peaje" },
+                new DocumentTypeModel() { Code = "27", Name = "Documento equivalente Espectaculos publicos" },
+                new DocumentTypeModel() { Code = "60", Name = "Documento equivalente Servicios Publicos y Domiciliarios" },
+                new DocumentTypeModel() { Code = "55", Name = "Documento equivalente Bolsa de valor y agropecuario" },
+                new DocumentTypeModel() { Code = "45", Name = "Documento equivalente Extractos" },
+                new DocumentTypeModel() { Code = "94", Name = "Documento equivalente Nota de ajuste" },
+                new DocumentTypeModel() { Code = "030", Name = "Acuse de recibo de la FEV" },
+                new DocumentTypeModel() { Code = "031", Name = "Reclamo de la FEV" },
+                new DocumentTypeModel() { Code = "032", Name = "Recibo del bien o prestación del servicio" },
+                new DocumentTypeModel() { Code = "033", Name = "Aceptacion expresa" },
+                new DocumentTypeModel() { Code = "034", Name = "Aceptacion tácita" },
                 new DocumentTypeModel() { Code = "101", Name = "Documento importación" }
                // new DocumentTypeModel() { Code = "102", Name = "Nomina Individual" },
                 //new DocumentTypeModel() { Code = "103", Name = "Nomina Individual de ajuste" },
-                
             };
         }
     }
@@ -149,6 +163,8 @@ namespace Gosocket.Dian.Web.Models
         public string SenderName { get; set; }
         public string ReceiverCode { get; set; }
         public string ReceiverName { get; set; }
+        public string CustomizationID { get; set; }
+        public string prefijo { get; set; }
     }
 
     public class ReferenceViewModel

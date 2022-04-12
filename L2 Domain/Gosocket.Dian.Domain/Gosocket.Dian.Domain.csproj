@@ -228,6 +228,7 @@
     <Compile Include="Entity\RadianCustomerList.cs" />
     <Compile Include="Entity\RadianLogger.cs" />
     <Compile Include="Entity\RadianUserData.cs" />
+    <Compile Include="Sql\EquivalentElectronicDocument.cs" />
     <Compile Include="Sql\MenuRole.cs" />
     <Compile Include="Sql\OtherDocElecContributor.cs" />
     <Compile Include="Sql\OtherDocElecContributorOperations.cs" />

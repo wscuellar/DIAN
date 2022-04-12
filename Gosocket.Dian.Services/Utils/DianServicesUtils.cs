@@ -28,6 +28,7 @@ namespace Gosocket.Dian.Services.Utils
         private static readonly TableManager tableManagerGlobalTestSet = new TableManager("GlobalTestSet");
         private static readonly TableManager tableManagerGlobalTestSetResult = new TableManager("GlobalTestSetResult");
         private static int _ublVersion = 20;
+        private static readonly string[] _equivalentDocumentTypes = new string[] {"20", "25", "27", "32", "35", "40", "45", "50", "55", "60"};
 
         public static object ApiHelepers { get; private set; }
 
@@ -607,6 +608,11 @@ namespace Gosocket.Dian.Services.Utils
                         codeMessage = "FA";
                         break;
                     }
+                case "05":
+                    {
+                        codeMessage = "DSA";
+                        break;
+                    }
                 case "7":
                 case "91":
                     {
@@ -617,6 +623,30 @@ namespace Gosocket.Dian.Services.Utils
                 case "92":
                     {
                         codeMessage = "DA";
+                        break;
+                    }
+                case "20":
+                case "25":
+                case "27":
+                case "32":
+                case "35":
+                case "40":
+                case "45":
+                case "50":
+                case "55":
+                case "60":
+                    {
+                        codeMessage = "DEA";
+                        break;
+                    }
+                case "94":
+                    {
+                        codeMessage = "NAA";
+                        break;
+                    }
+                case "95":
+                    {
+                        codeMessage = "NSA";
                         break;
                     }
                 default:
@@ -638,7 +668,8 @@ namespace Gosocket.Dian.Services.Utils
 
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["NumberXpath"]))
             {
-                stringBuilder.AppendLine($"{codeMessage}D05: El ID del Documento no puede estar vacío.");
+                string codeEnd = _equivalentDocumentTypes.Contains(docTypeCode) ? "b" : "";
+                stringBuilder.AppendLine($"{codeMessage}D05{codeEnd}: El ID del Documento no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -966,7 +997,7 @@ namespace Gosocket.Dian.Services.Utils
             {
                 if (string.IsNullOrEmpty(documentKey))
                 {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDE no está calculado correctamente.");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDS no está calculado correctamente.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -974,7 +1005,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05d" + txtRechazo + "Número de documento soporte no está contenido en el rango de numeración autorizado.");                                      
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05d" + txtRechazo + "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado.");                                      
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
@@ -982,7 +1013,7 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(documentParsed.SerieAndNumber))
                 {                   
-                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05e" + txtRechazo + "Número de documento soporte no existe para el número de autorización.");
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D05e" + txtRechazo + "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no existe para el número de autorización.");
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
