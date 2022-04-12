@@ -9,5 +9,6 @@ namespace Gosocket.Dian.Interfaces.Services
         GlobalTestSetOthersDocumentsResult GetTestSetResult(string partitionKey, string rowKey);
         bool InsertTestSetResult(GlobalTestSetOthersDocumentsResult testSet);
         List<GlobalTestSetOthersDocumentsResult> GetTestSetResultByNit(string nit);
+        List<GlobalTestSetOthersDocumentsResult> GetTestSetResultAcepted(string nit, int electronicDocumentId, int otherDocElecContributorId, string softwareId);
     }
 }
