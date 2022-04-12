@@ -5,6 +5,7 @@ using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Gosocket.Dian.Application
 {
@@ -49,6 +50,12 @@ namespace Gosocket.Dian.Application
         public GlobalOtherDocElecOperation GetOperation(string code, Guid softwareId)
         {
             return globalOtherDocElecOperation.Find<GlobalOtherDocElecOperation>(code, softwareId.ToString());
+        }
+
+        public GlobalOtherDocElecOperation GetOperationByElectronicDocumentId(string code, Guid softwareId, int electronicDocumentId)
+        {
+            return globalOtherDocElecOperation.FindBy<GlobalOtherDocElecOperation>(code, softwareId.ToString())
+                .FirstOrDefault(t => t.ElectronicDocumentId == electronicDocumentId);
         }
 
         public bool IsActive(string code, Guid softwareId)

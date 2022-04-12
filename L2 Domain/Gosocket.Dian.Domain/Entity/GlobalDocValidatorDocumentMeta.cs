@@ -69,4 +69,15 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     public string FechaPagoNominaFin { get; set; }
     public string CuneNovedad { get; set; }
 
+    /// <summary>
+    /// Contiene el tipo de formato con el que se 
+    /// generará la representación gráfica de la factura
+    /// <para>Formato tipo carta | Formato tipo media carta | Formato tipo parametrizable</para>
+    /// </summary>
+    public string PrintFormatType { get; set; }
+    /// <summary>
+    /// Contiene las secciones que deben ser ocultadas al momento de generar
+    /// la factura electrónica (Cuando el usuario selecciona el formato tipo parametrizable)
+    /// </summary>
+    public string SectionsToHide { get; set; }
 }
