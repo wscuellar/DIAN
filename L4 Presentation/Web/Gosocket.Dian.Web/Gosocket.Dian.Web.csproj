@@ -477,6 +477,7 @@
     <Content Include="Content\css\gosocket\gosocket.css" />
     <Content Include="Content\css\gosocket\typeahead.css" />
     <Content Include="Content\css\loaders.css" />
+    <Content Include="Content\css\login-new-styles.css" />
     <Content Include="Content\css\login.css" />
     <Content Include="Content\css\nifty.css" />
     <Content Include="Content\css\nifty.min.css" />
@@ -678,6 +679,12 @@
     <Content Include="Content\img\Gosocket-logo.png" />
     <Content Include="Content\img\Gov.co.png" />
     <Content Include="Content\img\loader.gif" />
+    <Content Include="Content\img\login-icons\Administrator.svg" />
+    <Content Include="Content\img\login-icons\Company.svg" />
+    <Content Include="Content\img\login-icons\Certificate.svg" />
+    <Content Include="Content\img\login-icons\NotObligued.svg" />
+    <Content Include="Content\img\login-icons\Person.svg" />
+    <Content Include="Content\img\login-icons\SearchDocument.svg" />
     <Content Include="Content\img\logo.png" />
     <Content Include="Content\img\LogoDian.png" />
     <Content Include="Content\img\LogoDian_Old.png" />
