@@ -47,8 +47,8 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        public List<OtherDocElecPayroll> Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(int take, DateTime? monthStart, 
-            DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, 
+        public List<OtherDocElecPayroll> Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(int take, DateTime? monthStart,
+            DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart,
             double? employeeSalaryEnd, string employeeCity)
         {
             string sqlQuery = string.Empty;
@@ -68,7 +68,7 @@ namespace Gosocket.Dian.Application
             string sqlQueryConditions = string.Empty;
             string sqlQueryOrderBy = "ORDER BY CreateDate DESC";
 
-            if (enumerationStart.HasValue)
+            if (enumerationStart.HasValue && enumerationStart.Value > 0)
             {
                 sqlQueryConditions += $" Convert(bigint,Consecutive) BETWEEN {enumerationStart.Value} AND {enumerationEnd.Value} AND ";
             }
