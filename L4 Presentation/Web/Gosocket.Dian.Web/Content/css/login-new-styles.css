@@ -47,3 +47,33 @@
 .login-wrapper p {
     font-family: 'Ubuntu';
 }
+
+button.menu-button {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    /*box-shadow: 0px 3px 6px rgb(0 0 0 / 16%);*/
+    width: 205px;
+    height: 205px;
+    padding: 30px;
+    font-family: 'Ubuntu';
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 26px;
+    text-align: center;
+    color: #2B323D;
+}
+
+    button.menu-button img {
+        display: block;
+        margin: auto;
+    }
+
+    button.menu-button:hover {
+        background: linear-gradient(90deg, #41D78C, #00B4DC);
+        color: #fff;
+    }
+
+    button.menu-button:hover img {
+        filter: invert(1) brightness(10);
+    }

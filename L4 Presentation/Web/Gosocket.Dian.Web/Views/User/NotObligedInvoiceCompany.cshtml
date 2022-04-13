@@ -71,29 +71,23 @@
             </a>
         </div>
     </div>
-    <div class="bhoechie-tab cardsLogin" style="display: none">
 
+    <div class="bhoechie-tab cardsLogin" style="display: none">
         <div class="container-fluid" id="panel-form-login">
-            <center><a href="@Url.Action("NotObligedInvoice", "User")"><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a></center>
+            <span class="sub-title">Iniciar sesión</span>
+            <p class="mt-28">Selecciona una opción para continuar:</p>
+
             <div class="row-fluid">
-                <div class="card RadianCardContainer RadianCardContainerLogin" id="legalRepresentative">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/RepresentanteLegal.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Representante legal</p>
-                    </div>
-                </div>
+                <button class="menu-button" id="legalRepresentative">
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/RepresentanteLegal.svg" />
+                    Representante legal
+                </button>
             </div>
             <div class="row-fluid">
-                <div class="card RadianCardContainer RadianCardContainerLogin" id="authorizedUser">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/UsuarioAutorizado.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Usuario Autorizado</p>
-                    </div>
-                </div>
+                <button class="menu-button" id="authorizedUser">
+                    <img class="RadianimgSvg" src="~/Content/images/Svg/UsuarioAutorizado.svg" />
+                    Usuario Autorizado
+                </button>
             </div>
         </div>
 

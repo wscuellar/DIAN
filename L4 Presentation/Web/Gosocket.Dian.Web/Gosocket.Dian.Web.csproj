@@ -686,8 +686,10 @@
     <Content Include="Content\img\Gov.co.png" />
     <Content Include="Content\img\loader.gif" />
     <Content Include="Content\img\login-icons\Administrator.svg" />
+    <Content Include="Content\img\login-icons\AuthorizedUser.svg" />
     <Content Include="Content\img\login-icons\Company.svg" />
     <Content Include="Content\img\login-icons\Certificate.svg" />
+    <Content Include="Content\img\login-icons\LegalRepresentative.svg" />
     <Content Include="Content\img\login-icons\NotObligued.svg" />
     <Content Include="Content\img\login-icons\Person.svg" />
     <Content Include="Content\img\login-icons\SearchDocument.svg" />
