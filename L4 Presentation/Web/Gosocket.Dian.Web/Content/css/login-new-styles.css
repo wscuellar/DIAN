@@ -66,7 +66,7 @@ button.menu-button {
 
     button.menu-button img {
         display: block;
-        margin: auto;
+        margin: 0 auto 12px;
     }
 
     button.menu-button:hover {
@@ -77,3 +77,9 @@ button.menu-button {
     button.menu-button:hover img {
         filter: invert(1) brightness(10);
     }
+
+#menu-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
