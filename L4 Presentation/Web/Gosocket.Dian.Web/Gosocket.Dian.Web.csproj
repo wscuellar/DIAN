@@ -462,6 +462,7 @@
     <Content Include="Content\crush-page\img\city-img.png" />
     <Content Include="Content\crush-page\img\crush-bg.png" />
     <Content Include="Content\crush-page\img\gosign-img.png" />
+    <Content Include="Content\css\app-new-style.css" />
     <Content Include="Content\css\bootstrap-grid.css" />
     <Content Include="Content\css\bootstrap-grid.min.css" />
     <Content Include="Content\css\bootstrap-reboot.css" />
@@ -569,6 +570,11 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\fonts\glyphicons.css" />
     <Content Include="Content\fonts\glyphicons.min.css" />
+    <Content Include="Content\font\custom\fa-arrow-left.svg" />
+    <Content Include="Content\font\custom\fa-edit.svg" />
+    <Content Include="Content\font\custom\fa-eye.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-warn.svg" />
+    <Content Include="Content\font\custom\fa-info-circle.svg" />
     <Content Include="Content\images\aproved.png" />
     <Content Include="Content\images\bandera-1.png" />
     <Content Include="Content\images\Bandera-2.png" />
