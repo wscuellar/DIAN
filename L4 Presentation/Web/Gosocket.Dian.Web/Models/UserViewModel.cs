@@ -73,7 +73,7 @@ namespace Gosocket.Dian.Web.Models
         public string HashCode { get; set; }
 
         [DataType(DataType.Text)]
-        [Display(Name = "Ingrese CUFE o UUID")]
+        [Display(Name = "CUFE o UUID")]
         [Required(ErrorMessage = "CUFE o UUID es requerido.")]
         public string DocumentKey { get; set; }
 

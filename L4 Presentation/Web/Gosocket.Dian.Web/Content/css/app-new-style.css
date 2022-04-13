@@ -1,6 +1,6 @@
-﻿body {
+﻿/*body {
     background: #F6F8F9 !important;
-}
+}*/
 
 /***************Inputs************************/
 .form-group .label-form-group,
@@ -50,6 +50,7 @@ button.btn.dropdown-toggle.btn-default {
     color: #F54E41 !important;
 }
 
+.field-validation-error,
 .input-helper-text-wrong {
     color: #F54E41 !important;
 }

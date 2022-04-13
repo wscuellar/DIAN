@@ -29,18 +29,21 @@
 }
 
 .bhoechie-tab-menu {
-    display: inline-table;
+    /****/
 }
 .bhoechie-tab {
-    display: inline-table;
-    width: calc(588px - 4px);
+    width: 588px;
 }
 .bhoechie-tab-content {
-    padding-top: 0 !important;
+    padding: 24px !important;
     background: #f6f7f9 !important;
 }
 .login-wrapper {
     width: 743px;
-    margin: 0 auto;
+    margin: 40px auto 0;
     background: #f6f7f9 !important;
+    display: flex;
+}
+.login-wrapper p {
+    font-family: 'Ubuntu';
 }
