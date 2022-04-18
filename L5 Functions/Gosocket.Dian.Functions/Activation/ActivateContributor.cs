@@ -57,7 +57,7 @@ namespace Gosocket.Dian.Functions.Activation
                             SentToActivateBy = "Function",
                             SoftwareId = requestObject.Software?.Id.ToString(),
                             SendDate = DateTime.UtcNow,
-                            Message = "Contribuyente se activó en producción con éxito.",
+                            Message = "Contribuyente se activï¿½ en producciï¿½n con ï¿½xito.",
                             Request = myQueueItem
                         };
                     }
@@ -144,11 +144,11 @@ namespace Gosocket.Dian.Functions.Activation
                         contributorActivation = new GlobalContributorActivation(requestObject.ContributorId.ToString(), Guid.NewGuid().ToString());
 
                     contributorActivation.Success = false;
-                    contributorActivation.Message = "Error al activar contribuyente en producción.";
+                    contributorActivation.Message = "Error al activar contribuyente en producciï¿½n.";
                     contributorActivation.Detail = ex.Message;
                     contributorActivation.Trace = ex.StackTrace;
                     contributorActivationTableManager.InsertOrUpdate(contributorActivation);
-                    log.Error($"Error al activar contribuyente con id '{contributor?.Id}' en producción _________ queueItem: '{myQueueItem}'_____________{ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    log.Error($"Error al activar contribuyente con id '{contributor?.Id}' en producciï¿½n _________ queueItem: '{myQueueItem}'_____________{ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
                     throw;
                 }
             }

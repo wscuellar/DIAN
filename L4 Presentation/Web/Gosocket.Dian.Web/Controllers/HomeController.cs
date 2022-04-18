@@ -171,6 +171,15 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = contributor.AcceptanceStatusId;
                 model.ContributorHabilitationDate = contributor.HabilitationDate ?? DateTime.UtcNow;
                 model.ContributorProductionDate = contributor.ProductionDate;
+
+                if (contributor.ContributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+                {
+                    Session["Login_ContributorType"] = "- No OFE";
+                }
+                else
+                {
+                    Session["Login_ContributorType"] = "";
+                }
             }
 
             return View(model);

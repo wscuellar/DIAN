@@ -80,7 +80,7 @@ namespace Gosocket.Dian.Functions.Payroll
 				var PaymentMethod = await cosmos.getPaymentMethod();
 				var NumberingRange = await cosmos.GetNumberingRangeByTypeDocument(objNomina.Prefijo, objNomina.Consecutivo, objNomina.TipoXML, account);
 
-				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString(), account);
+				var rango = await cosmos.ConsumeNumberingRange(NumberingRange.FirstOrDefault().id.ToString(),account);
 
 
 				//var numeric = await cosmos
@@ -219,7 +219,7 @@ namespace Gosocket.Dian.Functions.Payroll
 						LastName = objNomina.Emp_PrimerApellido,
 						SecondLastName = objNomina.Emp_SegundoApellido,
 						FirstName = objNomina.Emp_PrimerNombre,
-						//Pendiente SecondName - SegundoNombre
+						SecondName = objNomina.Emp_OtrosNombres,
 						NameCompositeEmployer = objNomina.Emp_OtrosNombres,
 						AddressEmployer = objNomina.Emp_Direccion,
 						IdCountryEmployer = objNomina.Emp_Pais,

@@ -325,4 +325,7 @@
   <data name="ElectronicBillerNoEnabled" xml:space="preserve">
     <value>Para poder continuar, realiza el proceso de habilitación como Facturador Electrónico.</value>
   </data>
+  <data name="EquivalentDocumentWithoutTestSet" xml:space="preserve">
+    <value>El documento equivalente "{equivalentDocument}" NO tiene set de pruebas configurado para el modo de operación {operationMode}. Comuníquese con el administrador del sistema.</value>
+  </data>
 </root>

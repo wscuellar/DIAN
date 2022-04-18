@@ -555,6 +555,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 Session["Url"] = accessUrl;
             }
+
+            /*Si el usuario tiene el campo ContributorTypeId en null 
+             * al iniciar sesión por esta sección (Empresa: Representante Legal)
+             * se asigna el contributorTypeId [ 1 | Facturador] para tratarlo como tal*/
+            if(contributor.ContributorTypeId is null)
+            {
+                contributor.ContributorTypeId = (int)Domain.Common.ContributorType.Biller;
+                contributor.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Pending;
+                contributorService.AddOrUpdate(contributor);
+            }
+
             return Json(new ResponseMessage("LoginConfirmed", "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
         }
 
@@ -685,6 +696,17 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.UserEmail = HideUserEmailParts(auth.Email);
             ViewBag.Url = accessUrl;
             ViewBag.currentTab = "confirmed";
+
+            /*Si el usuario tiene el campo ContributorTypeId en null 
+             * al iniciar sesión por esta sección (Persona)
+             * se asigna el contributorTypeId [ 1 | Facturador] para tratarlo como tal*/
+            if (contributor.ContributorTypeId is null)
+            {
+                contributor.ContributorTypeId = (int)Domain.Common.ContributorType.Biller;
+                contributor.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Pending;
+                contributorService.AddOrUpdate(contributor);
+            }
+
             return View("LoginConfirmed", model);
         }
 
@@ -1533,6 +1555,17 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
+
+            /*Si el usuario tiene el campo ContributorTypeId en null 
+             * al iniciar sesión por esta sección (Persona)
+             * se asigna el contributorTypeId [ 4 | No Obligado a Facturar] para tratarlo como tal*/
+            if (contributorInvoice.ContributorTypeId is null)
+            {
+                contributorInvoice.ContributorTypeId = (int)Domain.Common.ContributorType.BillerNoObliged;
+                contributorInvoice.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Pending;
+                contributorService.AddOrUpdate(contributorInvoice);
+            }
+
             return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: " + reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
         }
@@ -1665,6 +1698,17 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
+
+            /*Si el usuario tiene el campo ContributorTypeId en null 
+             * al iniciar sesión por esta sección (Persona)
+             * se asigna el contributorTypeId [ 4 | No Obligado a Facturar] para tratarlo como tal*/
+            if (contributor.ContributorTypeId is null)
+            {
+                contributor.ContributorTypeId = (int)Domain.Common.ContributorType.BillerNoObliged;
+                contributor.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Pending;
+                contributorService.AddOrUpdate(contributor);
+            }
+
             return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: "+ reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
         }
