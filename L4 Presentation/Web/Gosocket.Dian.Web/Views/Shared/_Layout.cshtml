@@ -76,84 +76,83 @@
 		</div>
 	}
 
-	<div id="container" class="effect mainnav-lg navbar-fixed">
-		<!--NAVBAR-->
-		<!--===================================================-->
-		<header id="navbar">
-			<div id="navbar-container" class="boxed">
-				<!--Brand logo & name-->
-				<!--================================-->
-				<div class="navbar-header">
-					<a href="/" class="navbar-brand">
-						<img src="~/Content/img/LogoDian.png" alt="Gosocket" class="brand-icon gologo-xs">
-						@*<img src="~/Content/img/logoNoSlogan.png" alt="Gosocket" class="brand-icon gologo-lg">*@
-					</a>
-				</div>
-				<!--================================-->
-				<!--End brand logo & name-->
-				<!--Navbar Dropdown-->
-				<!--================================-->
-				<div class="navbar-content clearfix">
-					<ul class="nav navbar-top-links pull-left">
-						<li>
-							<a id="mainnav-toggle" href="#">
-								<i class="fa fa-navicon fa-lg"></i>
-							</a>
-						</li>
-						<li class="dropdown-litopsearch dropdown">
-							<a href="#" data-toggle="dropdown" class="dropdown-toggle">
-								<i class="fa fa-search fa-lg"></i>
-							</a>
-							<!--litopsearch dropdown menu-->
-							<div class="dropdown-menu dropdown-menu-lg">
-								<div class="input-group mar-btm searchtop">
-									<span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
-									<input id="input-search-dropdown" class="form-control" type="text" data-provide="typeahead" placeholder="Buscar">
-									<span class="input-group-btn">
-										<button id="button-search-dropdown" class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
-									</span>
-								</div>
-							</div>
-						</li>
-					</ul>
-					<div>
-						<ul>
-							<li>
-								<center>
-									@if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-									{
-										<h4>
-											<b>Sistema de facturación electrónica – Ambiente de Habilitación</b>
-										</h4>
-									}
-									else if (ConfigurationManager.GetValue("Environment") == "Prod")
-									{
-										<h4>
-											<b>Sistema de facturación electrónica – Ambiente de Producción</b>
-										</h4>
+    <div id="container" class="effect mainnav-lg navbar-fixed">
+        <!--NAVBAR-->
+        <!--===================================================-->
+        <header id="navbar">
+            <div id="navbar-container" class="boxed">
+                <!--Brand logo & name-->
+                <!--================================-->
+                <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <img src="~/Content/img/LogoDian.png" alt="Gosocket" class="brand-icon gologo-xs">
+                        @*<img src="~/Content/img/logoNoSlogan.png" alt="Gosocket" class="brand-icon gologo-lg">*@
+                    </a>
+                </div>
+                <!--================================-->
+                <!--End brand logo & name-->
+                <!--Navbar Dropdown-->
+                <!--================================-->
+                <div class="navbar-content clearfix">
+                    <ul class="nav navbar-top-links pull-left">
+                        <li>
+                            <a id="mainnav-toggle" href="#">
+                                <i class="fa fa-navicon fa-lg"></i>
+                            </a>
+                        </li>
+                        <li class="dropdown-litopsearch dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                <i class="fa fa-search fa-lg"></i>
+                            </a>
+                            <!--litopsearch dropdown menu-->
+                            <div class="dropdown-menu dropdown-menu-lg">
+                                <div class="input-group mar-btm searchtop">
+                                    <span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
+                                    <input id="input-search-dropdown" class="form-control" type="text" data-provide="typeahead" placeholder="Buscar">
+                                    <span class="input-group-btn">
+                                        <button id="button-search-dropdown" class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div>
+                        <ul>
+                            <li>
+                                <center>
+                                    <h4>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod" )
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
+                                        }
 
-									}
-								</center>
-							</li>
-						</ul>
-					</div>
-					<ul id="right-nav" class="nav navbar-top-links pull-right">
-						@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
-						{
-							<li id="dropdown" class="dropdown">
-								<a href="#" data-toggle="dropdown" class="dropdown-toggle">
-									<div class="username">@contributorName</div>
-								</a>
-							</li>
-						}
-						<li id="dropdown" class="dropdown">
-							<a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
-								<span class="pull-right">
-									<img class="img-circle img-user media-object" src="~/Content/img/av1.png" alt="UserName">
-								</span>
-								<div class="username">@userFullName</div>
-							</a>
-							<div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default">
+                                    </h4>
+                                </center>
+                            </li>
+                        </ul>
+                    </div>
+                    <ul id="right-nav" class="nav navbar-top-links pull-right">
+                        @if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
+                        {
+                            <li id="dropdown" class="dropdown">
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                    <div class="username">@contributorName</div>
+                                </a>
+                            </li>
+                        }
+                        <li id="dropdown" class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="~/Content/img/av1.png" alt="UserName">
+                                </span>
+                                <div class="username">@userFullName</div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default">
 
 								<div class="pad-all bord-btm">
 
@@ -245,118 +244,115 @@
 								<ul class="list-group" id="mainnav-menu" style="min-width: 233px;padding-right:3px;padding-left:1px">
 
 
-									<!--Category name-->
-									<li class="list-header">Inicio</li>
-									<li id="@Navigation.NavigationEnum.Dashboard">
-										<a href="@Url.Action("Dashboard", "Home")">
-											<i class="fa fa-dashboard"></i>
-											<span class="menu-title">
-												Inicio
-											</span>
-										</a>
-									</li>
-									<!--Rol Administrador-->
-									@if (User.IsInAnyRole("Administrador", "Super"))
-									{
-										<li>
-											<a id="@Navigation.NavigationEnum.DocumentValidatorIndex" class="parent-link" href="#">
-												<i class="fa fa-check-square"></i>
-												<span class="menu-title">
-													Validador
-												</span>
-												<i class="arrow"></i>
-											</a>
-											<!--Submenu-->
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.DocumentValidatorReglas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorReglas"), pageName = "Reglas", navigation = @Navigation.NavigationEnum.DocumentValidatorReglas})">Reglas</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentValidatorEsquemas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorEsquemas"), pageName = "Configuraciones", navigation = @Navigation.NavigationEnum.DocumentValidatorEsquemas})">Configuraciones</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentValidator"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("Validator"), pageName = "Validar documento", navigation = @Navigation.NavigationEnum.DocumentValidator})">Validar documento</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentValidatorCheck"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorCheck"), pageName = "Consultar validación", navigation = @Navigation.NavigationEnum.DocumentValidatorCheck})">Consultar validación</a></li>
-											</ul>
-										</li>
-									}
-									<!--Rol Administrador-->
-									<li>
-										<a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
-											<i class="fa fa-inbox"></i>
-											<span class="menu-title">
-												Histórico
-											</span>
-											<i class="arrow"></i>
-										</a>
-										<!--Submenu-->
-										<!--Rol Administrador-->
-										@if (User.IsInAnyRole("Administrador", "Super"))
-										{
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
-												<li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
-												<li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
-											</ul>
-										}
-										<!--Rol Administrador-->
-										<!--Rol Facturador and Proveedor-->
-										@if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
-										{
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Documentos enviados</a></li>
-												<li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
-												@if (User.ContributorTypeId() == (int)ContributorType.Provider)
-												{
-													<li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
-												}
-												<li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
-											</ul>
-										}
-										<!--Rol Facturador and Proveedor-->
-									</li>
-									<li>
-										<a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
-											<i class="fa fa-users"></i>
-											<span class="menu-title">
-												Registro y habilitación
-											</span>
-											<i class="arrow"></i>
-										</a>
-										<!--Submenu-->
-										<ul class="collapse">
-											<li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("ElectronicDocuments", "Document" )">Documentos electrónicos</a></li>
-										</ul>
-										<ul class="collapse">
-											<!--Rol Administrador-->
-											@if (User.IsInAnyRole("Administrador", "Super"))
-											{
-												<!--RADIAN Administrador-->
-												if (User.IsInAnyRole("Administrador", "Super"))
-												{
-													<li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
-												}
-												<!--RADIAN Administrador-->
-												<li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
-												<li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
-												<li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
-												<li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
-												<li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
-												<li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
+                                    <!--Category name-->
+                                    <li class="list-header">Inicio</li>
+                                    <li id="@Navigation.NavigationEnum.Dashboard">
+                                        <a href="@Url.Action("Dashboard", "Home")">
+                                            <i class="fa fa-dashboard"></i>
+                                            <span class="menu-title">
+                                                Inicio
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <!--Rol Administrador-->
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.DocumentValidatorIndex" class="parent-link" href="#">
+                                                <i class="fa fa-check-square"></i>
+                                                <span class="menu-title">
+                                                    Validador
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorReglas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorReglas"), pageName = "Reglas", navigation = @Navigation.NavigationEnum.DocumentValidatorReglas})">Reglas</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorEsquemas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorEsquemas"), pageName = "Configuraciones", navigation = @Navigation.NavigationEnum.DocumentValidatorEsquemas})">Configuraciones</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidator"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("Validator"), pageName = "Validar documento", navigation = @Navigation.NavigationEnum.DocumentValidator})">Validar documento</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorCheck"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorCheck"), pageName = "Consultar validación", navigation = @Navigation.NavigationEnum.DocumentValidatorCheck})">Consultar validación</a></li>
+                                            </ul>
+                                        </li>
+                                    }
+                                    <!--Rol Administrador-->
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
+                                            <i class="fa fa-inbox"></i>
+                                            <span class="menu-title">
+                                                Histórico
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <!--Rol Administrador-->
+                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                        {
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
+                                                <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                                <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
+                                            </ul>
+                                        }
+                                        <!--Rol Administrador-->
+                                        <!--Rol Facturador and Proveedor-->
+                                        @if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
+                                        {
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Documentos enviados</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
+                                                @if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                {
+                                                    if (new string[] { "Dev", "Local", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    }
+                                                    
+                                                }
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                            </ul>
+                                        }
+                                        <!--Rol Facturador and Proveedor-->
+                                    </li>
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Registro y habilitación
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
+                                        </ul>
+                                        <ul class="collapse">
+                                            <!--Rol Administrador-->
+                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                            {
+                                                <!--RADIAN Administrador-->
+                                                if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
+                                                }
+                                                <!--RADIAN Administrador-->
+                                                <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
+                                                <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
+                                                <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
+                                                <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
+                                                
+                                            }
+                                            @*Rol Administrador
+                                            Rol Facturador and Proveedor*@
+                                            @if (!User.IsInAnyRole("Administrador", "Super"))
+                                            {
 
-											}
-											@*Rol Administrador
-												Rol Facturador and Proveedor*@
-											@if (!User.IsInAnyRole("Administrador", "Super"))
-											{
-												if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-												{
-													if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-													{
-														<li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar prefijos</a></li>
-													}
-												}
-
-												if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == null)
-												{
-													<li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
-												}
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
+                                                }
 
 												if (User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorOperationModeId() == (int)Gosocket.Dian.Domain.Common.OperationMode.Own)
 												{
@@ -401,28 +397,39 @@
 										</ul>
 									</li>
 
-									@if (!User.IsInAnyRole("Administrador", "Super"))
-									{
-										<li>
-											<a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
-												<i class="fa fa-users"></i>
-												<span class="menu-title">
-													Configuración
-												</span>
-												<i class="arrow"></i>
-											</a>
-											<!--Submenu-->
-											<ul class="collapse">
-												<li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
-											</ul>
-											<ul>
-												@if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
-												{
-													<li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-												}
-											</ul>
-										</li>
-									}
+                                    @if (!User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Configuración
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                        </ul>
+                                        <ul>
+                                            @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                            }
+                                        </ul>
+                                        <ul>
+                                            @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                            {
+                                                //if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                                if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Cancelled)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
+                                                }
+                                            }
+                                        </ul>
+
+                                    </li>
+                                     }
 
 									<!--Rol Administrador-->
 									@*@if (User.IsInAnyRole("Administrador", "Super"))

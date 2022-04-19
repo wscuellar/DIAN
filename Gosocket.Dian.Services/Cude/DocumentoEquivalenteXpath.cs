@@ -20,15 +20,18 @@
         /// <summary>
         /// Invoice/cbc:ID
         /// </summary>
-        public const string NumFac = "//*[local-name()='ID']";
+        public const string NumFac = "//*[local-name()='Invoice']/*[local-name()='ID']";
+        //public const string NumFac = "//*[local-name()='ID']";
         /// <summary>
         /// Invoice/cbc:IssueDate
         /// </summary>
-        public const string FecFac = "//*[local-name()='IssueDate']";
+        public const string FecFac = "//*[local-name()='Invoice']/*[local-name()='IssueDate']";
+        //public const string FecFac = "//*[local-name()='IssueDate']";
         /// <summary>
         /// "Invoice/cbc:IssueTime"
         /// </summary>
-        public const string HorFac = "//*[local-name()='IssueTime']";
+        public const string HorFac = "//*[local-name()='Invoice']/*[local-name()='IssueTime']";
+        //public const string HorFac = "//*[local-name()='IssueTime']";
         /// <summary>
         /// Invoice/cac:LegalMonetaryTotal/cbc:LineExtensionAmount
         /// </summary>

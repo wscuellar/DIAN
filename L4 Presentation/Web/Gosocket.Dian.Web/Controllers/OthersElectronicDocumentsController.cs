@@ -8,6 +8,7 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -17,7 +18,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
@@ -29,19 +33,24 @@ namespace Gosocket.Dian.Web.Controllers
     [Authorize]
     public class OthersElectronicDocumentsController : Controller
     {
+        private static readonly TableManager tableManagerNumberRangeManager = new TableManager("GlobalNumberRange");
         private readonly IOthersElectronicDocumentsService _othersElectronicDocumentsService;
         private readonly IOthersDocsElecContributorService _othersDocsElecContributorService;
         private readonly IContributorService _contributorService;
         private readonly IElectronicDocumentService _electronicDocumentService;
         private readonly IOthersDocsElecSoftwareService _othersDocsElecSoftwareService;
         private readonly IContributorOperationsService _contributorOperationsService;
+        private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
+        private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
             IContributorService contributorService,
             IElectronicDocumentService electronicDocumentService,
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
-            IContributorOperationsService contributorOperationsService)
+            IContributorOperationsService contributorOperationsService,
+            ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
+            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -49,6 +58,8 @@ namespace Gosocket.Dian.Web.Controllers
             _electronicDocumentService = electronicDocumentService;
             _othersDocsElecSoftwareService = othersDocsElecSoftwareService;
             _contributorOperationsService = contributorOperationsService;
+            _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
+            _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
         }
 
         /// <summary>
@@ -59,9 +70,19 @@ namespace Gosocket.Dian.Web.Controllers
         {
             ViewBag.UserCode = User.UserCode();
             ViewBag.CurrentPage = Navigation.NavigationEnum.OthersEletronicDocuments;
-            ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
-            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorTypeIde = User.ContributorTypeId();
 
+            if (ViewBag.ContributorTypeIde == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 13)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name.Replace("No OFE", ""))).ToList();
+            }
+            else
+            {
+                ViewBag.ListElectronicDocuments = _electronicDocumentService.GetElectronicDocuments().Where(x => x.Id == 1)?.Select(t => new AutoListModel(t.Id.ToString(), t.Name)).ToList();
+            }
+
+            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
             return View();
         }
 
@@ -70,12 +91,13 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = dataentity.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsEquivalentDocuments = dataentity.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
 
             OthersElectronicDocumentsViewModel model = new OthersElectronicDocumentsViewModel();
 
             List<ElectronicDocument> listED = _electronicDocumentService.GetElectronicDocuments();
             List<Domain.Sql.OtherDocElecOperationMode> listOM = _othersDocsElecContributorService.GetOperationModes();
-            
+
             if (dataentity.Message != null)
             {
                 ViewBag.Message = dataentity.Message;
@@ -205,12 +227,12 @@ namespace Gosocket.Dian.Web.Controllers
                         {
                             return Json(new ResponseMessage(
                                 $@"El modo de operación {operationMode.OperationModeId} - {operationMode.OperationMode.Name} 
-                                    NO se encuentra asociado para los otros documentos electrónicos.", 
+                                    NO se encuentra asociado para los otros documentos electrónicos.",
                                 TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
                         }
 
                         var testSetOfOPerationMode = GetTestSetResult(testSetResults, operationMode);
-                        if(testSetOfOPerationMode.Status != (int)TestSetStatus.Accepted)
+                        if (testSetOfOPerationMode.Status != (int)TestSetStatus.Accepted)
                         {
                             continue;
                         }
@@ -223,8 +245,8 @@ namespace Gosocket.Dian.Web.Controllers
                             OperationModeName = otherDocOperationMode.Name,
                             Data = new OperationModeElectronicBillerDataViewModel
                             {
-                                ProviderCompanyName = otherDocOperationMode.Id == (int)Domain.Common.OtherDocElecOperationMode.FreeBiller 
-                                    ? (ConfigurationManager.GetValue("DianBillerName")?? "DIRECCIÓN DE IMPUESTO Y ADUANAS NACIONALES - DIAN")
+                                ProviderCompanyName = otherDocOperationMode.Id == (int)Domain.Common.OtherDocElecOperationMode.FreeBiller
+                                    ? (ConfigurationManager.GetValue("DianBillerName") ?? "DIRECCIÓN DE IMPUESTO Y ADUANAS NACIONALES - DIAN")
                                     : contributor.Name,
                                 SoftwareId = operationMode.Software.Id.ToString(),
                                 SoftwareName = operationMode.Software.Name,
@@ -237,8 +259,11 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.OwnSoftware, Name = Domain.Common.OtherDocElecOperationMode.OwnSoftware.GetDescription() });
                     operationModesList.Add(new Domain.RadianOperationMode { Id = (int)Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider, Name = Domain.Common.OtherDocElecOperationMode.SoftwareTechnologyProvider.GetDescription() });
-                    var OperationsModes = _othersDocsElecContributorService.GetOperationModes().Where(x => x.Id == 3).FirstOrDefault();
-                    operationModesList.Add(new Domain.RadianOperationMode { Id = OperationsModes.Id, Name = OperationsModes.Name });
+                    if (!electronicDocumentIsEquivalentDocuments)
+                    {
+                        var OperationsModes = _othersDocsElecContributorService.GetOperationModes().Where(x => x.Id == 3).FirstOrDefault();
+                        operationModesList.Add(new Domain.RadianOperationMode { Id = OperationsModes.Id, Name = OperationsModes.Name });
+                    }
                 }
             }
 
@@ -263,7 +288,10 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
+            ViewBag.IsSupportDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
+            ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             return View(model);
         }
 
@@ -271,25 +299,16 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsEquivalent = electronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
+            bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
 
             List<Contributor> providersList;
             var providersListDto = new List<ContributorViewModel>();
 
-            if (!electronicDocumentIsSupport)
-            {
-                providersList = _othersDocsElecContributorService
-                    .GetTechnologicalProviders(
-                        User.ContributorId(), 
-                        electronicDocumentId, 
-                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider, 
-                        OtherDocElecState.Habilitado.GetDescription());
-
-                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
-            }
-            else
+            if (electronicDocumentIsSupport || electronicDocumentIsEquivalent)
             {
                 /*Filtrar los proveedores tecnologicos que fueron asociados y están habilitados 
-                     * en el modo de operación de facturación electrónica*/
+                * en el modo de operación de facturación electrónica*/
                 var softwaresIdAssociatedInElectronicBiller = operationModesAsociatedInElectronicBiller
                         .Where(t => t.OperationModeId == (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider)
                         .Select(t => new Guid(t.Data.SoftwareId))
@@ -297,12 +316,37 @@ namespace Gosocket.Dian.Web.Controllers
 
                 /*proveedores que esten habilitados y que tengan software que esté en produccion y no esté eliminado*/
                 providersList = _contributorService.GetContributorsByType((int)Domain.Common.ContributorType.Provider)
-                    .Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled && 
-                        x.Softwares.Any(t => 
+                    .Where(x => x.AcceptanceStatusId == (int)ContributorStatus.Enabled &&
+                        x.Softwares.Any(t =>
                             t.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production && !t.Deleted &&
                             (!contributorIsOfe || softwaresIdAssociatedInElectronicBiller.Contains(t.Id))
                         )
                     ).ToList();
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+            }
+            else if (electronicDocumentIsElectronicPayrollNoOFE)
+            {
+                /*Deberá trae el listado de los proveedores tecnológicos autorizados por la DIAN y que
+                ya tengan modos de operación nómina electrónica Habilitados como PT - Software Propio,
+                ellos están ubicados por la sección de OFES de la plataforma*/
+                providersList = _othersDocsElecContributorService
+                    .GetTechnologicalProviders(
+                        User.ContributorId(),
+                        (int)ElectronicsDocuments.ElectronicPayroll,
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription());
+
+                providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
+            }
+            else
+            {
+                providersList = _othersDocsElecContributorService
+                    .GetTechnologicalProviders(
+                        User.ContributorId(),
+                        electronicDocumentId,
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription());
 
                 providersListDto.AddRange(providersList.Select(c => new ContributorViewModel { Id = c.Id, Name = c.Name }).ToList());
             }
@@ -373,8 +417,8 @@ namespace Gosocket.Dian.Web.Controllers
             if (testSet == null)
             {
                 return Json(new ResponseMessage(
-                    TextResources.ModeElectroniDocWithoutTestSet, 
-                    TextResources.alertType, 500), 
+                    TextResources.ModeElectroniDocWithoutTestSet,
+                    TextResources.alertType, 500),
                     JsonRequestBehavior.AllowGet);
             }
 
@@ -396,6 +440,7 @@ namespace Gosocket.Dian.Web.Controllers
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService
                 .CreateContributorNew(
                     User.ContributorId(),
+                    //model.OtherDocElecContributorId,
                     OtherDocElecState.Registrado,
                     model.ContributorIdType,
                     model.OperationModeId,
@@ -454,41 +499,23 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (electronicDocumentIsSupport)
                 {
-                    var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
-                    var rangoDePrueba = new NumberingRange
-                    {
-                        id = Guid.NewGuid(),
-                        OtherDocElecContributorOperation = contributorOperation.Id,
-                        Prefix = "SEDS",
-                        ResolutionNumber = "18760000001",
-                        NumberFrom = 984000000,
-                        NumberTo = 985000000,
-                        CurrentNumber = 984000000,
-                        CreationDate = DateTime.Now,
-                        ExpirationDate = new DateTime(DateTime.Now.Year, 12, 31),
-                        IdDocumentTypePayroll = "104",
-                        DocumentTypePayroll = "Documento Soporte",
-                        Current = "SEDS (984000000 - 985000000)",
-                        N102 = "SEDS (984000000 - 985000000)",
-                        N103 = "SEDS (984000000 - 985000000)",
-                        State = 3,
-                        AccountId = Guid.Parse(accountId),
-                        PartitionKey = accountId.ToString(),
-                    };
-                    var cosmosManager = new CosmosDbManagerNumberingRange();
-                    await cosmosManager.SaveNumberingRange(rangoDePrueba);
+                    await RegisterNumberingRangeForSupportDocument(contributorOperation, software);
+                }
+                if (model.ElectronicDocumentIsEquivalent)
+                {
+                    await RegisterNumberingRangeForEquivalentDocumentPos(contributorOperation, software);
                 }
             }
 
             _othersElectronicDocumentsService
                 .ChangeParticipantStatus(
                     contributorId: otherDocElecContributor.Id,
-                    newState: (contributorIsOfe && electronicDocumentIsSupport) ? OtherDocElecState.Habilitado.GetDescription() : OtherDocElecState.Test.GetDescription(), 
-                    ContributorTypeId: model.ContributorIdType, 
-                    actualState: OtherDocElecState.Registrado.GetDescription(), 
+                    newState: (contributorIsOfe && electronicDocumentIsSupport) ? OtherDocElecState.Habilitado.GetDescription() : OtherDocElecState.Test.GetDescription(),
+                    ContributorTypeId: model.ContributorIdType,
+                    actualState: OtherDocElecState.Registrado.GetDescription(),
                     description: string.Empty);
 
-            if (electronicDocumentIsSupport)
+            if (electronicDocumentIsSupport || model.ElectronicDocumentIsEquivalent)
             {
                 return RedirectToAction("AddOrUpdate", "OthersElectronicDocuments", new
                 {
@@ -499,7 +526,122 @@ namespace Gosocket.Dian.Web.Controllers
                 });
             }
 
+            NotificationsController notification = new NotificationsController();
+            await notification.EventNotificationsAsync("04", User.UserCode());
+
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
+        }
+
+        private async Task RegisterNumberingRangeForSupportDocument(OtherDocElecContributorOperations contributorOperation, OtherDocElecSoftware software)
+        {
+            var taskRegisterInCosmos = Task.Run(async () =>
+            {
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
+                var rangoDePrueba = new NumberingRange
+                {
+                    id = Guid.NewGuid(),
+                    OtherDocElecContributorOperation = contributorOperation.Id,
+                    Prefix = "SEDS",
+                    ResolutionNumber = "18760000001",
+                    NumberFrom = 984000000,
+                    NumberTo = 985000000,
+                    CurrentNumber = 984000000,
+                    CreationDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ExpirationDate = new DateTime(DateTime.Now.Year, 12, 31),
+                    IdDocumentTypePayroll = "104",
+                    DocumentTypePayroll = "Documento Soporte",
+                    Current = "SEDS (984000000 - 985000000)",
+                    N102 = "SEDS (984000000 - 985000000)",
+                    N103 = "SEDS (984000000 - 985000000)",
+                    State = 3,
+                    AccountId = Guid.Parse(accountId),
+                    PartitionKey = accountId.ToString(),
+                };
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                await cosmosManager.SaveNumberingRange(rangoDePrueba);
+            });
+
+            var taskRegisterInAzureTable = Task.Run(async () =>
+            {
+                var softwareProvider = _contributorService.Get(software.ProviderId);
+                var globalNumerRange = new GlobalNumberRange(
+                    User.ContributorCode(), $"SEDS|{((int)DocumentType.DocumentSupportInvoice).ToString().PadLeft(2,'0')}|18760000001")
+                {
+                    Serie = "SEDS",
+                    ResolutionNumber = "18760000001",
+                    AssociationDate = DateTime.Now,
+                    ResolutionDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ValidDateNumberFrom = int.Parse($"{new DateTime(DateTime.Now.Year, 01, 01):yyyyMMdd}"),
+                    ValidDateNumberTo = int.Parse($"{new DateTime(DateTime.Now.Year, 12, 31):yyyyMMdd}"),
+                    FromNumber = 984000000,
+                    ToNumber = 985000000,
+                    SoftwareId = software.SoftwareId.ToString(),
+                    SoftwareName = software.Name,
+                    SoftwareOwnerCode = softwareProvider.Code,
+                    SoftwareOwnerName = softwareProvider.Name,
+                    State = (int)NumberRangeState.Authorized,
+                };
+                await tableManagerNumberRangeManager.InsertOrUpdateAsync(globalNumerRange);
+            });
+
+            await taskRegisterInCosmos;
+            await taskRegisterInAzureTable;
+        }
+
+        private async Task RegisterNumberingRangeForEquivalentDocumentPos(OtherDocElecContributorOperations contributorOperation, OtherDocElecSoftware software)
+        {
+            var taskRegisterInCosmos = Task.Run(async () =>
+            {
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
+                var rangoDePrueba = new NumberingRange
+                {
+                    id = Guid.NewGuid(),
+                    OtherDocElecContributorOperation = contributorOperation.Id,
+                    Prefix = "EPOS",
+                    ResolutionNumber = "18760000001",
+                    NumberFrom = 1,
+                    NumberTo = 1000,
+                    CurrentNumber = 1,
+                    CreationDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ExpirationDate = new DateTime(2030, 01, 01),
+                    IdDocumentTypePayroll = "20",
+                    DocumentTypePayroll = "Documento Equivalente POS",
+                    Current = "EPOS (1 - 1000)",
+                    N102 = "EPOS (1 - 1000)",
+                    N103 = "EPOS (1 - 1000)",
+                    State = 3,
+                    AccountId = Guid.Parse(accountId),
+                    PartitionKey = accountId.ToString(),
+                };
+                var cosmosManager = new CosmosDbManagerNumberingRange();
+                await cosmosManager.SaveNumberingRange(rangoDePrueba);
+            });
+
+            var taskRegisterInAzureTable = Task.Run(async () =>
+            {
+                var softwareProvider = _contributorService.Get(software.ProviderId);
+                var globalNumerRange = new GlobalNumberRange(
+                    User.ContributorCode(), $"EPOS|{((int)DocumentType.EquivalentDocumentPOS).ToString().PadLeft(2, '0')}|18760000001")
+                {
+                    Serie = "EPOS",
+                    ResolutionNumber = "18760000001",
+                    AssociationDate = DateTime.Now,
+                    ResolutionDate = new DateTime(DateTime.Now.Year, 01, 01),
+                    ValidDateNumberFrom = int.Parse($"{new DateTime(DateTime.Now.Year, 01, 01):yyyyMMdd}"),
+                    ValidDateNumberTo = int.Parse($"{new DateTime(2030, 01, 01):yyyyMMdd}"),
+                    FromNumber = 1,
+                    ToNumber = 100,
+                    SoftwareId = software.SoftwareId.ToString(),
+                    SoftwareName = software.Name,
+                    SoftwareOwnerCode = softwareProvider.Code,
+                    SoftwareOwnerName = softwareProvider.Name,
+                    State = (int)NumberRangeState.Authorized,
+                };
+                await tableManagerNumberRangeManager.InsertOrUpdateAsync(globalNumerRange);
+            });
+
+            await taskRegisterInCosmos;
+            await taskRegisterInAzureTable;
         }
 
         public ActionResult AddParticipants(int electronicDocumentId, string message)
@@ -615,8 +757,8 @@ namespace Gosocket.Dian.Web.Controllers
                     ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                                            new
                                            {
-                                               ElectronicDocumentId = 1, //ValidacionOtherDocs.ElectronicDocumentId,
-                                               OperationModeId = 0, //(int)ValidacionOtherDocs.OperationModeId,
+                                               ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
+                                               OperationModeId = (int)ValidacionOtherDocs.OperationModeId,
                                                ContributorIdType = (int)ValidacionOtherDocs.ContributorIdType,
                                                ContributorId
                                            });
@@ -736,21 +878,10 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult GetSoftwaresByContributorId(int id, int electronicDocumentId)
         {
             bool electronicDocumentIsSupport = electronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            bool electronicDocumentIsElectronicPayrollNoOFE = electronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
             List<SoftwareViewModel> softwareList;
-            
-            if (!electronicDocumentIsSupport)
-            {
-                softwareList = _othersDocsElecSoftwareService
-                    .GetSoftwaresByProviderTechnologicalServices(id,
-                        electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
-                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
-                        {
-                            //Id = s.Id,
-                            Id = s.SoftwareId,
-                            Name = s.Name
-                        }).ToList();
-            }
-            else
+
+            if (electronicDocumentIsSupport)
             {
                 var provider = _contributorService.Get(id);
                 softwareList = provider.SoftwaresInProduction().Select(s => new SoftwareViewModel
@@ -765,6 +896,30 @@ namespace Gosocket.Dian.Web.Controllers
                     .Where(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted).Select(t => t.SoftwareId);
 
                 softwareList = softwareList.Where(s => softwareIds.Contains(s.Id.ToString())).ToList();
+            }
+            else if (electronicDocumentIsElectronicPayrollNoOFE)
+            {
+                softwareList = _othersDocsElecSoftwareService
+                    .GetSoftwaresByProviderTechnologicalServices(
+                        id,
+                        (int)ElectronicsDocuments.ElectronicPayroll,
+                        (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                        {
+                            Id = s.SoftwareId,
+                            Name = s.Name
+                        }).ToList();
+            }
+            else
+            {
+                softwareList = _othersDocsElecSoftwareService
+                    .GetSoftwaresByProviderTechnologicalServices(id,
+                        electronicDocumentId, (int)Domain.Common.OtherDocElecContributorType.TechnologyProvider,
+                        OtherDocElecState.Habilitado.GetDescription()).Select(s => new SoftwareViewModel
+                        {
+                            Id = s.SoftwareId,
+                            Name = s.Name
+                        }).ToList();
             }
 
             return Json(new { res = softwareList }, JsonRequestBehavior.AllowGet);
@@ -798,6 +953,84 @@ namespace Gosocket.Dian.Web.Controllers
         public JsonResult CancelRegister(int id, string description)
         {
             ResponseMessage response = _othersDocsElecContributorService.CancelRegister(id, description);
+            return Json(new
+            {
+                response.Code,
+                response.data,
+                response.Message,
+                response.MessageType,
+                response.RedirectTo,
+                ExistOperationModeAsociated = response.ExistOperationModeAsociated
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public string GetContributorOperation(int code)
+        {
+
+            try
+            {
+                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
+                                      "WHERE C.Contributorid = " + code +
+                                      " AND C.Deleted <> 1";
+
+                SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
+                conn.Open();
+                DataTable table = new DataTable();
+                SqlCommand command = new SqlCommand(sqlQuery, conn);
+
+                using (var da = new SqlDataAdapter(command))
+                {
+                    da.Fill(table);
+                }
+                conn.Close();
+
+                var conteo = table.Rows.Count;
+
+                return conteo.ToString();
+                //return contributorType;
+
+            }
+            catch (Exception exc)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetTestSetResultAcepted(int otherDocElecContributorOperationsId)
+        {
+            var response = new List<TestSetResultAceptedModel>();
+
+            var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
+
+            var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResultAcepted(
+                User.UserCode(),
+                otherDocElecContributorOperation.OtherDocElecContributor.ElectronicDocumentId,
+                otherDocElecContributorOperation.OtherDocElecContributorId,
+                otherDocElecContributorOperation.SoftwareId.ToString());
+
+            var equivalentElectronicDocuments = _equivalentElectronicDocumentRepository.GetEquivalentElectronicDocuments().ToDictionary(t => t.Id);
+
+            foreach (var test in testSetResult)
+            {
+                var nameEquivalentElectronicDocument = "";
+                if (equivalentElectronicDocuments.ContainsKey(test.EquivalentElectronicDocumentId.Value))
+                {
+                    nameEquivalentElectronicDocument = equivalentElectronicDocuments[test.EquivalentElectronicDocumentId.Value].Name;
+                }
+
+                var testResponse = new TestSetResultAceptedModel()
+                {
+                    EquivalentElectronicDocumentId = test.EquivalentElectronicDocumentId.Value,
+                    EquivalentElectronicDocumentName = nameEquivalentElectronicDocument,
+                    EquivalentElectronicDocumentState = test.State == TestSetStatus.Accepted.GetDescription() ? "Habilitado" : test.State
+                };
+
+                response.Add(testResponse);
+            }
+
+
             return Json(response, JsonRequestBehavior.AllowGet);
         }
     }
