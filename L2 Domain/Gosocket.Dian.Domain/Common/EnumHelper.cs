@@ -217,6 +217,7 @@ namespace Gosocket.Dian.Domain.Common
     {
         public static bool IsSupportDocument(string documentTypeId)
         {
+            documentTypeId = string.IsNullOrWhiteSpace(documentTypeId) ? "0" : documentTypeId;
             int documentType = Convert.ToInt32(documentTypeId);
             return new int[] {(int)DocumentType.DocumentSupportInvoice, (int)DocumentType.AdjustmentNoteDocumentSupport, }
                 .Contains(documentType);

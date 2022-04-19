@@ -168,11 +168,6 @@ namespace Gosocket.Dian.Web.Controllers
         public ActionResult Index(int Id = 0)//TODO:
         {
             ViewBag.ValidateRequest = true;
-            var equivalentDocumentsList = _equivalentElectronicDocumentRepository
-                .GetEquivalentElectronicDocuments().Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name }).ToList();
-            equivalentDocumentsList.Insert(0, new SelectListItem { Value = "", Text = "[No especificado]", Selected = true });
-            ViewBag.EquivalentElectronicDocuments = equivalentDocumentsList.OrderBy(t => t.Value).ToList();
-
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
 
             if (model.Id == -1)
@@ -225,6 +220,16 @@ namespace Gosocket.Dian.Web.Controllers
                 ProviderId = software.ProviderId,
                 SoftwareId = software.SoftwareId,
             };
+
+            ViewBag.EquivalentElectronicDocuments = new List<SelectListItem>();
+
+            if (operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent)
+            {
+                var equivalentDocumentsList = _equivalentElectronicDocumentRepository
+                    .GetEquivalentElectronicDocuments().Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name }).ToList();
+                equivalentDocumentsList.Insert(0, new SelectListItem { Value = "", Text = "[No especificado]", Selected = true });
+                ViewBag.EquivalentElectronicDocuments = equivalentDocumentsList.OrderBy(t => t.Value).ToList();
+            }
 
             return View(model);
         }
