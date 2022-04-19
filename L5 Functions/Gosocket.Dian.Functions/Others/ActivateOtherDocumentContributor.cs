@@ -183,7 +183,7 @@ namespace Gosocket.Dian.Functions.Others
 
                     // Crear Software en TableSTorage
                     var software = softwareService.GetOtherDocSoftware(Guid.Parse(requestObject.SoftwareId));
-                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.Id.ToString())
+                    GlobalSoftware globalSoftware = new GlobalSoftware(software.SoftwareId.ToString(), software.SoftwareId.ToString())
                     {
                         Id = new Guid(requestObject.SoftwareId),
                         Deleted = false,
