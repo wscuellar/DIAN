@@ -6,51 +6,448 @@
 <div>
     <span class="margin-right-10">Perfiles:</span><ul id="list"></ul>
 </div>
-<div class="row checks-group">
-    @foreach (var menuMain in Model.MenuOptionsByProfile)
-    {
-        if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0)
+
+<div>
+    <div>
+        <em class="fa fa-file-text-o fa-5x" aria-hidden="true"></em>
+        <h5>Factura Electrónica</h5>
+    </div>
+    <div class="row checks-group">
+        @foreach (var menuMain in Model.MenuOptionsByProfile)
         {
-            <div class="col-sm-3">
-                <div class="level-1">
-                    <div>
-                        <spam class="titleMenu">@menuMain.Name</spam>
-                    </div>
-                    @foreach (var subMenuItems in menuMain.Children)
-                    {
-                        if (subMenuItems.MenuLevel == 2)
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
                         {
-                            <div class="level-2">
-                                <div>
-                                    <span class="subTitleMenu">@subMenuItems.Name</span>
-                                </div>
-                                @foreach (var subSubMenuItems in subMenuItems.Children)
-                                {
-                                    <div class="level-3">
-                                        <div class="row-cols-1">
-                                            <div class="form-group d-flex margin-0">
-                                                <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
-                                                <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Factura de venta" || subSubMenuItems.Name == "Factura AIU" || subSubMenuItems.Name == "Factura de exportación"
+                                            || subSubMenuItems.Name == "Factura de Mandatorio" || subSubMenuItems.Name == "Factura de Contingencia" || subSubMenuItems.Name == "Nota Crédito"
+                                            || subSubMenuItems.Name == "Nota Débito")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="level-3">
-                                <div class="row-cols-1">
-                                    <div class="form-group d-flex margin-0">
-                                        <input type="checkbox" id="@subMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id" disabled />
-                                        <label for="@subMenuItems.Id" class="label-check">@subMenuItems.Name</label>
-                                    </div>
+                                        }
+
+                                    }
                                 </div>
-                            </div>
+                            }
+
                         }
-                    }
+                    </div>
                 </div>
-            </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2)
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Documentos emitidos" || subSubMenuItems.Name == "Documentos recibidos")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Adquiriente/Comprador"
+                                            || subSubMenuItems.Name == "Productos" && subSubMenuItems.ParentId == 10)
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Nueva Plantilla")
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.ParentId == 11)
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Operaciones")
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.ParentId == 12)
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
         }
-    }
+    </div>
 </div>
+<br />
+<hr />
+<div>
+    <div>
+        <em class="fa fa-calculator fa-5x" aria-hidden="true"></em>
+        <h5>Nómina Electrónica</h5>
+    </div>
+    <div class="row checks-group">
+        @foreach (var menuMain in Model.MenuOptionsByProfile)
+        {
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Nómina Electrónica" || subSubMenuItems.Name == "Nota de Ajuste Reemplazar"
+                                            || subSubMenuItems.Name == "Nota de Ajuste Eliminar")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2)
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Documentos emitidos")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Trabajador")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+<br />
+<hr />
+<div>
+    <div>
+        <em class="fa fa-pencil-square-o fa-5x" aria-hidden="true"></em>
+        <h5>Documento soporte en adquisiciones</h5>
+        <h5>efectuadas a sujetos no obligados a </h5>
+        <h5>expedir factura</h5>
+    </div>
+    <div class="row checks-group">
+        @foreach (var menuMain in Model.MenuOptionsByProfile)
+        {
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Documentos soporte con no obligados a facturar" || subSubMenuItems.Name == "Nota de ajuste")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2)
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Documentos emitidos")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            {
+                <div class="col-sm-3">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            {
+                                <div class="level-2">
+                                    <div>
+
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Vendedor" || subSubMenuItems.Name == "Productos")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" disabled />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
