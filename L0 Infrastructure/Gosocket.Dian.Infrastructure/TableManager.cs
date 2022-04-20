@@ -115,6 +115,21 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
+        public async Task<bool> DeleteAsync(TableEntity entity)
+        {
+            try
+            {
+                var operationToDelete = TableOperation.Delete(entity);
+                await CloudTable.ExecuteAsync(operationToDelete);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message;
+                return false;
+            }
+        }
+
         public bool Insert(DynamicTableEntity entity)
         {
             try
@@ -1361,6 +1376,13 @@ namespace Gosocket.Dian.Infrastructure
         {
             var query = new TableQuery<T>();
             var filter = string.Join($" {TableOperators.Or} ", filters.Select(f => string.Join(string.Format(" {0} ", TableOperators.And), f.Select(d => string.Format("{0} eq {1}", d.Key, d.Value)))));
+            var entities = CloudTable.ExecuteQuery(query.Where(filter));
+            return entities;
+        }
+
+        public IEnumerable<T> GetRowsByAnyFilter<T>(string filter) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
             var entities = CloudTable.ExecuteQuery(query.Where(filter));
             return entities;
         }

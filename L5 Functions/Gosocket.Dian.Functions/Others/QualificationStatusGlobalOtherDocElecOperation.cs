@@ -26,6 +26,7 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
         private static readonly TableManager TableManagerGlobalOtherDocElecOperationProd = new TableManager("GlobalOtherDocElecOperation", ConfigurationManager.GetValue("GlobalStorageProd"));
         private static readonly TableManager TableManagerGlobalTestSetOthersDocumentsResultProd = new TableManager("GlobalTestSetOthersDocumentsResult", ConfigurationManager.GetValue("GlobalStorageProd"));
+        private static readonly TableManager TableManagerGlobalSoftwareProd = new TableManager("GlobalSoftware", ConfigurationManager.GetValue("GlobalStorageProd"));
         private static readonly OthersDocsElecSoftwareService othersDocsElecSoftwareService = new OthersDocsElecSoftwareService();
         private static readonly OthersElectronicDocumentsService othersElectronicDocumentsService = new OthersElectronicDocumentsService();
         private static readonly SoftwareService softwareService = new SoftwareService();
@@ -71,45 +72,160 @@ namespace Gosocket.Dian.Functions.Others
             {
                 #region #actualizacontributorid
                 if (data.ModeTest == "2")
-                {   
+                {
                     List<Tuple<String, int, int, int>> ListData = new List<Tuple<string, int, int, int>>();
-                    ListData.Add(new Tuple<string, int, int, int>("1152465784", 1, 2, 199798));
-                    ListData.Add(new Tuple<string, int, int, int>("12958638", 1, 1, 47153));
-                    ListData.Add(new Tuple<string, int, int, int>("12958638", 1, 2, 47155));
-                    ListData.Add(new Tuple<string, int, int, int>("15515241", 1, 2, 49004));
-                    ListData.Add(new Tuple<string, int, int, int>("20391256", 1, 2, 61162));
-                    ListData.Add(new Tuple<string, int, int, int>("28556855", 1, 2, 42845));
-                    ListData.Add(new Tuple<string, int, int, int>("51751494", 1, 1, 247268));
-                    ListData.Add(new Tuple<string, int, int, int>("51751494", 1, 2, 234273));
-                    ListData.Add(new Tuple<string, int, int, int>("700096455", 1, 2, 9545));
-                    ListData.Add(new Tuple<string, int, int, int>("76305812", 1, 2, 185350));
-                    ListData.Add(new Tuple<string, int, int, int>("830083670", 1, 2, 104144));
-                    ListData.Add(new Tuple<string, int, int, int>("830107828", 1, 1, 93999));
-                    ListData.Add(new Tuple<string, int, int, int>("830107828", 1, 2, 105282));
-                    ListData.Add(new Tuple<string, int, int, int>("890270661", 1, 2, 12795));
-                    ListData.Add(new Tuple<string, int, int, int>("892400697", 1, 2, 40083));
-                    ListData.Add(new Tuple<string, int, int, int>("900356681", 1, 2, 36314));
-                    ListData.Add(new Tuple<string, int, int, int>("900378629", 1, 2, 47197));
-                    ListData.Add(new Tuple<string, int, int, int>("900468497", 1, 2, 115358));
-                    ListData.Add(new Tuple<string, int, int, int>("900548430", 1, 2, 39570));
-                    ListData.Add(new Tuple<string, int, int, int>("900746078", 1, 2, 22636));
-                    ListData.Add(new Tuple<string, int, int, int>("900844587", 1, 2, 38490));
-                    ListData.Add(new Tuple<string, int, int, int>("901280536", 1, 2, 18386));
-                    ListData.Add(new Tuple<string, int, int, int>("901308210", 1, 1, 223838));
-                    ListData.Add(new Tuple<string, int, int, int>("901308210", 1, 2, 108134));
-                    ListData.Add(new Tuple<string, int, int, int>("901326514", 1, 2, 35368));
-                    ListData.Add(new Tuple<string, int, int, int>("901336753", 1, 1, 103942));
-                    ListData.Add(new Tuple<string, int, int, int>("901336753", 1, 2, 118852));
-                    ListData.Add(new Tuple<string, int, int, int>("901352450", 1, 2, 97202));
-                    ListData.Add(new Tuple<string, int, int, int>("901383875", 1, 2, 136953));
-                    ListData.Add(new Tuple<string, int, int, int>("901385477", 1, 2, 60825));
-                    ListData.Add(new Tuple<string, int, int, int>("901397575", 1, 2, 82873));
-                    ListData.Add(new Tuple<string, int, int, int>("901552575", 1, 1, 228206));
-                    ListData.Add(new Tuple<string, int, int, int>("901552575", 1, 2, 202563));
+                    ListData.Add(new Tuple<string, int, int, int>("1116261717", 1, 1, 44362));
+                    ListData.Add(new Tuple<string, int, int, int>("1116261717", 1, 2, 180366));
+                    ListData.Add(new Tuple<string, int, int, int>("13060584", 1, 1, 95185));
+                    ListData.Add(new Tuple<string, int, int, int>("13060584", 1, 2, 157452));
+                    ListData.Add(new Tuple<string, int, int, int>("15431620", 1, 1, 8716));
+                    ListData.Add(new Tuple<string, int, int, int>("15431620", 1, 2, 8717));
+                    ListData.Add(new Tuple<string, int, int, int>("15959491", 1, 1, 27695));
+                    ListData.Add(new Tuple<string, int, int, int>("15959491", 1, 2, 27696));
+                    ListData.Add(new Tuple<string, int, int, int>("16215590", 1, 1, 36259));
+                    ListData.Add(new Tuple<string, int, int, int>("16215590", 1, 2, 15252));
+                    ListData.Add(new Tuple<string, int, int, int>("19326888", 1, 1, 51312));
+                    ListData.Add(new Tuple<string, int, int, int>("19326888", 1, 2, 133607));
+                    ListData.Add(new Tuple<string, int, int, int>("19390632", 1, 1, 42636));
+                    ListData.Add(new Tuple<string, int, int, int>("19390632", 1, 2, 54977));
+                    ListData.Add(new Tuple<string, int, int, int>("25613044", 1, 1, 101825));
+                    ListData.Add(new Tuple<string, int, int, int>("25613044", 1, 2, 203045));
+                    ListData.Add(new Tuple<string, int, int, int>("43055922", 1, 1, 24824));
+                    ListData.Add(new Tuple<string, int, int, int>("43055922", 1, 2, 58479));
+                    ListData.Add(new Tuple<string, int, int, int>("48574672", 1, 1, 101860));
+                    ListData.Add(new Tuple<string, int, int, int>("48574672", 1, 2, 203058));
+                    ListData.Add(new Tuple<string, int, int, int>("63304321", 1, 1, 64989));
+                    ListData.Add(new Tuple<string, int, int, int>("63304321", 1, 2, 115155));
+                    ListData.Add(new Tuple<string, int, int, int>("6873403", 1, 1, 22454));
+                    ListData.Add(new Tuple<string, int, int, int>("6873403", 1, 2, 124575));
+                    ListData.Add(new Tuple<string, int, int, int>("70694218", 1, 1, 57127));
+                    ListData.Add(new Tuple<string, int, int, int>("70694218", 1, 2, 89339));
+                    ListData.Add(new Tuple<string, int, int, int>("800115005", 1, 1, 43176));
+                    ListData.Add(new Tuple<string, int, int, int>("800115005", 1, 2, 43172));
+                    ListData.Add(new Tuple<string, int, int, int>("800146814", 1, 1, 9278));
+                    ListData.Add(new Tuple<string, int, int, int>("800146814", 1, 2, 58195));
+                    ListData.Add(new Tuple<string, int, int, int>("800207224", 1, 2, 121414));
+                    ListData.Add(new Tuple<string, int, int, int>("800216484", 1, 1, 203087));
+                    ListData.Add(new Tuple<string, int, int, int>("800216484", 1, 2, 203178));
+                    ListData.Add(new Tuple<string, int, int, int>("802021369", 1, 1, 33193));
+                    ListData.Add(new Tuple<string, int, int, int>("802021369", 1, 2, 33708));
+                    ListData.Add(new Tuple<string, int, int, int>("811029042", 1, 1, 103516));
+                    ListData.Add(new Tuple<string, int, int, int>("811029042", 1, 2, 114661));
+                    ListData.Add(new Tuple<string, int, int, int>("812007286", 1, 1, 4775));
+                    ListData.Add(new Tuple<string, int, int, int>("812007286", 1, 2, 113307));
+                    ListData.Add(new Tuple<string, int, int, int>("814003420", 1, 1, 3009));
+                    ListData.Add(new Tuple<string, int, int, int>("814003420", 1, 2, 168019));
+                    ListData.Add(new Tuple<string, int, int, int>("816004480", 1, 1, 15187));
+                    ListData.Add(new Tuple<string, int, int, int>("816004480", 1, 2, 158971));
+                    ListData.Add(new Tuple<string, int, int, int>("819001302", 1, 1, 151947));
+                    ListData.Add(new Tuple<string, int, int, int>("819001302", 1, 2, 151934));
+                    ListData.Add(new Tuple<string, int, int, int>("830030986", 1, 1, 159796));
+                    ListData.Add(new Tuple<string, int, int, int>("830030986", 1, 2, 221662));
+                    ListData.Add(new Tuple<string, int, int, int>("830036470", 1, 1, 38775));
+                    ListData.Add(new Tuple<string, int, int, int>("830036470", 1, 2, 157611));
+                    ListData.Add(new Tuple<string, int, int, int>("830086720", 1, 2, 121625));
+                    ListData.Add(new Tuple<string, int, int, int>("860007229", 1, 1, 13188));
+                    ListData.Add(new Tuple<string, int, int, int>("860007229", 1, 2, 13248));
+                    ListData.Add(new Tuple<string, int, int, int>("860014987", 1, 1, 21259));
+                    ListData.Add(new Tuple<string, int, int, int>("860014987", 1, 2, 157757));
+                    ListData.Add(new Tuple<string, int, int, int>("860066875", 1, 1, 533));
+                    ListData.Add(new Tuple<string, int, int, int>("860066875", 1, 2, 532));
+                    ListData.Add(new Tuple<string, int, int, int>("890300524", 1, 1, 102952));
+                    ListData.Add(new Tuple<string, int, int, int>("890300524", 1, 2, 202013));
+                    ListData.Add(new Tuple<string, int, int, int>("890303254", 1, 1, 1367));
+                    ListData.Add(new Tuple<string, int, int, int>("890303254", 1, 2, 1347));
+                    ListData.Add(new Tuple<string, int, int, int>("891401093", 1, 1, 15728));
+                    ListData.Add(new Tuple<string, int, int, int>("891401093", 1, 2, 15719));
+                    ListData.Add(new Tuple<string, int, int, int>("891408974", 1, 1, 85153));
+                    ListData.Add(new Tuple<string, int, int, int>("891408974", 1, 2, 88568));
+                    ListData.Add(new Tuple<string, int, int, int>("891700203", 1, 1, 98115));
+                    ListData.Add(new Tuple<string, int, int, int>("891700203", 1, 2, 153876));
+                    ListData.Add(new Tuple<string, int, int, int>("891801193", 1, 1, 9944));
+                    ListData.Add(new Tuple<string, int, int, int>("891801193", 1, 2, 30275));
+                    ListData.Add(new Tuple<string, int, int, int>("900011819", 1, 2, 88918));
+                    ListData.Add(new Tuple<string, int, int, int>("900011885", 1, 2, 174884));
+                    ListData.Add(new Tuple<string, int, int, int>("900021682", 1, 1, 76724));
+                    ListData.Add(new Tuple<string, int, int, int>("900021682", 1, 2, 91207));
+                    ListData.Add(new Tuple<string, int, int, int>("900038575", 1, 2, 179807));
+                    ListData.Add(new Tuple<string, int, int, int>("900056422", 1, 1, 36203));
+                    ListData.Add(new Tuple<string, int, int, int>("900056422", 1, 2, 200178));
+                    ListData.Add(new Tuple<string, int, int, int>("900169782", 1, 1, 38605));
+                    ListData.Add(new Tuple<string, int, int, int>("900169782", 1, 2, 39943));
+                    ListData.Add(new Tuple<string, int, int, int>("900197552", 1, 1, 158037));
+                    ListData.Add(new Tuple<string, int, int, int>("900197552", 1, 2, 158033));
+                    ListData.Add(new Tuple<string, int, int, int>("900205886", 1, 1, 149557));
+                    ListData.Add(new Tuple<string, int, int, int>("900205886", 1, 2, 149558));
+                    ListData.Add(new Tuple<string, int, int, int>("900337310", 1, 1, 61670));
+                    ListData.Add(new Tuple<string, int, int, int>("900337310", 1, 2, 61668));
+                    ListData.Add(new Tuple<string, int, int, int>("900361697", 1, 2, 26573));
+                    ListData.Add(new Tuple<string, int, int, int>("900417923", 1, 1, 32633));
+                    ListData.Add(new Tuple<string, int, int, int>("900417923", 1, 2, 32784));
+                    ListData.Add(new Tuple<string, int, int, int>("900438679", 1, 2, 76038));
+                    ListData.Add(new Tuple<string, int, int, int>("900450994", 1, 1, 63719));
+                    ListData.Add(new Tuple<string, int, int, int>("900450994", 1, 2, 63720));
+                    ListData.Add(new Tuple<string, int, int, int>("900474088", 1, 1, 45751));
+                    ListData.Add(new Tuple<string, int, int, int>("900474088", 1, 2, 114045));
+                    ListData.Add(new Tuple<string, int, int, int>("900478500", 1, 1, 4588));
+                    ListData.Add(new Tuple<string, int, int, int>("900478500", 1, 2, 137061));
+                    ListData.Add(new Tuple<string, int, int, int>("900521455", 1, 1, 6451));
+                    ListData.Add(new Tuple<string, int, int, int>("900521455", 1, 2, 223726));
+                    ListData.Add(new Tuple<string, int, int, int>("900530718", 1, 2, 242856));
+                    ListData.Add(new Tuple<string, int, int, int>("900535078", 1, 2, 161329));
+                    ListData.Add(new Tuple<string, int, int, int>("900582372", 1, 1, 78316));
+                    ListData.Add(new Tuple<string, int, int, int>("900582372", 1, 2, 78317));
+                    ListData.Add(new Tuple<string, int, int, int>("900598357", 1, 1, 177940));
+                    ListData.Add(new Tuple<string, int, int, int>("900598357", 1, 2, 179810));
+                    ListData.Add(new Tuple<string, int, int, int>("900601276", 1, 1, 15140));
+                    ListData.Add(new Tuple<string, int, int, int>("900601276", 1, 2, 15137));
+                    ListData.Add(new Tuple<string, int, int, int>("900633198", 1, 1, 20107));
+                    ListData.Add(new Tuple<string, int, int, int>("900633198", 1, 2, 20111));
+                    ListData.Add(new Tuple<string, int, int, int>("900676334", 1, 2, 201325));
+                    ListData.Add(new Tuple<string, int, int, int>("900697924", 1, 2, 42573));
+                    ListData.Add(new Tuple<string, int, int, int>("900699319", 1, 2, 136829));
+                    ListData.Add(new Tuple<string, int, int, int>("900701816", 1, 1, 73237));
+                    ListData.Add(new Tuple<string, int, int, int>("900701816", 1, 2, 75592));
+                    ListData.Add(new Tuple<string, int, int, int>("900740317", 1, 1, 146242));
+                    ListData.Add(new Tuple<string, int, int, int>("900740317", 1, 2, 146225));
+                    ListData.Add(new Tuple<string, int, int, int>("900772711", 1, 1, 103561));
+                    ListData.Add(new Tuple<string, int, int, int>("900772711", 1, 2, 103555));
+                    ListData.Add(new Tuple<string, int, int, int>("900781986", 1, 1, 12830));
+                    ListData.Add(new Tuple<string, int, int, int>("900781986", 1, 2, 20861));
+                    ListData.Add(new Tuple<string, int, int, int>("900785720", 1, 1, 1888));
+                    ListData.Add(new Tuple<string, int, int, int>("900785720", 1, 2, 114585));
+                    ListData.Add(new Tuple<string, int, int, int>("900819287", 1, 1, 100411));
+                    ListData.Add(new Tuple<string, int, int, int>("900819287", 1, 2, 178535));
+                    ListData.Add(new Tuple<string, int, int, int>("900922437", 1, 2, 119172));
+                    ListData.Add(new Tuple<string, int, int, int>("900961711", 1, 1, 13214));
+                    ListData.Add(new Tuple<string, int, int, int>("900961711", 1, 2, 15472));
+                    ListData.Add(new Tuple<string, int, int, int>("900988309", 1, 2, 29187));
+                    ListData.Add(new Tuple<string, int, int, int>("901023043", 1, 2, 19909));
+                    ListData.Add(new Tuple<string, int, int, int>("901029762", 1, 1, 15037));
+                    ListData.Add(new Tuple<string, int, int, int>("901029762", 1, 2, 12750));
+                    ListData.Add(new Tuple<string, int, int, int>("901048549", 1, 1, 54738));
+                    ListData.Add(new Tuple<string, int, int, int>("901048549", 1, 2, 115131));
+                    ListData.Add(new Tuple<string, int, int, int>("901107406", 1, 1, 22947));
+                    ListData.Add(new Tuple<string, int, int, int>("901107406", 1, 2, 28699));
+                    ListData.Add(new Tuple<string, int, int, int>("901118295", 1, 2, 201919));
+                    ListData.Add(new Tuple<string, int, int, int>("901132953", 1, 1, 31393));
+                    ListData.Add(new Tuple<string, int, int, int>("901132953", 1, 2, 113445));
+                    ListData.Add(new Tuple<string, int, int, int>("901133642", 1, 1, 85321));
+                    ListData.Add(new Tuple<string, int, int, int>("901133642", 1, 2, 116215));
+                    ListData.Add(new Tuple<string, int, int, int>("901143611", 1, 1, 119046));
+                    ListData.Add(new Tuple<string, int, int, int>("901143611", 1, 2, 137668));
+                    ListData.Add(new Tuple<string, int, int, int>("901153500", 1, 1, 106549));
+                    ListData.Add(new Tuple<string, int, int, int>("901153500", 1, 2, 132029));
+                    ListData.Add(new Tuple<string, int, int, int>("901165175", 1, 2, 3176));
+                    ListData.Add(new Tuple<string, int, int, int>("901227025", 1, 1, 10967));
+                    ListData.Add(new Tuple<string, int, int, int>("901227025", 1, 2, 55298));
+                    ListData.Add(new Tuple<string, int, int, int>("901368769", 1, 2, 61660));
+                    ListData.Add(new Tuple<string, int, int, int>("901378861", 1, 2, 165692));
+                    ListData.Add(new Tuple<string, int, int, int>("901405704", 1, 2, 29827));
+                    ListData.Add(new Tuple<string, int, int, int>("901458700", 1, 2, 22279));
+                    ListData.Add(new Tuple<string, int, int, int>("901490114", 1, 2, 217549));
 
-                    IEnumerable <GlobalOtherDocElecOperation> listGlobalOtherDocElecOperation = TableManagerGlobalOtherDocElecOperation.GetRowsContainsInPartitionKeys<GlobalOtherDocElecOperation>(ListData.Select(d => d.Item1));
+                    IEnumerable<GlobalOtherDocElecOperation> listGlobalOtherDocElecOperation = TableManagerGlobalOtherDocElecOperation.GetRowsContainsInPartitionKeys<GlobalOtherDocElecOperation>(ListData.Select(d => d.Item1));
                     var listGlobalOtherDocElecOperationDif = from godeo in listGlobalOtherDocElecOperation
-                                                             join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, godeo.OperationModeId } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2, OperationModeId = ld.Item3}
+                                                             join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, godeo.OperationModeId } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2, OperationModeId = ld.Item3 }
                                                              where godeo.OtherDocElecContributorId != ld.Item4
                                                              select new { godeo, ld };
                     foreach (var item in listGlobalOtherDocElecOperationDif)
@@ -177,9 +293,9 @@ namespace Gosocket.Dian.Functions.Others
                             messages.Add(string.Format("('{0}','{1}','{2}','{3}','{4}','{5}','{6}'", item.PartitionKey, item.RowKey, item.OperationModeId, item.OtherDocElecContributorId, item.SoftwareId, item.State, item.Deleted));
 
                         }
-                        ListData.RemoveRange(0, ListData.Count > 100? 100 : ListData.Count);
+                        ListData.RemoveRange(0, ListData.Count > 100 ? 100 : ListData.Count);
                     }
-                    
+
 
                     //IEnumerable<GlobalTestSetOthersDocumentsResult> listGlobalTestSetOthersDocumentsResult = TableManagerGlobalTestSetOthersDocumentsResult.GetRowsContainsInPartitionKeys<GlobalTestSetOthersDocumentsResult>(ListData.Select(d => d.Item1));
                     //var listGlobalTestSetOthersDocumentsResultDif = from godeo in listGlobalTestSetOthersDocumentsResult
@@ -225,38 +341,99 @@ namespace Gosocket.Dian.Functions.Others
                 else if (data.ModeTest == "5")
                 {
                     List<Tuple<String, int, int, int>> ListData = new List<Tuple<string, int, int, int>>();
-                    ListData.Add(new Tuple<string, int, int, int>("1152465784", 1, 2, 242918));
-                    ListData.Add(new Tuple<string, int, int, int>("12958638", 1, 2, 18563));
-                    ListData.Add(new Tuple<string, int, int, int>("15515241", 1, 2, 18677));
-                    ListData.Add(new Tuple<string, int, int, int>("20391256", 1, 2, 28181));
-                    ListData.Add(new Tuple<string, int, int, int>("28556855", 1, 2, 13796));
-                    ListData.Add(new Tuple<string, int, int, int>("51751494", 1, 2, 223990));
-                    ListData.Add(new Tuple<string, int, int, int>("700096455", 1, 2, 225225));
-                    ListData.Add(new Tuple<string, int, int, int>("76305812", 1, 2, 242894));
-                    ListData.Add(new Tuple<string, int, int, int>("830107828", 1, 2, 79412));
-                    ListData.Add(new Tuple<string, int, int, int>("890270661", 1, 2, 4249));
-                    ListData.Add(new Tuple<string, int, int, int>("892400697", 1, 2, 12125));
-                    ListData.Add(new Tuple<string, int, int, int>("900356681", 1, 2, 8818));
-                    ListData.Add(new Tuple<string, int, int, int>("900378629", 1, 2, 253046));
-                    ListData.Add(new Tuple<string, int, int, int>("900468497", 1, 2, 79184));
-                    ListData.Add(new Tuple<string, int, int, int>("900746078", 1, 2, 11384));
-                    ListData.Add(new Tuple<string, int, int, int>("900844587", 1, 2, 10508));
-                    ListData.Add(new Tuple<string, int, int, int>("901280536", 1, 2, 245135));
-                    ListData.Add(new Tuple<string, int, int, int>("901308210", 1, 2, 228489));
-                    ListData.Add(new Tuple<string, int, int, int>("901326514", 1, 2, 239530));
-                    ListData.Add(new Tuple<string, int, int, int>("901336753", 1, 1, 239531));
-                    ListData.Add(new Tuple<string, int, int, int>("901352450", 1, 2, 239532));
-                    ListData.Add(new Tuple<string, int, int, int>("901383875", 1, 2, 247439));
-                    ListData.Add(new Tuple<string, int, int, int>("901385477", 1, 2, 225251));
-                    ListData.Add(new Tuple<string, int, int, int>("901397575", 1, 2, 239534));
-                    ListData.Add(new Tuple<string, int, int, int>("901552575", 1, 2, 232294));
+                    ListData.Add(new Tuple<string, int, int, int>("1116261717", 1, 2, 160119));
+                    ListData.Add(new Tuple<string, int, int, int>("13060584", 1, 2, 130069));
+                    ListData.Add(new Tuple<string, int, int, int>("15431620", 1, 2, 23972));
+                    ListData.Add(new Tuple<string, int, int, int>("15959491", 1, 2, 78499));
+                    ListData.Add(new Tuple<string, int, int, int>("16215590", 1, 2, 51129));
+                    ListData.Add(new Tuple<string, int, int, int>("19326888", 1, 2, 130721));
+                    ListData.Add(new Tuple<string, int, int, int>("19390632", 1, 2, 78292));
+                    ListData.Add(new Tuple<string, int, int, int>("25613044", 1, 2, 188376));
+                    ListData.Add(new Tuple<string, int, int, int>("43055922", 1, 2, 26254));
+                    ListData.Add(new Tuple<string, int, int, int>("48574672", 1, 2, 188388));
+                    ListData.Add(new Tuple<string, int, int, int>("63304321", 1, 2, 79047));
+                    ListData.Add(new Tuple<string, int, int, int>("6873403", 1, 2, 104683));
+                    ListData.Add(new Tuple<string, int, int, int>("70694218", 1, 2, 50411));
+                    ListData.Add(new Tuple<string, int, int, int>("800115005", 1, 2, 104705));
+                    ListData.Add(new Tuple<string, int, int, int>("800146814", 1, 2, 25695));
+                    ListData.Add(new Tuple<string, int, int, int>("800207224", 1, 2, 87038));
+                    ListData.Add(new Tuple<string, int, int, int>("800216484", 1, 2, 188572));
+                    ListData.Add(new Tuple<string, int, int, int>("802021369", 1, 2, 6979));
+                    ListData.Add(new Tuple<string, int, int, int>("811029042", 1, 2, 78164));
+                    ListData.Add(new Tuple<string, int, int, int>("812007286", 1, 2, 76750));
+                    ListData.Add(new Tuple<string, int, int, int>("814003420", 1, 2, 160316));
+                    ListData.Add(new Tuple<string, int, int, int>("816004480", 1, 2, 158546));
+                    ListData.Add(new Tuple<string, int, int, int>("819001302", 1, 2, 158736));
+                    ListData.Add(new Tuple<string, int, int, int>("830030986", 1, 2, 213549));
+                    ListData.Add(new Tuple<string, int, int, int>("830036470", 1, 2, 130346));
+                    ListData.Add(new Tuple<string, int, int, int>("830086720", 1, 2, 87012));
+                    ListData.Add(new Tuple<string, int, int, int>("860007229", 1, 2, 7324));
+                    ListData.Add(new Tuple<string, int, int, int>("860014987", 1, 2, 130096));
+                    ListData.Add(new Tuple<string, int, int, int>("860066875", 1, 2, 5932));
+                    ListData.Add(new Tuple<string, int, int, int>("890300524", 1, 2, 186947));
+                    ListData.Add(new Tuple<string, int, int, int>("890303254", 1, 2, 77362));
+                    ListData.Add(new Tuple<string, int, int, int>("891401093", 1, 2, 77421));
+                    ListData.Add(new Tuple<string, int, int, int>("891408974", 1, 2, 50152));
+                    ListData.Add(new Tuple<string, int, int, int>("891700203", 1, 2, 129596));
+                    ListData.Add(new Tuple<string, int, int, int>("891801193", 1, 2, 5470));
+                    ListData.Add(new Tuple<string, int, int, int>("900011819", 1, 2, 137154));
+                    ListData.Add(new Tuple<string, int, int, int>("900011885", 1, 2, 152220));
+                    ListData.Add(new Tuple<string, int, int, int>("900021682", 1, 2, 52082));
+                    ListData.Add(new Tuple<string, int, int, int>("900038575", 1, 2, 158868));
+                    ListData.Add(new Tuple<string, int, int, int>("900056422", 1, 2, 185897));
+                    ListData.Add(new Tuple<string, int, int, int>("900169782", 1, 2, 23744));
+                    ListData.Add(new Tuple<string, int, int, int>("900197552", 1, 2, 131219));
+                    ListData.Add(new Tuple<string, int, int, int>("900205886", 1, 2, 158577));
+                    ListData.Add(new Tuple<string, int, int, int>("900337310", 1, 2, 129725));
+                    ListData.Add(new Tuple<string, int, int, int>("900361697", 1, 2, 26127));
+                    ListData.Add(new Tuple<string, int, int, int>("900417923", 1, 2, 25414));
+                    ListData.Add(new Tuple<string, int, int, int>("900438679", 1, 2, 41080));
+                    ListData.Add(new Tuple<string, int, int, int>("900450994", 1, 2, 79677));
+                    ListData.Add(new Tuple<string, int, int, int>("900474088", 1, 2, 77133));
+                    ListData.Add(new Tuple<string, int, int, int>("900478500", 1, 2, 105105));
+                    ListData.Add(new Tuple<string, int, int, int>("900521455", 1, 2, 214363));
+                    ListData.Add(new Tuple<string, int, int, int>("900530718", 1, 2, 235270));
+                    ListData.Add(new Tuple<string, int, int, int>("900535078", 1, 2, 134392));
+                    ListData.Add(new Tuple<string, int, int, int>("900582372", 1, 2, 53013));
+                    ListData.Add(new Tuple<string, int, int, int>("900598357", 1, 2, 158944));
+                    ListData.Add(new Tuple<string, int, int, int>("900601276", 1, 2, 52896));
+                    ListData.Add(new Tuple<string, int, int, int>("900633198", 1, 2, 25827));
+                    ListData.Add(new Tuple<string, int, int, int>("900676334", 1, 2, 186553));
+                    ListData.Add(new Tuple<string, int, int, int>("900697924", 1, 2, 72521));
+                    ListData.Add(new Tuple<string, int, int, int>("900699319", 1, 2, 104764));
+                    ListData.Add(new Tuple<string, int, int, int>("900701816", 1, 2, 77422));
+                    ListData.Add(new Tuple<string, int, int, int>("900740317", 1, 2, 130842));
+                    ListData.Add(new Tuple<string, int, int, int>("900772711", 1, 2, 104487));
+                    ListData.Add(new Tuple<string, int, int, int>("900781986", 1, 2, 130680));
+                    ListData.Add(new Tuple<string, int, int, int>("900785720", 1, 2, 77991));
+                    ListData.Add(new Tuple<string, int, int, int>("900819287", 1, 2, 157250));
+                    ListData.Add(new Tuple<string, int, int, int>("900922437", 1, 2, 83536));
+                    ListData.Add(new Tuple<string, int, int, int>("900961711", 1, 2, 159704));
+                    ListData.Add(new Tuple<string, int, int, int>("900988309", 1, 2, 3659));
+                    ListData.Add(new Tuple<string, int, int, int>("901023043", 1, 2, 2862));
+                    ListData.Add(new Tuple<string, int, int, int>("901029762", 1, 2, 50838));
+                    ListData.Add(new Tuple<string, int, int, int>("901048549", 1, 2, 79446));
+                    ListData.Add(new Tuple<string, int, int, int>("901107406", 1, 2, 5338));
+                    ListData.Add(new Tuple<string, int, int, int>("901118295", 1, 2, 186776));
+                    ListData.Add(new Tuple<string, int, int, int>("901132953", 1, 2, 76840));
+                    ListData.Add(new Tuple<string, int, int, int>("901133642", 1, 2, 79801));
+                    ListData.Add(new Tuple<string, int, int, int>("901143611", 1, 2, 105896));
+                    ListData.Add(new Tuple<string, int, int, int>("901153500", 1, 1, 130098));
+                    ListData.Add(new Tuple<string, int, int, int>("901153500", 1, 2, 99338));
+                    ListData.Add(new Tuple<string, int, int, int>("901165175", 1, 2, 25508));
+                    ListData.Add(new Tuple<string, int, int, int>("901227025", 1, 2, 25013));
+                    ListData.Add(new Tuple<string, int, int, int>("901368769", 1, 2, 242743));
+                    ListData.Add(new Tuple<string, int, int, int>("901378861", 1, 2, 242516));
+                    ListData.Add(new Tuple<string, int, int, int>("901405704", 1, 2, 242688));
+                    ListData.Add(new Tuple<string, int, int, int>("901458700", 1, 2, 242711));
+                    ListData.Add(new Tuple<string, int, int, int>("901490114", 1, 2, 242890));
 
 
                     IEnumerable<GlobalOtherDocElecOperation> listGlobalOtherDocElecOperationProd = TableManagerGlobalOtherDocElecOperationProd.GetRowsContainsInPartitionKeys<GlobalOtherDocElecOperation>(ListData.Select(d => d.Item1));
                     var listGlobalOtherDocElecOperationDifProd = from godeo in listGlobalOtherDocElecOperationProd
-                                                             join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, godeo.OperationModeId } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2, OperationModeId = ld.Item3 }
-                                                             where godeo.OtherDocElecContributorId != ld.Item4
-                                                             select new { godeo, ld };
+                                                                 join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, godeo.OperationModeId } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2, OperationModeId = ld.Item3 }
+                                                                 where godeo.OtherDocElecContributorId != ld.Item4
+                                                                 select new { godeo, ld };
                     foreach (var item in listGlobalOtherDocElecOperationDifProd)
                     {
                         messages.Add(string.Format("Se actualizo el nit {0}", item.godeo.PartitionKey));
@@ -266,14 +443,33 @@ namespace Gosocket.Dian.Functions.Others
 
                     IEnumerable<GlobalTestSetOthersDocumentsResult> listGlobalTestSetOthersDocumentsResultProd = TableManagerGlobalTestSetOthersDocumentsResultProd.GetRowsContainsInPartitionKeys<GlobalTestSetOthersDocumentsResult>(ListData.Select(d => d.Item1));
                     var listGlobalTestSetOthersDocumentsResultDifProd = from godeo in listGlobalTestSetOthersDocumentsResultProd
-                                                                    join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, OperationModeId = godeo.RowKey.Split('|')[0] } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2.ToString(), OperationModeId = ld.Item3.ToString() }
-                                                                    where godeo.OtherDocElecContributorId != ld.Item4
-                                                                    select new { godeo, ld };
+                                                                        join ld in ListData on new { godeo.PartitionKey, godeo.ContributorTypeId, OperationModeId = godeo.RowKey.Split('|')[0] } equals new { PartitionKey = ld.Item1, ContributorTypeId = ld.Item2.ToString(), OperationModeId = ld.Item3.ToString() }
+                                                                        where godeo.OtherDocElecContributorId != ld.Item4
+                                                                        select new { godeo, ld };
                     foreach (var item1 in listGlobalTestSetOthersDocumentsResultDifProd)
                     {
                         messages.Add(string.Format("Se actualizo el nit {0}", item1.godeo.PartitionKey));
                         item1.godeo.OtherDocElecContributorId = item1.ld.Item4;
                         arrayTasks.Add(TableManagerGlobalTestSetOthersDocumentsResultProd.InsertOrUpdateAsync(item1.godeo));
+                    }
+                }
+                #endregion
+                #region #Softwarepartitiondiferenterow
+                else if (data.ModeTest == "6")
+                {
+                    GlobalSoftware globalSoftwareAux = null;
+                    IEnumerable<GlobalSoftware> listGlobalSoftwareProd = TableManagerGlobalSoftwareProd.GetRowsByAnyFilter<GlobalSoftware>(" Timestamp ge datetime'2022-04-01T00:00:00.000Z' ");
+                    foreach (GlobalSoftware globalSoftware in listGlobalSoftwareProd.Where(gs => !gs.PartitionKey.Equals(gs.RowKey)))
+                    {
+                        globalSoftwareAux = new GlobalSoftware();
+                        globalSoftwareAux.PartitionKey = globalSoftware.PartitionKey;
+                        globalSoftwareAux.RowKey = globalSoftware.RowKey;
+                        globalSoftwareAux.ETag = globalSoftware.ETag;
+                        globalSoftware.RowKey = globalSoftware.PartitionKey;
+                        globalSoftware.Timestamp = DateTime.Now;
+                        arrayTasks.Add(TableManagerGlobalSoftwareProd.InsertOrUpdateAsync(globalSoftware));
+                        arrayTasks.Add(TableManagerGlobalSoftwareProd.DeleteAsync(globalSoftwareAux));
+                        messages.Add(String.Format("Se actualizo el software base '{0}', software id '{1}'", globalSoftware.PartitionKey, globalSoftware.Id));
                     }
                 }
                 #endregion
@@ -331,8 +527,8 @@ namespace Gosocket.Dian.Functions.Others
                                             {
                                                 arrayTasks.Add(Task.Run(() =>
                                                 {
-                                                //Actualiza othersDocsElecSoftware
-                                                var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
+                                                    //Actualiza othersDocsElecSoftware
+                                                    var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
                                                     if (_guid.Result == Guid.Empty)
                                                         messages.Add(String.Format("OtherDocElecSoftware - No se pudo actualizar el Id : {0}, al estado Aceptado", item.SoftwareId));
                                                     else
@@ -340,8 +536,8 @@ namespace Gosocket.Dian.Functions.Others
                                                 }));
                                                 arrayTasks.Add(Task.Run(() =>
                                                 {
-                                                //Actualiza OtherDocElecContributorOperations
-                                                var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
+                                                    //Actualiza OtherDocElecContributorOperations
+                                                    var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
                                                     if (_ContributorOperationsId.Result == 0)
                                                         messages.Add(String.Format("OtherDocElecContributorOperations - No se pudo actualizar con el SoftwareId : {0}, al estado Habilitado", item.SoftwareId));
                                                     else
@@ -417,8 +613,8 @@ namespace Gosocket.Dian.Functions.Others
                                                                 messages.Add(String.Format("OtherDocElecSoftware - No se encontro con SoftwareId : {0}", it.SoftwareId));
                                                             else
                                                             {
-                                                            #region migracion SQL
-                                                            try
+                                                                #region migracion SQL
+                                                                try
                                                                 {
                                                                     var requestObject = new
                                                                     {
@@ -443,7 +639,8 @@ namespace Gosocket.Dian.Functions.Others
 
                                                                             string.Empty),
                                                                         contributorOpertaionModeId = ig.OperationModeId
-                                                                        ,otherDocElecContributorId = ig.OtherDocElecContributorId
+                                                                        ,
+                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId
                                                                     };
 
 
@@ -489,9 +686,9 @@ namespace Gosocket.Dian.Functions.Others
                                                                     log.Error($"Error al enviar a activar OtherDocument contribuyente con Code {ig.PartitionKey} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
 
                                                                 }
-                                                            #endregion
-                                                            //}
-                                                        }
+                                                                #endregion
+                                                                //}
+                                                            }
                                                         }));
                                                     }
                                                     else
@@ -617,8 +814,8 @@ namespace Gosocket.Dian.Functions.Others
                                                 {
                                                     arrayTasks.Add(Task.Run(() =>
                                                     {
-                                                    //Actualiza othersDocsElecSoftware
-                                                    var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item1.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.InProcess, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
+                                                        //Actualiza othersDocsElecSoftware
+                                                        var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item1.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.InProcess, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
                                                         if (_guid.Result == Guid.Empty)
                                                             messages.Add(String.Format("OtherDocElecSoftware - No se pudo actualizar el Id : {0}, al estado En proceso", item1.SoftwareId));
                                                         else
@@ -626,8 +823,8 @@ namespace Gosocket.Dian.Functions.Others
                                                     }));
                                                     arrayTasks.Add(Task.Run(() =>
                                                     {
-                                                    //Actualiza OtherDocElecContributorOperations
-                                                    var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item1.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Test, Deleted = false }, Domain.Common.OtherDocElecState.none);
+                                                        //Actualiza OtherDocElecContributorOperations
+                                                        var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item1.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Test, Deleted = false }, Domain.Common.OtherDocElecState.none);
                                                         if (_ContributorOperationsId.Result == 0)
                                                             messages.Add(String.Format("OtherDocElecContributorOperations - No se pudo actualizar con el SoftwareId : {0}, al estado En pruebas", item1.SoftwareId));
                                                         else
@@ -678,8 +875,8 @@ namespace Gosocket.Dian.Functions.Others
                                                     {
                                                         arrayTasks.Add(Task.Run(() =>
                                                         {
-                                                        //Actualiza othersDocsElecSoftware
-                                                        var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item1.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
+                                                            //Actualiza othersDocsElecSoftware
+                                                            var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item1.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
                                                             if (_guid.Result == Guid.Empty)
                                                                 messages.Add(String.Format("OtherDocElecSoftware - No se pudo actualizar el Id : {0}, al estado Aceptado", item1.SoftwareId));
                                                             else
@@ -687,8 +884,8 @@ namespace Gosocket.Dian.Functions.Others
                                                         }));
                                                         arrayTasks.Add(Task.Run(() =>
                                                         {
-                                                        //Actualiza OtherDocElecContributorOperations
-                                                        var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item1.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
+                                                            //Actualiza OtherDocElecContributorOperations
+                                                            var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item1.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
                                                             if (_ContributorOperationsId.Result == 0)
                                                                 messages.Add(String.Format("OtherDocElecContributorOperations - No se pudo actualizar con el SoftwareId : {0}, al estado Habilitado", item1.SoftwareId));
                                                             else
@@ -779,8 +976,8 @@ namespace Gosocket.Dian.Functions.Others
                                             {
                                                 arrayTasks.Add(Task.Run(() =>
                                                 {
-                                                //Actualiza othersDocsElecSoftware
-                                                var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item2.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Rejected, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
+                                                    //Actualiza othersDocsElecSoftware
+                                                    var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item2.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Rejected, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
                                                     if (_guid.Result == Guid.Empty)
                                                         messages.Add(String.Format("OtherDocElecSoftware - No se pudo actualizar el Id : {0}, al estado Rechazado", item2.SoftwareId));
                                                     else
@@ -788,8 +985,8 @@ namespace Gosocket.Dian.Functions.Others
                                                 }));
                                                 arrayTasks.Add(Task.Run(() =>
                                                 {
-                                                //Actualiza OtherDocElecContributorOperations
-                                                var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item2.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Cancelado, Deleted = false }, Domain.Common.OtherDocElecState.none);
+                                                    //Actualiza OtherDocElecContributorOperations
+                                                    var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item2.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Cancelado, Deleted = false }, Domain.Common.OtherDocElecState.none);
                                                     if (_ContributorOperationsId.Result == 0)
                                                         messages.Add(String.Format("OtherDocElecContributorOperations - No se pudo actualizar con el SoftwareId : {0}, al estado Cancelado (Rechazado)", item2.SoftwareId));
                                                     else
@@ -839,8 +1036,8 @@ namespace Gosocket.Dian.Functions.Others
                                                     {
                                                         arrayTasks.Add(Task.Run(() =>
                                                         {
-                                                        //Actualiza othersDocsElecSoftware
-                                                        var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item2.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
+                                                            //Actualiza othersDocsElecSoftware
+                                                            var _guid = othersDocsElecSoftwareService.UpdateSoftwareStatusId(new Domain.Sql.OtherDocElecSoftware() { Id = new Guid(item2.SoftwareId), OtherDocElecSoftwareStatusId = (int)Domain.Common.OtherDocElecSoftwaresStatus.Accepted, Status = true, Deleted = false }, Domain.Common.OtherDocElecSoftwaresStatus.None);
                                                             if (_guid.Result == Guid.Empty)
                                                                 messages.Add(String.Format("OtherDocElecSoftware - No se pudo actualizar el Id : {0}, al estado Aceptado", item2.SoftwareId));
                                                             else
@@ -848,8 +1045,8 @@ namespace Gosocket.Dian.Functions.Others
                                                         }));
                                                         arrayTasks.Add(Task.Run(() =>
                                                         {
-                                                        //Actualiza OtherDocElecContributorOperations
-                                                        var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item2.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
+                                                            //Actualiza OtherDocElecContributorOperations
+                                                            var _ContributorOperationsId = othersElectronicDocumentsService.UpdateOtherDocElecContributorOperationStatusId(new Domain.Sql.OtherDocElecContributorOperations() { OtherDocElecContributorId = itemGODEO.OtherDocElecContributorId, SoftwareId = new Guid(item2.SoftwareId), OperationStatusId = (int)Domain.Common.OtherDocElecState.Habilitado, Deleted = false }, Domain.Common.OtherDocElecState.none);
                                                             if (_ContributorOperationsId.Result == 0)
                                                                 messages.Add(String.Format("OtherDocElecContributorOperations - No se pudo actualizar con el SoftwareId : {0}, al estado Habilitado", item2.SoftwareId));
                                                             else
@@ -1035,7 +1232,8 @@ namespace Gosocket.Dian.Functions.Others
 
                                                                             string.Empty),
                                                                         contributorOpertaionModeId = ig.OperationModeId
-                                                                        ,otherDocElecContributorId = ig.OtherDocElecContributorId
+                                                                        ,
+                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId
                                                                     };
 
 
