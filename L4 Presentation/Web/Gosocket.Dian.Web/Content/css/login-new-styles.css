@@ -35,7 +35,7 @@
     width: 588px;
 }
 .bhoechie-tab-content {
-    padding: 24px !important;
+    padding: 57px 73px 50px 66px!important;
     background: #f6f7f9 !important;
 }
 .login-wrapper {
@@ -82,4 +82,8 @@ button.menu-button {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+}
+
+.no-flex {
+    display: block;
 }

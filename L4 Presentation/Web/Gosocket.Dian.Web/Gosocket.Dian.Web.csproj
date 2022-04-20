@@ -583,6 +583,9 @@
     <Content Include="Content\images\download.png" />
     <Content Include="Content\images\edit.png" />
     <Content Include="Content\images\exclamation-circle.png" />
+    <Content Include="Content\images\icon-check-confirmation.svg" />
+    <Content Include="Content\images\icon-warning-warn.svg" />
+    <Content Include="Content\images\icon-warning.svg" />
     <Content Include="Content\images\ingreso-1.png" />
     <Content Include="Content\images\ingreso-2.png" />
     <Content Include="Content\images\ingreso-3.png" />
@@ -3001,6 +3004,8 @@
     <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
     <Content Include="Views\Shared\_header.cshtml" />
     <Content Include="Views\Shared\_footer.cshtml" />
+    <Content Include="Views\Shared\_ConfirmModal.cshtml" />
+    <Content Include="Views\Shared\_LoadingPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

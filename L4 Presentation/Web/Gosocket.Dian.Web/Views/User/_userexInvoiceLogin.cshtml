@@ -42,11 +42,13 @@
             @Html.ValidationMessageFor(m => m.CompanyLoginFailed, "", new { @class = "" })
         </div>
 
-        <button type="submit" id="login-auth-user" class="btn btn-primary" style="margin-top: 10px;">
-            Entrar
-        </button>
-        <div class="left-section textRecovery">
-            <button id="forgot-password" class="btn-link btn-link-recovery">Olvidé mi contraseña</button>
+        <div style="margin-top:40px">
+            <button type="submit" id="login-auth-user" class="btn btn-primary">
+                Entrar
+            </button>
+            <div class="left-section textRecovery">
+                <button id="forgot-password" class="btn-link btn-link-recovery">Olvidé mi contraseña</button>
+            </div>
         </div>
     }
 </div>

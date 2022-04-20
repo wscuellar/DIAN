@@ -1,0 +1,187 @@
+﻿
+<style>
+    .flex-direction-column {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    div#confirmModal .modal-dialog,
+    div#errorModal .modal-dialog,
+    div#successModal .modal-dialog {
+        /*width: 678px !important;*/
+        margin: auto !important;
+        /*top: 50% !important;
+        transform: translateY(-50%) !important;*/
+    }
+
+    div#confirmModal .modal-content,
+    div#errorModal .modal-content,
+    div#successModal .modal-content {
+        border-radius: 6px !important;
+        padding: 25px !important;
+    }
+
+    div#confirmModal .close,
+    div#errorModal .close,
+    div#successModal .close {
+        margin: 0 !important;
+        font-size: 32px !important;
+        opacity: inherit !important;
+        color: #262944 !important;
+    }
+
+    div#confirmModal .modal-body,
+    div#errorModal .modal-body,
+    div#successModal .modal-body {
+        padding: 0 12px !important;
+    }
+
+    div#confirmModal .modal-footer,
+    div#errorModal .modal-footer,
+    div#successModal .modal-footer {
+        padding: 0 12px 15px !important;
+    }
+
+    div#confirmModal #confirmModal-title {
+        margin: 30px 0 20px 0;
+        text-align: center !important;
+    }
+
+    div#confirmModal #confirmModal-message,
+    div#errorModal #errorModal-message,
+    div#successModal #successModal-message {
+        font-family: 'Ubuntu';
+        font-size: 14px;
+        line-height: 22px;
+        color: #2b323d;
+        margin-bottom: 30px;
+    }
+
+    div#errorModal #errorModal-message {
+        color: #F54E41;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 0 !important;
+    }
+
+    div#errorModal .dian-alert {
+        width: 80% !important;
+    }
+</style>
+
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" style="z-index: 2000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="modal-body flex-direction-column align-items-center justify-content-center">
+                <img height="170" src="~/Content/Images/icon-warning.svg" />
+                <span id="confirmModal-title" class="sub-title">Titulo</span>
+                <p id="confirmModal-message">Mensaje</p>
+            </div>
+            <div class="modal-footer text-center">
+                <button id="confirmModal-confirm-button" class="btn btn-primary">Confirmar</button>
+                <button id="confirmModal-cancel-button" class="btn btn-secondary ml-32" data-dismiss="modal" aria-label="Close">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" style="z-index: 2000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="modal-body flex-direction-column align-items-center justify-content-center">
+                <img height="170" src="~/Content/Images/icon-warning-warn.svg"/>
+                <div class="dian-alert dian-alert-danger flex-direction-column align-items-center mt-28">
+                    <span id="errorModal-title" class="sub-title text-center">Titulo</span>
+                    <p id="errorModal-message" style="word-break: break-all;">Mensaje</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" style="z-index: 2000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="modal-body flex-direction-column align-items-center justify-content-center">
+                <img height="170" src="~/Content/Images/icon-check-confirmation.svg" />
+                <span id="successModal-title" class="sub-title text-center">Titulo</span>
+                <p id="successModal-message">Mensaje</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ConfirmDialogV2(title, message, buttons, confirmCallback, cancelCallback = null) {
+        $("#confirmModal-title").text(title || "Confirmación");
+        $("#confirmModal-message").html(message || "¿Está seguro que desea realizar esta operación?");
+        $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Confimar");
+        $("#confirmModal-cancel-button").text(buttons?.cancel ?? "Cancelar");
+
+        $("#confirmModal").modal("show");
+        const modalBackDropLast = $(".modal-backdrop").length -1;
+        //$(".modal-backdrop").get(modalBackDropLast).style['z-index'] = 1995;
+
+        $("#confirmModal-confirm-button").on('click', () => {
+            if (confirmCallback != null) {
+                confirmCallback();
+            }
+            $("#confirmModal").modal("hide");
+            removeOkClickEvent();
+        });
+        $("#confirmModal-cancel-button").on('click', () => {
+            if (cancelCallback != null) {
+                cancelCallback();
+            }
+            removeOkClickEvent();
+        });
+        $("#confirmModal").find(".close").on('click', () => {
+            if (cancelCallback != null) {
+                cancelCallback();
+            }
+            removeOkClickEvent();
+        });
+        $('#confirmModal').on('hidden.bs.modal', () => {
+            removeOkClickEvent();
+        });
+    }
+    function removeOkClickEvent() {
+        $("#confirmModal-confirm-button").off();
+        $("#confirmModal-cancel-button").off();
+    }
+
+    function ErrorDialogV2(title, message = null) {
+        $("#errorModal-title").text(title || "¡Notificación!");
+        $("#errorModal-message").html(message || '');
+        if (!message) {
+            $("#errorModal-message").hide();
+        } else {
+            $("#errorModal-message").show();
+        }
+        
+
+        $("#errorModal").modal("show");
+        const modalBackDropLast = $(".modal-backdrop").length - 1;
+        //$(".modal-backdrop").get(modalBackDropLast).style['z-index'] = 1995;
+    }
+
+    function SuccessDialogV2(title, message = null, autoClosed = false) {
+        $("#successModal-title").text(title || "¡Notificación!");
+        $("#successModal-message").html(message || '');
+        if (!message) {
+            $("#successModal-message").hide();
+        } else {
+            $("#successModal-message").show();
+        }
+
+        $("#successModal").modal("show");
+        const modalBackDropLast = $(".modal-backdrop").length - 1;
+        //$(".modal-backdrop").get(modalBackDropLast).style['z-index'] = 1995;
+
+        if (!autoClosed) return;
+        window.setTimeout(() => { $("#successModal").modal("hide"); }, 5000);
+    }
+</script>
