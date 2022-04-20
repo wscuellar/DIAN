@@ -687,6 +687,14 @@
     <Content Include="Content\img\Gadloading.png" />
     <Content Include="Content\img\Gosocket-logo.png" />
     <Content Include="Content\img\Gov.co.png" />
+    <Content Include="Content\img\lateral-menu-icons\createUser.svg" />
+    <Content Include="Content\img\lateral-menu-icons\freeSolution.svg" />
+    <Content Include="Content\img\lateral-menu-icons\hamburguerMenu.svg" />
+    <Content Include="Content\img\lateral-menu-icons\history.svg" />
+    <Content Include="Content\img\lateral-menu-icons\home.svg" />
+    <Content Include="Content\img\lateral-menu-icons\participants.svg" />
+    <Content Include="Content\img\lateral-menu-icons\registrationAndAuthorization.svg" />
+    <Content Include="Content\img\lateral-menu-icons\settings.svg" />
     <Content Include="Content\img\loader.gif" />
     <Content Include="Content\img\login-icons\Administrator.svg" />
     <Content Include="Content\img\login-icons\AuthorizedUser.svg" />
