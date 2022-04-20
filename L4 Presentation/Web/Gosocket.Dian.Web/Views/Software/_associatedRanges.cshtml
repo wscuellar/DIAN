@@ -3,7 +3,7 @@
 
 <div class="table-responsive">
 
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th>Proveedor</th>
@@ -49,7 +49,10 @@
                         <a class="label label-table @expireDateLabel add-tooltip" data-placement="top" data-original-title="@expireDateTooltipTitle">@r.ExpirationDate</a>
                     </td>
                     <td class="text-center">
-                        <a href="javascript:void(0)" class="text-center" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></a>
+                        <button class="btn btn-secondary">
+                            <i href="javascript:void(0)" class="text-center" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></i>
+                        </button>
+                            
                     </td>
                 </tr>
             }
