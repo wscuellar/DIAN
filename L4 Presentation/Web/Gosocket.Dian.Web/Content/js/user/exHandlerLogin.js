@@ -8,17 +8,23 @@ function OnSuccessAjax(response) {
         window.location.href = response.Message;
     } else {
         hideLoading("#panel-forma");
-        var confirmMessage = response.Message;
-        var closeEvent = () => { }
-        var buttons = AlertExecLoggin2();
-        showConfirmation(confirmMessage, buttons, null, closeEvent);
+        if (!response.Message) {
+            ErrorDialogV2("", response.Message || "Ocurrió un error por favor intente nuevamente.");
+            return;
+        }
+        SuccessDialogV2("Acceso al sistema de facturación", response.Message, false);
+        //var confirmMessage = response.Message;
+        //showConfirmation(confirmMessage, buttons, null, closeEvent);
+        //var closeEvent = () => { }
+        //var buttons = AlertExecLoggin2();
     }
 }
 
 function OnFailureAjax(response) {
     var confirmMessage = response.responseJSON.message;
-    var buttons = AlertExec();
-    showConfirmation(confirmMessage, buttons);
+    ErrorDialogV2("Notificación", confirmMessage);
+    //var buttons = AlertExec();
+    //showConfirmation(confirmMessage, buttons);
 }
 
 

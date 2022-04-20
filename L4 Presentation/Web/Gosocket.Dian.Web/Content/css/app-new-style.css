@@ -134,6 +134,10 @@ table.simple-table tbody tr td.dataTables_empty {
         padding-right: 54px;
     }*/
 /**************Botones********************/
+.mt-12 {
+    margin-top: 12px !important;
+}
+
 .mt-28 {
     margin-top: 28px !important;
 }
@@ -545,8 +549,14 @@ label.sub-title-2 {
     }
 
     .dian-alert i.fa {
+        flex: 0 0 24px;
         font-size: 24px;
         color: #262944;
+    }
+
+    .dian-alert a {
+        color: #00B4DC !important;
+        text-decoration: underline;
     }
 
 .dian-alert-info {
