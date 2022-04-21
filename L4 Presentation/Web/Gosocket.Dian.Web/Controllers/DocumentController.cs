@@ -305,6 +305,32 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<ActionResult> DownloadPDFDocEquivalente(string trackId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+                //XML
+                var requestObj = new { trackId };
+                var response = await DownloadXmlAsync(requestObj);
+                var base64Xml = response.XmlBase64;
+
+                //PDF
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObjDoc = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObjDoc);                           
+                var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
+
+                return File(pdfbytes, "application/pdf", $"{trackId}.pdf");               
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+
+        }
+
         public ActionResult Export()
         {
             var model = new ExportDocumentTableViewModel();
