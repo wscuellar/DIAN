@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
-                var xmlBytes =  DownloadXml(trackId);
+                var xmlBytes = await DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -998,11 +998,11 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
         }
-        private byte[] DownloadXml(string trackId)
+        private async Task<byte[]>DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response =  DownloadXml(requestObj);
+            var response =  await DownloadXml(requestObj);
             
             if (response.Success)
             {
