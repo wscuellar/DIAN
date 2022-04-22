@@ -1501,6 +1501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var digit = documentMeta.DocumentTypeId == "91" ? "C" : "D";
+            var BG02Message = "Se requiere obligatoriamente referencia a documento.";
             if (documentMeta.DocumentTypeId == "05")
             {
                 digit = "DS";
@@ -1512,10 +1513,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "95")
             {
                 digit = "NS";
+                BG02Message = "No se encuentra el grupo InvoiceDocumentReference";
             }
 
             if (string.IsNullOrEmpty(documentMeta.DocumentReferencedKey))
-                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Se requiere obligatoriamente referencia a documento.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = BG02Message, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
 
             var referencedDocumentData = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
 
