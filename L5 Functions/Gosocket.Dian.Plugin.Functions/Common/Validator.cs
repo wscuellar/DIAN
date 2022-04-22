@@ -1529,6 +1529,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     string errorCode = documentMeta.DocumentTypeId == "05" ? "DSBH04" : $"{digit}BG04a";
                     string errorMessage = documentMeta.DocumentTypeId == "05" ? "CUDS de la nota de ajuste referenciada no existe" : "Documento referenciado no existe en los registros de la DIAN.";
+
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        errorCode = $"{digit}BG04";
+                        errorMessage = "CUDS de DS referenciada no existe";
+                    }
+
                     return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessage, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
                 }
             }
