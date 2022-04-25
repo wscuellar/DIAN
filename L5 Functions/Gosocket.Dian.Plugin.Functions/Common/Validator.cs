@@ -4246,8 +4246,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "DSAB05b",
-                        ErrorMessage = "Número del formato 1876 informado no corresponde a un número de autorización de este ABS",
+                        ErrorCode = "DSAB05a",
+                        ErrorMessage = "No se encuentra el número de autorización del rango de numeración otorgado.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
@@ -4262,13 +4262,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             // Check invoice authorization Factura Electronica
+            string errorCodeA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.DocumentSupportInvoice ? "FAB05b" : "DSAB05b";
+            string errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.DocumentSupportInvoice 
+                ? "Número de la resolución que autoriza la numeración[x] corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización."
+                : "Número del formato 1876 informado[x] corresponde a un número de autorización de este ABS";
+
             if (range.ResolutionNumber == invoiceAuthorization)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
-                    ErrorCode = "FAB05b",
-                    ErrorMessage = "Número de la resolución que autoriza la numeración corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
+                    ErrorCode = errorCodeA05b,
+                    ErrorMessage = errorMessageA05b.Replace("[x]",""),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4276,8 +4281,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "FAB05b",
-                    ErrorMessage = "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
+                    ErrorCode = errorCodeA05b,
+                    ErrorMessage = errorMessageA05b.Replace("[x]", " no"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
