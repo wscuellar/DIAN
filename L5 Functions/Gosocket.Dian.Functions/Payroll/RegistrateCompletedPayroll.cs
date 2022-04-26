@@ -120,6 +120,8 @@ namespace Gosocket.Dian.Functions.Payroll
                     FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
                     NumeroDocumento = numeroDocumento,
                     Timestamp = DateTime.Now,
+                    CUNE = data.TrackId,
+                    TipoXML = docGlobalPayroll.TipoXML
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
 
