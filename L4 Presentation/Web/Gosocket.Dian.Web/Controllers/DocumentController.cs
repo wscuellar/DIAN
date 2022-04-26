@@ -1723,14 +1723,20 @@ namespace Gosocket.Dian.Web.Controllers
 
             try
             {
-                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
-                                      "WHERE C.Contributorid = " + code +
-                                      " AND C.Deleted <> 1";
+                string consulta = ConfigurationManager.GetValue("GetContributorOperationSQL");
+
+                string reemplazar = "'{contributorid}'";
+
+                string codigo = "'" + code + "'";
+
+                consulta = consulta.Replace(reemplazar, codigo);
+                
+                string sqlQuery = consulta;
               
                 SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
                 conn.Open();
                 DataTable table = new DataTable();
-                SqlCommand command = new SqlCommand(sqlQuery, conn);
+                SqlCommand command = new SqlCommand(consulta, conn);
 
                 using (var da = new SqlDataAdapter(command))
                 {
