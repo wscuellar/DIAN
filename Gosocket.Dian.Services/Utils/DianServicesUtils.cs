@@ -674,14 +674,30 @@ namespace Gosocket.Dian.Services.Utils
                 stringBuilder.Clear();
                 isValid = false;
             }
-
-            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
+            
+            /*Si el documento xml es tipo documento soporte o nota de ajuste de documento soporte,
+             el emisor es el receiverCodeXpath*/
+            if (new string[] {"05","95" }.Contains(docTypeCode))
             {
-                stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
-                errors.Add(stringBuilder.ToString());
-                stringBuilder.Clear();
-                isValid = false;
+                if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["receiverCodeXpath"]))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
+            else
+            {
+                if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
+            }
+
 
             if (string.IsNullOrEmpty(docTypeCode))
             {
@@ -836,6 +852,13 @@ namespace Gosocket.Dian.Services.Utils
             var providerCode = documentParsed.ProviderCode;
             txtRegla = "Regla: ";
             txtRechazo = ", Rechazo: ";
+
+            /*Si el documento xml es tipo documento soporte o nota de ajuste de documento soporte,
+             el emisor es el receiverCodeXpath*/
+            if (new string[] { "05", "95" }.Contains(docTypeCode))
+            {
+                senderCode = documentParsed.ReceiverCode;
+            }
 
             switch (docTypeCode)
             {
