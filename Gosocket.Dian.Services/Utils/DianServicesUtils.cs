@@ -675,30 +675,14 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
             
-            /*Si el documento xml es tipo documento soporte o nota de ajuste de documento soporte,
-             el emisor es el receiverCodeXpath*/
-            if (new string[] {"05","95" }.Contains(docTypeCode))
+            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
             {
-                if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["receiverCodeXpath"]))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
+                stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                errors.Add(stringBuilder.ToString());
+                stringBuilder.Clear();
+                isValid = false;
             }
-            else
-            {
-                if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
-                {
-                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
-                    errors.Add(stringBuilder.ToString());
-                    stringBuilder.Clear();
-                    isValid = false;
-                }
-            }
-
-
+        
             if (string.IsNullOrEmpty(docTypeCode))
             {
                 stringBuilder.AppendLine("ZB05: XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
@@ -852,13 +836,6 @@ namespace Gosocket.Dian.Services.Utils
             var providerCode = documentParsed.ProviderCode;
             txtRegla = "Regla: ";
             txtRechazo = ", Rechazo: ";
-
-            /*Si el documento xml es tipo documento soporte o nota de ajuste de documento soporte,
-             el emisor es el receiverCodeXpath*/
-            if (new string[] { "05", "95" }.Contains(docTypeCode))
-            {
-                senderCode = documentParsed.ReceiverCode;
-            }
 
             switch (docTypeCode)
             {
