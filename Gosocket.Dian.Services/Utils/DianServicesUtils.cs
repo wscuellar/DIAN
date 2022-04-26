@@ -677,15 +677,15 @@ namespace Gosocket.Dian.Services.Utils
             
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
             {
-                stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
-                
-                /*Cuando el documento xml es de tipo documento soporte o su nota de ajuste el codigo de error de la regla que valida
-                 el senderCode es NSAK21 y no NSAJ21*/
-                if (new string[] { "05", "95" }.Contains(docTypeCode))
+                if (!new string[] { "05", "95" }.Contains(docTypeCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                }
+                else
                 {
                     stringBuilder.AppendLine($"{codeMessage}K21: El NIT del Emisor no puede estar vacío.");
                 }
-                
+
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
@@ -1083,11 +1083,13 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(senderCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
-
                     /*Cuando el documento xml es de tipo documento soporte o su nota de ajuste el codigo de error de la regla que valida
                         el senderCode es NSAK21 y no NSAJ21*/
-                    if (new string[] {"05", "95" }.Contains(docTypeCode))
+                    if (!new string[] {"05", "95" }.Contains(docTypeCode))
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                    }
+                    else
                     {
                         stringBuilder.AppendLine($"{codeMessage}K21: El NIT del Emisor no puede estar vacío.");
                     }
