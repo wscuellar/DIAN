@@ -674,15 +674,23 @@ namespace Gosocket.Dian.Services.Utils
                 stringBuilder.Clear();
                 isValid = false;
             }
-
+            
             if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
             {
-                stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                if (!new string[] { "05", "95" }.Contains(docTypeCode))
+                {
+                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                }
+                else
+                {
+                    stringBuilder.AppendLine($"{codeMessage}K21: El NIT del Emisor no puede estar vacío.");
+                }
+
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
             }
-
+        
             if (string.IsNullOrEmpty(docTypeCode))
             {
                 stringBuilder.AppendLine("ZB05: XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
@@ -1075,7 +1083,17 @@ namespace Gosocket.Dian.Services.Utils
 
                 if (string.IsNullOrEmpty(senderCode))
                 {
-                    stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                    /*Cuando el documento xml es de tipo documento soporte o su nota de ajuste el codigo de error de la regla que valida
+                        el senderCode es NSAK21 y no NSAJ21*/
+                    if (!new string[] {"05", "95" }.Contains(docTypeCode))
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
+                    }
+                    else
+                    {
+                        stringBuilder.AppendLine($"{codeMessage}K21: El NIT del Emisor no puede estar vacío.");
+                    }
+                    
                     errors.Add(stringBuilder.ToString());
                     stringBuilder.Clear();
                     isValid = false;
