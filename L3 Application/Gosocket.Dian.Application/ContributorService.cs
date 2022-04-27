@@ -597,12 +597,11 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        public void OperationRejectOtherDoc(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        public void OperationRejectOtherDoc(int otherDocElecContributorId, string softwareId, int softwareType)
         {
             using (var context = new SqlDBContext())
             {
-                OtherDocElecContributor otherDoc = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
-                                      && t.OtherDocElecContributorTypeId == contributorTypeId);
+                OtherDocElecContributor otherDoc = context.OtherDocElecContributors.FirstOrDefault(t => t.Id == otherDocElecContributorId);
 
                 OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(
                                                 t => t.OtherDocElecContributorId == otherDoc.Id
