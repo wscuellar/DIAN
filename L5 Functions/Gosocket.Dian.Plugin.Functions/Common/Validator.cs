@@ -1521,6 +1521,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             var referencedDocumentData = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
 
+            if(documentMeta.TotalAmount > referencedDocumentData.TotalAmount)
+            {
+                return new ValidateListResponse 
+                { 
+                    IsValid = false, 
+                    Mandatory = true, 
+                    ErrorCode = $"VLR02", 
+                    ErrorMessage = "Valor de la Nota de Ajuste es superior al valor del documento referenciado", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+            }
+
             var referencedDocument = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(referencedDocumentData?.Identifier, referencedDocumentData?.Identifier);
             if (referencedDocument == null)
             {

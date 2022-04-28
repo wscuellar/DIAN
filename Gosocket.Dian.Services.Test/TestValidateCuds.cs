@@ -199,15 +199,6 @@ namespace Gosocket.Dian.Services.Test
 
         }
 
-        [TestMethod]
-        public void TestTruncarValoresNumericos() 
-        {
-            var cadena = "1234";
-            var cadenaTruncada = DocumentoSoporte.TruncarValoresNumericos(cadena);
-            Assert.AreEqual("1234", cadenaTruncada);
-        }
-
-
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;
     }
     
