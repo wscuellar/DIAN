@@ -11,6 +11,7 @@ using Gosocket.Dian.Plugin.Functions.ValidateParty;
 using Gosocket.Dian.Plugin.Functions.ValidateReferenceAttorney;
 using Gosocket.Dian.Services.Cude;
 using Gosocket.Dian.Services.Cuds;
+using Gosocket.Dian.Services.NotaAjustes;
 using Gosocket.Dian.Services.Utils;
 using Gosocket.Dian.Services.Utils.Common;
 using System;
@@ -431,13 +432,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
-        public List<ValidateListResponse> StartNoteReferenceValidation(string trackId)
+        public async Task<List<ValidateListResponse>> StartNoteReferenceValidation(string trackId)
         {
+            //var xmlBytesNotaAjuste = await GetXmlFromStorageAsync(trackId);
+            //var parserNotaAjuste = new XmlToNotaAjusteParser();
+            //var modelNotaAjuste = parserNotaAjuste.Parser(xmlBytesNotaAjuste);
+
             var validateResponses = new List<ValidateListResponse>();
-            // Validator instance
             var validator = new Validator();
             validateResponses.Add(validator.ValidateNoteReference(trackId));
-
             return validateResponses;
         }
 
@@ -838,6 +841,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             validateResponses.Add(validator.ValidateCuds(modelCuds, cuds));
             return validateResponses;
         }
+
 
         public async Task<List<ValidateListResponse>> StartValidateCude(RequestObjectCude cude)
         {
