@@ -5,6 +5,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
@@ -388,7 +389,7 @@ namespace Gosocket.Dian.Web.Controllers
             this.SetViewBag_FirstSurnameData();
 
             await this.GetPayrollData(20, model);
-
+            
             model.Payrolls = GetPayrollsList(model);
 
             return View(model);
@@ -434,8 +435,8 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            await this.GetPayrollData(50, model);
-
+            await this.GetPayrollData(50, model);           
+       
             model.Payrolls = GetPayrollsList(model);
 
             LoadData(ref model);
@@ -1495,6 +1496,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.Ordenadores = OrdenarModel.List();
             model.Ciudades = GetCiudadModelLists();
         }
+
+
         private async Task GetPayrollData(int toTake, PayrollViewModel model)
         {
             this.PayrollList = null;
@@ -1562,14 +1565,20 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
+                if (model.RangoNumeracionMenor == null) model.RangoNumeracionMenor = 0;
+
+                if (model.RangoNumeracionMayor == null) model.RangoNumeracionMayor = 0;
+
                 if (model.TipoDocumento == "00") model.TipoDocumento = null;
 
                 if (model.NumeroDocumento == "00") model.NumeroDocumento = null;
 
                 if (model.Ciudad == "00") model.Ciudad = null;
-                                
+
+
                 var otherDocElecPayrolls = otherDocElecPayrollService.Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
+  
 
                 this.PayrollList = DocumentParsedNomina.SetOtherDocElecPayrollsToGlobalDocPayrolls(otherDocElecPayrolls);
             }
