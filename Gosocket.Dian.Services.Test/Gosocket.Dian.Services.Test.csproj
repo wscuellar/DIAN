@@ -65,6 +65,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="EjemplosXml\14759.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="EjemplosXml\Documento Soporte Invoice05 26-11-2021-firmado-SHA384.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
