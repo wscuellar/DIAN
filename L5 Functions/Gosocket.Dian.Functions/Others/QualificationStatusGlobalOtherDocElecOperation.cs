@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Functions.Others
         private static readonly TableManager TableManagerGlobalOtherDocElecOperation = new TableManager("GlobalOtherDocElecOperation");
         private static readonly TableManager TableManagerGlobalTestSetOthersDocumentsResult = new TableManager("GlobalTestSetOthersDocumentsResult");//10169");
         private static readonly TableManager contributorActivationTableManager = new TableManager("GlobalContributorActivation");
+        private static readonly TableManager TableManagerGlobalTestSetTracking = new TableManager("GlobalTestSetTracking");
         private static readonly TableManager TableManagerGlobalOtherDocElecOperationProd = new TableManager("GlobalOtherDocElecOperation", ConfigurationManager.GetValue("GlobalStorageProd"));
         private static readonly TableManager TableManagerGlobalTestSetOthersDocumentsResultProd = new TableManager("GlobalTestSetOthersDocumentsResult", ConfigurationManager.GetValue("GlobalStorageProd"));
         private static readonly TableManager TableManagerGlobalSoftwareProd = new TableManager("GlobalSoftware", ConfigurationManager.GetValue("GlobalStorageProd"));
@@ -470,6 +471,68 @@ namespace Gosocket.Dian.Functions.Others
                         arrayTasks.Add(TableManagerGlobalSoftwareProd.InsertOrUpdateAsync(globalSoftware));
                         arrayTasks.Add(TableManagerGlobalSoftwareProd.DeleteAsync(globalSoftwareAux));
                         messages.Add(String.Format("Se actualizo el software base '{0}', software id '{1}'", globalSoftware.PartitionKey, globalSoftware.Id));
+                    }
+                }
+                #endregion
+                #region #actualizacontadores
+                else if (data.ModeTest == "7")
+                {
+                    string[] nomina = { "103" };
+                    string[] otherDocument = { "102" };
+                    List<string> listaNit = nits.ToList();
+                    List<GlobalTestSetTracking> allGlobalTestSetTracking = TableManagerGlobalTestSetTracking.FindByPartition<GlobalTestSetTracking>(listaNit[0]);
+                    GlobalTestSetOthersDocumentsResult setResultOther = TableManagerGlobalTestSetOthersDocumentsResult.GetOthersDocuments<GlobalTestSetOthersDocumentsResult>(listaNit[1], string.Format("{0}|{1}", listaNit[2], listaNit[3])).FirstOrDefault();
+
+                    if (setResultOther != null && allGlobalTestSetTracking.Count > 0)
+                    {
+                        //Totales docuemntos
+                        setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
+                        setResultOther.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                        setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+
+                        //Nomina Individual de Ajuste
+                        setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count(a => nomina.Contains(a.DocumentTypeId));
+                        setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && nomina.Contains(a.DocumentTypeId));
+                        setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && nomina.Contains(a.DocumentTypeId));
+
+                        //OtherDocument Nomina Individual
+                        setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count(a => otherDocument.Contains(a.DocumentTypeId));
+                        setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                        setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                        arrayTasks.Add(TableManagerGlobalTestSetOthersDocumentsResult.InsertOrUpdateAsync(setResultOther));
+                        messages.Add("Se actualizo ");
+
+                    }
+                }
+                #endregion
+                #region #actualizacontadoresProd
+                else if (data.ModeTest == "8")
+                {
+                    string[] nomina = { "103" };
+                    string[] otherDocument = { "102" };
+                    List<string> listaNit = nits.ToList();
+                    List<GlobalTestSetTracking> allGlobalTestSetTracking = TableManagerGlobalTestSetTracking.FindByPartition<GlobalTestSetTracking>(listaNit[0]);
+                    GlobalTestSetOthersDocumentsResult setResultOther = TableManagerGlobalTestSetOthersDocumentsResultProd.GetOthersDocuments<GlobalTestSetOthersDocumentsResult>(listaNit[1], string.Format("{0}|{1}", listaNit[2], listaNit[3])).FirstOrDefault();
+
+                    if (setResultOther != null && allGlobalTestSetTracking.Count > 0)
+                    {
+                        //Totales docuemntos
+                        setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
+                        setResultOther.TotalDocumentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid);
+                        setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
+
+                        //Nomina Individual de Ajuste
+                        setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count(a => nomina.Contains(a.DocumentTypeId));
+                        setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && nomina.Contains(a.DocumentTypeId));
+                        setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && nomina.Contains(a.DocumentTypeId));
+
+                        //OtherDocument Nomina Individual
+                        setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count(a => otherDocument.Contains(a.DocumentTypeId));
+                        setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                        setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                        arrayTasks.Add(TableManagerGlobalTestSetOthersDocumentsResultProd.InsertOrUpdateAsync(setResultOther));
+                        messages.Add("Se actualizo ");
+
                     }
                 }
                 #endregion

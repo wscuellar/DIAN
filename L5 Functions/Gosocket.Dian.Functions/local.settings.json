@@ -5,7 +5,7 @@
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "BatchThreads": 1,
     "BillerSoftwareId": "fa326ca7-c1f8-40d3-a6fc-24d7c1040607",
-    "Slot": "",
+    "Slot": "-Debug",
 
     //Test config
     //"Environment": "Test",
@@ -71,7 +71,7 @@
     "GetAppResponseUrl": "https://gtpa-function-commons-hab.azurewebsites.net/api/GetApplicationResponse?code=rrchw9riECXwv/ah8IxQTda4Wt5DhR83oN0eNNJL18bcyODNah1OKA==",
     "UploadXmlUrl": "https://gtpa-function-doc-validator-hab.azurewebsites.net/api/UploadXml?code=xbSW9Tia42niR4UYcHliQP6GDOkfaJtIh27DGQVm9LA8hQkzytBAhQ==",
     "ValidateDocumentUrl": "https://gtpa-function-doc-validator-hab.azurewebsites.net/api/ValidateDocument?code=2hlY0H43e779Gxg4HqwaP5tqBOL8EiMfjm7QDHVWPLms2d6EopdisQ==",
-    "SendToActivateOtherDocumentContributorUrl": "https://gtpa-function-commons-hab.azurewebsites.net/api/SendToActivateOtherDocumentContributor?code=D/HkmFxy5/Gfbwj1UGXD7NhBZMG9eqpWZhvwTLXM/dtLHCeYdI4oIg==",
+    "SendToActivateOtherDocumentContributorUrl": "http://localhost:7071/api/SendToActivateOtherDocumentContributor",
     "AuthClientId": "84da3c54-0272-4dfc-b301-786c7177f25d",
     "AuthClientSecret": "gs]j-JYh0aHiejgAO/7x+is6pEygYw65",
     "CosmosDbAccountEndpointUrl": "AccountEndpoint=https://gtpa-cosmosdb-document-test.documents.azure.com:443/;AccountKey=Kz5FGFLwRVrWYuwDJtYOoQsuSRF3qgPvIz7hPa5Bp2XgSBwhpt42UuKGtT12GMbvaHVl4UtK7ud344Mco1pomQ==;",
