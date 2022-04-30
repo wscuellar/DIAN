@@ -287,6 +287,15 @@ namespace Gosocket.Dian.Web.Controllers
                 model.PinSW = " ";
             }
 
+
+            operationModesList = operationModesList.GroupBy(t => t.Id)
+                .Select(t => new Domain.RadianOperationMode()
+                {
+                    Id = t.Key,
+                    Name = t.FirstOrDefault()?.Name ?? "",
+                    RadiantContributors = t.FirstOrDefault()?.RadiantContributors
+                }).ToList();
+
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
             ViewBag.IsSupportDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
             ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
@@ -1005,7 +1014,7 @@ namespace Gosocket.Dian.Web.Controllers
             var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
 
             var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResultAcepted(
-                User.UserCode(),
+                User.ContributorCode(),
                 otherDocElecContributorOperation.OtherDocElecContributor.ElectronicDocumentId,
                 otherDocElecContributorOperation.OtherDocElecContributorId,
                 otherDocElecContributorOperation.SoftwareId.ToString());
