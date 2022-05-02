@@ -4224,7 +4224,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentType = documentMeta?.DocumentTypeId;
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
-                if (Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice || Convert.ToInt32(documentType) == (int)DocumentType.EquivalentDocumentPOS)
+                if (Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice)
                 {
                     var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                     range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
@@ -4252,20 +4252,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     return responses;
-                } 
-                else if (Convert.ToInt32(documentType) == (int)DocumentType.EquivalentDocumentPOS)
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "DEAB05b",
-                        ErrorMessage = "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente emisor para este Proveedor de Autorización",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
-                    return responses;
-                }
+                }                 
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
