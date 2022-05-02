@@ -125,7 +125,6 @@
             border-radius: 4px;
             margin-top: 8px;
         }
-
         
     </style>
 }
@@ -156,7 +155,8 @@
                                    value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
 
                             <div class="row margin-left-20 margin-right-20">
-                                <h4 class="panel-title-radian padding-0"> <strong> Datos de usuario </strong>
+                                <h4 class="panel-title-radian padding-0">
+                                    <strong> Datos de usuario </strong>
                                 </h4>
                                 @*<hr class="margin-5 margin-bottom-20" />*@
                             </div>
@@ -180,7 +180,7 @@
                                     <div class="col-md-1" style="width:4%">
                                         @if (!string.IsNullOrEmpty(menu.Icon))
                                         {
-                                            <em class="@menu.Icon fa-3x"></em>
+                                            <img src="@menu.Icon" />
                                         }
                                     </div>
                                     <div id="@("divMenu" + menu.Id)" class="col-xs-2 col-md-2 form-group">
@@ -243,10 +243,10 @@
                                                     <br />
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="submit" class="btn btn-hover-gosocket btn-default-gosocket pull-right btn-save" style="margin-right:10px">Aceptar</button>
+                                                    <button type="submit" class="btn btn btn-primary btn-hover-gosocket btn-default-gosocket pull-right btn-save" style="margin-right:10px">Aceptar</button>
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" style="margin-left:10px" data-dismiss="modal" aria-label="Close">
+                                                    <button type="button" class="btn btn-secondary btn-hover-gosocket btn-radian-success" style="margin-left:10px" data-dismiss="modal" aria-label="Close">
                                                         Cancelar
                                                     </button>
                                                 </div>
@@ -311,14 +311,15 @@
                 @*<a href="/ExternalUsers/AddUser" class="btn btn-default btn-radian-default cancel-register">Cancelar</a>*@
             </div>
         </div>
-        <div class="panel" style="border-radius: 5px;">
+        <div class="panel" style="border-radius: 5px; background-color: initial;">
             @if (Model.Id == null || Model.Id == "")
             {
 
-                <div class="panel-body padding-top-20">
+                <div class="panel-body padding-top-20" style="background-color: initial;">
                     <div class="row">
                         <div class="col-lg-12  col-md-12  col-xs-12">
-                            <h4> Usuarios Configurados</h4>
+                            <h4><strong> Usuarios Configurados</strong></h4>
+                            
                         </div>
                         @*<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
                         </div>*@
