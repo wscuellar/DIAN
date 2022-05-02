@@ -15,7 +15,7 @@
     <div class="row checks-group">
         @foreach (var menuMain in Model.MenuOptionsByProfile)
         {
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -24,7 +24,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -32,9 +32,13 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Factura de venta" || subSubMenuItems.Name == "Factura AIU" || subSubMenuItems.Name == "Factura de exportación"
-                                            || subSubMenuItems.Name == "Factura de Mandatorio" || subSubMenuItems.Name == "Factura de Contingencia" || subSubMenuItems.Name == "Nota Crédito"
-                                            || subSubMenuItems.Name == "Nota Débito")
+                                        if ((subSubMenuItems.Name == "Factura de venta" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Factura AIU" && subSubMenuItems.SeccionOptions == "PermisosFactura") 
+                                            || (subSubMenuItems.Name == "Factura de exportación" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Factura de Mandatorio" && subSubMenuItems.SeccionOptions == "PermisosFactura") 
+                                            || (subSubMenuItems.Name == "Factura de Contingencia" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Nota Crédito" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Nota Débito" && subSubMenuItems.SeccionOptions == "PermisosFactura"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -54,7 +58,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -71,7 +75,8 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Documentos emitidos" || subSubMenuItems.Name == "Documentos recibidos")
+                                        if ((subSubMenuItems.Name == "Documentos emitidos" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Documentos recibidos" && subSubMenuItems.SeccionOptions == "PermisosFactura"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -90,7 +95,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -99,7 +104,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -107,8 +112,9 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Adquiriente/Comprador"
-                                            || subSubMenuItems.Name == "Productos" && subSubMenuItems.ParentId == 10)
+                                        if ((subSubMenuItems.Name == "Rangos de Numeración" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Adquiriente/Comprador" && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                            || (subSubMenuItems.Name == "Productos" && subSubMenuItems.SeccionOptions == "PermisosFactura"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -127,7 +133,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -136,7 +142,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Nueva Plantilla")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Nueva Plantilla" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -144,7 +150,7 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.ParentId == 11)
+                                        if (subSubMenuItems.ParentId == 11 && subSubMenuItems.SeccionOptions == "PermisosFactura")
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -163,7 +169,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -172,7 +178,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Operaciones")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Operaciones" && menuMain.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -180,7 +186,7 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.ParentId == 12)
+                                        if (subSubMenuItems.ParentId == 12 && subSubMenuItems.SeccionOptions == "PermisosFactura")
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -212,7 +218,7 @@
     <div class="row checks-group">
         @foreach (var menuMain in Model.MenuOptionsByProfile)
         {
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación"  && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -221,7 +227,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -229,8 +235,9 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Nómina Electrónica" || subSubMenuItems.Name == "Nota de Ajuste Reemplazar"
-                                            || subSubMenuItems.Name == "Nota de Ajuste Eliminar")
+                                        if ((subSubMenuItems.Name == "Nómina Electrónica" && subSubMenuItems.SeccionOptions == "PermisosNomina")
+                                            || (subSubMenuItems.Name == "Nota de Ajuste Reemplazar" && subSubMenuItems.SeccionOptions == "PermisosNomina")
+                                            || (subSubMenuItems.Name == "Nota de Ajuste Eliminar" && subSubMenuItems.SeccionOptions == "PermisosNomina"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -250,7 +257,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -259,7 +266,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2)
+                            if (subMenuItems.MenuLevel == 2 )
                             {
                                 <div class="level-2">
                                     <div>
@@ -267,7 +274,7 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Documentos emitidos")
+                                        if (subSubMenuItems.Name == "Documentos emitidos" && subSubMenuItems.SeccionOptions == "PermisosNomina")
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -286,7 +293,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -295,7 +302,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -303,7 +310,8 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Trabajador")
+                                        if ((subSubMenuItems.Name == "Rangos de Numeración" && subSubMenuItems.SeccionOptions == "PermisosNomina")
+                                            || (subSubMenuItems.Name == "Trabajador" && subSubMenuItems.SeccionOptions == "PermisosNomina"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -337,7 +345,7 @@
     <div class="row checks-group">
         @foreach (var menuMain in Model.MenuOptionsByProfile)
         {
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -346,7 +354,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Documentos" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -354,7 +362,8 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Documentos soporte con no obligados a facturar" || subSubMenuItems.Name == "Nota de ajuste")
+                                        if ((subSubMenuItems.Name == "Documentos soporte con no obligados a facturar" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte")
+                                            || (subSubMenuItems.Name == "Nota de ajuste" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -374,7 +383,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -391,7 +400,7 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Documentos emitidos")
+                                        if (subSubMenuItems.Name == "Documentos emitidos" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte")
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
@@ -410,7 +419,7 @@
                     </div>
                 </div>
             }
-            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración")
+            if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
             {
                 <div class="col-sm-3">
                     <div class="level-1">
@@ -419,7 +428,7 @@
                         </div>
                         @foreach (var subMenuItems in menuMain.Children)
                         {
-                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar")
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Administrar" && subMenuItems.SeccionOptions == "PermisosPerfil")
                             {
                                 <div class="level-2">
                                     <div>
@@ -427,7 +436,9 @@
                                     </div>
                                     @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subSubMenuItems.Name == "Rangos de Numeración" || subSubMenuItems.Name == "Vendedor" || subSubMenuItems.Name == "Productos")
+                                        if ((subSubMenuItems.Name == "Rangos de Numeración" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte")
+                                            || (subSubMenuItems.Name == "Vendedor" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte") 
+                                            || (subSubMenuItems.Name == "Productos" && subSubMenuItems.SeccionOptions == "PermisosDocumentoSoporte"))
                                         {
                                             <div class="level-3">
                                                 <div class="row-cols-1">
