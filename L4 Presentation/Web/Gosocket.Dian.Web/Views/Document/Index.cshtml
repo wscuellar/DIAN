@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.SearchDocumentViewModel
 
 @{
-    ViewBag.Title = "Consultar documentos";
+    ViewBag.Title = "Consultar documentos" + $" {ViewBag.ViewTypeSpanish}";
     var view = ViewBag.ViewType;
 
     var columnSize = 3;
@@ -216,7 +216,7 @@
                 var id = $(this).context.getAttribute('data-id');
                 var partitionKey = $(this).context.getAttribute('data-partitionKey');
                 var documentType = $(this).context.getAttribute('data-type');
-                if (documentType != "101" && documentType != "12") //ignora documento exportacion 
+                if (documentType != "101" && documentType != "12") //ignora documento exportacion
                 {
                     showLoading('#panel-form', 'Cargando', 'Cargando datos, por favor espere.');
                     window.location.href = "/Document/Details?trackId=" + id + "&partitionKey=" + partitionKey;
@@ -226,6 +226,22 @@
             $(".download-document").click(function(){
                 var cufe = this.id;
                 window.location.href = "/Document/DownloadZipFiles?trackId=" + cufe;
+            })
+
+            $(".download-eventos").click(function () {
+                
+                var cufe = this.id;
+                var fecha = $(this).context.getAttribute('code');
+                var code = $(this).context.getAttribute('data-id');
+                window.location.href = "/Document/DownloadZipFilesEventos?trackId=" + cufe + "&code=" + code + "&fecha=" + fecha;
+            })
+
+            $(".download-equivalente-document").click(function () {
+                var cufe = this.id;
+                var typeId = $(this).context.getAttribute('documenTypeId');
+                var emissionDate = $(this).context.getAttribute('EmissionDate');
+                var generationDate = $(this).context.getAttribute('GenerationDate');
+                window.location.href = "/Document/DownloadZipFilesEquivalente?trackId=" + cufe + "&documentTypeId=" + typeId + "&FechaValidacionDIAN=" + emissionDate + "&FechaGeneracionDIAN=" + generationDate;
             })
 
             $(".download-support-document").click(function () {

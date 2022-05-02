@@ -7,8 +7,13 @@
     .RadianCardContainer {
         cursor: pointer;
     }
+
     .margin-page-content {
         margin-top: 50px !important;
+    }
+
+    .imgSvg110px {
+        height: 110px;
     }
 </style>
 
@@ -26,7 +31,8 @@
             <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
         </svg>
 
-        <div class="row-fluid">
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
+        {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
                     <a href="@Url.Action("Check", "Contributor")">
@@ -40,24 +46,58 @@
                     </a>
                 </div>
             </div>
-            @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0" )&& ViewBag.ContributorAcceptanceStatus==4)
-            {
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                        <a href="@Url.Action("Index", "OthersElectronicDocuments")">
-                            <div class="RadianImgContainer">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard">Nomina Electrónica</p>
-                                <p class="RadianTittleCard2">Nomina Electrónica</p>
-                            </div>
-                        </a>
+        }
+
+        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        @if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0"))
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        @if (ViewBag.ContributorTypeIde != null)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
+                     onclick="EnabledSupportDocumentForNoOfe()">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
+                    </div>
+                    <div class="card-body">
+                        <p class="RadianTittleCard">Documento soporte para no obligados a facturar</p>
                     </div>
                 </div>
-            }
-        </div>
-        @if (ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0")
+            </div>
+        }
+
+        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
         {
             <div class="row-fluid">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -75,7 +115,22 @@
                 </div>
 
             </div>
-          }
+        }
+
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
+                     onclick="EnabledEquivalentDocuments()">
+                    <div class="RadianImgContainer">
+                        <img style="height:115px;" class="RadianimgSvg imgSvg110px" src="~/Content/images/Svg/documentos_equivalentes_icono_principal_Mesa_de_trabajo.svg" />
+                    </div>
+                    <div class="card-body" style="padding: 0 16px;">
+                        <p class="RadianTittleCard">Documentos equivalentes</p>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -92,6 +147,13 @@
                 operationClick = true;
 
                 var electronicDocumentId = 3;
+
+				if ("@ViewBag.ContributorIsOfe".toLowerCase() == "true") {
+                    var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
+                    window.location.href = url;
+                    return;
+                }
+
                 var ValidacionOtherDocsElecViewModel = {
                     UserCode: '@ViewBag.UserCode',
                     ContributorId: '@ViewBag.ContributorId',
@@ -102,11 +164,41 @@
 
                 CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocsElecViewModel,
                     function (param) {
+						operationClick = false;
+
                         var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
-                        
                         window.location.href = url;
                     }, true, () => hideLoading('#panel-form')
                 );
+            }
+        }
+
+        function EnabledEquivalentDocuments() {
+            showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
+            if (!operationClick) {
+                operationClick = true;
+
+                var electronicDocumentId = @((int)Gosocket.Dian.Domain.Common.ElectronicsDocuments.ElectronicEquivalent);
+                var ValidacionOtherDocsElecViewModel = {
+                    UserCode: '@ViewBag.UserCode',
+                    ContributorId: '@ViewBag.ContributorId',
+                    Accion: 'SeleccionElectronicDocument',
+                    ElectronicDocumentId: electronicDocumentId,
+                    complementoTexto: `Documentos equivalentes`,
+                };
+
+                var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
+                window.location.href = url;
+                //hideLoading('#panel-form');
+
+                @*CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherDocsElecViewModel,
+                    function (param) {
+                        operationClick = false;
+
+                        var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
+                        window.location.href = url;
+                    }, true, () => hideLoading('#panel-form')
+                );*@
             }
         }
     </script>

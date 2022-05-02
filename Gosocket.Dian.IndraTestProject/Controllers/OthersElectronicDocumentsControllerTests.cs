@@ -4,6 +4,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Interfaces;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
@@ -28,7 +29,9 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IElectronicDocumentService> _electronicDocumentService = new Mock<IElectronicDocumentService>();
         private readonly Mock<IOthersDocsElecSoftwareService> _othersDocsElecSoftwareService = new Mock<IOthersDocsElecSoftwareService>();
         private readonly Mock<IContributorOperationsService> _contributorOperationsService = new Mock<IContributorOperationsService>();
-
+        private readonly Mock<ITestSetOthersDocumentsResultService> _testSetOthersDocumentsResultService = new Mock<ITestSetOthersDocumentsResultService>();
+        private readonly Mock<IEquivalentElectronicDocumentRepository> _equivalentElectronicDocumentRepository = new Mock<IEquivalentElectronicDocumentRepository>();
+        
         [TestInitialize]
         public void TestInitialize()
         {
@@ -38,7 +41,9 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                     _contributorService.Object,
                     _electronicDocumentService.Object,
                     _othersDocsElecSoftwareService.Object,
-                    _contributorOperationsService.Object);
+                    _contributorOperationsService.Object,
+                    _testSetOthersDocumentsResultService.Object,
+                    _equivalentElectronicDocumentRepository.Object);
         }
 
         [TestMethod()]

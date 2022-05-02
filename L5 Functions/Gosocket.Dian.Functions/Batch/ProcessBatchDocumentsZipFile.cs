@@ -718,6 +718,21 @@ namespace Gosocket.Dian.Functions.Batch
             var eventCodes = responseXpathDataValue.Select(x => x.XpathsValues["AppResEventCodeXpath"]).Distinct();
             var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
             var responseCustomizationID = responseXpathDataValue.Select(x => x.XpathsValues["AppResCustomizationIDXpath"]).Distinct();
+            string documentType = responseXpathDataValue.Select(t => t.XpathsValues["DocumentTypeXpath"]).FirstOrDefault();
+
+            /*Si es un documento soporte o una una nota de ajuste del mismo, 
+             * el emisor del documento está en el customerParty*/
+            if (OtherDocumentsDocumentType.IsSupportDocument(documentType))
+            {
+                codes = responseXpathDataValue.Select(x => x.XpathsValues["ReceiverCodeXpath"]).Distinct();
+            }
+            
+            var log = new GlobalLogger(zipKey, "7.0.1 Validate Data for update set test")
+            {
+                Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
+                Action = $@"documentType: {documentType} | senderCode: {string.Join(", ", codes)} | setTestId: {testSetId} | softwareId: {string.Join(", ",softwareIds)}"
+            };
+            TableManagerGlobalLogger.InsertOrUpdateAsync(log);
 
             //Valida si endoso es en blanco obtiene informacion NIT ProviderID - ApplicationResponse
             if (flagApplicationResponse)
@@ -779,14 +794,23 @@ namespace Gosocket.Dian.Functions.Batch
                         {
                             lstResult = tableManagerRadianTestSetResult.FindByPartition<RadianTestSetResult>(code);
                             objRadianTestSetResult = lstResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
-                        }                                              
+                        }
 
                         //Consulta exista testSetID registros Otros Documentos           
-                        List<GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
+                        nitNomina = !string.IsNullOrWhiteSpace(nitNomina) ? nitNomina : code;
+                        nitNominaProv = !string.IsNullOrWhiteSpace(nitNominaProv) ? nitNominaProv : code;
+                        softwareIdNomina = !string.IsNullOrWhiteSpace(softwareIdNomina) ? softwareIdNomina : softwareId;
+
+                        List <GlobalTestSetOthersDocumentsResult> lstOtherDocResult = tableManagerGlobalTestSetOthersDocumentResult.FindByPartition<GlobalTestSetOthersDocumentsResult>(nitNomina);
                         GlobalTestSetOthersDocumentsResult objGlobalTestSetOthersDocumentResult = lstOtherDocResult.FirstOrDefault(t => t.Id.Trim().Equals(testSetId.Trim(), StringComparison.OrdinalIgnoreCase));
 
                         if (objGlobalTestSetResult != null)
                         {
+                            if (!objGlobalTestSetResult.SoftwareId.Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
+
                             //Factura Electronica
                             start = DateTime.UtcNow;
                             var checkFE = new GlobalLogger(zipKey, "7.2 checkPermissions")
@@ -836,6 +860,11 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (objGlobalTestSetOthersDocumentResult != null)
                         {
+                            if (!objGlobalTestSetOthersDocumentResult.RowKey.Split('|')[1].Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
+
                             //Otros Docuemntos Electronicos
                             start = DateTime.UtcNow;
                             var checkOtherDoc = new GlobalLogger(zipKey, "7.3 checkPermissions")
@@ -847,7 +876,6 @@ namespace Gosocket.Dian.Functions.Batch
                             var insertCheckOtherDoc = TableManagerGlobalLogger.InsertOrUpdateAsync(checkOtherDoc);
 
                             //Valida software asociado al NIT en GlobalOtherDocElecOperation
-
                             bool existOperationProv = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNominaProv, softwareIdNomina);
 
                             bool existOperationEmp = tableManagerGlobalOtherDocElecOperation.Exist<GlobalOtherDocElecOperation>(nitNomina, softwareIdNomina);
@@ -880,6 +908,10 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (objRadianTestSetResult != null)
                         {
+                            if (!objRadianTestSetResult.SoftwareId.Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
                             // Is Radian
                             var isRadian = false;                          
                             var docEvent = tableManagerGlobalDocEvent.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();

@@ -82,14 +82,14 @@ namespace Gosocket.Dian.Functions.Activation
                         if (radianTesSetResult != null) break;                     
                     }
                     
-                    //OtherDocument Nomina - Nomina de Ajustes
-                    if (Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll 
-                        || Convert.ToInt32(itemMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+                    /*Si es un documento tipo otros documentos (Nomina, documento soporte, documento equivalente)*/
+                    if (OtherDocumentsDocumentType.GetAll().Contains(Convert.ToInt32(itemMeta.DocumentTypeId)))
                     {
-                       
-                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult.FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.SenderCode, globalTestSetTracking.TestSetId);
+                        setResultOther = tableManagerGlobalTestSetOthersDocumentsResult
+                            .FindGlobalTestOtherDocumentId<GlobalTestSetOthersDocumentsResult>(globalTestSetTracking.SenderCode, globalTestSetTracking.TestSetId);
+                        
                         if (setResultOther != null) break;
-                    }                        
+                    }                 
                 }
                
                 SetLogger(radianTesSetResult, " Step 0 ", " Paso radianTesSetResult " + radianTesSetResult + " **** " + globalTestSetTracking.TestSetId + " radianProvider " + radianProvider, "UPDATE-01");
@@ -498,8 +498,8 @@ namespace Gosocket.Dian.Functions.Activation
 
                     SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");
 
-                    string[] nomina = { "103" };
-                    string[] otherDocument = { "102" };
+                    int[] nomina = OtherDocumentsDocumentType.GetAdjustmentDocumentType();
+                    int[] otherDocument = OtherDocumentsDocumentType.GetDocumentType();
 
                     //Totales docuemntos
                     setResultOther.TotalDocumentSent = allGlobalTestSetTracking.Count();
@@ -507,14 +507,14 @@ namespace Gosocket.Dian.Functions.Activation
                     setResultOther.TotalDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid);
 
                     //Nomina Individual de Ajuste
-                    setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count(a => nomina.Contains(a.DocumentTypeId));
-                    setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && nomina.Contains(a.DocumentTypeId));
-                    setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && nomina.Contains(a.DocumentTypeId));
+                    setResultOther.TotalElectronicPayrollAjustmentSent = allGlobalTestSetTracking.Count(a => nomina.Contains(Convert.ToInt32(a.DocumentTypeId)));
+                    setResultOther.ElectronicPayrollAjustmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && nomina.Contains(Convert.ToInt32(a.DocumentTypeId)));
+                    setResultOther.ElectronicPayrollAjustmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && nomina.Contains(Convert.ToInt32(a.DocumentTypeId)));
 
                     //OtherDocument Nomina Individual
-                    setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count(a => otherDocument.Contains(a.DocumentTypeId));
-                    setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && otherDocument.Contains(a.DocumentTypeId));
-                    setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && otherDocument.Contains(a.DocumentTypeId));
+                    setResultOther.TotalOthersDocumentsSent = allGlobalTestSetTracking.Count(a => otherDocument.Contains(Convert.ToInt32(a.DocumentTypeId)));
+                    setResultOther.OthersDocumentsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && otherDocument.Contains(Convert.ToInt32(a.DocumentTypeId)));
+                    setResultOther.OthersDocumentsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && otherDocument.Contains(Convert.ToInt32(a.DocumentTypeId)));
 
                     //Validacion Total Nomina aceptados
                     if (setResultOther.TotalDocumentAccepted >= setResultOther.TotalDocumentAcceptedRequired
@@ -556,7 +556,7 @@ namespace Gosocket.Dian.Functions.Activation
                         SetLogger(null, "Step 6.1", "Aceptado", "UPDATE-03.7");                      
 
                         // Send to activate contributor in production
-                        if (ConfigurationManager.GetValue("Environment") == "Hab")
+                        if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
                         {
                             try
                             {
@@ -585,7 +585,9 @@ namespace Gosocket.Dian.Functions.Activation
                                     enabled = false,
                                     testSetId = testSetId,
                                     contributorOpertaionModeId = isPartipantActiveOtherDoc.OperationModeId,
-                                    otherDocElecContributorId = isPartipantActiveOtherDoc.OtherDocElecContributorId
+                                    otherDocElecContributorId = isPartipantActiveOtherDoc.OtherDocElecContributorId,
+                                    electronicDocumentId = isPartipantActiveOtherDoc.ElectronicDocumentId,
+                                    equivalentDocumentId = setResultOther.EquivalentElectronicDocumentId
                                 };
 
                                 string functionPath = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");

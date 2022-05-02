@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Gosocket.Dian.Application;
+using Gosocket.Dian.Interfaces.Repositories;
 
 namespace Gosocket.Dian.Web.Controllers.Tests
 {
@@ -28,6 +29,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         private readonly Mock<IGlobalOtherDocElecOperationService> _globalOtherDocElecOperationService = new Mock<IGlobalOtherDocElecOperationService>();
         private readonly Mock<IRadianTestSetAppliedService> _globalRadianTestSetAppliedService = new Mock<IRadianTestSetAppliedService>();
         private readonly TelemetryClient telemetry;
+        private readonly Mock<IEquivalentElectronicDocumentRepository> _equivalentElectronicDocumentRepository = new Mock<IEquivalentElectronicDocumentRepository>();
+
 
 
         [TestInitialize]
@@ -40,7 +43,8 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                 _testSetOthersDocumentsResultService.Object,
                 _othersDocsElecSoftwareService.Object,
                 _globalOtherDocElecOperationService.Object, _globalRadianTestSetAppliedService.Object,
-                 telemetry);
+                 telemetry,
+                 _equivalentElectronicDocumentRepository.Object);
         }
 
 
