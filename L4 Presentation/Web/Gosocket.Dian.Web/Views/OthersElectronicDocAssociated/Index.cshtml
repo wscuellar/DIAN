@@ -590,10 +590,22 @@
                     },
                     success: function (data) {
                         hideLoading('#panel-form');
-                        if (data.success)
-                            showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);
-                        if (!data.success)
-                            showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);
+                        if (data.success) {
+                            /*showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);*/
+                            bootbox.dialog({
+                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>"
+                                    + data.message
+                                    + "</h4></div></div>"
+                            });
+                        }
+                        if (!data.success) {
+                            /*showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);*/
+                            bootbox.dialog({
+                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
+                                    + data.message
+                                    + "</h4></div></div>"
+                            });
+                        }
                     }
                 });
             }
