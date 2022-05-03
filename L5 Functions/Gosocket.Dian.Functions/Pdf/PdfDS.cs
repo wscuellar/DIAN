@@ -907,7 +907,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			
 			}
 
-			var AdquirienteRegimenFiscal = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "TaxLevelCode");
+			var AdquirienteRegimenFiscal = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "TaxLevelCode");
 
 			if (AdquirienteRegimenFiscal.Any())
 				Html = Html.Replace("{AdquirienteRegimenFiscal}", AdquirienteRegimenFiscal.FirstOrDefault().Value);
