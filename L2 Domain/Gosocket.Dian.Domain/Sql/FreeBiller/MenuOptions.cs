@@ -19,6 +19,9 @@
 
         public int MenuLevel { get; set; }
 
+        [StringLength(100)]
+        public string SeccionOptions { get; set; }
+
         [NotMapped]
         public List<MenuOptions> Children { get; set; }
 
