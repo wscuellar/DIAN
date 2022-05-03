@@ -633,6 +633,8 @@ namespace Gosocket.Dian.Services.Utils
                 case "40":
                 case "45":
                 case "50":
+                    codeMessage = "DEA";
+                    break;
                 case "55":
                 case "60":
                     {
