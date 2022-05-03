@@ -177,7 +177,7 @@
                                                     <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
-                                                    @if (ViewBag.IsSupportDocument)
+                                                    @if (ViewBag.IsSupportDocument && !Model.ContributorIsOfe)
                                                     {
                                                         <th class="text-center">Rangos de Pruebas</th>
                                                     }
@@ -202,7 +202,7 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            @if (ViewBag.IsSupportDocument)
+                                                            @if (ViewBag.IsSupportDocument && !Model.ContributorIsOfe)
                                                             {
                                                                 <td class="text-center">
                                                                     <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
