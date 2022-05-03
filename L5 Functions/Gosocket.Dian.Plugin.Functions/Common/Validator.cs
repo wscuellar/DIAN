@@ -1260,16 +1260,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (senderCode != senderCodeProvider && documentMeta.DocumentTypeId != "95")
                 {
                     string sender2DvErrorCode = "FAJ47";
-                    var errorMessage = "DV del NIT del emsior del documento no está correctamente calculado";
                     if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
                     else if (documentMeta.DocumentTypeId == "92") sender2DvErrorCode = "DAJ47";
-                    else if (documentMeta.DocumentTypeId == "50"){ sender2DvErrorCode = "DEAJ01"; errorMessage = "No fue informado el grupo que define el emisor del documento electrónico"; }
 
                     sender2 = GetContributorInstanceCache(senderCodeProvider);
                     if (string.IsNullOrEmpty(senderCodeProviderDigit) || senderCodeProviderDigit == "undefined") senderCodeProviderDigit = "11";
                     if (ValidateDigitCode(senderCodeProvider, int.Parse(senderCodeProviderDigit)))
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = errorMessage, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = sender2DvErrorCode, ErrorMessage = "DV del NIT del emsior del documento no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
             }
 
