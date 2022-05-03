@@ -706,19 +706,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
-
-                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
-                    .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
-
-                if (!mode.Any())
-                {
-                    return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    if (electronicDocumentIsSupport)
-                    {
-                        ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
+                ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                         new
                         {
                             ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
@@ -727,6 +715,22 @@ namespace Gosocket.Dian.Web.Controllers
                             ContributorId = User.ContributorId(),
                             message = ""
                         });
+
+                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
+                    .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
+
+                if (!mode.Any())
+                {
+                    if (contributorIsOfe && electronicDocumentIsSupport)
+                    {
+                        return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    if (electronicDocumentIsSupport)
+                    {
                         return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
                     }
 
