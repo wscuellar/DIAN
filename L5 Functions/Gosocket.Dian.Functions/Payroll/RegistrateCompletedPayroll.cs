@@ -58,6 +58,18 @@ namespace Gosocket.Dian.Functions.Payroll
                 GlobalDocPayroll docGlobalPayroll = xmlParser.globalDocPayrolls;
                 docGlobalPayroll.Timestamp = DateTime.Now;
 
+                docGlobalPayroll.FechaIngreso = ValidateFechaAnio(docGlobalPayroll.FechaIngreso);
+                //docGlobalPayroll.CreateDate = ValidateFechaAnio(docGlobalPayroll.CreateDate); timestamp
+                docGlobalPayroll.FechaFin = ValidateFechaAnio(docGlobalPayroll.FechaFin);
+                docGlobalPayroll.FechaPagoFin = ValidateFechaAnio(docGlobalPayroll.FechaPagoFin);
+                docGlobalPayroll.FechaGen = ValidateFechaAnio(docGlobalPayroll.FechaGen);
+                docGlobalPayroll.FechaGenPred = ValidateFechaAnio(docGlobalPayroll.FechaGenPred);
+                docGlobalPayroll.Info_FechaGen = ValidateFechaAnio(docGlobalPayroll.Info_FechaGen);
+                docGlobalPayroll.FechaLiquidacion = ValidateFechaAnio(docGlobalPayroll.FechaLiquidacion);
+                docGlobalPayroll.FechaInicio = ValidateFechaAnio(docGlobalPayroll.FechaInicio);
+                docGlobalPayroll.FechaPagoInicio = ValidateFechaAnio(docGlobalPayroll.FechaPagoInicio);
+                docGlobalPayroll.FechaRetiro = ValidateFechaAnio(docGlobalPayroll.FechaRetiro);
+
                 var arrayTasks = new List<Task>();
                 arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
 
@@ -108,6 +120,8 @@ namespace Gosocket.Dian.Functions.Payroll
                     FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
                     NumeroDocumento = numeroDocumento,
                     Timestamp = DateTime.Now,
+                    CUNE = data.TrackId,
+                    TipoXML = docGlobalPayroll.TipoXML
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
 
@@ -119,22 +133,22 @@ namespace Gosocket.Dian.Functions.Payroll
                 //17/12/2021 Validacion para cuando migre a sql server no falle por el año minimo 1753
                 otherDocElecPayroll.AdmissionDate = ValidateFechaAnio(otherDocElecPayroll.AdmissionDate);
                 otherDocElecPayroll.CreateDate = ValidateFechaAnio(otherDocElecPayroll.CreateDate);
-                otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
+                //otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
                 otherDocElecPayroll.EndPaymentDate = ValidateFechaAnio(otherDocElecPayroll.EndPaymentDate);
                 otherDocElecPayroll.GenDate = ValidateFechaAnio(otherDocElecPayroll.GenDate);
-                otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
+                //otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
                 otherDocElecPayroll.Info_DateGen = ValidateFechaAnio(otherDocElecPayroll.Info_DateGen);
-                otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
-                otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
+                //otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
+                //otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
                 otherDocElecPayroll.StartPaymentDate = ValidateFechaAnio(otherDocElecPayroll.StartPaymentDate);
-                otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
+                //otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
 
                 otherDocElecPayroll = otherDocElecPayrollService.CreateOtherDocElecPayroll(otherDocElecPayroll);
             }
             catch (Exception ex)
             {
                 log.Error(ex.Message + "_________" + ex.StackTrace + "_________" + ex.Source, ex);
-                response.Code = ((int)EventValidationMessage.Error).ToString();
+                response.Code = ((int)EventValidationMessage.ErrorNomina).ToString();
                 response.Message = ex.Message;
             }
 

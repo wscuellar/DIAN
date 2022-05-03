@@ -119,6 +119,9 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=106.15.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RestSharp.106.15.0\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
@@ -329,6 +332,7 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\ExternalUsersController.cs" />
     <Compile Include="Controllers\FreeBillerController.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\OthersElectronicDocNumberRangeController.cs" />
     <Compile Include="Controllers\OthersDocumentsController.cs" />
     <Compile Include="Controllers\OthersElectronicDocAssociatedController.cs" />
@@ -372,6 +376,7 @@
     <Compile Include="Models\ChangePasswordModel.cs" />
     <Compile Include="Models\EventsCounterViewModel.cs" />
     <Compile Include="Models\FileHistoryFilterViewModel.cs" />
+    <Compile Include="Models\NotificationEntity.cs" />
     <Compile Include="Models\OtherDocElecCustomerListViewModel.cs" />
     <Compile Include="Models\OtherDocElecSetupOperationModeViewModel.cs" />
     <Compile Include="Models\OtherDocElecSoftwareViewModel.cs" />
@@ -416,6 +421,7 @@
     <Compile Include="Models\RadianTestSetTableViewModel.cs" />
     <Compile Include="Models\RadianTestSetTrackingViewModel.cs" />
     <Compile Include="Models\RadianTestSetViewModel.cs" />
+    <Compile Include="Models\TestSetResultAceptedModel.cs" />
     <Compile Include="Models\ValidacionOtherElectronicDocumentsViewModel.cs" />
     <Compile Include="Models\RegistrationDataViewModel.cs" />
     <Compile Include="Models\RequestAuthorizationBigContributorViewModel.cs" />
@@ -601,6 +607,7 @@
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\documentos_equivalentes_icono_principal_Mesa_de_trabajo.svg" />
     <Content Include="Content\images\Svg\edti.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaElectronica.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaRadian1.svg" />
@@ -2948,8 +2955,7 @@
     <Content Include="Views\FreeBiller\_usersFreeBiller.cshtml" />
     <Content Include="Views\ProfileFreeBiller\CreateProfile.cshtml" />
     <Content Include="Views\User\_userexLogin.cshtml" />
-    <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
-    <Content Include="Views\ProfileFreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_permissionGrid.cshtml" />
     <Content Include="Views\Document\_payrolls.cshtml" />
     <Content Include="Views\User\_forgotPasswordForm.cshtml" />
     <Content Include="Views\Document\Payroll.cshtml" />
@@ -2964,6 +2970,11 @@
     <Content Include="Views\Document\ElectronicDocuments.cshtml" />
     <Content Include="Views\OthersElectronicDocNumberRange\_Items.cshtml" />
     <Content Include="Views\OthersElectronicDocNumberRange\Index.cshtml" />
+    <Content Include="Views\FreeBiller\_checksGrid.cshtml" />
+    <Content Include="Views\ProfileFreeBiller\_permissionFGrid.cshtml" />
+    <Content Include="Views\Contributor\CheckContributorRegister.cshtml" />
+    <Content Include="Views\Contributor\RegisterNoOfe.cshtml" />
+    <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -2987,6 +2998,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="Content\plugins\flot-charts\examples\gauge\" />
     <Folder Include="Content\plugins\fullcalendar\less\" />
+    <Folder Include="Views\Notifications\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

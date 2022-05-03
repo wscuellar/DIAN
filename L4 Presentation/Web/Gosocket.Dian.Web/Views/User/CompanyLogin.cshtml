@@ -51,15 +51,14 @@
 
                 <!-- external user -->
                 @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
-            <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
-        </a>*@
+                     <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
+                </a>*@
 
                 <!-- person -->
                 <a href="@Url.Action("PersonLogin", "User")" class="list-group-item text-center">
                     <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
                 </a>
-
-                 @* Se comenta para produccion
+ 
                 <!-- Not obliged to invoice -->
                 @*<a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
                     <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)

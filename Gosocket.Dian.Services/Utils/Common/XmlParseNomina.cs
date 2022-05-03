@@ -258,7 +258,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             if(tempNovedadXmlNode != null && !string.IsNullOrWhiteSpace(tempNovedadXmlNode.InnerText))
             {
                 this.Novelty = bool.Parse(tempNovedadXmlNode.InnerText);
-                globalDocPayrolls.CUNENov = tempNovedadXmlNode.Attributes["CUNENov"]?.InnerText;
+                globalDocPayrolls.CUNENov = tempNovedadXmlNode.Attributes["CUNENov"]?.InnerText.ToLower();
             }
 
             globalDocPayrolls.Novedad = this.Novelty;
@@ -284,7 +284,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             if(paymentsDateNode != null)
             {
                 var datesList = new List<string>();
-                XmlNodeList paymentsDatesList = paymentsDateNode.SelectNodes($"/{rootNodeXPath}/*[local-name()='FechaPago']");
+                XmlNodeList paymentsDatesList = paymentsDateNode.SelectNodes($"/{rootNodeXPath}/*[local-name()='FechasPagos']");
                 for (int i = 0; i < paymentsDatesList.Count; i++)
                 {
                     datesList.Add(paymentsDatesList[i]?.InnerText);
@@ -298,7 +298,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                 globalDocPayrolls.CodigoTrabajador = xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText;
                 globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
                 this.SequenceConsecutive = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
-                globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(this.SequenceConsecutive) ? decimal.Parse(this.SequenceConsecutive) : 0);
+                globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(this.SequenceConsecutive) ? this.SequenceConsecutive : "0");
                 globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
             }
             XmlNodeList xLugarGeneracionXML = xmlDocument.GetElementsByTagName("LugarGeneracionXML");
@@ -338,7 +338,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             {
                 globalDocPayrolls.Version = xInformacionGeneral[j].Attributes["Version"]?.InnerText;
                 globalDocPayrolls.Ambiente = xInformacionGeneral[j].Attributes["Ambiente"]?.InnerText;
-                globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"]?.InnerText;
+                globalDocPayrolls.CUNE = xInformacionGeneral[j].Attributes["CUNE"]?.InnerText.ToLower();
                 globalDocPayrolls.EncripCUNE = xInformacionGeneral[j].Attributes["EncripCUNE"]?.InnerText;
                 globalDocPayrolls.Info_FechaGen = Convert.ToDateTime(xInformacionGeneral[j].Attributes["FechaGen"]?.InnerText);
                 globalDocPayrolls.HoraGen = xInformacionGeneral[j].Attributes["HoraGen"]?.InnerText;
@@ -353,7 +353,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             for (int j = 0; j < xReemplazandoPredecesor.Count; j++)
             {
                 globalDocPayrolls.NumeroPred = xReemplazandoPredecesor[j].Attributes["NumeroPred"]?.InnerText;
-                globalDocPayrolls.CUNEPred = xReemplazandoPredecesor[j].Attributes["CUNEPred"]?.InnerText;
+                globalDocPayrolls.CUNEPred = xReemplazandoPredecesor[j].Attributes["CUNEPred"]?.InnerText.ToLower();
                 globalDocPayrolls.FechaGenPred = Convert.ToDateTime(xReemplazandoPredecesor[j].Attributes["FechaGenPred"]?.InnerText);
 
                 var paymentsDateNodeR = xmlDocument.SelectSingleNode(paymentsDatesPath);
@@ -375,7 +375,7 @@ namespace Gosocket.Dian.Services.Utils.Common
             for (int j = 0; j < xEliminandoPredecesor.Count; j++)
             {
                 globalDocPayrolls.NumeroPred = xEliminandoPredecesor[j].Attributes["NumeroPred"]?.InnerText;
-                globalDocPayrolls.CUNEPred = xEliminandoPredecesor[j].Attributes["CUNEPred"]?.InnerText;
+                globalDocPayrolls.CUNEPred = xEliminandoPredecesor[j].Attributes["CUNEPred"]?.InnerText.ToLower();
                 globalDocPayrolls.FechaGenPred = Convert.ToDateTime(xEliminandoPredecesor[j].Attributes["FechaGenPred"]?.InnerText);
             }
             XmlNodeList xEmpleador = xmlDocument.GetElementsByTagName("Empleador");

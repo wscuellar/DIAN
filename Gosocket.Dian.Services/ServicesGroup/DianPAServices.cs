@@ -9,6 +9,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 {
     public class DianPAServices : IDisposable
     {
-        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");      
+        private static readonly TableManager TableManagerDianFileMapper = new TableManager("DianFileMapper");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private static readonly TableManager TableManagerGlobalDocAssociate = new TableManager("GlobalDocAssociate");
         private static readonly TableManager TableManagerGlobalDocValidatorDocument = new TableManager("GlobalDocValidatorDocument");
@@ -68,7 +69,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="authCode"></param>
         /// <param name="testSetId"></param>
         /// <returns></returns>
-        public UploadDocumentResponse ProcessBatchZipFile(string fileName, byte[] contentFile, string authCode = null, string testSetId = null)
+        public async Task<UploadDocumentResponse> ProcessBatchZipFile(string fileName, byte[] contentFile, string authCode = null, string testSetId = null)
         {
             var zipKey = Guid.NewGuid().ToString();
             UploadDocumentResponse responseMessages = new UploadDocumentResponse
@@ -77,7 +78,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
             var utcNow = DateTime.UtcNow;
             var blobPath = $"{utcNow.Year}/{utcNow.Month.ToString().PadLeft(2, '0')}/{utcNow.Day.ToString().PadLeft(2, '0')}";
-            var result = fileManager.Upload(blobContainer, $"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
+            var result = await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
             if (!result)
             {
                 responseMessages.ZipKey = "";
@@ -125,7 +126,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="contentFile"></param>
         /// <param name="authCode"></param>
         /// <returns></returns>
-        public DianResponse UploadDocumentSync(string fileName, byte[] contentFile, string authCode = null)
+        public async Task<DianResponse> UploadDocumentSync(string fileName, byte[] contentFile, string authCode = null)
         {
             StringBuilder sb = new StringBuilder();
             var start = DateTime.UtcNow;
@@ -279,7 +280,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // upload xml
             start = DateTime.UtcNow;
             var uploadXmlRequest = new { xmlBase64, fileName = contentFileList[0].XmlFileName, documentTypeId = docTypeCode, trackId };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
+            var uploadXmlResponse = await ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue("UploadXmlUrl"), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
                 dianResponse.XmlFileName = $"{fileName}";
@@ -300,7 +301,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // send to validate document sync
             start = DateTime.UtcNow;
             var requestObjTrackId = new { trackId, draft = "false" };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
+            var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("ValidateDocumentUrl"), requestObjTrackId);
 
 
             sb.AppendLine($"6 Validate {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString()}");
@@ -426,13 +427,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// 
         /// </summary>
         /// <returns></returns>
-        public ExchangeEmailResponse GetExchangeEmails(string authCode)
+        public async Task <ExchangeEmailResponse> GetExchangeEmails(string authCode)
         {
             var contributor = GetGlobalContributor(authCode);
             if (contributor == null)
                 return new ExchangeEmailResponse { StatusCode = "89", Success = false, Message = $"NIT {authCode} no autorizado para consultar correos de recepción de facturas.", CsvBase64Bytes = null };
 
-            var bytes = fileManager.GetBytes("dian", $"exchange/emails.csv");
+            var bytes = await fileManager.GetBytesAsync("dian", $"exchange/emails.csv");
             var response = new ExchangeEmailResponse { StatusCode = "0", Success = true, CsvBase64Bytes = bytes };
             return response;
         }
@@ -442,7 +443,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public List<DianResponse> GetBatchStatus(string trackId)
+        public async Task<List<DianResponse>> GetBatchStatus(string trackId)
         {
             var batchStatus = TableManagerGlobalBatchFileStatus.Find<GlobalBatchFileStatus>(trackId, trackId);
             if (batchStatus == null) return GetStatusZip(trackId);
@@ -475,7 +476,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             if (exist)
             {
-                var zipBytes = fileManager.GetBytes(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
+                var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
                 if (zipBytes != null)
                 {
                     responses.Add(new DianResponse { IsValid = true, StatusCode = "00", StatusDescription = "Procesado Correctamente.", XmlBase64Bytes = zipBytes });
@@ -498,13 +499,14 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
-            
+
             //if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD")) isUploaded = true;
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
                 //var isFinished = DianServicesUtils.CheckIfDocumentValidationsIsFinished(trackId);
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
                 {
+                    string messageDescription = string.Empty;
                     start = DateTime.UtcNow;
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
@@ -513,13 +515,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var validations = new List<GlobalDocValidatorTracking>();
                     List<Task> arrayTasks = new List<Task>();
 
-                    //Task firstLocalRun = Task.Run(() =>
-                    //{
-                    //    var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                    //    response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                    //    if (!applicationResponse.Success)
-                    //        Debug.WriteLine(applicationResponse.Message);
-                    //});
+                    Task firstLocalRun = Task.Run(() =>
+                    {
+                        var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
+                        response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
+                        if (!applicationResponse.Success)
+                            Debug.WriteLine(applicationResponse.Message);
+                    });
 
                     Task secondLocalRun = Task.Run(() =>
                     {
@@ -535,13 +537,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
                     });
 
-                    //arrayTasks.Add(firstLocalRun);
+                    arrayTasks.Add(firstLocalRun);
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(fourLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
 
-                    var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
-                    response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
+                    //var applicationResponse = XmlUtil.GetApplicationResponseIfExist(documentMeta);
+                    //response.XmlBase64Bytes = (applicationResponse != null) ? XmlUtil.GenerateApplicationResponseBytes(trackId, documentMeta, validations) : null;
 
                     response.XmlDocumentKey = trackId;
                     response.XmlFileName = documentMeta.FileName;
@@ -556,6 +558,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var failed = validations.Where(r => r.Mandatory && !r.IsValid).ToList();
                     var notifications = validations.Where(r => r.IsNotification).ToList();
                     var message = (string.IsNullOrEmpty(documentMeta.Serie)) ? $"La {documentMeta.DocumentTypeName} {documentMeta.Number}, ha sido autorizada." : $"La {documentMeta.DocumentTypeName} {documentMeta.Serie}-{documentMeta.Number}, ha sido autorizada.";
+                    var document = TableManagerGlobalDocValidatorDocument.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
+
 
                     if (!failed.Any() && !notifications.Any())
                     {
@@ -563,13 +567,42 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.StatusMessage = message;
                     }
 
-                    //if (failed.Any() && !applicationResponseExist)
-                    if (failed.Any())
-                    {
+                    if (failed.Any() && !applicationResponseExist)
+                    //if (failed.Any())
+                    {                        
                         var failedList = new List<string>();
                         foreach (var f in failed)
+                        {
                             failedList.Add($"Regla: {f.ErrorCode}, Rechazo: {f.ErrorMessage}");
-
+                            if (f.ErrorCode == "90")
+                            {
+                                switch (f.DocumentTypeCode)
+                                {
+                                    case "01":
+                                    case "91":
+                                    case "92":
+                                        {
+                                            messageDescription = document != null ? $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUFE {document.DocumentKey} " : null ;
+                                            break;
+                                        }
+                                    case "96":
+                                        {
+                                            messageDescription = document != null ? $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUDE {document.DocumentKey} " : null;
+                                            break;
+                                        }
+                                    case "102":
+                                    case "103":
+                                        {
+                                            messageDescription = document != null ?  $"Documento {documentMeta.SerieAndNumber} procesado anteriormente. CUNE  {document.DocumentKey} " : null;
+                                            break;
+                                        }
+                                    default:
+                                        break;
+                                }
+                                response.StatusDescription = messageDescription;
+                            }
+                        }
+                                                   
                         response.IsValid = false;
                         response.StatusMessage = "Documento con errores en campos mandatorios.";
                         response.ErrorMessage.AddRange(failedList);
@@ -586,13 +619,13 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         response.ErrorMessage.AddRange(notificationList);
                     }
 
-                    //if (response.IsValid || applicationResponseExist)
-                    if (response.IsValid)
+                    if (response.IsValid || applicationResponseExist)
+                    //if (response.IsValid)
                     {
                         response.IsValid = true;
                         response.StatusCode = "00";
                         response.StatusMessage = message;
-                        response.StatusDescription = "Procesado Correctamente.";
+                        response.StatusDescription = "Procesado Correctamente.";                   
                     }
                     else
                     {
@@ -725,17 +758,17 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 List<GlobalDocAssociate> events = source.ToList();
 
                 //calcula items del proceso
-                List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();               
+                List<GlobalDocValidatorDocumentMeta> meta = new List<GlobalDocValidatorDocumentMeta>();
                 GlobalDocValidatorDocumentMeta invoice = OperationProcess(events, meta, cufe);
 
                 //Unifica la data
                 var eventDoc = from associate in events
-                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey                               
+                               join docMeta in meta on associate.RowKey equals docMeta.PartitionKey
                                select new EventDocument()
                                {
                                    Cufe = cufe,
                                    Associate = associate,
-                                   DocumentMeta = docMeta,                                  
+                                   DocumentMeta = docMeta,
                                };
 
                 InvoiceWrapper invoiceWrapper = new InvoiceWrapper()
@@ -760,7 +793,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <returns></returns>
         public DianResponse GetStatusEvent(string trackId)
         {
-            var globalStart = DateTime.UtcNow; 
+            var globalStart = DateTime.UtcNow;
 
             var response = new DianResponse() { ErrorMessage = new List<string>() };
             var validatorRuntimes = TableManagerGlobalDocValidatorRuntime.FindByPartition(trackId);
@@ -768,7 +801,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (validatorRuntimes.Any(v => v.RowKey == "UPLOAD"))
             {
                 if (validatorRuntimes.Any(v => v.RowKey == "END"))
-                { 
+                {
                     GlobalDocValidatorDocumentMeta documentMeta = null;
                     bool applicationResponseExist = false;
                     bool existDocument = false;
@@ -928,7 +961,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// </summary>
         /// <param name="contentFile"></param>
         /// <returns></returns>
-        public DianResponse SendEventUpdateStatus(byte[] contentFile, string authCode)
+        public async Task<DianResponse> SendEventUpdateStatus(byte[] contentFile, string authCode)
         {
             var start = DateTime.UtcNow;
             var globalStart = DateTime.UtcNow;
@@ -1037,7 +1070,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var serieAndNumber = documentParsed.SerieAndNumber;
             var trackId = documentParsed.DocumentKey.ToLower();
             var eventCode = documentParsed.ResponseCode;
-            var trackIdCude = documentParsed.Cude.ToLower(); 
+            var trackIdCude = documentParsed.Cude.ToLower();
             var customizationID = documentParsed.CustomizationId;
             var listId = documentParsed.listID == "" ? "1" : documentParsed.listID;
 
@@ -1125,7 +1158,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 customizationID,
                 sendTestSet
             };
-            var uploadXmlResponse = ApiHelpers.ExecuteRequest<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
+            var uploadXmlResponse = await ApiHelpers.ExecuteRequestAsync<ResponseUploadXml>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_UoloadXml), uploadXmlRequest);
             if (!uploadXmlResponse.Success)
             {
                 dianResponse.XmlFileName = trackIdMapperEntity.PartitionKey;
@@ -1147,7 +1180,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             start = DateTime.UtcNow;
             trackId = trackIdCude;
             var requestObjTrackId = new { trackId, draft = Properties.Settings.Default.Param_False };
-            var validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentUrl), requestObjTrackId);
+            var validations = await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ValidateDocumentUrl), requestObjTrackId);
             StackTrace = "validations.Count => " + validations.Count;
             sb.AppendLine($"{Properties.Settings.Default.Param_Validate6} {DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture)} ValidateDocument StackTrace: {StackTrace}");
 
@@ -1239,7 +1272,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         EmissionDateNumber = documentMeta?.EmissionDate.ToString("yyyyMMdd")
                     };
 
-                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });
+                    var processRegistrateComplete = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedRadianUrl), new { TrackId = trackIdCude, AuthCode = authCode });
 
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
@@ -1254,7 +1287,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
                     trackId = documentParsed.DocumentKey;
                     var responseCode = documentParsed.ResponseCode;
-                    var processEventResponse = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { trackId, responseCode, trackIdCude, listId });
+                    var processEventResponse = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_ApplicationResponseProcessUrl), new { trackId, responseCode, trackIdCude, listId });
 
                     if (processEventResponse.Code != Properties.Settings.Default.Code_100)
                     {
@@ -1394,7 +1427,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// <param name="trackId"></param>
         /// <param name="authCode"></param>
         /// <returns></returns>
-        public EventResponse GetXmlByDocumentKey(string trackId, string authCode)
+        public async Task<EventResponse> GetXmlByDocumentKey(string trackId, string authCode)
         {
             var eventResponse = new EventResponse();
             XmlParser xmlParser = new XmlParser();
@@ -1431,18 +1464,18 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 return eventResponse;
             }
 
-            var xmlBytes = GetXmlFromStorage(documentKey);
+            var xmlBytes = await GetXmlFromStorage(documentKey);
             if (xmlBytes == null)
             {
                 eventResponse.Code = "404";
                 eventResponse.Message = $"Xml con CUFE: '{documentKey}' no encontrado.";
                 return eventResponse;
             }
-            
+
             if (Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                 || Convert.ToInt32(globalDocValidatorDocumentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
             {
-               
+
                 xmlParserNomina = new XmlParseNomina(xmlBytes);
                 if (!xmlParserNomina.Parser())
                 {
@@ -1458,7 +1491,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
             else
             {
-                
+
                 xmlParser = new XmlParser(xmlBytes);
                 if (!xmlParser.Parser())
                 {
@@ -1473,7 +1506,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 receiverCode = documentParsed.ReceiverCode;
             }
 
-            
+
 
             if (!authCode.Contains(senderCode) && !authCode.Contains(receiverCode))
             {
@@ -1516,7 +1549,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 }
             }
 
-            if(string.IsNullOrWhiteSpace(dateNumber)) // Si no llega fecha, se establece la actual...
+            if (string.IsNullOrWhiteSpace(dateNumber)) // Si no llega fecha, se establece la actual...
             {
                 var now = DateTime.Now;
                 dateNumber = $"{now.Year}{now.Month.ToString().PadLeft(2, char.Parse("0"))}{now.Day.ToString().PadLeft(2, char.Parse("0"))}";
@@ -1524,7 +1557,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var partitionKey = $"{dateNumber}|{contributorCode}"; // Se arma el PartitionKey compuesto (fecha|NIT)
             var eventsList = TableManagerGlobalDocumentWithEventRegistered.FindAll<GlobalDocumentWithEventRegistered>(partitionKey).ToList();
-            if(eventsList == null || eventsList.Count <= 0)
+            if (eventsList == null || eventsList.Count <= 0)
             {
                 response.Message = $"No existe información con los criterios de búsqueda recibidos";
                 return response;
@@ -1651,7 +1684,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                 response.XmlDocumentKey = document.DocumentKey;
                 response.XmlFileName = meta.FileName;
 
-            } 
+            }
         }
 
         /// <summary>
@@ -1684,7 +1717,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return globalContributor;
         }
 
-        public static byte[] GetXmlFromStorage(string trackId)
+        public async static Task<byte[]> GetXmlFromStorage(string trackId)
         {
             var tableManager = new TableManager("GlobalDocValidatorRuntime");
             var documentStatusValidation = tableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
@@ -1694,7 +1727,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var fileManager = new FileManager();
             var container = $"global";
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = fileManager.GetBytes(container, fileName);
+            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
 
             tableManager = null;
             return xmlBytes;
@@ -1734,6 +1767,113 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
         }
 
-        
+        public DianResponse SendRequestBulkDocumentsDownload(string authCode, string email, string nit, DateTime startDate, DateTime endDate, string documentGroup)
+        {
+            var timer = new Stopwatch();
+            DianResponse dianResponse = new DianResponse
+            {
+                StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
+                StatusDescription = "",
+                ErrorMessage = new List<string>()
+            };
+
+            timer.Start();
+
+            var user = GetGlobalContributor(authCode);
+
+            var request = new BulkDocumentDownloadRequest(user.Code, email, nit, startDate, endDate, documentGroup);
+            var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
+            timer.Stop();
+            if (!response.IsCorrect)
+            {
+                dianResponse.StatusCode = "89";
+            }
+            dianResponse.IsValid = response.IsCorrect;
+            dianResponse.StatusDescription = response.Message;
+            
+            var globalEnd = timer.ElapsedMilliseconds / 1000;
+            if (globalEnd >= 10)
+            {
+                var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
+                TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+            }
+
+            return dianResponse;
+        }
+
+        public DianResponse GetStatusBulkDocumentsDownload(string trackId)
+        {
+            var timer = new Stopwatch();
+            DianResponse dianResponse = new DianResponse
+            {
+                StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
+                StatusDescription = "",
+                ErrorMessage = new List<string>()
+            };
+
+            timer.Start();
+            var response = ApiHelpers.ExecuteRequest<GetStatusBulkDocumentDownloadResponse>(ConfigurationManager.GetValue("GetStatusBulkDocumentsDownloadUrl"), new { trackId });
+            timer.Stop();
+            if (response.IsCorrect)
+            {
+                dianResponse.StatusDescription = $"La solicitud {trackId} se encuentra en estado: {response.State}, {response.Response}";
+                dianResponse.UrlDescarga = response.UrlFileCsv;
+            }
+            else
+            {
+                dianResponse.StatusCode = "89";
+                dianResponse.StatusDescription = response.Message;
+            }
+            dianResponse.IsValid = response.IsCorrect;
+
+            var globalEnd = timer.ElapsedMilliseconds / 1000;
+            if (globalEnd >= 10)
+            {
+                var globalTimeValidation = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow:yyyyMMdd}", Guid.NewGuid().ToString()) { Message = globalEnd.ToString(), Action = "Download" };
+                TableManagerGlobalLogger.InsertOrUpdate(globalTimeValidation);
+            }
+
+            return dianResponse;
+        }
+    }
+
+    public class BulkDocumentDownloadRequest
+    {
+        public BulkDocumentDownloadRequest(string userId, string email, string nit, DateTime initialDate, DateTime endDate, string groupDocument)
+        {
+            UserId = userId;
+            Email = email;
+            Nit = nit;
+            InitialDate = initialDate;
+            EndDate = endDate;
+            GroupDocument = groupDocument;
+        }
+
+        public string UserId { get; set; }
+        public string Email { get; set; }
+        public string Nit { get; set; }
+        public DateTime InitialDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string GroupDocument { get; set; }
+    }
+    public class BulkDocumentDownloadResponse
+    {
+        public bool IsCorrect { get; set; }
+        public string Message { get; set; }
+        public string LogDownloadWsTrackId { get; set; }
+    }
+
+    public class GetStatusBulkDocumentDownloadResponse
+    {
+        public bool IsCorrect { get; set; }
+        public string Message { get; set; }
+        public string Nit { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public string logDownloadWs { get; set; }
+        public string State { get; set; }
+        public string Response { get; set; }
+        public string TotalRecords { get; set; }
+        public string UrlFileCsv { get; set; }
     }
 }

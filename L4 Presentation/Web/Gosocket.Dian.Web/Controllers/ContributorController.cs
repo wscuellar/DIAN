@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -253,6 +254,30 @@ namespace Gosocket.Dian.Web.Controllers
                 return RedirectToAction(nameof(Wizard));
 
             return RedirectToAction(nameof(HomeController.Dashboard));
+        }
+
+        public ActionResult CheckContributorRegister()
+        {
+            Contributor contributor = contributorService.Get(User.ContributorId());
+            var contributorId = contributor.Id;
+            var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
+            var contributorTypeId = contributor.ContributorTypeId;
+            
+            if (contributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+            {
+                if(contributorAcceptanceStatusId == (int)Domain.Common.ContributorStatus.Pending)
+                {
+                    return RedirectToAction(nameof(RegisterNoOfe));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(DocumentController.ElectronicDocuments), "Document");
+                }
+            }
+            else
+            {
+                return RedirectToAction(nameof(DocumentController.ElectronicDocuments), "Document");
+            }
         }
 
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
@@ -694,6 +719,78 @@ namespace Gosocket.Dian.Web.Controllers
 
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction(nameof(UserController.Login), "User");
+        }
+
+        public ActionResult RegisterNoOfe()
+        {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+                return RedirectToAction(nameof(UserController.Unauthorized));
+
+            Contributor contributor = contributorService.Get(User.ContributorId());
+            SetView(contributor.ContributorTypeId.ToString());
+
+            var model = new ContributorViewModel
+            {
+                Id = contributor.Id,
+                Code = contributor.Code,
+                Name = contributor.Name,
+                BusinessName = contributor.BusinessName,
+                Email = contributor.Email?.Trim(),
+                ExchangeEmail = contributor.ExchangeEmail ?? "",
+                AcceptanceStatusId = contributor.AcceptanceStatusId,
+                AcceptanceStatusName = Domain.Common.EnumHelper.GetEnumDescription((ContributorStatus)contributor.AcceptanceStatusId),
+                PrincipalActivityCode = contributor.PrincipalActivityCode
+            };
+            FillContributorCategory(model);
+
+            if (string.IsNullOrEmpty(model.PrincipalActivityCode))
+                ModelState.AddModelError("PrincipalActivityCode", "");
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult RegisterNoOfe(ContributorViewModel model)
+        {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+                return RedirectToAction(nameof(UserController.Unauthorized));
+
+            if (User.ContributorId() == 0)
+            {
+                AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+                return RedirectToAction(nameof(UserController.Login), "User");
+            }
+
+            if (User.ContributorId() != model.Id)
+                return RedirectToAction(nameof(UserController.Unauthorized), "User");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            Contributor contributor = contributorService.ObsoleteGet(model.Id);
+            contributor.ContributorTypeId = (int)Domain.Common.ContributorType.BillerNoObliged;
+            contributor.AcceptanceStatusId = (int)ContributorStatus.Registered;
+            contributor.ExchangeEmail = model.ExchangeEmail?.ToLower();
+            contributorService.AddOrUpdate(contributor);
+
+            var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
+            tableManagerGlobalContributor.InsertOrUpdate(globalContributor);
+
+            if (!string.IsNullOrEmpty(contributor.ExchangeEmail))
+            {
+                var globalExchangeEmail = new GlobalExchangeEmail(contributor.Code, contributor.Code) { Email = contributor.ExchangeEmail?.ToLower() };
+                tableManagerGlobalExchangeEmail.InsertOrUpdate(globalExchangeEmail);
+
+                // insert in production.
+                if (ConfigurationManager.GetValue("Environment") == "Hab")
+                {
+                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
+                    var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
+                    tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
+                }
+            }
+
+            return RedirectToAction(nameof(RegisterNoOfe), "Contributor");
         }
 
         public ActionResult ConfigureOperationModes(int id)
@@ -1265,11 +1362,11 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         [ValidateAntiForgeryToken]
-        public JsonResult SyncToProduction(int id)
+        public async Task<JsonResult> SyncToProduction(int id)
         {
             try
             {
-                var response = ApiHelpers.ExecuteRequest<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(ConfigurationManager.GetValue("SendToActivateContributorUrl"), new { contributorId = id });
                 if (!response.Success)
                     return Json(new
                     {
@@ -1295,7 +1392,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [HttpPost]
         [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
-        public JsonResult SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
+        public async Task<JsonResult> SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
         {
 
             DateTime.TryParseExact(habilitationDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _habilitationDate);
@@ -1326,9 +1423,9 @@ namespace Gosocket.Dian.Web.Controllers
                 try
                 {
                     // Get token
-                    var result = GetAssignResponsabilityToken();
+                    var result = await GetAssignResponsabilityToken();
                     // Assign responsoabilty
-                    var response = AssignResponsability(contributor, result);
+                    var response = await AssignResponsability(contributor, result);
                     int.TryParse(response.Code, out int statusCode);
                     if (statusCode == (int)HttpStatus.Success)
                     {
@@ -1804,15 +1901,15 @@ namespace Gosocket.Dian.Web.Controllers
                     return "text-red";
             }
         }
-        private ResponseAssignResponsabilityToken GetAssignResponsabilityToken()
+        private async Task<ResponseAssignResponsabilityToken> GetAssignResponsabilityToken()
         {
             var loginUrl = ConfigurationManager.GetValue("AssignResponsabilityLoginUrl").Replace("#", "&");
             //loginUrl = loginUrl.Replace("#", "&");
             var obj = new { };
-            var response = ApiHelpers.ExecuteRequest<ResponseAssignResponsabilityToken>(loginUrl, obj);
+            var response = await ApiHelpers.ExecuteRequestAsync<ResponseAssignResponsabilityToken>(loginUrl, obj);
             return response;
         }
-        private ResponseAssignResponsability AssignResponsability(Contributor contributor, ResponseAssignResponsabilityToken responseAssignResponsabilityToken)
+        private async Task<ResponseAssignResponsability> AssignResponsability(Contributor contributor, ResponseAssignResponsabilityToken responseAssignResponsabilityToken)
         {
             var headers = new Dictionary<string, string>
                 {
@@ -1824,7 +1921,7 @@ namespace Gosocket.Dian.Web.Controllers
 
             var assignResponsabilityUrl = ConfigurationManager.GetValue("AssignResponsabilityUrl");
             var request = new { idTransaccion = StringUtil.GenerateRandomString(), nroIdentificacion = contributor.Code, fechaCambio = contributor.ProductionDate?.ToString("yyyyMMdd") };
-            var response = ApiHelpers.ExecuteRequestWithHeader<ResponseAssignResponsability>(assignResponsabilityUrl, request, headers);
+            var response = await ApiHelpers.ExecuteRequestWithHeaderAsync<ResponseAssignResponsability>(assignResponsabilityUrl, request, headers);
             return response;
         }
         private void SetView(string type)

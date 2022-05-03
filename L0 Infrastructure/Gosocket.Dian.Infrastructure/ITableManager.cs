@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Infrastructure
         T ExistTarifa<T>(string partitionKey, string tarifa) where T : ITableEntity, new();
         DynamicTableEntity Find(string partitionKey, string rowKey);
         T Find<T>(string partitionKey, string rowKey) where T : ITableEntity, new();
+        IEnumerable<T> FindBy<T>(string partitionKey, string rowKey) where T : ITableEntity, new();
         IEnumerable<T> FindAll<T>() where T : ITableEntity, new();
         IEnumerable<T> FindAll<T>(int take, ref TableContinuationToken continuationToken) where T : ITableEntity, new();
         IEnumerable<T> FindAll<T>(string partitionKey) where T : ITableEntity, new();

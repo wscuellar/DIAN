@@ -89,7 +89,10 @@ namespace Gosocket.Dian.Application
             //return sqlDBContext.Contributors.FirstOrDefault(x => x.Id == id);
             using (var context = new SqlDBContext())
             {
-                return context.Contributors.Include("ContributorOperations").AsNoTracking().FirstOrDefault(x => x.Id == id);
+                return context.Contributors
+                    .Include("ContributorOperations").AsNoTracking()
+                    .Include("Softwares").AsNoTracking()
+                    .FirstOrDefault(x => x.Id == id);
             }
         }
 
@@ -518,13 +521,12 @@ namespace Gosocket.Dian.Application
         }
 
 
-        public void SetToEnabledOtherDocElecContributor(int contributorId, int contributorTypeId, string softwareId, int softwareType, int contributorTypeModeId)
+        public void SetToEnabledOtherDocElecContributor(string softwareId, int softwareType, int otherDocElecContributorId)
         {
             using (var context = new SqlDBContext())
             {
                 //Ubicar el participante que se habilitara
-                OtherDocElecContributor otherDocElec = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
-                                        && t.OtherDocElecContributorTypeId == contributorTypeId && t.OtherDocElecOperationModeId == contributorTypeModeId);
+                OtherDocElecContributor otherDocElec = context.OtherDocElecContributors.FirstOrDefault(t => t.Id == otherDocElecContributorId);
 
                 if (otherDocElec != null)
                 {
@@ -673,21 +675,18 @@ namespace Gosocket.Dian.Application
         /// </summary>
         /// <param name="radianContributorId">Id a ubicar</param>
         /// <returns>Un objeto RadianCotributor buscado</returns>
-        public OtherDocElecContributor GetOtherDocElecContributor(int contributorId, int contributorTypeId, bool enabled, int contributorOpertaionModeId)
+        public OtherDocElecContributor GetOtherDocElecContributorById(int otherDocElecContributorId, bool enabled)
         {
             using (var context = new SqlDBContext())
             {
                 if (enabled)
                 {
-                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                    && rc.OtherDocElecContributorTypeId == contributorTypeId && rc.State == "Habilitado" 
-                    && rc.OtherDocElecOperationModeId == contributorOpertaionModeId);
+                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.Id == otherDocElecContributorId
+                     && rc.State == "Habilitado");
                 }
                 else
                 {
-                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.ContributorId == contributorId
-                    && rc.OtherDocElecContributorTypeId == contributorTypeId
-                    && rc.OtherDocElecOperationModeId == contributorOpertaionModeId);
+                    return context.OtherDocElecContributors.FirstOrDefault(rc => rc.Id == otherDocElecContributorId);
                 }
             }
         }

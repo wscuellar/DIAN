@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Core;
 using Gosocket.Dian.Domain;
 using System.Globalization;
+using System.Linq;
 
 namespace Gosocket.Dian.Functions.Others
 {
@@ -34,7 +35,7 @@ namespace Gosocket.Dian.Functions.Others
 
             //Solo en ambiente de habilitacion.
             if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-            {
+            {                
                 //Se obtiene la informacion para habilitar
                 OtherDocumentActivationRequest data = await req.Content.ReadAsAsync<OtherDocumentActivationRequest>();
                 if (data == null)
@@ -50,7 +51,7 @@ namespace Gosocket.Dian.Functions.Others
                 await TableManagerGlobalLogger.InsertOrUpdateAsync(startSendToActivateOtherDocument);
 
                 //Se obtiene participante otros documentos habilitacion
-                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributor(data.ContributorId, data.ContributorTypeId, data.Enabled, data.ContributorOpertaionModeId);
+                OtherDocElecContributor otherDocElecContributor = contributorService.GetOtherDocElecContributorById(data.OtherDocElecContributorId, data.Enabled);
                 SetLogger(null, "Step STA-4", otherDocElecContributor != null ? otherDocElecContributor.Id.ToString() : "no hay otherDocElecContributor contributor", "SEND-01");
                 if (otherDocElecContributor == null)
                     throw new ObjectNotFoundException($"Not found contributor in environment Hab with given id {data.ContributorId}, ContributorTypeId {data.ContributorTypeId} and Enabled {data.Enabled} .");
@@ -87,15 +88,16 @@ namespace Gosocket.Dian.Functions.Others
                         throw new ObjectNotFoundException($"Not found contributor in environment Prod with given code {data.Code}.");
 
                     // Se obtiene el set de pruebas par el cliente
-                    string key = data.SoftwareType + '|' + data.SoftwareId;
+                    string key = data.SoftwareType + '|' + data.SoftwareId + (data.EquivalentDocumentId.HasValue ? $"|{data.EquivalentDocumentId}":"");
                     SetLogger(null, "Step STA-4.1", data.Code,"SEND-06");
                     SetLogger(null, "Step STA-4.2", key,"SEND-07");
-                    GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.Find<GlobalTestSetOthersDocumentsResult>(data.Code, key);
-                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
+                    GlobalTestSetOthersDocumentsResult results = globalTestSetResultTableManager.FindBy<GlobalTestSetOthersDocumentsResult>(data.Code, key)
+                        .FirstOrDefault(t => t.ElectronicDocumentId == data.ElectronicDocumentId);
 
+                    SetLogger(null, "Step STA-5", results == null ? "result nullo" : "Pase " + results.Status.ToString(), "SEND-08");
                     //Se valida que pase el set de pruebas.
                     if (results.Status != (int)Domain.Common.TestSetStatus.Accepted || results.Deleted)
-                        throw new Exception("Contribuyente no a pasado set de pruebas.");
+                        throw new Exception("Contribuyente no a pasado set de pruebas.");                 
 
                     SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
@@ -121,12 +123,10 @@ namespace Gosocket.Dian.Functions.Others
                     await TableManagerGlobalLogger.InsertOrUpdateAsync(startOtehrDocElecContributor);
 
                     //Se habilita el contribuyente en BD
-                    contributorService.SetToEnabledOtherDocElecContributor(
-                      otherDocElecContributor.ContributorId,
-                      otherDocElecContributor.OtherDocElecContributorTypeId,                     
+                    contributorService.SetToEnabledOtherDocElecContributor(                                       
                       results.SoftwareId,
-                      Convert.ToInt32(data.SoftwareType),
-                      otherDocElecContributor.OtherDocElecOperationModeId);
+                      Convert.ToInt32(data.SoftwareType),                     
+                      otherDocElecContributor.Id);
 
                     //Se habilita el contribuyente en la table Storage
                     globalOtherDocElecOperation.EnableParticipantOtherDocument(data.Code, results.SoftwareId, otherDocElecContributor);
@@ -138,7 +138,7 @@ namespace Gosocket.Dian.Functions.Others
                         ContributorId = contributorProd.Id,
                         OtherDocContributorTypeId = otherDocElecContributor.OtherDocElecContributorTypeId,
                         CreatedBy = otherDocElecContributor.CreatedBy,
-                        OtherDocOperationModeId = (int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
+                        OtherDocOperationModeId = data.ContributorOpertaionModeId, //(int)(data.SoftwareType == "1" ? Domain.Common.RadianOperationMode.Direct : Domain.Common.RadianOperationMode.Indirect),
                         SoftwarePassword = data.SoftwarePassword,
                         SoftwareUser = data.SoftwareUser,
                         Pin = data.Pin,
@@ -168,8 +168,8 @@ namespace Gosocket.Dian.Functions.Others
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Error al enviar a activar contribuyente con id {otherDocElecContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
-                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
+                    log.Error($"Error al enviar a activar contribuyente con id {otherDocElecContributor?.Id} en producciï¿½n _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producciï¿½n.", detail = ex.Message, trace = ex.StackTrace };
 
                     SetLogger(failResponse, "STA-Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
 
@@ -177,7 +177,7 @@ namespace Gosocket.Dian.Functions.Others
                 }
 
 
-                var response = new { success = true, message = "Contribuyente Otros Documentos Electrónicos se envió a activar a producción con éxito." };
+                var response = new { success = true, message = "Contribuyente Otros Documentos Electrï¿½nicos se enviï¿½ a activar a producciï¿½n con ï¿½xito." };
                 return req.CreateResponse(HttpStatusCode.OK, response);
             }
 
@@ -266,8 +266,19 @@ namespace Gosocket.Dian.Functions.Others
             [JsonProperty(PropertyName = "enabled")]
             public bool Enabled { get; set; }
 
+            [JsonProperty(PropertyName = "equivalentDocumentId")]
+            public int? EquivalentDocumentId { get; set; }
+
+
             [JsonProperty(PropertyName = "contributorOpertaionModeId")]
             public int ContributorOpertaionModeId { get; set; }
+
+            [JsonProperty(PropertyName = "otherDocElecContributorId")]
+            public int OtherDocElecContributorId { get; set; }
+
+            [JsonProperty(PropertyName = "electronicDocumentId")]
+            public int ElectronicDocumentId { get; set; }
+
         }
 
         class OtherDocumentActivateContributorRequestObject

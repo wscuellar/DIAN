@@ -43,6 +43,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
     {
         private static readonly TableManager TableManagerGlobalDocHolderExchange = new TableManager("GlobalDocHolderExchange");
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private readonly string[] _equivalentDocumentTypes = new string[]{"20", "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
 
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
@@ -81,8 +82,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private const string NoErrorCode = "SinCódigo";
         private const string DefaultStringValue = "true";
         private const bool DefaultBoolValue = false;
-        private const string DefaultStatusRutValidationErrorMessage = "El facturador electrónico y/o proveedor tecnólogico tiene el RUT en estado cancelado, suspendido o inactivo.";        
-        private const string DefaultStatusRutValidationOkMessage = "El facturador tiene el RUT en estado válido.";        
+        private const string DefaultStatusRutValidationErrorMessage = "El facturador electrónico y/o proveedor tecnólogico tiene el RUT en estado cancelado, suspendido o inactivo.";
+        private const string DefaultStatusRutValidationOkMessage = "El facturador tiene el RUT en estado válido.";
         private const int CacheTimePolicy24HoursInMinutes = 1440;
         private const int CacheTimePolicy1HourInMinutes = 60;
 
@@ -257,7 +258,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
             ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
 
-            XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID",ns);
+            XmlNodeList invoiceLineListResponse = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:Invoice/cac:InvoiceLine/cbc:ID", ns);
 
             var isErrorConsecutiveInvoice = false;
             int[] arrayInvoiceListResponse = new int[invoiceLineListResponse.Count];
@@ -501,7 +502,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     var xmlID = allowanceChargeListResponse.Item(i).SelectNodes("//cac:AllowanceCharge/cbc:ID", ns).Item(i)?.InnerText.ToString().Trim();
 
-                    if(string.IsNullOrWhiteSpace(xmlID))
+                    if (string.IsNullOrWhiteSpace(xmlID))
                     {
                         isErrorConsecutiveAllowance = true;
                         break;
@@ -724,7 +725,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (codesWithCUDE.Contains(documentMeta.DocumentTypeId))
                 prop = "CUDE";
             if (documentMeta.DocumentTypeId == "05")
+            {
                 errorCode = "DSAD06";
+                prop = "CUDS";
+            }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                errorCode = "NSAD06";
+                prop = "CUDS";
+            }
             else if (documentMeta.DocumentTypeId == "91")
                 errorCode = "CAD06";
             else if (documentMeta.DocumentTypeId == "92")
@@ -796,12 +805,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
             var documentKey = cufeModel.DocumentKey;
 
-            if(cufeModel.DocumentTypeId == "05")
+            if (cufeModel.DocumentTypeId == "05")
             {
                 data = $"{number}{emissionDate}{emissionHour}{amount}{taxCode1}{taxAmount1}{taxCode2}{taxAmount2}{taxCode3}{taxAmount3}{amountToPay}{receiverCode}{senderCode}{key}{environmentType}";
             }
 
-            if(cufeModel.DocumentTypeId == "101")
+            if (cufeModel.DocumentTypeId == "101")
             {
                 data = $"{number}{emissionDate}{emissionHour}{amount}{amountToPay}{senderCode}{receiverCode}{key}{environmentType}";
                 documentKey = cufeModel.DocumentKey;
@@ -1084,6 +1093,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     receiverDvErrorCode = "DSAJ24b";
                     receiverDvrErrorDescription = "El DV del NIT no es correcto";
                 }
+                /*Si el documento pertenece a un Documento Equivalente*/
+                if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                {
+                    receiverDvErrorCode = "DEAJ24b";
+                    receiverDvrErrorDescription = "El DV del NIT no es correcto";
+                }
                 if (documentMeta.DocumentTypeId == "91") receiverDvErrorCode = "CAK24";
                 else if (documentMeta.DocumentTypeId == "92") receiverDvErrorCode = "DAK24";
                 else if (documentMeta.DocumentTypeId == "96") receiverDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK24;
@@ -1121,7 +1136,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (documentMeta.DocumentTypeId == "91") receiver2DvErrorCode = "CAK47";
                     else if (documentMeta.DocumentTypeId == "92") receiver2DvErrorCode = "DAK47";
                     else if (documentMeta.DocumentTypeId == "96") receiver2DvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAK47;
-
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        receiver2DvErrorCode = "DEAJ47";
+                        receiver2DvrErrorDescription = "DV del NIT emisor no informado";
+                    }
                     var receiver2CodeDigit = nitModel.ReceiverCode2Digit;
 
                     long numberReceiver2CodeDigit = 0;
@@ -1223,6 +1242,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     else if (documentMeta.DocumentTypeId == "91") senderDvErrorCode = "CAJ24";
                     else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        senderDvErrorCode = "DEAK24";
+                        senderDvrErrorDescription = "No está informado el DV del NIT";
+                    }
 
                     if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
                     if (ValidateDigitCode(senderCode, int.Parse(senderCodeDigit)))
@@ -1233,7 +1257,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
                 // Sender2               
-                if (senderCode != senderCodeProvider)
+                if (senderCode != senderCodeProvider && documentMeta.DocumentTypeId != "95")
                 {
                     string sender2DvErrorCode = "FAJ47";
                     if (documentMeta.DocumentTypeId == "91") sender2DvErrorCode = "CAJ47";
@@ -1250,16 +1274,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Software provider
             string softwareproviderDvErrorCode = string.Empty;
             if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
+            if (documentMeta.DocumentTypeId == "95") softwareproviderDvErrorCode = "NSAB22b";
             //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            {
+                softwareproviderDvErrorCode = "DEAB22b";
+            }
             // Is Radian
             var isRadian = false;
             if (documentMeta.DocumentTypeId == "96")
             {
                 var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(nitModel.ResponseCode).FirstOrDefault();
-                if(docEvent != null)
+                if (docEvent != null)
                     isRadian = docEvent.IsRadian;
             }
 
@@ -1289,7 +1317,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Se busca el set de pruebas procesado para el testsetid en curso
                     RadianTestSetResult radianTesSetResult = TableManagerRadianTestSetResult.FindByTestSetId<RadianTestSetResult>(documentMeta.TechProviderCode, documentMeta.TestSetId);
 
-                    if(radianTesSetResult != null && Convert.ToInt32(radianTesSetResult.ContributorTypeId) != (int)RadianContributorType.ElectronicInvoice)
+                    if (radianTesSetResult != null && Convert.ToInt32(radianTesSetResult.ContributorTypeId) != (int)RadianContributorType.ElectronicInvoice)
                     {
                         //Valida evento mandato - sender mismo provider mismo mandatario
                         if (String.Equals(senderCode, senderCodeProvider) && String.Equals(senderCode, issuerPartyCode))
@@ -1330,7 +1358,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (string.IsNullOrEmpty(softwareProviderCodeDigit) || softwareProviderCodeDigit == "undefined") softwareProviderCodeDigit = "11";
             if (ValidateDigitCode(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode, documentMeta.DocumentTypeId == "96" ? int.Parse(providerCodeDigit) : int.Parse(softwareProviderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            //else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             string senderErrorCode = "FAJ21";
             if (documentMeta.DocumentTypeId == "05") senderErrorCode = "DSAJ21";
@@ -1347,7 +1375,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "05") softwareProviderErrorCode = "DSAB19b";
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
-
+            else if (documentMeta.DocumentTypeId == "95") softwareProviderErrorCode = "NSAB19b";
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            {
+                softwareProviderErrorCode = "DEAB19b";
+            }
             //Validar habilitacion RADIAN
             else if (documentMeta.DocumentTypeId == "96") softwareProviderErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB19b;
 
@@ -1366,16 +1398,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (softwareProvider != null || habilitadoRadian)
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                {
+                    var mensajeError = (documentMeta.DocumentTypeId == "05" || documentMeta.DocumentTypeId == "95") ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = mensajeError, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                }
+
             }
             else if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
                 //Valida software proveedor RADIAN Habilitado
-                if (documentMeta.DocumentTypeId == "96" )
+                if (documentMeta.DocumentTypeId == "96")
                 {
                     if (softwareProviderRadian != null && habilitadoRadian && isRadian)
                         responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    else if(!isRadian)
+                    else if (!isRadian)
                     {
                         //Valida eventos Fase I Factura Electronica 
                         if (softwareProvider?.StatusId == (int)ContributorStatus.Enabled)
@@ -1465,9 +1501,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var digit = documentMeta.DocumentTypeId == "91" ? "C" : "D";
+            var BG02Message = "Se requiere obligatoriamente referencia a documento.";
+            if (documentMeta.DocumentTypeId == "05")
+            {
+                digit = "DS";
+            }
+            if (documentMeta.DocumentTypeId == "94")
+            {
+                digit = "NA";
+            }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                digit = "NS";
+                BG02Message = "No se encuentra el grupo InvoiceDocumentReference";
+            }
 
             if (string.IsNullOrEmpty(documentMeta.DocumentReferencedKey))
-                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Se requiere obligatoriamente referencia a documento.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = BG02Message, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
 
             var referencedDocumentData = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
 
@@ -1476,7 +1526,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 referencedDocument = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(referencedDocumentData?.DocumentKey, referencedDocumentData?.DocumentKey);
                 if (referencedDocument == null)
-                    return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG04a", ErrorMessage = "Documento referenciado no existe en los registros de la DIAN.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                {
+                    string errorCode = documentMeta.DocumentTypeId == "05" ? "DSBH04" : $"{digit}BG04a";
+                    string errorMessage = documentMeta.DocumentTypeId == "05" ? "CUDS de la nota de ajuste referenciada no existe" : "Documento referenciado no existe en los registros de la DIAN.";
+
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        errorCode = $"{digit}BG04";
+                        errorMessage = "CUDS de DS referenciada no existe";
+                    }
+
+                    return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessage, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                }
             }
 
             if (referencedDocumentData.SenderCode != documentMeta.SenderCode)
@@ -1518,7 +1579,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var isRadian = false;
 
             var docEvent = docEventTableManager.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();
-            if(docEvent != null)
+            if (docEvent != null)
                 isRadian = docEvent.IsRadian;
 
             //valida si existe los permisos del mandatario
@@ -2320,16 +2381,36 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     return responses;
 
                 case (int)EventStatus.Mandato:
-
-                    responses.Add(new ValidateListResponse
+                    if (!documentMetaCude.SendTestSet)
                     {
-                        IsValid = true,
-                        Mandatory = true,
-                        ErrorCode = "100",
-                        ErrorMessage = errorMessageParty,
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
+                        //Valida mandante habilitado en RADIAN
+                        var responseVal = ValidateRadianEnabled(documentMetaCude);
+                        if (responseVal != null)
+                        {
+                            foreach (var item in responseVal)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = item.IsValid,
+                                    Mandatory = item.Mandatory,
+                                    ErrorCode = item.ErrorCode,
+                                    ErrorMessage = item.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }                   
                     return responses;
 
                 case (int)EventStatus.Avales:
@@ -3350,7 +3431,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateReferenceAttorney
-        private List<ValidateListResponse> ValidateCufeReferenceAttorney(XmlParser xmlParser, XmlNamespaceManager ns)
+        private async Task<List<ValidateListResponse>> ValidateCufeReferenceAttorney(XmlParser xmlParser, XmlNamespaceManager ns)
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
@@ -3495,7 +3576,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                 }
 
-                
+
                 var docHolderExchange = TableManagerGlobalDocHolderExchange.FindhByCufeExchange<GlobalDocHolderExchange>(xmlUUID.ToLower(), true);
                 if (docHolderExchange != null)
                 {
@@ -3565,8 +3646,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 ValidatorEngine validatorEngine = new ValidatorEngine();
                 dataSigningtime.TrackId = cufeListResponse.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:DocumentReference/cbc:UUID", ns).Item(i)?.InnerText.ToString();
-                var xmlBytesCufe = validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
-                var xmlParserCufe = new XmlParser(xmlBytesCufe.Result);
+                var xmlBytesCufe = await validatorEngine.GetXmlFromStorageAsync(dataSigningtime.TrackId);
+                var xmlParserCufe = new XmlParser(xmlBytesCufe);
                 if (!xmlParserCufe.Parser())
                     throw new Exception(xmlParserCufe.ParserError);
 
@@ -3600,7 +3681,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validate Reference Attorney
-        public List<ValidateListResponse> ValidateReferenceAttorney(XmlParser xmlParser, string trackId, XmlNamespaceManager ns)
+        public async  Task<List<ValidateListResponse>> ValidateReferenceAttorney(XmlParser xmlParser, string trackId, XmlNamespaceManager ns)
         {
             int attorneyLimit = Convert.ToInt32(ConfigurationManager.GetValue("MAX_Attorney"));
             bool validate = true;
@@ -3613,9 +3694,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
             ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
 
-            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject",ns);
+            XmlNodeList AttachmentBase64List = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", ns);
 
-            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID",ns).Item(0)?.InnerText.ToString();
+            string issuerPartyCode = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:IssuerParty/cac:PowerOfAttorney/cbc:ID", ns).Item(0)?.InnerText.ToString();
             XmlNodeList cufeList = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse", ns);
             XmlNodeList cufeListReference = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse[2]/cac:DocumentReference", ns);
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cbc:CustomizationID", ns).Item(0)?.InnerText.ToString();
@@ -3648,7 +3729,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Validaciones previas secciones DocumentResponse / DocumentReference 1 y 2
             if (listID != "3")
             {
-                var validateCufeReferenceAttorney = ValidateCufeReferenceAttorney(xmlParser, ns);
+                var validateCufeReferenceAttorney = await ValidateCufeReferenceAttorney(xmlParser, ns);
                 if (validateCufeReferenceAttorney != null)
                 {
                     validate = false;
@@ -3861,7 +3942,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            if(issuerPartyCode != providerCode)
+            if (issuerPartyCode != providerCode)
             {
                 validate = false;
                 responses.Add(new ValidateListResponse
@@ -4174,8 +4255,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         IsValid = false,
                         Mandatory = true,
-                        ErrorCode = "DSAB05b",
-                        ErrorMessage = "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente vendedor para este Proveedor de Autorización",
+                        ErrorCode = "DSAB05a",
+                        ErrorMessage = "No se encuentra el número de autorización del rango de numeración otorgado.",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
 
@@ -4190,13 +4271,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             // Check invoice authorization Factura Electronica
+            string errorCodeA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.DocumentSupportInvoice ? "FAB05b" : "DSAB05b";
+            string errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.DocumentSupportInvoice 
+                ? "Número de la resolución que autoriza la numeración[x] corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización."
+                : "Número del formato 1876 informado[x] corresponde a un número de autorización de este ABS";
+
             if (range.ResolutionNumber == invoiceAuthorization)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
-                    ErrorCode = "FAB05b",
-                    ErrorMessage = "Número de la resolución que autoriza la numeración corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
+                    ErrorCode = errorCodeA05b,
+                    ErrorMessage = errorMessageA05b.Replace("[x]",""),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4204,8 +4290,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     IsValid = false,
                     Mandatory = true,
-                    ErrorCode = "FAB05b",
-                    ErrorMessage = "Número de la resolución que autoriza la numeración no corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización.",
+                    ErrorCode = errorCodeA05b,
+                    ErrorMessage = errorMessageA05b.Replace("[x]", " no"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
@@ -4224,14 +4310,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (range.ValidDateNumberFrom == fromDateNumber)
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
             else
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado NO corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado NO corresponde a la fecha inicial del rango vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
@@ -4256,10 +4342,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (num < fromNumberID || num > endNumberID) validateNumberID = true;
                 }
 
-                if(validateNumberID)
+                if (validateNumberID)
                 {
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte no está contenido en el rango de numeración autorizado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05d", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no está contenido en el rango de numeración autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAD05e", ErrorMessage = "Número de documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura o documento equivalente no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 }
 
                 DateTime.TryParse(numberRangeModel.EmissionDate, out DateTime numberEmisionDate);
@@ -4295,7 +4381,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         IsValid = false,
                         Mandatory = true,
                         ErrorCode = "DSAB08a",
-                        ErrorMessage = "Fecha de emisión posterior a la fecha final de la autorización de numeración",
+                        ErrorMessage = "Fecha de generación posterior a la fecha final de la autorización de numeración EndDate < IssueDate",
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
                 else
@@ -4313,6 +4399,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime.TryParse(numberRangeModel.EndDate, out DateTime endDate);
             int.TryParse(endDate.ToString("yyyyMMdd"), out int toDateNumber);
             string errorCodeRange = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB08b" : "FAB08b";
+            string errorMessageDescription = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ?
+                "Fecha final del rango de numeración informado no corresponde a la fecha final del rango vigente para el ABS"
+                : "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.";
+
             if (range.ValidDateNumberTo == toDateNumber)
                 responses.Add(new ValidateListResponse
                 {
@@ -4328,7 +4418,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = errorCodeRange,
-                    ErrorMessage = "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.",
+                    ErrorMessage = errorMessageDescription,
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
@@ -4358,16 +4448,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" : "FAB11b";
 
             string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
-                ? "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigentes para el contribuyente vendedor"
+                ? "Valor inicial del rango de numeración informado no corresponde a la autorización vigente para el ABS"
                 : "Valor inicial del rango de numeración informado no corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.";
-
+            var tipoEmisor = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "ABS" : "contribuyente emisor";
             if (range.FromNumber == fromNumber)
                 responses.Add(new ValidateListResponse
                 {
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel,
-                    ErrorMessage = "Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el contribuyente emisor.",
+                    ErrorMessage = $"Valor inicial del rango de numeración informado corresponde a un valor inicial de los rangos vigente para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4383,7 +4473,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
             string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
-                ? "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente vendedor"
+                ? "Valor final del rango de numeración informado no corresponde a la autorización vigente para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
 
             if (range.ToNumber == endNumber)
@@ -4392,7 +4482,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = true,
                     Mandatory = true,
                     ErrorCode = errorCodeModel2,
-                    ErrorMessage = "Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el contribuyente emisor.",
+                    ErrorMessage = $"Valor final del rango de numeración informado corresponde a un valor final de los rangos vigentes para el {tipoEmisor}.",
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             else
@@ -4489,10 +4579,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                 response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE233" : "NIAE020";
             if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+            {
                 response.ErrorCode = "DSAB27b";
+                response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
+            }
+            if (documentMeta.DocumentTypeId == "95")
+            {
+                response.ErrorCode = "NSAB27b";
+                response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
+            }
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            {
+                response.ErrorCode = "DEAB27b";
+            }
 
             if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
-                || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
+            || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                 response.ErrorMessage = "Se debe indicar el Software Security Code según la definición establecida.";
 
 
@@ -4524,7 +4626,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                         response.ErrorCode = nominaModel.TipoNota == "2" ? "NIAE232" : "NIAE019";
                     if ((Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice))
+                    {
                         response.ErrorCode = "DSAB24b";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
+                    }
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        response.ErrorCode = "NSAB24b";
+                        response.ErrorMessage = "Identificador del software asignado cuando el software se activa en el Sistema de Facturación Electrónica no corresponde a un software autorizado para este ABS.";
+                    }
+                    if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+                    {
+                        response.ErrorCode = "DEAB24b";
+                    }
 
                     if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayroll
                          || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
@@ -4562,7 +4676,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                       || Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
                     hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
                 else
-                    hash = $"{software.Id}{software.Pin}{number}".EncryptSHA384();
+                    hash = $"{software.PartitionKey}{software.Pin}{number}".EncryptSHA384();
 
             }
 
@@ -4608,7 +4722,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DIAK26", ErrorMessage = "Responsabilidad informada para el importador válida según lista.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
 
             }
-            else if(Convert.ToInt32(typeDocument) == (int)DocumentType.DocumentSupportInvoice)
+            else if (Convert.ToInt32(typeDocument) == (int)DocumentType.DocumentSupportInvoice)
             {
                 //Sender tax level code validation
                 var isValid = true;
@@ -4752,7 +4866,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 contributor = contributorTableManager.Find<GlobalContributor>(code, code);
                 if (contributor == null) return null;
                 CacheItemPolicy policy = new CacheItemPolicy
-                {                    
+                {
                     AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(contributorInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.ContributorInstanceCache.Set(new CacheItem(itemKey, contributor), policy);
@@ -4781,7 +4895,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 if (env == "Prod" || env == "Test")
                     numberRanges = numberRangeTableManager.FindByPartition<GlobalNumberRange>(senderCode);
                 CacheItemPolicy policy = new CacheItemPolicy
-                {                    
+                {
                     AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(numberRangesInstanceCacheTimePolicyInMinutes)
                 };
                 InstanceCache.NumberRangesInstanceCache.Set(new CacheItem(cacheItemKey, numberRanges), policy);
@@ -5140,6 +5254,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorCodeReglaUUID = "AAH07";
             //string trackidRef = documentMeta.DocumentReferencedKey;
 
+            var typeListInstance = GetTypeOperation_InvoiceCache();
+            var typeListvalues = typeListInstance.Value.Split(';');
+
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             DateTime startDate = DateTime.UtcNow;
 
@@ -5232,7 +5349,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //Valida se encuentre aprobado el documento referenciado
                     var approved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMetaRef?.Identifier, documentMetaRef?.Identifier, documentMetaRef?.PartitionKey);
-                    if(approved == null)
+                    if (approved == null)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -5247,10 +5364,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida ID documento Invoice/AR coincida con el CUFE/CUDE referenciado
                     if (documentMetaRef.SerieAndNumber != documentMeta.DocumentReferencedId)
                     {
-                        string message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
+                        string message = String.Empty;
+                        if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.AnulacionLimitacionCirculacion)
+                        {
+                            message = ConfigurationManager.GetValue("ErrorMessage_AAH06_042");
+                        }
+                        else
+                        {
+                            message = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                             || Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
                             ? ConfigurationManager.GetValue("ErrorMessage_AAH06_043")
                             : ConfigurationManager.GetValue("ErrorMessage_AAH06");
+
+                        }
 
                         responses.Add(new ValidateListResponse
                         {
@@ -5261,7 +5387,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-                    //Valida DocumentTypeCode coincida con el documento informado
+                    //Valida DocumentTypeCode coincida con el documento informado                    
+                    if(typeListvalues.Contains(documentMetaRef.DocumentTypeId)) documentMetaRef.DocumentTypeId = "01";
+
                     if (documentMetaRef.DocumentTypeId != documentMeta.DocumentReferencedTypeId)
                     {
                         responses.Add(new ValidateListResponse
@@ -5274,7 +5402,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation
+                    if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.InvoiceOfferedForNegotiation
                         && documentMetaRef.DocumentTypeId != "96")
                     {
                         responses.Add(new ValidateListResponse
@@ -5304,7 +5432,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                         //Valida nombre o razon social informado igual al del adquiriente en la factura referenciada
-                        if (documentMetaRef.ReceiverName.Replace("&amp;","&") != documentMeta.IssuerPartyName.Replace("&amp;", "&"))
+                        if (documentMetaRef.ReceiverName.Replace("&amp;", "&") != documentMeta.IssuerPartyName.Replace("&amp;", "&"))
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -5380,7 +5508,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 case (int)EventStatus.Rejected:
                     //Valida eventos previos Rechazo de la FEV
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianRejected = new LogicalEventRadian();
                         var eventRadianRejected = logicalEventRadianRejected.ValidateRejectedEventPrev(documentMeta);
@@ -5414,7 +5542,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Receipt:
                     //Valida eventos previos Constancia de recibo del Bien de la FEV
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianReceipt = new LogicalEventRadian();
                         var eventRadianReceipt = logicalEventRadianReceipt.ValidateReceiptEventPrev(documentMeta);
@@ -5448,7 +5576,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Accepted:
                     //Valida eventos previos Aceptacion expresa de la FEV
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianAccepted = new LogicalEventRadian();
                         var eventRadianAccepted = logicalEventRadianAccepted.ValidateAcceptedEventPrev(documentMeta);
@@ -5546,7 +5674,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.SolicitudDisponibilizacion:
                     //Valida eventos previos Solicitud Disponibilizacion
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianDisponibilizacion = new LogicalEventRadian();
                         var eventRadianDisponibilizacion = logicalEventRadianDisponibilizacion.ValidateAvailabilityRequestEventPrev(documentMeta, totalInvoice, xmlParserCude, nitModel);
@@ -5569,7 +5697,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.EndosoPropiedad:
                     //Valida eventos previos Endoso en Propiedad
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoPropiedad = new LogicalEventRadian();
                         var eventRadianEndosoPropiedad = logicalEventRadianEndosoPropiedad.ValidatePropertyEndorsement(documentMeta, eventPrev, xmlParserCude, nitModel);
@@ -5592,7 +5720,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.EndosoGarantia:
                     //Valida eventos previos Endoso en Garantia
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoGarantia = new LogicalEventRadian();
                         var eventRadianEndosoGarantia = logicalEventRadianEndosoGarantia.ValidateEndorsementGatantia(documentMeta, eventPrev, xmlParserCude, nitModel);
@@ -5615,7 +5743,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.EndosoProcuracion:
                     //Valida eventos previos Endoso en Procuracion
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianEndosoProcuracion = new LogicalEventRadian();
                         var eventRadianEndosoProcuracion = logicalEventRadianEndosoProcuracion.ValidateEndorsementProcurement(documentMeta, eventPrev, xmlParserCude, nitModel);
@@ -5638,7 +5766,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.InvoiceOfferedForNegotiation:
                     //Valida eventos previos Cancelacion Endosos
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianCancelaEndoso = new LogicalEventRadian();
                         var eventRadianCancelaEndoso = logicalEventRadianCancelaEndoso.ValidateEndorsementCancell(documentMeta, eventPrev);
@@ -5681,7 +5809,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.AnulacionLimitacionCirculacion:
                     //Valida eventos previos Anulacion de la Limitacion de Circulacion
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianNegotiatedInvoiceCancell = new LogicalEventRadian();
                         var eventRadianNegotiatedInvoiceCancell = logicalEventRadianNegotiatedInvoiceCancell.ValidateNegotiatedInvoiceCancell(documentMeta);
@@ -5734,7 +5862,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.NotificacionPagoTotalParcial:
                     //Valida eventos previos Pago parcial o Total
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianPartialPayment = new LogicalEventRadian();
                         var eventRadianPartialPayment = logicalEventRadianPartialPayment.ValidatePartialPayment(documentMeta, eventPrev, xmlParserCude, nitModel);
@@ -5757,7 +5885,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.ValInfoPago:
                     //Valida eventos previos Informacion Pago
-                    if(documentMeta != null)
+                    if (documentMeta != null)
                     {
                         LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
                         var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidatePaymetInfo(documentMeta);
@@ -5780,7 +5908,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             }
 
-            if(documentMeta != null)
+            if (documentMeta != null)
             {
                 //Valida Evento registrado previamente para Fase I y Solicitud de primera disponibilizacion
                 if ((Convert.ToInt32(eventPrev.EventCode) >= 30 && Convert.ToInt32(eventPrev.EventCode) <= 34))
@@ -5789,7 +5917,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentIdentifier.Identifier, documentIdentifier.Identifier, documentIdentifier.PartitionKey);
 
-                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey )
+                        if (documentIdentifier.EventCode == eventPrev.EventCode && document != null && documentIdentifier.Identifier == document?.PartitionKey)
                         {
                             responses.Add(new ValidateListResponse
                             {
@@ -5869,7 +5997,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region Validación de la Sección prerrequisitos Solicitud Disponibilizacion
-        public List<ValidateListResponse> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
+        public async Task<List<ValidateListResponse>> EventApproveCufe(NitModel dataModel, RequestObjectEventApproveCufe data)
         {
             DateTime startDate = DateTime.UtcNow;
             bool eventTV = false;
@@ -5886,7 +6014,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             //Valida eventos titulo valor
-            eventTV = ( Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Received
+            eventTV = (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Received
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Rejected
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Receipt
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Accepted
@@ -5894,7 +6022,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
-            if(validatorDocumentMeta != null )
+            if (validatorDocumentMeta != null)
             {
                 //Esto aplica solo para FE
                 if (Convert.ToInt32(validatorDocumentMeta.DocumentTypeId) == (int)DocumentType.Invoice)
@@ -5915,8 +6043,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     //Valida si FE es contado no permite realizar la primera incripción
                     if (Convert.ToInt32(data.ResponseCode) == (int)EventStatus.SolicitudDisponibilizacion)
                     {
-                        var xmlBytes = validatorEngine.GetXmlFromStorageAsync(data.TrackId);
-                        var xmlParser = new XmlParser(xmlBytes.Result);
+                        var xmlBytes = await validatorEngine.GetXmlFromStorageAsync(data.TrackId);
+                        var xmlParser = new XmlParser(xmlBytes);
                         if (!xmlParser.Parser())
                             throw new Exception(xmlParser.ParserError);
 
@@ -5958,7 +6086,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
 
             int businessDays = 0;
-            int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimit"), out int businessDaysLimit); 
+            int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimit"), out int businessDaysLimit);
 
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
@@ -6516,7 +6644,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var arrayTasks = new List<Task>();
             if (validatorDocumentMeta != null)
             {
-                validatorDocumentMeta.PaymentDueDate= paymentDueDate;
+                validatorDocumentMeta.PaymentDueDate = paymentDueDate;
                 arrayTasks.Add(documentMetaTableManager.InsertOrUpdateAsync(validatorDocumentMeta));
             }
         }
@@ -6581,9 +6709,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             var document = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier, documentMeta.PartitionKey);
-            if(document != null)
+            if (document != null)
             {
-                if(documentMeta.SerieAndNumber == nitModel.SerieAndNumber && documentMeta.TechProviderCode == nitModel.ProviderCode && documentMeta.DocumentTypeId == nitModel.DocumentTypeId)
+                if (documentMeta.SerieAndNumber == nitModel.SerieAndNumber && documentMeta.TechProviderCode == nitModel.ProviderCode && documentMeta.DocumentTypeId == nitModel.DocumentTypeId)
                 {
                     responses.Add(new ValidateListResponse
                     {
@@ -6865,7 +6993,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             // Control de cambios v9.3: Se valida que el Predecesor corresponda al mismo Empleador y Empleado.
-            if(noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Replace)
+            if (noteType.Value == (int)IndividualPayrollAdjustmentNoteType.Replace)
             {
                 if (companyId != individualPayroll.SenderCode || employeeId != individualPayroll.ReceiverCode)
                 {
@@ -7164,10 +7292,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //valido que esten todos los namespace que necesita el archivo
             foreach (var item in vector)
             {
-                if (!NamespaceAll.Any(x => item.Equals(x.Key + "=" + x.Value)))  NamespaceInvalidos += (NamespaceInvalidos == String.Empty ? String.Empty : ", ") + "xmlns:" + item;
+                if (!NamespaceAll.Any(x => item.Equals(x.Key + "=" + x.Value))) NamespaceInvalidos += (NamespaceInvalidos == String.Empty ? String.Empty : ", ") + "xmlns:" + item;
             }
 
-            if (!string.IsNullOrWhiteSpace(NamespaceInvalidos)) 
+            if (!string.IsNullOrWhiteSpace(NamespaceInvalidos))
                 return "Faltan Namespace que corresponden al " + xmlNominaIndividualDeAjuste + ", " + NamespaceInvalidos;
 
             return validate;
@@ -7234,7 +7362,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateSigningTime
 
-        public List<ValidateListResponse> RequestValidateSigningTime(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
+        public async Task<List<ValidateListResponse>> RequestValidateSigningTimeAsync(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
         {
             var validateResponses = new List<ValidateListResponse>();
             string originalTrackId = data.TrackId;
@@ -7288,7 +7416,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var trackIdEvent = InvoiceWrapper[0].Documents.FirstOrDefault(x => x.DocumentMeta.EventCode == eventSearch
                     && int.Parse(x.DocumentMeta.DocumentTypeId) == (int)DocumentType.ApplicationResponse);
 
-                    documentMeta = trackIdEvent != null? trackIdEvent.DocumentMeta : new GlobalDocValidatorDocumentMeta();
+                    documentMeta = trackIdEvent != null ? trackIdEvent.DocumentMeta : new GlobalDocValidatorDocumentMeta();
 
                     if (!string.IsNullOrEmpty(documentMeta.PartitionKey))
                     {
@@ -7353,16 +7481,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            if (documentMeta == null || string.IsNullOrEmpty(documentMeta.PartitionKey))
-            {
+            if ( documentMeta == null || string.IsNullOrWhiteSpace(documentMeta.PartitionKey))
+             {
                 documentMeta = documentMetaRef;
 
                 //Si no retorna fecha campo SigningTimeStamp //Date = { 1 / 1 / 0001 12:00:00 AM}
                 string dateTimeStamp = documentMeta.SigningTimeStamp.ToString("yyyy-MM-ddTHH:mm:ss");
                 if (dateTimeStamp.Equals("0001-01-01T00:00:00"))
                 {
-                    var xmlBytes = GetXmlFromStorageAsync(documentMetaRef.PartitionKey);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    var xmlBytes = await GetXmlFromStorageAsync(documentMetaRef.PartitionKey);
+                    var xmlParser = new XmlParser(xmlBytes);
                     if (!xmlParser.Parser())
                         throw new Exception(xmlParser.ParserError);
 
@@ -7381,12 +7509,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
             {
 
-                documentMetaOriginal = originalTrackId == data.TrackId ? documentMeta: documentMetaRef;
+                documentMetaOriginal = originalTrackId == data.TrackId ? documentMeta : documentMetaRef;
 
                 if (string.IsNullOrEmpty(documentMetaOriginal.PaymentDueDate))
                 {
-                    var originalXmlBytes = validatorEngine.GetXmlFromStorageAsync(originalTrackId);
-                    var originalXmlParser = new XmlParser(originalXmlBytes.Result);
+                    var originalXmlBytes = await validatorEngine.GetXmlFromStorageAsync(originalTrackId);
+                    var originalXmlParser = new XmlParser(originalXmlBytes);
                     if (!originalXmlParser.Parser())
                         throw new Exception(originalXmlParser.ParserError);
 
@@ -7427,6 +7555,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             GlobalDocValidatorDocumentMeta cufeDocumentMeta = new GlobalDocValidatorDocumentMeta();
             GlobalDocValidatorDocumentMeta availabilityDocumentMeta = new GlobalDocValidatorDocumentMeta();
             NitModel nitModel = new NitModel();
+            List<InvoiceWrapper> InvoiceWrapper = null;
 
             //Anulacion de endoso electronico, TerminacionLimitacion de Circulacion obtiene CUFE referenciado en el CUDE emitido
             if (eventCode == (int)EventStatus.InvoiceOfferedForNegotiation ||
@@ -7443,31 +7572,34 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //Obtiene XML Factura Electornica CUFE
-            if (string.IsNullOrEmpty(cufeDocumentMeta.PartitionKey))
+            if(eventCode != (int)EventStatus.Mandato)
             {
-                nitModel.SenderCode = documentMeta.SenderCode;
-                nitModel.ReceiverCode = documentMeta.ReceiverCode;
-                nitModel.ReceiverName = documentMeta.ReceiverName;
-                nitModel.DocumentKey = documentMeta.DocumentKey;
-                nitModel.DocumentTypeId = documentMeta.DocumentTypeId;
-            }
-            else
-            {
-                nitModel.SenderCode = cufeDocumentMeta.SenderCode;
-                nitModel.ReceiverCode = cufeDocumentMeta.ReceiverCode;
-                nitModel.ReceiverName = cufeDocumentMeta.ReceiverName;
-                nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
-                nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
+                //Obtiene XML Factura Electornica CUFE
+                if (string.IsNullOrEmpty(cufeDocumentMeta.PartitionKey))
+                {
+                    nitModel.SenderCode = documentMeta.SenderCode;
+                    nitModel.ReceiverCode = documentMeta.ReceiverCode;
+                    nitModel.ReceiverName = documentMeta.ReceiverName;
+                    nitModel.DocumentKey = documentMeta.DocumentKey;
+                    nitModel.DocumentTypeId = documentMeta.DocumentTypeId;
+                }
+                else
+                {
+                    nitModel.SenderCode = cufeDocumentMeta.SenderCode;
+                    nitModel.ReceiverCode = cufeDocumentMeta.ReceiverCode;
+                    nitModel.ReceiverName = cufeDocumentMeta.ReceiverName;
+                    nitModel.DocumentKey = cufeDocumentMeta.DocumentKey;
+                    nitModel.DocumentTypeId = cufeDocumentMeta.DocumentTypeId;
+                }
+
+                InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
             }
 
             bool valid = true;
 
             // ...
             List<string> issuerAttorneyList = null;
-
-            List<InvoiceWrapper> InvoiceWrapper = associateDocumentService.GetEventsByTrackId(party.TrackId.ToLower());
-
+           
             if (eventCode == (int)EventStatus.Avales || eventCode == (int)EventStatus.NegotiatedInvoice || eventCode == (int)EventStatus.AnulacionLimitacionCirculacion)
             {
                 List<GlobalDocReferenceAttorney> attorneyList = InvoiceWrapper.Select(s => s.Documents).ToList()[0].Where(w => w.Attorney != null).Select(x => x.Attorney).ToList();
@@ -7586,10 +7718,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region RequestValidateEmitionEventPrev
 
-        public List<ValidateListResponse> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
+        public async Task<List<ValidateListResponse>> RequestValidateEmitionEventPrev(RequestObjectEventPrev eventPrev, GlobalDocValidatorDocumentMeta documentMeta, GlobalDocValidatorDocumentMeta documentMetaCude)
         {
+            DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
-            ValidatorEngine validatorEngine = new ValidatorEngine();
+            ValidatorEngine validatorEngine = new ValidatorEngine();          
             NitModel nitModel = new NitModel();
             XmlParser xmlParserCude = null;
             string totalInvoice = string.Empty;
@@ -7602,6 +7735,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Obtiene el CUFE
                     eventPrev.TrackId = documentMeta.DocumentReferencedKey;
+                    if (string.IsNullOrWhiteSpace(eventPrev.TrackId))
+                    {
+                         validateResponses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH06",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH06_042"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+
+                        return validateResponses;
+                    }
                 }
             }
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
@@ -7612,8 +7758,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalInvoice = documentMeta.TotalAmount.ToString();
 
                 ////Obtiene XML ApplicationResponse CUDE
-                var xmlBytesCude = validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
-                xmlParserCude = new XmlParser(xmlBytesCude.Result);
+                var xmlBytesCude = await validatorEngine.GetXmlFromStorageAsync(eventPrev.TrackIdCude);
+                xmlParserCude = new XmlParser(xmlBytesCude);
                 if (!xmlParserCude.Parser())
                     throw new Exception(xmlParserCude.ParserError);
 
@@ -7629,7 +7775,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion      
 
         #region NewValidateEventRADIAN
-        public List<ValidateListResponse> NewValidateEventRadianAsync(string trackId)
+        public async Task <List<ValidateListResponse>> NewValidateEventRadianAsync(string trackId)
         {
             DateTime startDate = DateTime.UtcNow;
             var validateResponses = new List<ValidateListResponse>();
@@ -7658,6 +7804,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 RequestObjectParty requestParty = new RequestObjectParty();
                 RequestObjectEventPrev eventPrev = new RequestObjectEventPrev();
                 RequestObjectSigningTime signingTime = new RequestObjectSigningTime();
+                GlobalDocValidatorDocumentMeta documentMetaRef = null;
 
                 EventRadianModel eventRadian = new EventRadianModel(
                      documentMeta.DocumentReferencedKey,
@@ -7696,16 +7843,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     eventRadian.TrackId = documentMeta.CancelElectronicEvent;
                 }
 
-                bool validaMandatoListID = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;
+                bool validateEventAproveCufe = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato && documentMeta.ResponseCodeListID == "3") ? false : true;
+                
+                //Valida documento procesado anteriormente regla 90
                 responses = ValidateSerieAndNumber(nitModel, documentMeta);
                 validateResponses.AddRange(responses);
 
 
-                if (validaMandatoListID)
+                if (validateEventAproveCufe)
                 {
+                    documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());
+
                     //Valida FE Activa como Titulo Valor y que exista la UUID
                     EventRadianModel.SetValueEventAproveCufe(ref eventRadian, eventApproveCufe);
-                    responses = EventApproveCufe(nitModel, eventApproveCufe);
+                    responses = await EventApproveCufe(nitModel, eventApproveCufe);
                     foreach (var itemEventAproveCufe in responses)
                     {
                         if (!itemEventAproveCufe.IsValid)
@@ -7713,19 +7864,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
-                
+              
+
                 //Si es mandato 
                 if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Mandato
                     && validEventRadian)
                 {
-                    var xmlBytes = GetXmlFromStorageAsync(trackId);
-                    var xmlParser = new XmlParser(xmlBytes.Result);
+                    var xmlBytes = await GetXmlFromStorageAsync(trackId);
+                    var xmlParser = new XmlParser(xmlBytes);
                     if (!xmlParser.Parser())
                         throw new Exception(xmlParser.ParserError);
 
-                    validatorDocumentNameSpaces(xmlBytes.Result);
+                    validatorDocumentNameSpaces(xmlBytes);
 
-                    responses = ValidateReferenceAttorney(xmlParser, trackId, _ns);
+                    responses = await ValidateReferenceAttorney(xmlParser, trackId, _ns);
                     foreach (var itemReferenceAttorney in responses)
                     {
                         if (itemReferenceAttorney.ErrorCode == "AAH07")
@@ -7733,9 +7885,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
-
-                var documentMetaRef = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(eventRadian.TrackId?.ToLower(), eventRadian.TrackId?.ToLower());                               
-
+               
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
@@ -7748,21 +7898,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     validateResponses.AddRange(responses);
                 }
-
+                
                 //Si Mandato contiene CUFEs Referenciados
-                if (validaMandatoListID && validEventRadian && validEventReference)
+                if (validateEventAproveCufe && validEventRadian && validEventReference)
                 {
                     EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
                     EventRadianModel.SetValuesEventPrev(ref eventRadian, eventPrev);
                     EventRadianModel.SetValuesSigningTime(ref eventRadian, signingTime);
 
-                    responses = RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
+                    responses = await RequestValidateEmitionEventPrev(eventPrev, documentMetaRef, documentMeta);
                     foreach (var itemResponsesTacita in responses)
                     {
                         if (itemResponsesTacita.ErrorCode == "LGC14" || itemResponsesTacita.ErrorCode == "LGC12"
                             || itemResponsesTacita.ErrorCode == "LGC05" || itemResponsesTacita.ErrorCode == "LGC24"
                             || itemResponsesTacita.ErrorCode == "LGC27" || itemResponsesTacita.ErrorCode == "LGC30"
-                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38")
+                            || itemResponsesTacita.ErrorCode == "LGC33" || itemResponsesTacita.ErrorCode == "LGC38" 
+                            || itemResponsesTacita.ErrorCode == "AAH06")
                             validEventPrev = false;
                     }
                     validateResponses.AddRange(responses);
@@ -7772,9 +7923,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
                         validateResponses.AddRange(responses);
 
-                        responses = RequestValidateSigningTime(signingTime, documentMetaRef);
+                        responses = await RequestValidateSigningTimeAsync (signingTime, documentMetaRef);
                         validateResponses.AddRange(responses);
                     }
+                }
+                
+                if(!validateEventAproveCufe)
+                {
+                    //Mandato Abierto ListId = 3
+                    EventRadianModel.SetValuesValidateParty(ref eventRadian, requestParty);
+                    responses = RequestValidateParty(requestParty, documentMetaRef, documentMeta);
+                    validateResponses.AddRange(responses);
                 }
 
                 UpdateInTransactions(documentMeta.DocumentReferencedKey, documentMeta.EventCode);
@@ -7845,8 +8004,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 invoceCuds.SoftwarePin = software?.Pin;
             }
 
-            
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
+            var error = new { Code = "DSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            if (invoceCuds.IsAdjustmentNote())
+            {
+                error = new { Code = "NSAD06", Message = "Valor del CUDS no está calculado correctamente." };
+            }
+
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = error.Code, ErrorMessage = error.Message };
             var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
             if (invoceCuds.Cuds.ToLower() == hash)
             {
@@ -7858,7 +8022,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
-        #region Evento Cudeq
+        #region Evento ValidateCude
 
         public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCuds, RequestObjectCude data)
         {
@@ -7881,7 +8045,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDE", ErrorMessage = "Cude No Válido" };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDE no está calculado correctamente." };
             var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
             if (invoceCuds.Cude.ToLower() == hash)
             {
@@ -7892,65 +8056,97 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return response;
         }
         #endregion
+
+        #region GetTypeOperation_InvoiceCache
+
+        private GlobalTypeList GetTypeOperation_InvoiceCache()
+        {
+            GlobalTypeList typeList = null;
+            List<GlobalTypeList> typesList;
+            var typesListInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("TypesListInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
+            var cacheItem = InstanceCache.TypesListInstanceCache.GetCacheItem("TypesList");
+            if (cacheItem == null)
+            {
+                typesList = typeListTableManager.FindByPartition<GlobalTypeList>("new-dian-ubl21");
+                CacheItemPolicy policy = new CacheItemPolicy
+                {
+                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(typesListInstanceCacheTimePolicyInMinutes)
+                };
+                InstanceCache.TypesListInstanceCache.Set(new CacheItem("TypesList", typesList), policy);
+            }
+            else
+                typesList = (List<GlobalTypeList>)cacheItem.Value;
+
+            typeList = typesList.FirstOrDefault(t => t.Name == "TypeOperation_Invoice");
+            return typeList;
+
+        }
+
+        #endregion
+
+        #region ValidateRadianEnabled
+
+        private List<ValidateListResponse> ValidateRadianEnabled(GlobalDocValidatorDocumentMeta documentMetaCude)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            GlobalRadianOperations softwareProviderRadian = null;
+            bool radianEnabled = false;
+
+            //Valida sender mandante habilitado en RADIAN
+            softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                            documentMetaCude.SenderCode, false, documentMetaCude.SoftwareId);
+            if (softwareProviderRadian != null)
+            {
+                switch (softwareProviderRadian.SoftwareType)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                            || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                            radianEnabled = true;
+                        break;
+                }
+            }
+            if (!radianEnabled)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC64",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC64"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida SW Mandante igual al SW Mandatario habilitado RADIAN            
+            softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                            documentMetaCude.TechProviderCode, false, documentMetaCude.SoftwareId);
+            if (softwareProviderRadian == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC93",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC93"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                return responses;
+            }
+
+            if (radianEnabled)
+                responses = null;
+
+            return responses;
+
+        }
+
+        #endregion
+
     }
-
-    //public class ValidadorCudeq 
-    //{
-    //    static readonly TableManager softwareTableManager = new TableManager("GlobalSoftware");
-    //    private GlobalSoftware GetSoftwareInstanceCache(string id)
-    //    {
-    //        var itemKey = id;
-    //        GlobalSoftware software = null;
-    //        var softwareInstanceCacheTimePolicyInMinutes = !String.IsNullOrEmpty(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) ? Int32.Parse(ConfigurationManager.GetValue("SoftwareInstanceCacheTimePolicyInMinutes")) : CacheTimePolicy24HoursInMinutes;
-    //        var cacheItem = InstanceCache.SoftwareInstanceCache.GetCacheItem(itemKey);
-    //        if (cacheItem == null)
-    //        {
-    //            software = softwareTableManager.Find<GlobalSoftware>(itemKey, itemKey);
-    //            if (software == null) return null;
-    //            CacheItemPolicy policy = new CacheItemPolicy
-    //            {
-    //                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(softwareInstanceCacheTimePolicyInMinutes)
-    //            };
-    //            InstanceCache.SoftwareInstanceCache.Set(new CacheItem(itemKey, software), policy);
-    //        }
-    //        else
-    //            software = (GlobalSoftware)cacheItem.Value;
-
-    //        return software;
-    //    }
-    //    public ValidateListResponse ValidateCuds(DocumentoSoporte invoceCuds, RequestObjectCuds data)
-    //    {
-    //        DateTime startDate = DateTime.UtcNow;
-    //        data.TrackId = data.TrackId.ToLower();
-
-    //        var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
-    //        var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
-
-    //        var softwareId = invoceCuds.SoftwareId;
-
-    //        if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
-    //        {
-    //            invoceCuds.SoftwarePin = billerSoftwarePin;
-    //        }
-    //        else
-    //        {
-    //            var @else = "";
-    //            @else = "1212";
-
-    //            var software = GetSoftwareInstanceCache(softwareId);
-    //            invoceCuds.SoftwarePin = software?.Pin;
-    //        }
-
-
-    //        var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "CUDS", ErrorMessage = "Cuds No Válido" };
-    //        var hash = invoceCuds.ToCombinacionToCuds().EncryptSHA384();
-    //        if (invoceCuds.Cuds.ToLower() == hash)
-    //        {
-    //            response.IsValid = true;
-    //            response.ErrorMessage = $"Valor calculado correctamente.";
-    //        }
-    //        response.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
-    //        return response;
-    //    }
-    //}
 }

@@ -11,6 +11,7 @@ using Gosocket.Dian.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data.Entity;
 using System.Linq;
 
 namespace Gosocket.Dian.Application
@@ -35,6 +36,14 @@ namespace Gosocket.Dian.Application
             using (var context = new SqlDBContext())
             {
                 return context.OtherDocElecOperationModes.ToList();
+            }
+        }
+
+        public Gosocket.Dian.Domain.Sql.OtherDocElecOperationMode GetOperationModeById(int operationModeId)
+        {
+            using (var context = new SqlDBContext())
+            {
+                return context.OtherDocElecOperationModes.FirstOrDefault(t => t.Id == operationModeId);
             }
         }
 
@@ -337,7 +346,7 @@ namespace Gosocket.Dian.Application
 
             IQueryable<OtherDocsElectData> query = (from oc in sqlDBContext.OtherDocElecContributors
                                                     join s in sqlDBContext.OtherDocElecSoftwares on oc.Id equals s.OtherDocElecContributorId
-                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on s.Id equals oco.SoftwareId
+                                                    join oco in sqlDBContext.OtherDocElecContributorOperations on new { SoftwareId = s.Id, s.OtherDocElecContributorId  } equals new { oco.SoftwareId, oco.OtherDocElecContributorId } 
                                                     join ocs in sqlDBContext.OtherDocElecSoftwareStatus on s.OtherDocElecSoftwareStatusId equals ocs.Id
                                                     join ope in sqlDBContext.OtherDocElecOperationModes on oc.OtherDocElecOperationModeId equals ope.Id
                                                     join oty in sqlDBContext.OtherDocElecContributorTypes on oc.OtherDocElecContributorTypeId equals oty.Id
@@ -378,7 +387,9 @@ namespace Gosocket.Dian.Application
         {
             ResponseMessage result = new ResponseMessage();
 
-            var operation = sqlDBContext.OtherDocElecContributorOperations.FirstOrDefault(c => c.Id == operationId);
+            var operation = sqlDBContext.OtherDocElecContributorOperations
+                .Include(t => t.OtherDocElecContributor.Contributor.OtherDocElecContributors)
+                .FirstOrDefault(c => c.Id == operationId);
             if (operation != null)
             {
                 operation.Deleted = true;
@@ -388,6 +399,9 @@ namespace Gosocket.Dian.Application
                 int re1 = sqlDBContext.SaveChanges();
                 result.Code = System.Net.HttpStatusCode.OK.GetHashCode();
                 result.Message = "Se canceló el registro exitosamente";
+
+                result.ExistOperationModeAsociated = operation.OtherDocElecContributor.Contributor.OtherDocElecContributors
+                    .Any(t => t.ElectronicDocumentId == operation.OtherDocElecContributor.ElectronicDocumentId && !t.OtherDocElecContributorOperations.Any(x => x.Deleted));
 
                 if (re1 > 0) //Update operations state
                 {

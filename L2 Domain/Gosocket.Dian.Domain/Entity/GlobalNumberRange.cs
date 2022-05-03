@@ -5,8 +5,11 @@ namespace Gosocket.Dian.Domain.Entity
 {
     public class GlobalNumberRange : TableEntity
     {
-
         public GlobalNumberRange() { }
+        public GlobalNumberRange(string partitionKey, string rowKey) :base(partitionKey, rowKey)
+        {
+            Active = true;
+        }
 
         public bool Active { get; set; }
         public string Serie { get; set; }
