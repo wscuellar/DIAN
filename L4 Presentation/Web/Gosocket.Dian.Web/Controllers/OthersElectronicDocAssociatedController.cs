@@ -298,16 +298,21 @@ namespace Gosocket.Dian.Web.Controllers
             else
             if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
+                bool contributorIsOfeAndIsSupportDocument = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller
+                    && operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-                result.Code = 500;
-                result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
-                return result;
-                //return Json(new
-                //{
-                //    code = 500,
-                //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
-                //    success = true,
-                //}, JsonRequestBehavior.AllowGet);
+                if (!contributorIsOfeAndIsSupportDocument)
+                {
+                    result.Code = 500;
+                    result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                    //return Json(new
+                    //{
+                    //    code = 500,
+                    //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                    //    success = true,
+                    //}, JsonRequestBehavior.AllowGet);
+                }
             }
 
             OthersElectronicDocAssociatedViewModel model = DataAssociate(id);
@@ -322,7 +327,7 @@ namespace Gosocket.Dian.Web.Controllers
                 _testSetOthersDocumentsResultService.InsertTestSetResult(globalResult);
             }
             //
-            var globalOperation = _globalOtherDocElecOperationService.GetOperation(model.Nit, software.SoftwareId);
+            var globalOperation = _globalOtherDocElecOperationService.GetOperationByElectronicDocumentId(model.Nit, software.SoftwareId, model.ElectronicDocId);
             if (globalOperation != null)
             {
                 globalOperation.Deleted = true;
