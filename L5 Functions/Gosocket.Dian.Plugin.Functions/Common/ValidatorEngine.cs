@@ -852,6 +852,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateRequiredDocRadianAsync(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            var validator = new Validator();
+
+            validateResponses.AddRange(await validator.ValidateRequiredDocRadianAsync(trackId));            
+
+            return validateResponses;
+        }
         #region Private methods
         private Dictionary<string, string> CreateTaxLevelCodeXpathsRequestObject(string trackId)
         {

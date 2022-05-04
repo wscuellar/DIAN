@@ -80,5 +80,6 @@ namespace Gosocket.Dian.Domain.Entity
 
         public int RadianOperationModeId { get; set; }
         public int RadianContributorId { get; set; }
+        public bool IsActive { get; set; }
     }
 }

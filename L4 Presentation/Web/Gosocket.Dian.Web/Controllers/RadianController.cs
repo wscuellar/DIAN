@@ -14,17 +14,19 @@ using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Application;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
         private readonly IRadianContributorService _radianContributorService;
-        private readonly UserService userService = new UserService();
+        private readonly IGlobalRadianContributorEnabledService _globalRadianContributorEnabledService = new GlobalRadianContributorEnabledService();        
+        private readonly UserService userService = new UserService();       
 
         public RadianController(IRadianContributorService radianContributorService)
         {
-            _radianContributorService = radianContributorService;
+            _radianContributorService = radianContributorService;            
         }
 
 
@@ -99,7 +101,7 @@ namespace Gosocket.Dian.Web.Controllers
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
-                    RadianState = c.RadianState
+                    RadianState = c.RadianState                    
 
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
@@ -210,6 +212,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Name = u.Name,
                     Email = u.Email
                 }).ToList(),
+                IsActive = radianAdmin.Contributor.IsActive
 
             };
 
@@ -268,27 +271,70 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-                RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
-                if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
-                    return Json(new { message = TextResources.TestNotRemove, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
-
-                if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
-                    return Json(new { message = TextResources.AllSoftware, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
-
-                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
+                
+                //Requisitos vencidos
+                if(approveState == "2")
                 {
-                    int counter = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
-                    if (counter > 0)
+                    RadianContributor result = _radianContributorService.ChangeContributorActiveRequirement(radianAdmin.Contributor.RadianContributorId);
+                    if(result == null)
+                        return Json(new { messasge = "Error al actualizar contributor requisitos activos.", success = false, error = "" }, JsonRequestBehavior.AllowGet);
+                    else if (result.IsActive)
                     {
-                        string message = string.Format(TextResources.WithCustomerList, counter);
-                        return Json(new { message, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        string guid = Guid.NewGuid().ToString();
+                        GlobalRadianContributorEnabled item = new GlobalRadianContributorEnabled(radianAdmin.Contributor.Code, guid)
+                        {
+                            IsActive = true,
+                            UpdateBy = User.Identity.Name
+                        };
+                        _ = SendMail(radianAdmin);
+
+                        if(_globalRadianContributorEnabledService.Insert(item))
+                            return Json(new { message = "Actualiza requisitos contributor a activos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                    }                        
+                    else if (!result.IsActive)
+                    {
+                        string guid = Guid.NewGuid().ToString();
+                        GlobalRadianContributorEnabled item = new GlobalRadianContributorEnabled(radianAdmin.Contributor.Code, guid)
+                        {
+                            IsActive = false,
+                            UpdateBy = User.Identity.Name
+                        };
+                        _ = SendMail(radianAdmin);
+
+                        if(_globalRadianContributorEnabledService.Insert(item))                        
+                            return Json(new { message = "Actualiza requisitos contributor a inactivos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                     }
+                    
                 }
+                else
+                {
+                    RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
 
-                _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                    //Participantes en pruebas no pueden ser cancelados
+                    if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
+                        return Json(new { message = TextResources.TestNotRemove, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (stateProcess == RadianState.Test && radianAdmin.Contributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
-                    _radianContributorService.UpdateRadianOperation(radianAdmin.Contributor.RadianContributorId, (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware);
+                    //Todos los archivos soporte deben estar aceptados 
+                    if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
+                        return Json(new { message = TextResources.AllSoftware, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
+                    //El SW de la operacion tiene clientes asociados
+                    if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
+                    {
+                        int counter = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                        if (counter > 0)
+                        {
+                            string message = string.Format(TextResources.WithCustomerList, counter);
+                            return Json(new { message, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+
+                    _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+
+                    if (stateProcess == RadianState.Test && radianAdmin.Contributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                        _radianContributorService.UpdateRadianOperation(radianAdmin.Contributor.RadianContributorId, (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware);
+
+                }
 
                 _ = SendMail(radianAdmin);
 

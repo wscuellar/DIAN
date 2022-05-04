@@ -64,13 +64,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager TableManagerRadianTestSetResult = new TableManager("RadianTestSetResult");
         private static readonly string pdfMimeType = "application/pdf";
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
-        private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");
-        private static readonly TableManager GlobalRadianOperationsTableManager = new TableManager("GlobalRadianOperations");
+        private static readonly TableManager docEventTableManager = new TableManager("GlobalDocEvent");      
 
         private readonly string xmlNominaIndividualDeAjuste = "NominaIndividualDeAjuste";
         private readonly string xmlNominaIndividual = "NominaIndividual";
         private readonly string xmlXSDNominaIndividualDeAjuste = "NominaIndividualDeAjusteElectronicaXSD";
         private readonly string xmlXSDNominaIndividual = "NominaIndividualElectronicaXSD";
+        private readonly TableManager globalRadianContributorEnabledTableManager = new TableManager("GlobalRadianContributorEnabled");
 
         XmlDocument _xmlDocument;
         XPathDocument _document;
@@ -8047,6 +8047,80 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return response;
         }
         #endregion
+
+
+
+        #region Validar cliente cumple con documentos requeridos RADIAN
+
+        public async Task<List<ValidateListResponse>> ValidateRequiredDocRadianAsync(string trackId)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            GlobalRadianOperations softwareProviderRadian = null;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool radianEnabled = false;
+            string rowKey = string.Empty;
+            responses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "LGC94",
+                ErrorMessage = "Cliente cumple con requisitos RADIAN",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+            GlobalDocValidatorDocumentMeta documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
+            if (documentMeta != null)
+            {
+               
+                //Consulta si no cumple con los documentos requisitos RADIAN               
+                var validateStatusDocRequired = globalRadianContributorEnabledTableManager.FindByPartition<GlobalRadianContributorEnabled>(documentMeta.SenderCode)
+                    .OrderByDescending(x => x.Timestamp).FirstOrDefault();
+
+                //Solo para eventos RADIAN
+                if (int.Parse(documentMeta.EventCode) >= (int)EventStatus.SolicitudDisponibilizacion 
+                    && !validateStatusDocRequired.IsActive)
+                {
+                    softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                           documentMeta.SenderCode, false, documentMeta.SoftwareId);
+                    if (softwareProviderRadian != null)
+                    {
+                        rowKey = softwareProviderRadian.RadianContributorTypeId + "|" + softwareProviderRadian.RowKey;
+                        RadianTestSetResult testSetResult = TableManagerRadianTestSetResult.Find<RadianTestSetResult>(documentMeta.SenderCode, rowKey);
+                        if(testSetResult != null)
+                        {
+                            switch (softwareProviderRadian.SoftwareType)
+                            {
+                                case 1: //Facturador Electronico
+                                case 2: //Proveedor Tecnologico
+                                case 3: //Sistema de Negociacion
+                                case 4: //Factor
+                                    if ((softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                                        || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                                        && testSetResult.OperationModeId == 1)
+                                    {
+                                        responses.Clear();
+                                        responses.Add(new ValidateListResponse
+                                        {
+                                            IsValid = false,
+                                            Mandatory = true,
+                                            ErrorCode = "LGC94",
+                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC94"),
+                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                        });
+                                    }
+                                       
+                                    break;
+                            }
+                        }                       
+                    }
+                }
+            }
+
+            return responses;
+        }
+
+        #endregion
+
 
         #region GetTypeOperation_InvoiceCache
 

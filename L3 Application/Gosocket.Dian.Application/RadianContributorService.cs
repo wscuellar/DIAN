@@ -232,7 +232,8 @@ namespace Gosocket.Dian.Application
                          CreatedDate = c.CreatedDate,
                          Step = c.Step,
                          RadianContributorTypeId = c.RadianContributorTypeId,
-                         RadianOperationModeId = c.RadianOperationModeId
+                         RadianOperationModeId = c.RadianOperationModeId,
+                         IsActive = c.IsActive                         
                      },
                      Files = newFiles,
                      FileTypes = fileTypes,
@@ -512,6 +513,18 @@ namespace Gosocket.Dian.Application
             //var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
             var fileManager = new FileManager();
             return fileManager.GetBytes("radiancontributor-files", fileNameURL, out contentType);
+        }
+
+        public RadianContributor ChangeContributorActiveRequirement(int radianContributorId)
+        {
+            RadianContributor radianContributor = _radianContributorRepository.Get(t => t.Id == radianContributorId);
+
+            if (radianContributor == null)
+                return radianContributor;
+
+            radianContributor.IsActive = radianContributor.IsActive ? false : true;
+            _radianContributorRepository.AddOrUpdate(radianContributor);
+            return radianContributor;
         }
 
         #endregion

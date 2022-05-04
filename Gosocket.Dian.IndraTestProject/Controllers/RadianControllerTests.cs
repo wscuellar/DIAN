@@ -17,7 +17,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
     public class RadianControllerTests
     {
         private RadianController _current;
-        private readonly Mock<IRadianContributorService> _radianContributorService = new Mock<IRadianContributorService>();
+        private readonly Mock<IRadianContributorService> _radianContributorService = new Mock<IRadianContributorService>();        
         private readonly Mock<System.Web.Mvc.UrlHelper> mockUrlHelper = new Mock<System.Web.Mvc.UrlHelper>();
 
         [TestInitialize]

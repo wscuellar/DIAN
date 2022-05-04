@@ -143,6 +143,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                     radianContributorInstance.CreatedBy = radianContributor.CreatedBy;
                     radianContributorInstance.Description = radianContributor.Description;
                     radianContributorInstance.Step = radianContributor.Step == 0 ? 1 : radianContributor.Step;
+                    radianContributorInstance.IsActive = radianContributor.IsActive;
 
                     context.Entry(radianContributorInstance).State = System.Data.Entity.EntityState.Modified;
                 }
@@ -150,6 +151,7 @@ namespace Gosocket.Dian.DataContext.Repositories
                 {
                     radianContributor.Step = 1;
                     radianContributor.Update = DateTime.Now;
+                    radianContributor.IsActive = true;
                     context.Entry(radianContributor).State = System.Data.Entity.EntityState.Added;
                 }
 

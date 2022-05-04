@@ -44,5 +44,7 @@ namespace Gosocket.Dian.Interfaces.Services
         int GetAssociatedClients(int radianContributorId);
         RadianTestSetResult GetSetTestResult(string code, string softwareId, int type);
         byte[] DownloadContributorFile(string code, string fileName, out string contentType);
+
+        RadianContributor ChangeContributorActiveRequirement(int radianContributorId);
     }
 }
