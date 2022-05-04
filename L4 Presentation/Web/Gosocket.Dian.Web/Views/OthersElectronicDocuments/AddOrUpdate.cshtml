@@ -177,10 +177,6 @@
                                                     <th class="text-center">ID</th>
                                                     <th class="text-center">PIN del SW </th>
                                                     <th class="text-center">URL</th>
-                                                    @if (ViewBag.IsSupportDocument && !Model.ContributorIsOfe)
-                                                    {
-                                                        <th class="text-center">Rangos de Pruebas</th>
-                                                    }
                                                     <th class="text-center">Acciones</th>
                                                 </tr>
                                             </thead>
@@ -202,14 +198,6 @@
                                                             <td class="text-center">@item.SoftwareId</td>
                                                             <td class="text-center">@item.PinSW</td>
                                                             <td class="text-center">  @item.Url  </td>
-                                                            @if (ViewBag.IsSupportDocument && !Model.ContributorIsOfe)
-                                                            {
-                                                                <td class="text-center">
-                                                                    <a href="@Url.Action("Index", "OthersElectronicDocNumberRange", new { otherDocElecContributorId =  @item.Id })" title="Ver rangos de numeración">
-                                                                        <i class="fa fa-server" style="font-size: 22px;color: #348441;"></i>
-                                                                    </a>
-                                                                </td>
-                                                            }
                                                             <td nowrap class="text-center">
                                                                 @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
                                                                 <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
@@ -485,7 +473,7 @@
 
 
         function EliminarRegistro(id) {
-            if (@Model.ElectronicDocumentId == 14) {
+            if (@Model.ElectronicDocumentId == 14 || @Model.ElectronicDocumentId == 3) {
                 let confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
 
                 showConfirmation(`¿${confirmMessage}?`, ConfirmExec(

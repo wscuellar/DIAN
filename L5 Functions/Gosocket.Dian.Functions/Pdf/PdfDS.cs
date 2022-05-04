@@ -704,9 +704,9 @@ namespace Gosocket.Dian.Functions.Pdf
 			try
 			{
 				var VendedorNumeroDocumento = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "CompanyID");
-				Html = Html.Replace("{VendedorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
-				Html = Html.Replace("{EmisorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
-				Html = Html.Replace("{EmisorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
+				Html = Html.Replace("{VendedorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().NameDocumentType);
+				Html = Html.Replace("{EmisorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().NameDocumentType);
+				Html = Html.Replace("{EmisorTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().NameDocumentType);
 				Html = Html.Replace("{VendedorNumeroDocumento}", VendedorNumeroDocumento.FirstOrDefault().Value);
 			}
 			catch (Exception)

@@ -4448,7 +4448,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             if (string.IsNullOrEmpty(range.Serie)) range.Serie = "";
-            string errorCodeSerie = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB10b" : "FAB10b";
+            string errorCodeSerie = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB10b" : 
+                                    Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS ? "DEAB10b" : "FAB10b";
             if (range.Serie == numberRangeModel.Serie)
                 responses.Add(new ValidateListResponse
                 {
@@ -4469,7 +4470,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
-            string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" : "FAB11b";
+            string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" :
+                                    (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS) ? "DEAB11b" : "FAB11b";
 
             string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                 ? "Valor inicial del rango de numeración informado no corresponde a la autorización vigente para el ABS"
@@ -4495,7 +4497,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
+            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" :
+                                     Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS ? "DEAB12b" : "FAB12b";
+
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
                 ? "Valor final del rango de numeración informado no corresponde a la autorización vigente para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
