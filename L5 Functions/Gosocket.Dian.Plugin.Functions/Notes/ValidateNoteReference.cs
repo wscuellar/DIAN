@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Plugin.Functions.Notes
 
             try
             {
-                var validateResponses = ValidatorEngine.Instance.StartNoteReferenceValidation(trackId);
+                var validateResponses = await ValidatorEngine.Instance.StartNoteReferenceValidation(trackId);
                 return req.CreateResponse(HttpStatusCode.OK, validateResponses);
             }
             catch (Exception ex)

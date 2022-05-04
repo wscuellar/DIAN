@@ -175,6 +175,30 @@ namespace Gosocket.Dian.Services.Test
             //Assert.AreEqual(invoceDs.Cuds, invoceDs.ToCombinacionToCuds().EncryptSHA384());
 
         }
+
+
+        [TestMethod]
+        public void Should_Reader_Xml_Cuds_14759()
+        {
+            var xmlEjemplo = @"\\EjemplosXml\\14759.xml";
+            var pathFull = ObtenerPath(xmlEjemplo);
+            var xmlBytes = File.ReadAllBytes(pathFull);
+            Assert.IsNotNull(xmlBytes);
+            var invoceParser = new XmlToDocumentoSoporteParser();
+            var invoceDs = invoceParser.Parser(xmlBytes);
+            Assert.IsNotNull(invoceDs);
+            invoceDs.SoftwarePin = "81218";
+
+            Console.WriteLine($"Cuds en Xml: {invoceDs.Cuds}");
+            Console.WriteLine($"Cuds en Calculado: {invoceDs.ToCombinacionToCuds().EncryptSHA384()}");
+            
+            Console.WriteLine($"Parametros para armar CUDS separados por (*) {invoceDs.ToCombinacionToCuds("*")}");
+            Console.WriteLine($"Parametros para armar CUDS separados {invoceDs.ToCombinacionToCuds("")}");
+
+            Assert.AreEqual(invoceDs.Cuds, invoceDs.ToCombinacionToCuds().EncryptSHA384());
+
+        }
+
         public string ObtenerPath(string nameFile) => AppDomain.CurrentDomain.BaseDirectory + nameFile;
     }
     

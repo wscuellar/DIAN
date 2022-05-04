@@ -205,7 +205,7 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
-                var xmlBytes =  DownloadXml(trackId);
+                var xmlBytes = await DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -266,6 +266,33 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<ActionResult> DownloadPDFDocEquivalente(string trackId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+                //XML
+                var requestObj = new { trackId };
+                var response = await DownloadXmlAsync(requestObj);
+                var base64Xml = response.XmlBase64;
+
+                //PDF
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObjDoc = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObjDoc);
+                var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
+
+                return File(pdfbytes, "application/pdf", $"{trackId}.pdf");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+
+        }
+
         public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code,string fecha)
         {
             try
@@ -998,11 +1025,11 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
         }
-        private byte[] DownloadXml(string trackId)
+        private async Task<byte[]>DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response =  DownloadXml(requestObj);
+            var response =  await DownloadXml(requestObj);
             
             if (response.Success)
             {
@@ -1696,14 +1723,20 @@ namespace Gosocket.Dian.Web.Controllers
 
             try
             {
-                string sqlQuery = "SELECT c.OperationModeId  FROM ContributorOperations C " +
-                                      "WHERE C.Contributorid = " + code +
-                                      " AND C.Deleted <> 1";
+                string consulta = ConfigurationManager.GetValue("GetContributorOperationSQL");
+
+                string reemplazar = "'{contributorid}'";
+
+                string codigo = "'" + code + "'";
+
+                consulta = consulta.Replace(reemplazar, codigo);
+                
+                string sqlQuery = consulta;
               
                 SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
                 conn.Open();
                 DataTable table = new DataTable();
-                SqlCommand command = new SqlCommand(sqlQuery, conn);
+                SqlCommand command = new SqlCommand(consulta, conn);
 
                 using (var da = new SqlDataAdapter(command))
                 {

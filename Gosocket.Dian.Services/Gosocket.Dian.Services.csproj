@@ -76,6 +76,9 @@
     <Compile Include="Models\CufeModel.cs" />
     <Compile Include="Models\ValidateListResponse.cs" />
     <Compile Include="Models\ValidatePayroll.cs" />
+    <Compile Include="NotaAjustes\NotaAjuste.cs" />
+    <Compile Include="NotaAjustes\NotaAjusteXpath.cs" />
+    <Compile Include="NotaAjustes\XmlToNotaAjusteParser.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -562,5 +565,6 @@
       <Name>Gosocket.Dian.Logger</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
