@@ -4252,7 +4252,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     return responses;
-                }
+                }                 
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
