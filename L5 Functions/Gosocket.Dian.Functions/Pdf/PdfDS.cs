@@ -1244,8 +1244,12 @@ namespace Gosocket.Dian.Functions.Pdf
 			MemoryStream logoDianStream = new MemoryStream(fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
 			string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
 			var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
+			MemoryStream logoStream = new MemoryStream();
+			var logoempresa = fileManagerBiller.GetBytesBiller("logo", $"{identificationUser}.jpg");
+			if (logoempresa != null) {
+				logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller("logo", $"{identificationUser}.jpg"));
+			}
 
-			MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller("logo", $"{identificationUser}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
 			string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
 			var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
@@ -1253,9 +1257,16 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			plantillaHtml = plantillaHtml.Replace("{imgLogoDian}", logoDianBase64);
 			/*WebConfig: clave MainStorage*/
-
-
-			plantillaHtml = plantillaHtml.Replace("{imgLogoEmpresa}", logoBase64);
+			if (logoempresa != null)
+			{
+				plantillaHtml = plantillaHtml.Replace("{imgLogoEmpresa}", logoBase64);
+				
+			}
+			else
+			{
+				plantillaHtml = plantillaHtml.Replace("{imgLogoEmpresa}", string.Empty);
+			}
+			
 			return plantillaHtml;
 		}
 		private static string CruzarModeloNotasFinales(string Html, XElement obj)
