@@ -1501,6 +1501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
 
             var digit = documentMeta.DocumentTypeId == "91" ? "C" : "D";
+            var BG02Message = "Se requiere obligatoriamente referencia a documento.";
             if (documentMeta.DocumentTypeId == "05")
             {
                 digit = "DS";
@@ -1512,12 +1513,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId == "95")
             {
                 digit = "NS";
+                BG02Message = "No se encuentra el grupo InvoiceDocumentReference";
             }
 
             if (string.IsNullOrEmpty(documentMeta.DocumentReferencedKey))
-                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = "Se requiere obligatoriamente referencia a documento.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+                return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = $"{digit}BG02", ErrorMessage = BG02Message, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
 
             var referencedDocumentData = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(documentMeta.DocumentReferencedKey, documentMeta.DocumentReferencedKey);
+
+            if(documentMeta.TotalAmount > referencedDocumentData.TotalAmount)
+            {
+                return new ValidateListResponse 
+                { 
+                    IsValid = false, 
+                    Mandatory = true, 
+                    ErrorCode = $"VLR02", 
+                    ErrorMessage = "Valor de la Nota de Ajuste es superior al valor del documento referenciado", 
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
+            }
 
             var referencedDocument = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(referencedDocumentData?.Identifier, referencedDocumentData?.Identifier);
             if (referencedDocument == null)
@@ -1527,6 +1540,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     string errorCode = documentMeta.DocumentTypeId == "05" ? "DSBH04" : $"{digit}BG04a";
                     string errorMessage = documentMeta.DocumentTypeId == "05" ? "CUDS de la nota de ajuste referenciada no existe" : "Documento referenciado no existe en los registros de la DIAN.";
+
+                    if (documentMeta.DocumentTypeId == "95")
+                    {
+                        errorCode = $"{digit}BG04";
+                        errorMessage = "CUDS de DS referenciada no existe";
+                    }
+
                     return new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = errorCode, ErrorMessage = errorMessage, ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds };
                 }
             }
@@ -4224,7 +4244,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentType = documentMeta?.DocumentTypeId;
             if (ConfigurationManager.GetValue("Environment") == "Prod" || ConfigurationManager.GetValue("Environment") == "Test")
             {
-                if (Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice)
+                if (Convert.ToInt32(documentType) == (int)DocumentType.DocumentSupportInvoice || Convert.ToInt32(documentType) == (int)DocumentType.EquivalentDocumentPOS)
                 {
                     var rk = $"{documentMeta?.Serie}|{documentType}|{documentMeta?.InvoiceAuthorization}";
                     range = ranges?.FirstOrDefault(r => r.PartitionKey == documentMeta.SenderCode && r.RowKey == rk);
@@ -4252,7 +4272,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
 
                     return responses;
-                }                 
+                }
+                else if (Convert.ToInt32(documentType) == (int)DocumentType.EquivalentDocumentPOS)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DEAB05b",
+                        ErrorMessage = "Número de la autorización de la numeración no corresponde a un número de autorización de este contribuyente emisor para este Proveedor de Autorización",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+
+                    return responses;
+                }
                 else
                 {
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAD05e", ErrorMessage = "Número de factura no existe para el número de autorización.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
@@ -4415,7 +4448,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
 
             if (string.IsNullOrEmpty(range.Serie)) range.Serie = "";
-            string errorCodeSerie = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB10b" : "FAB10b";
+            string errorCodeSerie = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB10b" : 
+                                    Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS ? "DEAB10b" : "FAB10b";
             if (range.Serie == numberRangeModel.Serie)
                 responses.Add(new ValidateListResponse
                 {
@@ -4436,7 +4470,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             long.TryParse(numberRangeModel.StartNumber, out long fromNumber);
-            string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" : "FAB11b";
+            string errorCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice) ? "DSAB11b" :
+                                    (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS) ? "DEAB11b" : "FAB11b";
 
             string messageCodeModel = (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                 ? "Valor inicial del rango de numeración informado no corresponde a la autorización vigente para el ABS"
@@ -4462,7 +4497,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
 
             long.TryParse(numberRangeModel.EndNumber, out long endNumber);
-            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" : "FAB12b";
+            string errorCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ? "DSAB12b" :
+                                     Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS ? "DEAB12b" : "FAB12b";
+
             string messageCodeModel2 = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice
                 ? "Valor final del rango de numeración informado no corresponde a la autorización vigente para el ABS."
                 : "Valor final del rango de numeración informado no corresponde a un valor final de los rangos vigentes para el contribuyente emisor.";
