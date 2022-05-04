@@ -58,69 +58,14 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,400italic,700,800" rel="stylesheet" type="text/css">
     @RenderSection("css", required: false)
     @Scripts.Render("~/bundles/modernizr")
-    <style>
-        ul#mainnav-menu li:not(li.list-divider) {
-            min-height: 92px;
-            padding: 26px;
-        }
-
-            ul#mainnav-menu li a {
-                padding: 0;
-            }
-
-            ul#mainnav-menu li img {
-                height: 40px;
-            }
-
-        ul#mainnav-menu .menu-title {
-            margin-left: 26px;
-        }
-        ul#mainnav-menu .arrow {
-            margin-top: 8px;
-        }
-
-        ul#mainnav-menu ul a:hover {
-            padding: initial !important;
-        }
-
-        ul.collapse.in li {
-            display: flex;
-            align-items: center;
-            padding: 0 0 26px 0 !important;
-        }
-        ul.collapse.in li:first-child {
-            padding-top: 26px !important;
-        }
-        ul.collapse.in li:last-child {
-            padding-bottom: 0 !important;
-        }
-        ul#mainnav-menu .list-divider {
-            margin: 0;
-        }
-    </style>
 </head>
 <body>
     @{
-        string mainTitle = string.Empty;
-        if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
-        {
-            mainTitle = $"Sistema de facturación electrónica – Ambiente de Habilitación";
-        }
-        else
-        if (ConfigurationManager.GetValue("Environment") == "Prod")
-        {
-            mainTitle = $"Sistema de facturación electrónica – Ambiente de Producción";
-        }
-        mainTitle += Session["Login_ContributorType"];
-    }
-    @Html.Partial("_header", mainTitle)
-
-    @{
-        var alertClass = "warning";
+        var alertClass = "danger";
         var environment = "DIAN piloto";
         if (ConfigurationManager.GetValue("Environment") == "Hab")
         {
-            alertClass = "info";
+            alertClass = "success";
             environment = "DIAN habilitación";
         }
         var contributorType = User.ContributorTypeId();
@@ -130,16 +75,15 @@
 
     @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
     {
-        <div class="dian-alert dian-alert-@alertClass fade in">
-            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
-            <p class="text-bold">@environment</p>
+        <div class="alert custom-alert-@alertClass fade in" style="margin-bottom: 0px; top: 40px; z-index: 9;">
+            <strong>@environment</strong>
         </div>
     }
 
     <div id="container" class="effect mainnav-lg navbar-fixed">
         <!--NAVBAR-->
         <!--===================================================-->
-        <header id="navbar" style="position:initial;display:none;">
+        <header id="navbar">
             <div id="navbar-container" class="boxed">
                 <!--Brand logo & name-->
                 <!--================================-->
@@ -294,7 +238,7 @@
             <!--===================================================-->
             <!--END CONTENT CONTAINER-->
 
-            <nav id="mainnav-container" style="min-width:345px;padding-top:0;">
+            <nav id="mainnav-container" style="min-width:223px">
                 <div id="mainnav">
                     <!--Menu-->
                     <!--================================-->
@@ -303,24 +247,23 @@
                             <div class="nano-content" tabindex="0">
                                 <ul class="list-group" id="mainnav-menu" style="min-width: 233px;padding-right:3px;padding-left:1px">
 
+
                                     <!--Category name-->
                                     <li class="list-header">Inicio</li>
-                                    <li class="list-divider"></li>
                                     <li id="@Navigation.NavigationEnum.Dashboard">
                                         <a href="@Url.Action("Dashboard", "Home")">
-                                            <img src="~/Content/img/lateral-menu-icons/home.svg" />
+                                            <i class="fa fa-dashboard"></i>
                                             <span class="menu-title">
-                                                Tablero
+                                                Inicio
                                             </span>
                                         </a>
                                     </li>
-                                    <li class="list-divider"></li>
                                     <!--Rol Administrador-->
                                     @if (User.IsInAnyRole("Administrador", "Super"))
                                     {
                                         <li>
                                             <a id="@Navigation.NavigationEnum.DocumentValidatorIndex" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/registrationAndAuthorization.svg" />
+                                                <i class="fa fa-check-square"></i>
                                                 <span class="menu-title">
                                                     Validador
                                                 </span>
@@ -334,12 +277,11 @@
                                                 <li id="@Navigation.NavigationEnum.DocumentValidatorCheck"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorCheck"), pageName = "Consultar validación", navigation = @Navigation.NavigationEnum.DocumentValidatorCheck})">Consultar validación</a></li>
                                             </ul>
                                         </li>
-                                        <li class="list-divider"></li>
                                     }
                                     <!--Rol Administrador-->
                                     <li>
                                         <a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
-                                            <img src="~/Content/img/lateral-menu-icons/history.svg" />
+                                            <i class="fa fa-inbox"></i>
                                             <span class="menu-title">
                                                 Histórico
                                             </span>
@@ -376,10 +318,9 @@
                                         }
                                         <!--Rol Facturador and Proveedor-->
                                     </li>
-                                    <li class="list-divider"></li>
                                     <li>
                                         <a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
-                                            <img src="~/Content/img/lateral-menu-icons/registrationAndAuthorization.svg" />
+                                            <i class="fa fa-users"></i>
                                             <span class="menu-title">
                                                 Registro y habilitación
                                             </span>
@@ -459,13 +400,12 @@
 
                                         </ul>
                                     </li>
-                                    <li class="list-divider"></li>
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
                                     {
                                         <li>
                                             <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/settings.svg" />
+                                                <i class="fa fa-users"></i>
                                                 <span class="menu-title">
                                                     Configuración
                                                 </span>
@@ -491,8 +431,8 @@
                                                     }
                                                 }
                                             </ul>
+
                                         </li>
-                                        <li class="list-divider"></li>
                                     }
 
                                     <!--Rol Administrador-->
@@ -524,7 +464,7 @@
                                         <li>
                                             <a id="@Navigation.NavigationEnum.ConfigurationIndex" class="parent-link" href="#">
 
-                                                <img src="~/Content/img/lateral-menu-icons/settings.svg" />
+                                                <i class="fa fa-cog"></i>
                                                 <span class="menu-title">
                                                     Configuración
                                                 </span>
@@ -562,11 +502,11 @@
                                                     <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
                                                 }
                                             </ul>
+
                                         </li>
-                                        <li class="list-divider"></li>
                                         <li>
                                             <a id="@Navigation.NavigationEnum.Bi" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/freeSolution.svg" />
+                                                <i class="fa fa-bar-chart"></i>
                                                 <span class="menu-title">
                                                     Business Intelligence
                                                 </span>
@@ -583,7 +523,6 @@
                                                 }
                                             </ul>
                                         </li>
-                                        <li class="list-divider"></li>
                                     }
                                     <!--Rol Administrador-->
                                     <!--Rol Facturador-->
@@ -591,7 +530,7 @@
                                     {
                                         <li>
                                             <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/freeSolution.svg" />
+                                                <i class="fa fa-dollar"></i>
                                                 <span class="menu-title">
                                                     Solución Gratuita
                                                 </span>
@@ -606,7 +545,6 @@
 
                                             </ul>
                                         </li>
-                                        <li class="list-divider"></li>
                                     }
                                     else
                                     if (Session["ShowFree"] == "1")
@@ -614,7 +552,7 @@
 
                                         <li id="LiFree" class="active">
                                             <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/freeSolution.svg" />
+                                                <i class="fa fa-dollar"></i>
                                                 <span class="menu-title">
                                                     Facturador Gratuito
                                                 </span>
@@ -629,9 +567,12 @@
 
                                             </ul>
                                         </li>
-                                        <li class="list-divider"></li>
                                     }
+
+
+
                                     <!--Rol Facturador-->
+                                    <li class="list-divider"></li>
                                 </ul>
                             </div>
                         </div>
@@ -693,6 +634,10 @@
         <!--===================================================-->
         <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
         <!--===================================================-->
+        <!-- Support phone -->
+        <a id="support-tel" href="tel:600 600 0060" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 600 600 0060</a>
+        <a id="support-tel-pe" href="tel:0 801 10880" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 0 801 10880</a>
+        <!-- END Support phone -->
     </div>
 
     @Html.Partial("_ConfirmModal")
