@@ -701,9 +701,11 @@ namespace Gosocket.Dian.Functions.Others
                                                                             }, new Domain.Sql.OtherDocElecContributor() { ContributorId = con.Id, OtherDocElecOperationModeId = ig.OperationModeId, Description = ig.PartitionKey },
 
                                                                             string.Empty),
-                                                                        contributorOpertaionModeId = ig.OperationModeId
-                                                                        ,
-                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId
+                                                                        contributorOpertaionModeId = ig.OperationModeId,
+                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId,
+                                                                        testSetId = it.Id,
+                                                                        electronicDocumentId = ig.ElectronicDocumentId,
+                                                                        equivalentDocumentId = it.EquivalentElectronicDocumentId
                                                                     };
 
 
@@ -1294,9 +1296,11 @@ namespace Gosocket.Dian.Functions.Others
                                                                             }, new Domain.Sql.OtherDocElecContributor() { ContributorId = con.Id, OtherDocElecOperationModeId = ig.OperationModeId, Description = ig.PartitionKey },
 
                                                                             string.Empty),
-                                                                        contributorOpertaionModeId = ig.OperationModeId
-                                                                        ,
-                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId
+                                                                        contributorOpertaionModeId = ig.OperationModeId,
+                                                                        otherDocElecContributorId = ig.OtherDocElecContributorId,
+                                                                        testSetId = it.Id,
+                                                                        electronicDocumentId = ig.ElectronicDocumentId,
+                                                                        equivalentDocumentId = it.EquivalentElectronicDocumentId
                                                                     };
 
 
