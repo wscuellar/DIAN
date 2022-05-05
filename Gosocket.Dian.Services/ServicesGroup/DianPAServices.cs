@@ -1810,10 +1810,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return dianResponse;
         }
 
-        public DianResponse GetStatusBulkDocumentsDownload(string trackId)
+        public DianResponseBulkDocumentDownload GetStatusBulkDocumentsDownload(string trackId)
         {
             var timer = new Stopwatch();
-            DianResponse dianResponse = new DianResponse
+            DianResponseBulkDocumentDownload dianResponse = new DianResponseBulkDocumentDownload
             {
                 StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
                 StatusDescription = "",
