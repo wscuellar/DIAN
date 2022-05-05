@@ -467,6 +467,50 @@ namespace Gosocket.Dian.Domain.Entity
         /// </summary>
         public int TotalReportForPaymentSent { get; set; }
 
+        //Transferencia de los derechos económicos 
+        [Display(Name = "Transferencia de los derechos económicos")]
+        public int TransferEconomicRightsTotalRequired { get; set; }
+        [Display(Name = "Transferencia de los derechos económicos")]
+        public int TransferEconomicRightsTotalAcceptedRequired { get; set; }
+        public int TransferEconomicRightsAccepted { get; set; }
+        public int TransferEconomicRightsRejected { get; set; }
+        public int TotalTransferEconomicRightsSent { get; set; }
+
+        //Notificación al deudor sobre la transferencia de los derechos económicos 
+        [Display(Name = "Notificación al deudor sobre la transferencia de los derechos económicos")]
+        public int NotificationDebtorOfTransferEconomicRightsTotalRequired { get; set; }
+        [Display(Name = "Notificación al deudor sobre la transferencia de los derechos económicos")]
+        public int NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+        public int NotificationDebtorOfTransferEconomicRightsAccepted { get; set; }
+        public int NotificationDebtorOfTransferEconomicRightsRejected { get; set; }
+        public int TotalNotificationDebtorOfTransferEconomicRightsSent { get; set; }
+
+        //Pago de la transferencia de los derechos económicos 
+        [Display(Name = "Pago de la transferencia de los derechos económicos")]
+        public int PaymentOfTransferEconomicRightsTotalRequired { get; set; }
+        [Display(Name = "Pago de la transferencia de los derechos económicos")]
+        public int PaymentOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+        public int PaymentOfTransferEconomicRightsAccepted { get; set; }
+        public int PaymentOfTransferEconomicRightsRejected { get; set; }
+        public int TotalPaymentOfTransferEconomicRightsSent { get; set; }
+
+        //Endoso con efectos de cesión ordinaria
+        [Display(Name = "Endoso con efectos de cesión ordinaria")]
+        public int EndorsementWithEffectOrdinaryAssignmentTotalRequired { get; set; }
+        [Display(Name = "Endoso con efectos de cesión ordinaria")]
+        public int EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired { get; set; }
+        public int EndorsementWithEffectOrdinaryAssignmentAccepted { get; set; }
+        public int EndorsementWithEffectOrdinaryAssignmentRejected { get; set; }
+        public int TotalEndorsementWithEffectOrdinaryAssignmentSent { get; set; }
+
+        //Protesto
+        [Display(Name = "Protesto")]
+        public int ObjectionTotalRequired { get; set; }
+        [Display(Name = "Protesto")]
+        public int ObjectionTotalAcceptedRequired { get; set; }
+        public int ObjectionAccepted { get; set; }
+        public int ObjectionRejected { get; set; }
+        public int TotalObjectionSent { get; set; }
 
         public string StatusDescription { get; set; }
         public int Status { get; set; }

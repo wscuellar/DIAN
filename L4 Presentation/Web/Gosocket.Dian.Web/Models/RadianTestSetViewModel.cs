@@ -234,7 +234,70 @@ namespace Gosocket.Dian.Web.Models
         [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
         public int ReportForPaymentTotalRequired { get; set; }
 
-        
+        //Transferencia de los derechos económicos 
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Transferencia de los derechos económicos ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int TransferEconomicRightsTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Transferencia de los derechos económicos ")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int TransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Notificación al deudor sobre la transferencia de los derechos económicos 
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Notificación al deudor sobre la transferencia de los derechos económicos")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int NotificationDebtorOfTransferEconomicRightsTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Notificación al deudor sobre la transferencia de los derechos económicos")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Pago de la transferencia de los derechos económicos 
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Pago de la transferencia de los derechos económicos")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int PaymentOfTransferEconomicRightsTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Pago de la transferencia de los derechos económicos")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int PaymentOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Endoso con efectos de cesión ordinaria
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso con efectos de cesión ordinaria")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementWithEffectOrdinaryAssignmentTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Endoso con efectos de cesión ordinaria")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired { get; set; }
+
+        //Protesto
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Protesto")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int ObjectionTotalRequired { get; set; }
+
+        [Required(ErrorMessage = "El campo es requerido")]
+        [Display(Name = "Protesto")]
+        [Range(0, short.MaxValue, ErrorMessage = "El valor {0} debe ser max 32767.")]
+        [RegularExpression("([0-9]+)", ErrorMessage = "El valor {0} debe ser numérico")]
+        public int ObjectionTotalAcceptedRequired { get; set; }
 
         public DateTime Date { get; set; }
 

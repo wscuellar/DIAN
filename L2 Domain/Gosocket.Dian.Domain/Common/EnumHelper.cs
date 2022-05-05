@@ -332,7 +332,17 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Pago de la Factura Electrónica de Venta como Título Valor")]
         NotificacionPagoTotalParcial = 045,
         [Description("Informe para el pago de la Factura Electrónica de Venta como Título Valor")]
-        ValInfoPago = 046
+        ValInfoPago = 046,
+        [Description("Endoso con efectos de cesión ordinaria")]
+        EndorsementWithEffectOrdinaryAssignment = 047,
+        [Description("Protesto")]
+        Objection = 048,
+        [Description("Transferencia de los derechos económicos")]
+        TransferEconomicRights = 049,
+        [Description("Notificación al deudor sobre la transferencia de los derechos económicos")]
+        NotificationDebtorOfTransferEconomicRights = 050,
+        [Description("Pago de la transferencia de los derechos económicos")]
+        PaymentOfTransferEconomicRights = 051
     }
 
     public enum SubEventStatus

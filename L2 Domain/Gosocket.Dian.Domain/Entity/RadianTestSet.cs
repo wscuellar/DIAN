@@ -67,6 +67,28 @@ namespace Gosocket.Dian.Domain.Entity
         public int EndCirculationLimitationTotalRequired { get; set; }
         public int EndCirculationLimitationTotalAcceptedRequired { get; set; }
 
+        //Transferencia de los derechos económicos 
+        public int TransferEconomicRightsTotalRequired { get; set; }
+        public int TransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Notificación al deudor sobre la transferencia de los derechos económicos 
+        public int NotificationDebtorOfTransferEconomicRightsTotalRequired { get; set; }
+        public int NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Pago de la transferencia de los derechos económicos 
+        public int PaymentOfTransferEconomicRightsTotalRequired { get; set; }
+        public int PaymentOfTransferEconomicRightsTotalAcceptedRequired { get; set; }
+
+        //Endoso con efectos de cesión ordinaria
+        public int EndorsementWithEffectOrdinaryAssignmentTotalRequired { get; set; }
+        public int EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired { get; set; }
+
+        //Protesto
+        public int ObjectionTotalRequired { get; set; }
+        public int ObjectionTotalAcceptedRequired { get; set; }
+
+
+
         public DateTime Date { get; set; }
 
         public string CreatedBy { get; set; }
