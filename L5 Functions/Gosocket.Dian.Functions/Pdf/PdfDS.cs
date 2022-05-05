@@ -360,7 +360,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var VendedorNumeroDocumento = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "CompanyID");
 			if (VendedorNumeroDocumento.Any())
 			{
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
+				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNumeroDocumento}", VendedorNumeroDocumento.FirstOrDefault().Value);
 				plantillaHtml = plantillaHtml.Replace("{EntidadTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNit}", VendedorNumeroDocumento.FirstOrDefault().Value);
