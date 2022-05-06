@@ -120,6 +120,8 @@ namespace Gosocket.Dian.Functions.Payroll
                     FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
                     NumeroDocumento = numeroDocumento,
                     Timestamp = DateTime.Now,
+                    CUNE = data.TrackId,
+                    TipoXML = docGlobalPayroll.TipoXML
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
 
@@ -131,15 +133,15 @@ namespace Gosocket.Dian.Functions.Payroll
                 //17/12/2021 Validacion para cuando migre a sql server no falle por el año minimo 1753
                 otherDocElecPayroll.AdmissionDate = ValidateFechaAnio(otherDocElecPayroll.AdmissionDate);
                 otherDocElecPayroll.CreateDate = ValidateFechaAnio(otherDocElecPayroll.CreateDate);
-                otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
+                //otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
                 otherDocElecPayroll.EndPaymentDate = ValidateFechaAnio(otherDocElecPayroll.EndPaymentDate);
                 otherDocElecPayroll.GenDate = ValidateFechaAnio(otherDocElecPayroll.GenDate);
-                otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
+                //otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
                 otherDocElecPayroll.Info_DateGen = ValidateFechaAnio(otherDocElecPayroll.Info_DateGen);
-                otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
-                otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
+                //otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
+                //otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
                 otherDocElecPayroll.StartPaymentDate = ValidateFechaAnio(otherDocElecPayroll.StartPaymentDate);
-                otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
+                //otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
 
                 otherDocElecPayroll = otherDocElecPayrollService.CreateOtherDocElecPayroll(otherDocElecPayroll);
             }
