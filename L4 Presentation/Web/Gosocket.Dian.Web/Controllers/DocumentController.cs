@@ -5,6 +5,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
@@ -205,7 +206,7 @@ namespace Gosocket.Dian.Web.Controllers
                 HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObj);
 
                 var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
-                var xmlBytes =  DownloadXml(trackId);
+                var xmlBytes = await DownloadXml(trackId);
 
                 var zipFile = ZipExtensions.CreateMultipleZip(new List<Tuple<string, byte[]>>
                 {
@@ -266,6 +267,33 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<ActionResult> DownloadPDFDocEquivalente(string trackId, string FechaValidacionDIAN, string FechaGeneracionDIAN)
+        {
+            try
+            {
+                //XML
+                var requestObj = new { trackId };
+                var response = await DownloadXmlAsync(requestObj);
+                var base64Xml = response.XmlBase64;
+
+                //PDF
+                string url = ConfigurationManager.GetValue("GetPdfUrlDocEquivalentePos");
+                var requestObjDoc = new { base64Xml, FechaValidacionDIAN, FechaGeneracionDIAN };
+                HttpResponseMessage responseMessage = await ConsumeApiAsync(url, requestObjDoc);
+                var pdfbytes = await responseMessage.Content.ReadAsByteArrayAsync();
+
+                return File(pdfbytes, "application/pdf", $"{trackId}.pdf");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+
+        }
+
         public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code,string fecha)
         {
             try
@@ -361,7 +389,7 @@ namespace Gosocket.Dian.Web.Controllers
             this.SetViewBag_FirstSurnameData();
 
             await this.GetPayrollData(20, model);
-
+            
             model.Payrolls = GetPayrollsList(model);
 
             return View(model);
@@ -407,8 +435,8 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            await this.GetPayrollData(50, model);
-
+            await this.GetPayrollData(50, model);           
+       
             model.Payrolls = GetPayrollsList(model);
 
             LoadData(ref model);
@@ -998,11 +1026,11 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
         }
-        private byte[] DownloadXml(string trackId)
+        private async Task<byte[]>DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response =  DownloadXml(requestObj);
+            var response =  await DownloadXml(requestObj);
             
             if (response.Success)
             {
@@ -1468,6 +1496,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.Ordenadores = OrdenarModel.List();
             model.Ciudades = GetCiudadModelLists();
         }
+
+
         private async Task GetPayrollData(int toTake, PayrollViewModel model)
         {
             this.PayrollList = null;
@@ -1535,14 +1565,20 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
+                if (model.RangoNumeracionMenor == null) model.RangoNumeracionMenor = 0;
+
+                if (model.RangoNumeracionMayor == null) model.RangoNumeracionMayor = 0;
+
                 if (model.TipoDocumento == "00") model.TipoDocumento = null;
 
                 if (model.NumeroDocumento == "00") model.NumeroDocumento = null;
 
                 if (model.Ciudad == "00") model.Ciudad = null;
-                                
+
+
                 var otherDocElecPayrolls = otherDocElecPayrollService.Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
+  
 
                 this.PayrollList = DocumentParsedNomina.SetOtherDocElecPayrollsToGlobalDocPayrolls(otherDocElecPayrolls);
             }
