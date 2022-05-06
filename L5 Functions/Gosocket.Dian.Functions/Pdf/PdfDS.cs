@@ -1224,13 +1224,13 @@ namespace Gosocket.Dian.Functions.Pdf
 			var info = InformacionAdicional.Where(x => x.FirstNode.ToString().Contains("InformacionTicket"));
 			var InformacionTicket = info.Descendants().Elements(def + "Value").ToArray();
 
-			if (InformacionTicket.Count() == 4)
+			if (InformacionTicket.Count() != 0)
 			{
-				Html = Html.Replace("{Placa}", InformacionTicket[0].ToString());
-				Html = Html.Replace("{ModoTransporte}", "Terrestre");
-				Html = Html.Replace("{MedioTransporte}", InformacionTicket[1].ToString());
-				Html = Html.Replace("{LugarOrigen}", InformacionTicket[2].ToString());
-				Html = Html.Replace("{LugarDestino}", InformacionTicket[3].ToString());
+				Html = Html.Replace("{ModoTransporte}", InformacionTicket[0].ToString());
+				Html = Html.Replace("{Placa}", InformacionTicket[1].ToString());
+				Html = Html.Replace("{MedioTransporte}", InformacionTicket[2].ToString());
+				Html = Html.Replace("{LugarOrigen}", InformacionTicket[3].ToString());
+				Html = Html.Replace("{LugarDestino}", InformacionTicket[4].ToString());
 			}
 			else
 			{
