@@ -446,7 +446,6 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal subTotal = 0;
 			decimal DescDet = 0;
 			decimal RecDet = 0;
-
 			foreach (var detalle in model)
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
@@ -555,6 +554,12 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal DescDet = 0;
 			decimal RecDet = 0;
 
+			var OtrasEntidades = "";
+			/// Invoice / ext:UBLExtensions / ext:UBLExtension / ext:ExtensionContent / Services_SPD / SubscriberConsumption / ConsumptionSection / SubInvoiceLines / SubInvoiceLine / Balance / Transactions / Transaction / CreditLineAmount
+			var AcuerdosPagos = element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "SubscriberConsumption").Elements(def + "ConsumptionSection")
+						.Elements(def + "SubInvoiceLines").Elements(def + "SubInvoiceLine").Elements(def + "Balance").Elements(def + "Transactions").Elements(def + "Transaction").Elements(def + "CreditLineAmount");
+
+
 			var listaCont = new List<Cont>();
 
 			var contador = element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "SubscriberConsumption").Elements(def + "ConsumptionSection")
@@ -633,6 +638,18 @@ namespace Gosocket.Dian.Functions.Pdf
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
 
 			plantillaHtml = plantillaHtml.Replace("{SubTotal}", String.Format("{0:n}", subTotal.ToString()));
+
+			if (AcuerdosPagos.Any())
+				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", AcuerdosPagos.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", string.Empty);
+			
+			if (OtrasEntidades.Any())
+				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", OtrasEntidades);
+			else
+				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", string.Empty);
+
+
 			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
 			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
 			return plantillaHtml;
