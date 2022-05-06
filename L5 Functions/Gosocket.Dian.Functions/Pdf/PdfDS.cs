@@ -360,7 +360,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var VendedorNumeroDocumento = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "CompanyID");
 			if (VendedorNumeroDocumento.Any())
 			{
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
+				plantillaHtml = plantillaHtml.Replace("{AdquirienteTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().NameDocumentType);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNumeroDocumento}", VendedorNumeroDocumento.FirstOrDefault().Value);
 				plantillaHtml = plantillaHtml.Replace("{EntidadTipoDocumento}", DocumentType.Where(x => x.IdDocumentType.ToString() == VendedorNumeroDocumento.FirstOrDefault().Attribute("schemeName").Value).FirstOrDefault().CompositeName);
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNit}", VendedorNumeroDocumento.FirstOrDefault().Value);
@@ -392,6 +392,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteRegimen}", string.Empty);
 
 			}
+
+			
 
 			var AdquirienteResponsabilidadTributaria = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "Name");
 			if (AdquirienteResponsabilidadTributaria.Any())
@@ -693,6 +695,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var AdquirienteTipoContribuyente = model.Elements(cac + "AccountingCustomerParty").Elements(cbc + "AdditionalAccountID");
 			if (AdquirienteTipoContribuyente.Any())
 				Html = Html.Replace("{AdquirienteTipoContribuyente}", AdquirienteTipoContribuyente.FirstOrDefault().Value == "3" ? "NO IDENTIFICADO" : AdquirienteTipoContribuyente.FirstOrDefault().Value == "2" ? "Persona Natural" : "Persona Juridica");
+			
 
 			var AccountingSupplierPartyName = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyName").Elements(cbc + "Name");
 			if (AccountingSupplierPartyName.Any())
@@ -906,6 +909,32 @@ namespace Gosocket.Dian.Functions.Pdf
 			{
 				Html = Html.Replace("{OrdenPedido}", string.Empty);
 			
+			}
+
+			var NumeroContrato = model.Elements(cac + "AccountingCustomerParty").Elements(cbc + "CustomerAssignedAccountID");
+
+			if (NumeroContrato.Any())
+			{
+
+				Html = Html.Replace("{NumeroContrato}", NumeroContrato.FirstOrDefault().Value);
+			}
+			else
+			{
+				Html = Html.Replace("{NumeroContrato}", string.Empty);
+
+			}
+
+			var Estrato = model.Elements(cbc + "CustomizationID");
+
+			if (Estrato.Any())
+			{
+
+				Html = Html.Replace("{Estrato}", Estrato.FirstOrDefault().Value);
+			}
+			else
+			{
+				Html = Html.Replace("{Estrato}", string.Empty);
+
 			}
 
 			var AdquirienteRegimenFiscal = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "TaxLevelCode");

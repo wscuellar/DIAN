@@ -145,6 +145,6 @@ namespace Gosocket.Dian.Web.Services
         /// <returns></returns>
         [OperationContract]
         [CustomOperation]
-        DianResponse GetStatusBulkDocumentDownload(string trackId);
+        DianResponseBulkDocumentDownload GetStatusBulkDocumentDownload(string trackId);
     }
 }
