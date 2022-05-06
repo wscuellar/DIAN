@@ -436,7 +436,23 @@ namespace Gosocket.Dian.Web.Controllers
             // Terminación limitación  
             events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = result.EndCirculationLimitationTotalAcceptedRequired, Counter2 = result.EndCirculationLimitationAccepted, Counter3 = result.EndCirculationLimitationRejected });
 
+
             events.Add(new EventCountersViewModel() { EventName = EventStatus.ValInfoPago.GetDescription(), Counter1 = result.ReportForPaymentTotalAcceptedRequired, Counter2 = result.ReportForPaymentAccepted, Counter3 = result.ReportForPaymentRejected });
+
+            //Endoso con efectos de cesión ordinaria
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndorsementWithEffectOrdinaryAssignment.GetDescription(), Counter1 = result.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, Counter2 = result.EndorsementWithEffectOrdinaryAssignmentAccepted, Counter3 = result.EndorsementWithEffectOrdinaryAssignmentRejected });
+
+            //Protesto
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Objection.GetDescription(), Counter1 = result.ObjectionTotalAcceptedRequired, Counter2 = result.ObjectionAccepted, Counter3 = result.ObjectionRejected });
+
+            //Transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.TransferEconomicRights.GetDescription(), Counter1 = result.TransferEconomicRightsTotalAcceptedRequired, Counter2 = result.TransferEconomicRightsAccepted, Counter3 = result.TransferEconomicRightsRejected });
+
+            //Notificación al deudor sobre la transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificationDebtorOfTransferEconomicRights.GetDescription(), Counter1 = result.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = result.NotificationDebtorOfTransferEconomicRightsAccepted, Counter3 = result.NotificationDebtorOfTransferEconomicRightsRejected });
+
+            //Pago de la transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.PaymentOfTransferEconomicRights.GetDescription(), Counter1 = result.PaymentOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = result.PaymentOfTransferEconomicRightsAccepted, Counter3 = result.PaymentOfTransferEconomicRightsRejected });
 
             return Json(events, JsonRequestBehavior.AllowGet);
         }

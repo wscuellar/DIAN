@@ -313,7 +313,22 @@ namespace Gosocket.Dian.Application
                     EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
                     //Reporte para el pago
                     ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
-                    ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired
+                    ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired,
+                    //Transferencia de los derechos económicos 
+                    TransferEconomicRightsTotalRequired = testSet.TransferEconomicRightsTotalRequired,
+                    TransferEconomicRightsTotalAcceptedRequired = testSet.TransferEconomicRightsTotalAcceptedRequired,
+                    //Notificación al deudor sobre la transferencia de los derechos económicos
+                    NotificationDebtorOfTransferEconomicRightsTotalRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                    NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                    //Pago de la transferencia de los derechos económicos  
+                    PaymentOfTransferEconomicRightsTotalRequired = testSet.PaymentOfTransferEconomicRightsTotalRequired,
+                    PaymentOfTransferEconomicRightsTotalAcceptedRequired = testSet.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                    //Endoso con efectos de cesión ordinaria
+                    EndorsementWithEffectOrdinaryAssignmentTotalRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                    EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                    //Protesto
+                    ObjectionTotalRequired = testSet.ObjectionTotalRequired,
+                    ObjectionTotalAcceptedRequired = testSet.ObjectionTotalAcceptedRequired,
                 };
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
