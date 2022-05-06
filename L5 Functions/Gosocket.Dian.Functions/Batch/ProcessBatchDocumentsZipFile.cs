@@ -431,7 +431,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 try
                                 {
                                     byte[] xmlBytesEvent = null;
-                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
+                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
                                     if (processRegistrateComplete.Code == "100")
                                     {
                                         xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
