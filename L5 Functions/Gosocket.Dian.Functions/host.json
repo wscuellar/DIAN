@@ -1,5 +1,5 @@
 {
-  //"functions": [ "SendToActivateOtherDocumentContributor", "UpdateTestSetResultPrueba", "RegisterCompletedPayrollCosmos" ],
+  "functions": [ "CorrectQualificationStatus", "SendToActivateOtherDocumentContributor" ], //"UpdateTestSetResultPrueba", "RegisterCompletedPayrollCosmos" ],
   "queues": {
     "batchSize": 1,
     "maxPollingInterval": 2000,
