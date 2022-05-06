@@ -754,7 +754,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			//falta regimen fiscal
 			var VendedorResponsabilidadTributaria = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "Name");
 			var VendedorResponsabilidadTributariaID = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "ID");
-			Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributariaID.FirstOrDefault().Value + "-" + VendedorResponsabilidadTributaria.FirstOrDefault().Value);
+			//Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributariaID.FirstOrDefault().Value + "-" + VendedorResponsabilidadTributaria.FirstOrDefault().Value);
+			Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributaria.FirstOrDefault().Value);
 
 			var Moneda = model.Elements(cbc + "DocumentCurrencyCode");
 			Html = Html.Replace("{Moneda}", Moneda.FirstOrDefault().Value);
