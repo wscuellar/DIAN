@@ -272,7 +272,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				{
 					try
 					{
-						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + ";");
 					}
 					catch (Exception)
 					{
@@ -382,7 +382,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				for (int i = 0; i < regimen.Count(); i++)
 				{
 
-					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + ";");
 
 				}
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteRegimen}", regim.ToString().Substring(0, regim.ToString().Length - 1));
@@ -755,7 +755,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				{
 					try
 					{
-						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + "\n ");
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + "\n ");
 
 					}
 					catch (Exception)
