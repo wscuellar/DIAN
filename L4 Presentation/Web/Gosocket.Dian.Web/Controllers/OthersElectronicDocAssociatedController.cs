@@ -298,16 +298,21 @@ namespace Gosocket.Dian.Web.Controllers
             else
             if (operation != null && operation.OperationStatusId != (int)OtherDocElecState.Test)
             {
+                bool contributorIsOfeAndIsSupportDocument = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller
+                    && operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-                result.Code = 500;
-                result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
-                return result;
-                //return Json(new
-                //{
-                //    code = 500,
-                //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
-                //    success = true,
-                //}, JsonRequestBehavior.AllowGet);
+                if (!contributorIsOfeAndIsSupportDocument)
+                {
+                    result.Code = 500;
+                    result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
+                    //return Json(new
+                    //{
+                    //    code = 500,
+                    //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
+                    //    success = true,
+                    //}, JsonRequestBehavior.AllowGet);
+                }
             }
 
             OthersElectronicDocAssociatedViewModel model = DataAssociate(id);
@@ -322,7 +327,7 @@ namespace Gosocket.Dian.Web.Controllers
                 _testSetOthersDocumentsResultService.InsertTestSetResult(globalResult);
             }
             //
-            var globalOperation = _globalOtherDocElecOperationService.GetOperation(model.Nit, software.SoftwareId);
+            var globalOperation = _globalOtherDocElecOperationService.GetOperationByElectronicDocumentId(model.Nit, software.SoftwareId, model.ElectronicDocId);
             if (globalOperation != null)
             {
                 globalOperation.Deleted = true;
@@ -350,7 +355,7 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new ResponseMessage($"El registro no pudo ser actualizado", "Nulo"), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetSetTestResult(int Id)
+        public async Task<ActionResult> GetSetTestResult(int Id)
         {
             OthersElectronicDocAssociatedViewModel model = DataAssociate(Id);
             
@@ -401,8 +406,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (!model.OperationModeIsFree)
             {
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
                 var cosmosManager = new CosmosDbManagerNumberingRange();
-                var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
+                var numberingRange = await cosmosManager.GetNumberingRangeByOtherDocElecContributor(accountId, Id);
                 model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
                     numberingRange?.Prefix ?? "-",
                     numberingRange?.ResolutionNumber ?? "-",
@@ -424,7 +430,7 @@ namespace Gosocket.Dian.Web.Controllers
             return View(model);
         }
 
-        public ActionResult GetSetTestResultEquivalentDocument(int Id, int? equivalentElectronicDocumentId=null)
+        public async Task<ActionResult> GetSetTestResultEquivalentDocument(int Id, int? equivalentElectronicDocumentId=null)
         {
             EquivalentElectronicDocument equivalentDocument = equivalentElectronicDocumentId.HasValue ? _equivalentElectronicDocumentRepository
                 .GetEquivalentElectronicDocument(equivalentElectronicDocumentId.Value) : null;
@@ -488,8 +494,9 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (!model.OperationModeIsFree && equivalentDocument?.Name == "Documentos equivalentes POS")
             {
+                var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = User.ContributorCode() });
                 var cosmosManager = new CosmosDbManagerNumberingRange();
-                var numberingRange = cosmosManager.GetNumberingRangeByOtherDocElecContributor(Id);
+                var numberingRange = await cosmosManager.GetNumberingRangeByOtherDocElecContributor(accountId, Id);
                 model.NumberingRange = new OtherDocElecNumberingRangeViewModel(
                     numberingRange?.Prefix ?? "-",
                     numberingRange?.ResolutionNumber ?? "-",

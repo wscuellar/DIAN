@@ -287,6 +287,15 @@ namespace Gosocket.Dian.Web.Controllers
                 model.PinSW = " ";
             }
 
+
+            operationModesList = operationModesList.GroupBy(t => t.Id)
+                .Select(t => new Domain.RadianOperationMode()
+                {
+                    Id = t.Key,
+                    Name = t.FirstOrDefault()?.Name ?? "",
+                    RadiantContributors = t.FirstOrDefault()?.RadiantContributors
+                }).ToList();
+
             ViewBag.OperationModes = new SelectList(operationModesList, "Id", "Name", operationModesList.FirstOrDefault()?.Id);
             ViewBag.IsSupportDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
             ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
@@ -697,19 +706,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 var ResponseMessageRedirectTo = new ResponseMessage("", TextResources.redirectType);
-
-                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
-                    .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
-
-                if (!mode.Any())
-                {
-                    return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    if (electronicDocumentIsSupport)
-                    {
-                        ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
+                ResponseMessageRedirectTo.RedirectTo = Url.Action("AddOrUpdate", "OthersElectronicDocuments",
                         new
                         {
                             ElectronicDocumentId = ValidacionOtherDocs.ElectronicDocumentId,
@@ -718,6 +715,22 @@ namespace Gosocket.Dian.Web.Controllers
                             ContributorId = User.ContributorId(),
                             message = ""
                         });
+
+                var mode = _othersDocsElecContributorService.GetDocElecContributorsByContributorId(ValidacionOtherDocs.ContributorId)
+                    .Where(x => x.ElectronicDocumentId == ValidacionOtherDocs.ElectronicDocumentId && x.OtherDocElecContributorTypeId == 1);// 1 es emisor
+
+                if (!mode.Any())
+                {
+                    if (contributorIsOfe && electronicDocumentIsSupport)
+                    {
+                        return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new ResponseMessage(TextResources.OthersElectronicDocumentsSelect_Confirm.Replace("@docume", ValidacionOtherDocs.ComplementoTexto), TextResources.confirmType), JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    if (electronicDocumentIsSupport)
+                    {
                         return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
                     }
 
@@ -1005,7 +1018,7 @@ namespace Gosocket.Dian.Web.Controllers
             var otherDocElecContributorOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(otherDocElecContributorOperationsId);
 
             var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResultAcepted(
-                User.UserCode(),
+                User.ContributorCode(),
                 otherDocElecContributorOperation.OtherDocElecContributor.ElectronicDocumentId,
                 otherDocElecContributorOperation.OtherDocElecContributorId,
                 otherDocElecContributorOperation.SoftwareId.ToString());

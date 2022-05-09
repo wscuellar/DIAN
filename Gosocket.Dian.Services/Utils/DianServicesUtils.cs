@@ -674,15 +674,15 @@ namespace Gosocket.Dian.Services.Utils
                 stringBuilder.Clear();
                 isValid = false;
             }
-
-            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]))
+            
+            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]) && docTypeCode != "50")
             {
                 stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
                 stringBuilder.Clear();
                 isValid = false;
             }
-
+        
             if (string.IsNullOrEmpty(docTypeCode))
             {
                 stringBuilder.AppendLine("ZB05: XML informado no corresponde a un tipo de documento valido: Facturas (nodo padre y tipos de documemto no son validos) o Nota de Crédito (nodo padre y tipo de documemto no es valido) o Nota de Débito (nodo padre no es valido) o Application Response (nodo padre no es valido)");
@@ -884,6 +884,8 @@ namespace Gosocket.Dian.Services.Utils
                 case "40":
                 case "45":
                 case "50":
+                    codeMessage = "DEA";
+                    break;
                 case "55":
                 case "60":
                     {
@@ -1043,6 +1045,16 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
+            }
+            else if (docTypeCode == "95")
+            {
+                if (string.IsNullOrEmpty(documentKey))
+                {
+                    stringBuilder.AppendLine(txtRegla + $"{codeMessage}D06" + txtRechazo + "Valor del CUDS no está calculado correctamente.");
+                    errors.Add(stringBuilder.ToString());
+                    stringBuilder.Clear();
+                    isValid = false;
+                }
             }
             else if (docTypeCode == "101")
             {

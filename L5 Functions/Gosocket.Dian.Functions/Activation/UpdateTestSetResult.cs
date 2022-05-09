@@ -493,7 +493,7 @@ namespace Gosocket.Dian.Functions.Activation
                     // Se verifica si la operacion para el cliente y el software que usa esta habilitada para otros documentos
                     bool isActive = globalOtherDocElecOperation.IsActive(setResultOther.PartitionKey, new Guid(tempSoftwareID[1]));
                     SetLogger(null, "Step 2.3", isActive.ToString(), "UPDATE-03.1");
-                    if (isActive)
+                    if (isActive && setResultOther.Status == (int)TestSetStatus.Accepted)
                         return;               
 
                     SetLogger(null, "Step 2 - Nomina", "estado en prueba ", "UPDATE-03.2");

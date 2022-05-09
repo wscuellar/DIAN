@@ -212,7 +212,16 @@ namespace Gosocket.Dian.Services.ServicesGroup
             // ZONE 3
             start = DateTime.UtcNow;
             //Validar campos mandatorios basicos para el trabajo del WS
-            if (!DianServicesUtils.ValidateParserValuesSync(documentParsed, ref dianResponse)) return dianResponse;
+            if(documentParsed.DocumentTypeId == "50")
+            {
+                DianServicesUtils.ValidateParserValuesSync(documentParsed, ref dianResponse);
+            }
+            else if (!DianServicesUtils.ValidateParserValuesSync(documentParsed, ref dianResponse))
+            {
+                return dianResponse;
+            }
+
+            
 
             var senderCode = documentParsed.SenderCode;
             var docTypeCode = documentParsed.DocumentTypeId;
@@ -1801,10 +1810,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return dianResponse;
         }
 
-        public DianResponse GetStatusBulkDocumentsDownload(string trackId)
+        public DianResponseBulkDocumentDownload GetStatusBulkDocumentsDownload(string trackId)
         {
             var timer = new Stopwatch();
-            DianResponse dianResponse = new DianResponse
+            DianResponseBulkDocumentDownload dianResponse = new DianResponseBulkDocumentDownload
             {
                 StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
                 StatusDescription = "",

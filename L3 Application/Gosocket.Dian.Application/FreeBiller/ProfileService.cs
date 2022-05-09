@@ -91,6 +91,7 @@ namespace Gosocket.Dian.Application.FreeBiller
                         ParentId = c.ParentId,
                         IsActive = c.IsActive,
                         MenuLevel = c.MenuLevel,
+                        SeccionOptions = c.SeccionOptions,
                         Children = GetChildren(menuOptions, c.Id, optionsByProfile),
                         Checked = optionsByProfile.Any(t => t.MenuOptionId == c.Id)
                     })
