@@ -1146,29 +1146,8 @@ namespace Gosocket.Dian.Application.Cosmos
         }
 
         #region Utils
-        //public static List<string> GeneratePartitionKeys(DateTime from, DateTime to)
-        //{
-        //    List<string> partitionKeys = new List<string>();
-        //    List<string> dayList = new List<string>();
-        //    var permutations = GetPermutations(new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }, 2);
-
-        //    foreach (DateTime date in EachDay(from, to))
-        //        dayList.Add($"co|{date.Day.ToString().PadLeft(2, '0')}");
-
-        //    var distinctDays = dayList.Distinct().ToList();
-        //    foreach (var day in distinctDays)
-        //        foreach (var p in permutations)
-        //            partitionKeys.Add(day + "|" + string.Join("", p));
-
-        //    return partitionKeys;
-        //}
-        private static IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
-        {
-            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
-            {
-                yield return day;
-            }
-        }
+        
+        
         private static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
         {
             if (length == 1) return list.Select(t => new T[] { t });
