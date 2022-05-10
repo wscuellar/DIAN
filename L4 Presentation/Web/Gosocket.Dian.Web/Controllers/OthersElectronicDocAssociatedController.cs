@@ -1134,7 +1134,13 @@ namespace Gosocket.Dian.Web.Controllers
 
                 // OtherDocElecContributorOperations
                 var softwareOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId);
-                softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                
+                /*Si es documento equivalente y ya está habilitado NO se cambia el estado de la operación*/
+                if(!(softwareOperation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent 
+                    && softwareOperation.OperationStatusId == (int)OtherDocElecState.Habilitado))
+                {
+                    softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                }
                 _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
             }
             #endregion
