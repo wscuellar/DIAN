@@ -582,6 +582,7 @@
     <Content Include="Content\images\loaded.png" />
     <Content Include="Content\images\logo.png" />
     <Content Include="Content\images\LogoAnticipos.png" />
+    <Content Include="Content\images\logoDian.png" />
     <Content Include="Content\images\observations.png" />
     <Content Include="Content\images\payment-design.jpg" />
     <Content Include="Content\images\pendiente-1.png" />
@@ -2975,6 +2976,7 @@
     <Content Include="Views\Contributor\CheckContributorRegister.cshtml" />
     <Content Include="Views\Contributor\RegisterNoOfe.cshtml" />
     <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
+    <Content Include="Views\Shared\_LoadingPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
