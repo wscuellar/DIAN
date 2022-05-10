@@ -39,7 +39,7 @@
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=tB4VgsIdcCxLH8/oGW8QuWzHmo35V1ks3s1+Lb4pkwxnVu458LMW0NtxJ4BYD+nBI1NyhdH3PoVbhtjo+KSbag==;EndpointSuffix=core.windows.net",
     "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=tB4VgsIdcCxLH8/oGW8QuWzHmo35V1ks3s1+Lb4pkwxnVu458LMW0NtxJ4BYD+nBI1NyhdH3PoVbhtjo+KSbag==;EndpointSuffix=core.windows.net",
     "BindingRedirects": "[ { \"ShortName\": \"Microsoft.WindowsAzure.ServiceRuntime\", \"RedirectToVersion\": \"2.7.0.0\", \"PublicKeyToken\": \"31bf3856ad364e35\" } ]",
-    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=tB4VgsIdcCxLH8/oGW8QuWzHmo35V1ks3s1+Lb4pkwxnVu458LMW0NtxJ4BYD+nBI1NyhdH3PoVbhtjo+KSbag==;EndpointSuffix=core.windows.net",
+    "GlobalStorage": "DefaultEndpointsProtocol=https;AccountName=gtpastoragetest;AccountKey=N6T73yd7bY8016nZjUVWe8siHOr+kekKoupWcRG4/++0PLIN9SqtxSQ8d1lfVNJCPR7QlAt7hiWuKSO/uq9pLg==;EndpointSuffix=core.windows.net",
     "GlobalRedis": "gtpa-validator-redis-test.redis.cache.windows.net:6380,password=ghckdGfPqQOec7xvz8IUaBF6yObX4gcCdIWOc2TMFWo=,ssl=True,abortConnect=False",
     "DownloadXmlUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/DownloadXml?code=RrnXFtVj0ZIgJVgoUppytMM8FJWBdQ2xrIMCEID7rMeEc/rtMOZbWQ==",
     "GetXpathDataValuesUrl": "https://gtpa-function-doc-validator-test.azurewebsites.net/api/GetXpathDataValues?code=iISdBakj0QUhDcloBs7J1sQ4g8jWJdM3wGjXCAFNlxbrzyKovmyTBw==",
@@ -161,7 +161,12 @@
     "ValidatePayrollFG": "true",
     "ErrorMessage_AAH06_042": "El número de documento electrónico referenciado no coincide con uno reportado en el contrato de mandato",
     "ErrorMessage_LGC64": "Este evento no puede ser transmitido por el emisor informado",
-    "ErrorMessage_LGC93": "Identificador de software no coincide con uno habilitado para el mandante en RADIAN"
+    "ErrorMessage_LGC93": "Identificador de software no coincide con uno habilitado para el mandante en RADIAN",
+    "ErrorMessage_AAG20_Endoso": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value (ValorTotalEndoso)",
+    "ErrorMessage_AAG20_Transferencia": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionTransferenciaDerechos/Value (ValorTranferenciaDerechos)",
+    "ErrorMessage_AAF19_Endoso": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionNegociacion/Value (ValorTotalEndoso)",
+    "ErrorMessage_AAF19_Transferencia": "La sumatoria del elemento: cbc:CorporateStockAmount no coincide con el valor ../ext:UBLExtension/ext:ExtensionContent/InformacionTransferenciaDerechos/Value (ValorTranferenciaDerechos)",
+    "ValidateElementsSum": "true"
 
 
     // Test UAT INDRA

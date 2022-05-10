@@ -48,6 +48,8 @@
         public string SenderPartyPersonSchemeID { get; set; }
         public string SenderPartyPersonSchemeName { get; set; }
         public string SenderPartyPersonID { get; set; }
+        public string InformacionTransferenciaDerechos { get; set; }
+        public string InformacionPagoTransferencia { get; set; }
 
         public NitModel() { }
 
