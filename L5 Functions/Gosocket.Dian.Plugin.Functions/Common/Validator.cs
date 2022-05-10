@@ -5417,7 +5417,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad ||
                        Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoGarantia ||
-                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion)
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion ||
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TransferEconomicRights)
                     {
                         //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                         if (documentMetaRef.ReceiverCode != documentMeta.IssuerPartyCode)
@@ -5444,21 +5445,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
 
-                        var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
-                        if (responseListEndoso != null)
+                        //Actualiza estado factura transaccion solo para endosos
+                        if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.TransferEconomicRights)
                         {
-                            foreach (var item in responseListEndoso)
+                            var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
+                            if (responseListEndoso != null)
                             {
-                                responses.Add(new ValidateListResponse
+                                foreach (var item in responseListEndoso)
                                 {
-                                    IsValid = item.IsValid,
-                                    Mandatory = item.Mandatory,
-                                    ErrorCode = item.ErrorCode,
-                                    ErrorMessage = item.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = item.IsValid,
+                                        Mandatory = item.Mandatory,
+                                        ErrorCode = item.ErrorCode,
+                                        ErrorMessage = item.ErrorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                             }
                         }
+                        
                     }
                 }
                 else
