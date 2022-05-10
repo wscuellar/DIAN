@@ -281,13 +281,19 @@ namespace Gosocket.Dian.Services.Utils.Common
             }
 
             var paymentsDateNode = xmlDocument.SelectSingleNode(paymentsDatesPath);
-            if(paymentsDateNode != null)
+            if (paymentsDateNode != null)
             {
                 var datesList = new List<string>();
                 XmlNodeList paymentsDatesList = paymentsDateNode.SelectNodes($"/{rootNodeXPath}/*[local-name()='FechasPagos']");
                 for (int i = 0; i < paymentsDatesList.Count; i++)
                 {
-                    datesList.Add(paymentsDatesList[i]?.InnerText);
+                    int j = 0;
+                    while (j < paymentsDatesList[i]?.InnerText.Length)
+                    {
+                        var initIndex = j;
+                        datesList.Add(paymentsDatesList[i]?.InnerText.Substring(initIndex, 10));
+                        j = initIndex + 10;
+                    }
                 }
                 globalDocPayrolls.FechasPagos = string.Join(";", datesList);
             }
