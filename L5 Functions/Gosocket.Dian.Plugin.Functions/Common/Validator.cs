@@ -5911,6 +5911,71 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     break;
+                case (int)EventStatus.EndorsementWithEffectOrdinaryAssignment:
+                    if (documentMeta != null)
+                    {
+                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
+                        var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
+                        if (eventRadianPaymentInfo != null)
+                        {
+                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianPaymentInfo.IsValid,
+                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
+                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
+                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    break;
+                case (int)EventStatus.TransferEconomicRights:
+                    if (documentMeta != null)
+                    {
+                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
+                        var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
+                        //validateE(documentMeta);
+                        if (eventRadianPaymentInfo != null)
+                        {
+                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianPaymentInfo.IsValid,
+                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
+                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
+                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    break;
+                case (int)EventStatus.PaymentOfTransferEconomicRights:
+                    if (documentMeta != null)
+                    {
+                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
+                        var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
+                        //validateE(documentMeta);
+                        if (eventRadianPaymentInfo != null)
+                        {
+                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventRadianPaymentInfo.IsValid,
+                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
+                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
+                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    break;
 
             }
 
@@ -7759,7 +7824,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
-                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Objection
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.TransferEconomicRights
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificationDebtorOfTransferEconomicRights
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights)
             {
                 totalInvoice = documentMeta.TotalAmount.ToString();
 
