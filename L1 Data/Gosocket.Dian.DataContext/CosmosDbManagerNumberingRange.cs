@@ -48,7 +48,7 @@ namespace Gosocket.Dian.DataContext
 
                 IDocumentQuery<NumberingRange> QueryData = client
                     .CreateDocumentQuery<NumberingRange>(uri, options)
-                    .Where(t => t.AccountId == Guid.Parse(accountId) && t.OtherDocElecContributorOperation == otherDocElecContributorId)
+                    .Where(t => t.PartitionKey == accountId && t.OtherDocElecContributorOperation == otherDocElecContributorId)
                     .AsDocumentQuery();
 
                 var result = await QueryData.ExecuteNextAsync<NumberingRange>();
