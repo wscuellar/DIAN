@@ -33,6 +33,7 @@ function CallExecution(callMethod, url, jsonvalue, method, showMessage, cancelFu
         type: callMethod,
         data: jsonvalue,
         success: function (data) {
+            hideLoading('#panel-form');
             if (showMessage) {
                 if (data.MessageType === "alert") {
                     showConfirmation(data.Message, AlertExec(cancelFunction));
