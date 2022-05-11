@@ -573,6 +573,8 @@
     <Content Include="Content\font\custom\fa-arrow-left.svg" />
     <Content Include="Content\font\custom\fa-edit.svg" />
     <Content Include="Content\font\custom\fa-eye.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-danger.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-success.svg" />
     <Content Include="Content\font\custom\fa-info-circle-warn.svg" />
     <Content Include="Content\font\custom\fa-info-circle.svg" />
     <Content Include="Content\images\aproved.png" />

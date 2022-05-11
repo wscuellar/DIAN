@@ -35,15 +35,18 @@ button.btn.dropdown-toggle.btn-default {
     padding: 10px 16px !important;
     border-radius: 4px !important;
 }
-.form-control::placeholder {
-    text-transform:initial;
-    color: #ccc !important;
-}
-.form-control[readonly],
-.form-control[disabled] {
-    background: #F0F2F4 !important;
-    cursor: not-allowed !important;
-}
+
+    .form-control::placeholder {
+        text-transform: initial;
+        color: #ccc !important;
+    }
+
+    .form-control[readonly],
+    .form-control[disabled] {
+        background: #F0F2F4 !important;
+        cursor: not-allowed !important;
+        pointer-events: none;
+    }
 
 .input-validation-error {
     border: 2px solid #F54E41 !important;
@@ -81,6 +84,7 @@ button.btn.dropdown-toggle.btn-default .filter-option {
     border-bottom-left-radius: 0px !important;
     border-left: 0;
 }
+
 .input-group input[disabled='disabled'] ~ .input-group-btn .btn,
 .input-group input.disabled ~ .input-group-btn .btn {
     pointer-events: none;
@@ -140,6 +144,10 @@ table.simple-table tbody tr td.dataTables_empty {
 
 .mt-28 {
     margin-top: 28px !important;
+}
+
+.mr-4 {
+    margin-right: 4px !important;
 }
 
 .mr-9 {
@@ -344,6 +352,7 @@ label.sub-title-2 {
 .mb-20 {
     margin-bottom: 20px !important;
 }
+
 .mb-30 {
     margin-bottom: 30px !important;
 }
@@ -448,13 +457,22 @@ label.sub-title-2 {
     width: 24px;
     height: 24px;
 }
+
 .dian-alert-warning .fa-info-circle {
     background: url(/Content/font/custom/fa-info-circle-warn.svg);
 }
 
-    .fa-info-circle::before {
-        content: '' !important;
-    }
+.dian-alert-danger .fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle-danger.svg);
+}
+
+.dian-alert-success .fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle-success.svg);
+}
+
+.fa-info-circle::before {
+    content: '' !important;
+}
 
 /***************************/
 .dataTables_length {
@@ -575,8 +593,17 @@ label.sub-title-2 {
 .dian-alert-danger {
     background: #fcd5d3;
 }
+
     .dian-alert-danger * {
         color: #F54E41 !important;
+    }
+
+.dian-alert-success {
+    background: #d5f4e6;
+}
+
+    .dian-alert-success * {
+        color: #00ac57 !important;
     }
 /*********Calendario Doble**************/
 .input-group.double-calendar .input-group-addon {
@@ -587,6 +614,7 @@ label.sub-title-2 {
     border: 1px solid #BEC8D2;
     cursor: pointer;
 }
+
     .input-group.double-calendar .input-group-addon:hover {
         background: #eee !important;
     }
@@ -701,14 +729,15 @@ label.sub-title-2 {
     }
 
 .drp-buttons {
-    display:none !important;
+    display: none !important;
 }
-.drp-buttons .drp-selected {
-    font-size: 14px !important;
-    font-family: 'Ubuntu';
-    font-weight: 600;
-    padding-right: 16px !important;
-}
+
+    .drp-buttons .drp-selected {
+        font-size: 14px !important;
+        font-family: 'Ubuntu';
+        font-weight: 600;
+        padding-right: 16px !important;
+    }
 
 @media (min-width: 564px) {
     .daterangepicker .drp-calendar.left .calendar-table {
