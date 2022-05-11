@@ -39,25 +39,26 @@ namespace Gosocket.Dian.DataContext
             }
         }
 
-        public NumberingRange GetNumberingRangeByOtherDocElecContributor(long otherDocElecContributorId)
+        public async Task<NumberingRange> GetNumberingRangeByOtherDocElecContributor(string accountId, long otherDocElecContributorId)
         {
             try
             {
-                string sql = $"SELECT * FROM c where c.OtherDocElecContributorOperation = {otherDocElecContributorId}";
-                
                 var uri = UriFactory.CreateDocumentCollectionUri("Lists", "NumberingRange");
+                var options = new FeedOptions { MaxItemCount = -1 };
+
                 IDocumentQuery<NumberingRange> QueryData = client
-                    .CreateDocumentQuery<NumberingRange>(uri, sql, new FeedOptions { MaxItemCount = -1 })
+                    .CreateDocumentQuery<NumberingRange>(uri, options)
+                    .Where(t => t.PartitionKey == accountId && t.OtherDocElecContributorOperation == otherDocElecContributorId)
                     .AsDocumentQuery();
-                
-                var result = QueryData.ExecuteNextAsync<NumberingRange>().Result;
-                
+
+                var result = await QueryData.ExecuteNextAsync<NumberingRange>();
+
                 return result.FirstOrDefault();
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 return null;
-
             }
         }
     }

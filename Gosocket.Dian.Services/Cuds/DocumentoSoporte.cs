@@ -71,8 +71,30 @@
         /// <returns></returns>
         public string ToCombinacionToCuds(string sep = "")
         {
-            return $"{NumDs}{sep}{FecDs}{sep}{HorDs}{sep}{ValDs}{sep}{CodImp}{sep}{ValImp}{sep}{ValTol}{sep}{NumSno}{sep}{NitAbs}{sep}{SoftwarePin}{sep}{TipoAmb}";
+            var valDsTruncado = TruncarValoresNumericos(ValDs);
+            var valImpTruncado = TruncarValoresNumericos(ValImp);
+            var valTot = TruncarValoresNumericos(ValTol);
+            return $"{NumDs}{sep}{FecDs}{sep}{HorDs}{sep}{valDsTruncado}{sep}{CodImp}{sep}{valImpTruncado}{sep}{valTot}{sep}{NumSno}{sep}{NitAbs}{sep}{SoftwarePin}{sep}{TipoAmb}";
+        }
 
+        public static string TruncarValoresNumericos(string cadena)
+        {
+            var indexPuntoDecimal = cadena.IndexOf('.');
+            if (indexPuntoDecimal == -1)
+            {
+                return cadena;
+            }
+            else
+            {
+                if (indexPuntoDecimal + 2 <= cadena.Length - 1)
+                {
+                    return cadena.Substring(0, indexPuntoDecimal + 2 + 1);
+                }
+                else
+                {
+                    return cadena.Substring(0, cadena.Length);
+                }
+            }
         }
 
         public bool IsAdjustmentNote() => DocumentType == "95";
