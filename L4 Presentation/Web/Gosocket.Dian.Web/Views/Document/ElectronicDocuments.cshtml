@@ -4,6 +4,40 @@
 @*<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />*@
 
 <style>
+    a.menu-button,
+    button.menu-button {
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        /*box-shadow: 0px 3px 6px rgb(0 0 0 / 16%);*/
+        width: 205px;
+        height: 205px;
+        padding: 25px 30px 55px;
+        font-family: 'Work Sans';
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 26px;
+        text-align: center;
+        color: #2B323D;
+    }
+
+        a.menu-button img,
+        button.menu-button img {
+            display: block;
+            margin: 0 auto 12px;
+        }
+
+        a.menu-button:hover,
+        button.menu-button:hover {
+            background: linear-gradient(90deg, #41D78C, #00B4DC);
+            color: #fff;
+        }
+
+            a.menu-button:hover img,
+            button.menu-button:hover img {
+                filter: invert(1) brightness(10);
+            }
+
     .RadianCardContainer {
         cursor: pointer;
     }
@@ -33,6 +67,10 @@
 
         @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
         {
+            <a class="menu-button" target="_self" href="@Url.Action("Check", "Contributor")" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura Electrónica
+            </a>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
                     <a href="@Url.Action("Check", "Contributor")">
@@ -50,6 +88,10 @@
 
         @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
         {
+            <a class="menu-button" target="_self" href="@Url.Action("Index", "OthersElectronicDocuments")" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </a>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
                     <a href="@Url.Action("Index", "OthersElectronicDocuments")">
@@ -66,6 +108,10 @@
         }
         else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0"))
         {
+            <a class="menu-button" target="_self" href="@Url.Action("Index", "OthersElectronicDocuments")" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </a>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
                     <a href="@Url.Action("Index", "OthersElectronicDocuments")">
@@ -83,6 +129,10 @@
 
         @if (ViewBag.ContributorTypeIde != null)
         {
+            <button class="menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
+                Documento soporte para no obligados a facturar
+            </button>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
                      onclick="EnabledSupportDocumentForNoOfe()">
@@ -98,6 +148,10 @@
 
         @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
         {
+            <a class="menu-button" target="_self" href="@Url.Action("Index", "Radian")" contributorType="4" operationMode="1" id="4">
+                <img src="~/Content/img/electronic-document-icons/eventos-radian-icon.svg" height="130" />
+                Eventos RADIAN
+            </a>
             <div class="row-fluid">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="card RadianCardContainer" contributorType="4" operationMode="1" id="4">
@@ -118,6 +172,10 @@
 
         @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
         {
+            <button class="menu-button" onclick="EnabledEquivalentDocuments()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/eventos-radian-icon.svg" height="130" />
+                Documentos equivalentes
+            </button>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
                      onclick="EnabledEquivalentDocuments()">

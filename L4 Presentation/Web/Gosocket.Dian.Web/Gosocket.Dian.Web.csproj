@@ -696,6 +696,11 @@
     <Content Include="Content\img\DHL_logo.png" />
     <Content Include="Content\img\Documento soporte para NO OFE icono principal_Mesa de trabajo 1 copia 2.svg" />
     <Content Include="Content\img\edelpa.png" />
+    <Content Include="Content\img\electronic-document-icons\documento-soporte-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\documentos-equivalentes-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\eventos-radian-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\factura-electronica-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-electronica-icon.svg" />
     <Content Include="Content\img\Facebook.svg" />
     <Content Include="Content\img\Factura electrónica ícono principal_Mesa de trabajo 1.svg" />
     <Content Include="Content\img\favicon.ico" />
