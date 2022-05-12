@@ -23,6 +23,7 @@ using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System.Threading.Tasks;
+using Gosocket.Dian.Application.FreeBillerSoftwares;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -698,6 +699,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             var IdS = Guid.NewGuid();
             var now = DateTime.Now;
+            string freeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocId);
+
             OtherDocElecSoftware software = new OtherDocElecSoftware()
             {
                 Id = IdS,
@@ -712,7 +715,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,                
-                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid(freeBillerSoftwareId),
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 

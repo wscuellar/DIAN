@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Application.FreeBillerSoftwares;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Common;
@@ -415,7 +416,10 @@ namespace Gosocket.Dian.Functions.Batch
 						{
 							if (validateDocumentUrl)
 							{
-								if (softwareIdNomina == ConfigurationManager.GetValue("BillerSoftwareId"))
+								var documentTypeId = !string.IsNullOrWhiteSpace(xmlParser.globalDocPayrolls.CUNEPred)
+								? "103" : "102";
+								var freeBillerSoftwareId = FreeBillerSoftwareService.Get(documentTypeId);
+								if (softwareIdNomina == freeBillerSoftwareId)
 								{
 
 									ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegisterCompletedPayrollCosmosUrl"), new { TrackId = trackId });
