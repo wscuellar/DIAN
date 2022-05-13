@@ -749,3 +749,53 @@ label.sub-title-2 {
         width: 620px;
     }
 }
+/*Botones del proceso de habilitacion*/
+button.hab-menu-button {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    width: 286px;
+    height: 286px;
+    padding: 25px 30px 55px;
+    font-family: 'Work Sans';
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 26px;
+    text-align: center;
+    color: #2B323D;
+    box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+    webkit-box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+    moz-box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+}
+
+    button.hab-menu-button img {
+        display: block;
+        margin: 0 auto 12px;
+    }
+
+    button.hab-menu-button:hover {
+        background: linear-gradient(90deg, #41D78C, #00B4DC);
+        color: #fff;
+    }
+
+        button.hab-menu-button:hover img {
+            filter: invert(1) brightness(10);
+        }
+
+.hab-menu-button-subtitle {
+    font-weight: normal;
+}
+
+.hab-menu-container {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 30px;
+    column-gap: 30px;
+}
+/*****************************/
+.RadianContainerBegin {
+    margin-top: 40px;
+    margin-bottom: 0px;
+    padding: 45px 60px;
+}

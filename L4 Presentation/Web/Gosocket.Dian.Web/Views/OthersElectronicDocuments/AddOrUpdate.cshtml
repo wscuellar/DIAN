@@ -148,8 +148,8 @@
                                         {
                                             if (ConfigurationManager.GetValue("Environment") != "Prod")
                                             {
-                                                <div class="panel-footer text-right">
-                                                    <button id="btnSave" type="button" class="btn btn-success btn-radian-success btnSave @(Model.ListTable.Any(t=> t.StateSoftware == "En pruebas") ? "disabled" : "")">Asociar</button>
+                                                <div class="panel-footer">
+                                                    <button id="btnSave" type="button" class="btn btn-secondary btnSave @(Model.ListTable.Any(t=> t.StateSoftware == "En pruebas") ? "disabled" : "")">Asociar</button>
                                                 </div>
                                             }
                                         }
@@ -157,79 +157,83 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="panel-body padding-top-20">
-                            <div class="row">
-                                <div class="col-lg-12  col-md-12  col-xs-12">
-                                    <h4> Listado de modos de operación asociados</h4>
-                                </div>
-                                <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-                                </div>
-                                <div class="col-lg-12 col-md-12  col-xs-12">
-                                    <div class="table-responsive">
-                                        <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-                                            <thead>
+                            <p class="sub-title"> Listado de modos de operación asociados</p>
+
+                            <div class="table-responsive">
+                                <table class="simple-table" data-int="0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Modo de operación</th>
+                                            <th class="text-center">Documento Electrónico</th>
+                                            <th class="text-center">Registro</th>
+                                            <th class="text-center">Estado</th>
+                                            <th class="text-center">Nombre del Software</th>
+                                            <th class="text-center">ID</th>
+                                            <th class="text-center">PIN del SW </th>
+                                            <th class="text-center">URL</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.ListTable != null)
+                                        {
+                                            //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                            foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
+                                            {
                                                 <tr>
-                                                    <th class="text-center">Modo de operación</th>
-                                                    <th class="text-center">Documento Electrónico</th>
-                                                    <th class="text-center">Registro</th>
-                                                    <th class="text-center">Estado</th>
-                                                    <th class="text-center">Nombre del Software</th>
-                                                    <th class="text-center">ID</th>
-                                                    <th class="text-center">PIN del SW </th>
-                                                    <th class="text-center">URL</th>
-                                                    <th class="text-center">Acciones</th>
+                                                    <td nowrap class="text-left">
+                                                        @item.OperationMode @if (isElectronicPayroll)
+                                                        {<span>- @item.ContributorType</span>}
+                                                    </td>
+                                                    <td nowrap class="text-center">@item.ElectronicDoc</td>
+                                                    <td nowrap class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                    <td class="text-center">@item.StateSoftware</td>
+                                                    <td class="text-center">@item.Software</td>
+                                                    <td class="text-center">@item.SoftwareId</td>
+                                                    <td class="text-center">@item.PinSW</td>
+                                                    <td class="text-center">  @item.Url  </td>
+                                                    <td nowrap class="text-center">
+                                                        @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
+                                                        <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Pruebas de aceptación" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+                                                        @if (isElectronicPayroll || isElectronicPayrollNoOfe)
+                                                        {
+                                                            <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Eliminar" onclick="EliminarRegistro(@item.Id)">
+                                                                <i style="color:#262944 !important" class="fa fa-times-circle"></i>
+                                                            </a>
+                                                        }
+                                                        else if (ViewBag.IsSupportDocument && Model.ContributorIsOfe)
+                                                        {
+                                                            <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Eliminar" onclick="EliminarRegistro(@item.Id)">
+                                                                <i style="color:#262944 !important" class="fa fa-times-circle"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a class="btn btn-xs @(item.StateSoftware != "En pruebas" ? "disabled" : "")" data-tooltip="tooltip" data-placement="top" title="Eliminar" onclick="EliminarRegistro(@item.Id)">
+                                                                <i style="color:#262944 !important" class="fa fa-times-circle"></i>
+                                                            </a>
+                                                        }
+                                                        @if (ViewBag.IsEquivalentDocument)
+                                                        {
+                                                            <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Documentos habilitados" onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)">
+                                                                <i style="color:#262944 !important" class="fa fa-check-circle"></i>
+                                                            </a>
+                                                        }
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                @if (Model.ListTable != null)
-                                                {
-                                                    //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                                                    foreach (var item in (List<Gosocket.Dian.Web.Models.OtherDocsElectListViewModel>)Model.ListTable)
-                                                    {
-                                                        <tr>
-                                                            <td nowrap class="text-left">
-                                                                @item.OperationMode @if (isElectronicPayroll)
-                                                                {<span>- @item.ContributorType</span>}
-                                                            </td>
-                                                            <td nowrap class="text-center">@item.ElectronicDoc</td>
-                                                            <td nowrap class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-                                                            <td class="text-center">@item.StateSoftware</td>
-                                                            <td class="text-center">@item.Software</td>
-                                                            <td class="text-center">@item.SoftwareId</td>
-                                                            <td class="text-center">@item.PinSW</td>
-                                                            <td class="text-center">  @item.Url  </td>
-                                                            <td nowrap class="text-center">
-                                                                @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-                                                                <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-                                                                @if (isElectronicPayroll || isElectronicPayrollNoOfe)
-                                                                {
-                                                                    <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                                else if (ViewBag.IsSupportDocument && Model.ContributorIsOfe)
-                                                                {
-                                                                    <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                                @if (ViewBag.IsEquivalentDocument)
-                                                                {
-                                                                    <a onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)" title="Documentos habilitados"><i class="fa fa-check-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                            </td>
-                                                        </tr>
-                                                    }
-                                                }
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                    <!--Paginación de la tabla-->
-                                    <div class="pull-right table-pagination padding-top-10">
+                            <!--Paginación de la tabla-->
+                            <div class="pull-right table-pagination padding-top-10">
 
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

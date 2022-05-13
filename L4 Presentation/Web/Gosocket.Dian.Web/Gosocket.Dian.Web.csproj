@@ -701,6 +701,8 @@
     <Content Include="Content\img\electronic-document-icons\eventos-radian-icon.svg" />
     <Content Include="Content\img\electronic-document-icons\factura-electronica-icon.svg" />
     <Content Include="Content\img\electronic-document-icons\nomina-electronica-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-participante-emisor.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-proveedor-servicios-tecnologicos.svg" />
     <Content Include="Content\img\Facebook.svg" />
     <Content Include="Content\img\Factura electrónica ícono principal_Mesa de trabajo 1.svg" />
     <Content Include="Content\img\favicon.ico" />

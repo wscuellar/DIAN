@@ -252,27 +252,22 @@
                         @if (Model.Step > 0)
                         {
                             <div class="panel-footer">
-                                <div class="row">
-                                    <div class="text-right">
+                                <button name="SubmitPrueba" id="btnDetalleSetPruebas"
+                                        class="btn btn-primary Set-Prueba mr-9">
+                                    Set de pruebas
+                                </button>
 
-                                        <button name="SubmitPrueba" id="btnDetalleSetPruebas"
-                                                class="margin-right-20 btn btn-radian-success Set-Prueba">
-                                            Set de pruebas
-                                        </button>
+                                <button type="button"
+                                        class="btn btn-secondary mr-9 @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
+                                        id="btnReiniciarSerPruebas">
+                                    Reiniciar SET de pruebas
+                                </button>
 
-                                        <button type="button"
-                                                class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
-                                                id="btnReiniciarSerPruebas">
-                                            Reiniciar SET de pruebas
-                                        </button>
-
-                                        <button type="button"
-                                                class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
-                                                id="btnSincronizarAProduccion">
-                                            Sincronizar a Producción
-                                        </button>
-                                    </div>
-                                </div>
+                                <button type="button"
+                                        class="btn btn-secondary btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
+                                        id="btnSincronizarAProduccion">
+                                    Sincronizar a Producción
+                                </button>
                             </div>
                         }
 
