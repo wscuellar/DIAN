@@ -37,8 +37,8 @@
     if (!string.IsNullOrEmpty(Model.RangePrefix))
     {
         <div class="row">
-            <h4 class="text-thin">Rango de numeración asignado</h4>
-            <hr class="margin-5" />
+            <p class="sub-title">Rango de numeración asignado</p>
+            
             <div class="col-sm-2 padding-xs-0">
                 <div class="form-group">
                     @Html.LabelFor(m => m.RangePrefix, new { @class = "control-label" })
@@ -79,8 +79,8 @@
     }
 
     <div class="row">
-        <h4 class="text-thin">Información del software</h4>
-        <hr class="margin-5" />
+        <p >Información del software</p>
+        
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.SoftwareId, new { @class = "control-label" })
@@ -109,8 +109,8 @@
 }
 
 <div class="row">
-    <h4 class="text-thin">Total de documentos requeridos</h4>
-    <hr class="margin-5" />
+    <p class="sub-title">Total de documentos requeridos</p>
+    
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
             @Html.LabelFor(m => m.TotalDocumentRequired, new { @class = "control-label" })
@@ -143,8 +143,7 @@
 </div>
 
 <div class="row">
-    <h4 class="text-thin">Total de documentos aceptados requeridos</h4>
-    <hr class="margin-5" />
+    <p class="sub-title">Total de documentos aceptados requeridos</p>
 
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
