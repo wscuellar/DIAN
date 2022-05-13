@@ -272,7 +272,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				{
 					try
 					{
-						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + ";");
 					}
 					catch (Exception)
 					{
@@ -382,7 +382,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				for (int i = 0; i < regimen.Count(); i++)
 				{
 
-					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + ";");
+					regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + ";");
 
 				}
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteRegimen}", regim.ToString().Substring(0, regim.ToString().Length - 1));
@@ -446,7 +446,6 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal subTotal = 0;
 			decimal DescDet = 0;
 			decimal RecDet = 0;
-
 			foreach (var detalle in model)
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
@@ -554,6 +553,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal subTotal = 0;
 			decimal DescDet = 0;
 			decimal RecDet = 0;
+			var _bandera = 0;
+			var OtrasEntidades = "";
+			/// Invoice / ext:UBLExtensions / ext:UBLExtension / ext:ExtensionContent / Services_SPD / SubscriberConsumption / ConsumptionSection / SubInvoiceLines / SubInvoiceLine / Balance / Transactions / Transaction / CreditLineAmount
+			var AcuerdosPagos = element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "SubscriberConsumption").Elements(def + "ConsumptionSection")
+						.Elements(def + "SubInvoiceLines").Elements(def + "SubInvoiceLine").Elements(def + "Balance").Elements(def + "Transactions").Elements(def + "Transaction").Elements(def + "CreditLineAmount");
 
 			var listaCont = new List<Cont>();
 
@@ -567,15 +571,22 @@ namespace Gosocket.Dian.Functions.Pdf
 				listaCont.Add(new Cont() { numero = item.Value, id = node.Value });
 
 			}
+			string[] info = new string[20];
+			int continfo = 0;
+			foreach (var item in AcuerdosPagos)
+			{
+				info[continfo] = item.Value;
+				continfo = continfo + 1;
+			}
 
 
-
+			var _bande = 0;
 			foreach (var detalle in model)
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
-				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount");
+				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxAmount");
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
@@ -604,35 +615,49 @@ namespace Gosocket.Dian.Functions.Pdf
 				var Descr = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "Description");
 
 				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
-
-				var cont = listaCont.Where(x => x.id == detalle.Elements(cbc + "AccountingCostCode").FirstOrDefault().Value);
+				
+				var cont = listaCont.Where(x => x.id == element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "ID").FirstOrDefault().Value);
 				var conta = cont.Any() ? cont.FirstOrDefault().numero : "";
-
+				
+               
 				rowDetalleProductosBuilder.Append($@"
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
-		            <td>{unit.CompositeName}</td>
-		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+		            <td>{unit.IdSubList}</td>
+		            <td>{detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		            
                     <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-					 <td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+					<td>{DescDet}</td>
+                    <td>{info[_bande]}</td>
+					<td class='text-right'>{RecDet:n2}</td>
+					<td class='text-right'>{IvaVal:n2}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
-
-
-		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
-					<td style='word-wrap: break-word;'>{conta}</td>
+					<td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		
+					<td style='word-wrap: break-word;'>{listaCont[_bande].numero}</td>
 		    
 	            </tr>");
 
 				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
 										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
+				_bande = _bande + 1;
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
 
 			plantillaHtml = plantillaHtml.Replace("{SubTotal}", String.Format("{0:n}", subTotal.ToString()));
+
+			if (AcuerdosPagos.Any())
+				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", AcuerdosPagos.FirstOrDefault().Value);
+			else
+				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", string.Empty);
+			
+			if (OtrasEntidades.Any())
+				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", OtrasEntidades);
+			else
+				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", string.Empty);
+
+
 			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
 			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
 			return plantillaHtml;
@@ -738,7 +763,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				{
 					try
 					{
-						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().CompositeName + "\n ");
+						regim.Append(Regimen.Where(x => x.IdSubList.ToString() == regimen[i]).FirstOrDefault().IdSubList + "\n ");
 
 					}
 					catch (Exception)
@@ -757,7 +782,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			//falta regimen fiscal
 			var VendedorResponsabilidadTributaria = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "Name");
 			var VendedorResponsabilidadTributariaID = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "TaxScheme").Elements(cbc + "ID");
-			Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributariaID.FirstOrDefault().Value + "-" + VendedorResponsabilidadTributaria.FirstOrDefault().Value);
+			//Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributariaID.FirstOrDefault().Value + "-" + VendedorResponsabilidadTributaria.FirstOrDefault().Value);
+			Html = Html.Replace("{VendedorResponsabilidadTributaria}", VendedorResponsabilidadTributaria.FirstOrDefault().Value);
 
 			var Moneda = model.Elements(cbc + "DocumentCurrencyCode");
 			Html = Html.Replace("{Moneda}", Moneda.FirstOrDefault().Value);
@@ -1223,13 +1249,13 @@ namespace Gosocket.Dian.Functions.Pdf
 			var info = InformacionAdicional.Where(x => x.FirstNode.ToString().Contains("InformacionTicket"));
 			var InformacionTicket = info.Descendants().Elements(def + "Value").ToArray();
 
-			if (InformacionTicket.Count() == 4)
+			if (InformacionTicket.Count() != 0)
 			{
-				Html = Html.Replace("{Placa}", InformacionTicket[0].ToString());
-				Html = Html.Replace("{ModoTransporte}", "Terrestre");
-				Html = Html.Replace("{MedioTransporte}", InformacionTicket[1].ToString());
-				Html = Html.Replace("{LugarOrigen}", InformacionTicket[2].ToString());
-				Html = Html.Replace("{LugarDestino}", InformacionTicket[3].ToString());
+				Html = Html.Replace("{ModoTransporte}", InformacionTicket[0].ToString());
+				Html = Html.Replace("{Placa}", InformacionTicket[1].ToString());
+				Html = Html.Replace("{MedioTransporte}", InformacionTicket[2].ToString());
+				Html = Html.Replace("{LugarOrigen}", InformacionTicket[3].ToString());
+				Html = Html.Replace("{LugarDestino}", InformacionTicket[4].ToString());
 			}
 			else
 			{

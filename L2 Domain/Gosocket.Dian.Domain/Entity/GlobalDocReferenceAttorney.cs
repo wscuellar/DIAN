@@ -26,5 +26,6 @@ namespace Gosocket.Dian.Domain.Entity
         public string SerieAndNumber { get; set; }
         public string ResponseCodeListID { get; set; }
         public string SchemeID { get; set; }
+        public string IssuerAttorneyPersonId { get; set; }
     }
 }

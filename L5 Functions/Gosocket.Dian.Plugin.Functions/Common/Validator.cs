@@ -1,5 +1,6 @@
 ﻿using Gosocket.Dian.Application;
 using Gosocket.Dian.Application.Common;
+using Gosocket.Dian.Application.FreeBillerSoftwares;
 using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
@@ -747,7 +748,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
 
-            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwareId = FreeBillerSoftwareService.Get(documentMeta.DocumentTypeId);
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
             if (!codesWithCUDE.Contains(documentMeta.DocumentTypeId))
@@ -866,7 +867,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             string key = string.Empty;
 
-            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwareId = FreeBillerSoftwareService.Get(objCune.DocumentType);
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
             var softwareId = objCune?.SoftwareId;
@@ -4227,8 +4228,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (ConfigurationManager.GetValue("Environment") == "Hab")
             {
                 testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(senderCode);
-
-                if (softwareId == ConfigurationManager.GetValue("BillerSoftwareId"))
+                var freeBillerSoftwareId = FreeBillerSoftwareService.Get(documentMeta.DocumentTypeId);
+                if (softwareId == freeBillerSoftwareId)
                     range = ranges.FirstOrDefault(r => r.Serie == "SETG");
                 else
                 {
@@ -4299,6 +4300,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.DocumentSupportInvoice 
                 ? "Número de la resolución que autoriza la numeración[x] corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización."
                 : "Número del formato 1876 informado[x] corresponde a un número de autorización de este ABS";
+            
+            errorCodeA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS ? errorCodeA05b : "DEAB05b";
+            errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS
+                ? errorMessageA05b
+                : "Número de la autorización de la numeración[x] corresponde a un número de autorización de este contribuyente emisor para este Proveedor de Autorización";
 
             if (range.ResolutionNumber == invoiceAuthorization)
                 responses.Add(new ValidateListResponse
@@ -4335,6 +4341,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else if(Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DEAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
@@ -4342,6 +4350,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             {
                 if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice)
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DSAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado NO corresponde a la fecha inicial del rango vigente para el ABS.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                else if (Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.EquivalentDocumentPOS)
+                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = "DEAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado NO corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
                 else
                     responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "FAB07b", ErrorMessage = "Fecha inicial del rango de numeración informado no corresponde a la fecha inicial de los rangos vigente para el contribuyente.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
             }
@@ -4426,6 +4436,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string errorMessageDescription = Convert.ToInt32(documentMeta.DocumentTypeId) == (int)DocumentType.DocumentSupportInvoice ?
                 "Fecha final del rango de numeración informado no corresponde a la fecha final del rango vigente para el ABS"
                 : "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente.";
+
+            errorCodeRange = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS ? errorCodeRange : "DEAB08b";
+            errorMessageDescription = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS
+                ? errorCodeRange
+                : "Fecha final del rango de numeración informado no corresponde a la fecha final de los rangos vigente para el contribuyente";
 
             if (range.ValidDateNumberTo == toDateNumber)
                 responses.Add(new ValidateListResponse
@@ -4630,7 +4645,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var softwareId = (softwareModel != null) ? softwareModel.SoftwareId : nominaModel.ProveedorSoftwareID;
             var SoftwareSecurityCode = (softwareModel != null) ? softwareModel.SoftwareSecurityCode : nominaModel.ProveedorSoftwareSC;
 
-            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwareId = FreeBillerSoftwareService.Get(documentMeta.DocumentTypeId);
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
             string hash = "";
@@ -8017,7 +8032,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             data.TrackId = data.TrackId.ToLower();
 
-            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwareId = FreeBillerSoftwareService.Get(invoceCuds.DocumentType);
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
             var softwareId = invoceCuds.SoftwareId;
@@ -8052,30 +8067,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         #region Evento ValidateCude
 
-        public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCuds, RequestObjectCude data)
+        public ValidateListResponse ValidateCude(DocumentoEquivalente invoceCude, RequestObjectCude data)
         {
             DateTime startDate = DateTime.UtcNow;
             data.TrackId = data.TrackId.ToLower();
 
-            var billerSoftwareId = ConfigurationManager.GetValue("BillerSoftwareId");
+            var billerSoftwareId = FreeBillerSoftwareService.Get(invoceCude.DocumentType);
             var billerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin");
 
-            var softwareId = invoceCuds.SoftwareId;
+            var softwareId = invoceCude.SoftwareId;
 
             if (softwareId == billerSoftwareId || string.IsNullOrEmpty(softwareId))
             {
-                invoceCuds.SoftwarePin = billerSoftwarePin;
+                invoceCude.SoftwarePin = billerSoftwarePin;
             }
             else
             {
                 var software = GetSoftwareInstanceCache(softwareId);
-                invoceCuds.SoftwarePin = software?.Pin;
+                invoceCude.SoftwarePin = software?.Pin;
             }
 
-
             var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDE no está calculado correctamente." };
-            var hash = invoceCuds.ToCombinacionToCude().EncryptSHA384();
-            if (invoceCuds.Cude.ToLower() == hash)
+            var hash = invoceCude.ToCombinacionToCude().EncryptSHA384();
+            if (invoceCude.Cude.ToLower() == hash)
             {
                 response.IsValid = true;
                 response.ErrorMessage = $"Valor calculado correctamente.";

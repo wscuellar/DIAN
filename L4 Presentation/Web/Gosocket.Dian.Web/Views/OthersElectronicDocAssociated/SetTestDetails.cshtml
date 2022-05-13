@@ -98,7 +98,7 @@
                 yAxis: {
                     min: 0,
                     title: {
-                        text: ''
+                        text: 'Total'
                     }
                 },
                 legend: {
@@ -108,6 +108,10 @@
                     symbolRadius: 0,
                     x: 0,
                     y: 12
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.x}</b><br/>',
+                    pointFormat: '{series.name}: <b>{point.y}</b><br/>Total: <b>{point.stackTotal}</b>'
                 },
                 plotOptions: {
                     series: {

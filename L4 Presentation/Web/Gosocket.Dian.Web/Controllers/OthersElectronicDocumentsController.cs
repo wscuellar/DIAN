@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.FreeBillerSoftwares;
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
@@ -445,6 +446,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             var now = DateTime.Now;
+            string freeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocumentId);
 
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService
                 .CreateContributorNew(
@@ -472,7 +474,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,
-                SoftwareId = model.OperationModeSelectedId != "3" ? new Guid(model.SoftwareId) : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeSelectedId != "3" ? new Guid(model.SoftwareId) : new Guid(freeBillerSoftwareId),
                 OtherDocElecContributorId = int.Parse(ContributorId)
             };
 

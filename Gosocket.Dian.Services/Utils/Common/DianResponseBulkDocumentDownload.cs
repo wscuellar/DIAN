@@ -4,16 +4,13 @@ using System.Runtime.Serialization;
 namespace Gosocket.Dian.Services.Utils.Common
 {
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/DianResponse")]
-    public class DianResponse
+    public class DianResponseBulkDocumentDownload
     {
         [DataMember]
         public byte[] XmlBytes { get; set; }
 
         [DataMember]
         public byte[] XmlBase64Bytes { get; set; }
-
-        //[DataMember]
-        //public byte[] ZipBase64Bytes { get; set; }
 
         [DataMember]
         public string StatusCode { get; set; }
@@ -36,7 +33,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         [DataMember]
         public List<string> ErrorMessage { get; set; }
         
-        //[DataMember]
-        //public string UrlDescarga { get; set; }
+        [DataMember]
+        public string UrlDescarga { get; set; }
     }
 }
