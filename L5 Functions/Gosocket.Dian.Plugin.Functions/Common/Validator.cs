@@ -1279,7 +1279,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) && documentMeta.DocumentTypeId != "40")
             {
                 softwareproviderDvErrorCode = "DEAB22b";
             }
@@ -1359,9 +1359,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (string.IsNullOrEmpty(softwareProviderCodeDigit) || softwareProviderCodeDigit == "undefined") softwareProviderCodeDigit = "11";
             if (ValidateDigitCode(documentMeta.DocumentTypeId == "96" ? providerCode : softwareProviderCode, documentMeta.DocumentTypeId == "96" ? int.Parse(providerCodeDigit) : int.Parse(softwareProviderCodeDigit)))
                 responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
-            else responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            else if(documentMeta.DocumentTypeId != "40")
+            { 
+                responses.Add(new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = softwareproviderDvErrorCode, ErrorMessage = "DV del NIT del Prestador de Servicios no está correctamente calculado", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+            }
 
-            string senderErrorCode = "FAJ21";
+        string senderErrorCode = "FAJ21";
             if (documentMeta.DocumentTypeId == "05") senderErrorCode = "DSAJ21";
             else if (documentMeta.DocumentTypeId == "91") senderErrorCode = "CAJ21";
             else if (documentMeta.DocumentTypeId == "92") senderErrorCode = "DAJ21";
@@ -1397,7 +1400,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 if (softwareProvider != null || habilitadoRadian)
-                    responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                {
+                    if(documentMeta.DocumentTypeId == "40")
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"NIT del Prestador de Servicios no está autorizado para prestar servicios.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                    else 
+                    {
+                        responses.Add(new ValidateListResponse { IsValid = true, Mandatory = true, ErrorCode = softwareProviderErrorCode, ErrorMessage = $"{ softwareProviderCodeHab } Prestrador de servicios autorizado.", ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds });
+                    }
+                }
                 else
                 {
                     var mensajeError = (documentMeta.DocumentTypeId == "05" || documentMeta.DocumentTypeId == "95") ? $"{ softwareProviderCodeHab } NIT del Prestador de Servicios no está autorizado por la DIAN." : $"{ softwareProviderCodeHab } NIT del Prestador de Servicios No está autorizado para prestar servicios.";
