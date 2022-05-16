@@ -611,8 +611,18 @@ namespace Gosocket.Dian.Application
                                                 && !t.Deleted
                                                 );
                 if (otherDocOperation != null)
-                    otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocElecState.Cancelado; //cancelo = rechazo.
-
+                {
+                    if (
+                        !(
+                            otherDoc.ElectronicDocumentId == (int)Domain.Common.ElectronicsDocuments.ElectronicEquivalent &&
+                            otherDocOperation.OperationStatusId == (int)Domain.Common.OtherDocElecState.Habilitado
+                        )
+                    )
+                    {
+                        otherDocOperation.OperationStatusId = (int)Domain.Common.OtherDocElecState.Cancelado; //cancelo = rechazo.
+                    }
+                }
+                     
                 context.SaveChanges();
             }
         }
