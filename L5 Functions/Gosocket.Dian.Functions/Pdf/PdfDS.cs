@@ -664,7 +664,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		}
 		public static string GenerateQrBase64ForDocument(string code)
 		{
-			var urlSiteDian = ConfigurationManager.GetValue("SiteDian");
+			//var urlSiteDian = ConfigurationManager.GetValue("SiteDian");
+			var urlSiteDian = "https://gtpa-web-prototype-test-uat-utnxse.azurewebsites.net/";
 			var urlToQr = $"{urlSiteDian}document/searchqr?documentkey={code}";
 
 			QRCodeGenerator qrGenerator = new QRCodeGenerator();
