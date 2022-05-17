@@ -1,0 +1,11 @@
+﻿#mainnav-container {
+    left: 0;
+    width: 92px !important;
+}
+
+@media(min-width: 992px) {
+    #container.mainnav-lg #mainnav-container {
+        left: 0;
+        width: 345px !important;
+    }
+}

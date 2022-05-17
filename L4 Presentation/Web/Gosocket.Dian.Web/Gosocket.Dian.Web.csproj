@@ -462,6 +462,7 @@
     <Content Include="Content\crush-page\img\city-img.png" />
     <Content Include="Content\crush-page\img\crush-bg.png" />
     <Content Include="Content\crush-page\img\gosign-img.png" />
+    <Content Include="Content\css\navbar-new-style.css" />
     <Content Include="Content\css\app-new-style.css" />
     <Content Include="Content\css\bootstrap-grid.css" />
     <Content Include="Content\css\bootstrap-grid.min.css" />
@@ -804,6 +805,7 @@
     <Content Include="Content\img\thumbs\img2.jpg" />
     <Content Include="Content\img\thumbs\img3.jpg" />
     <Content Include="Content\img\Twitter.svg" />
+    <Content Include="Content\img\user-icon.svg" />
     <Content Include="Content\img\valorem.png" />
     <Content Include="Content\img\video-overlay.png" />
     <Content Include="Content\img\video-visa.png" />
