@@ -271,7 +271,7 @@ namespace Gosocket.Dian.Application
         {
             using (var context = string.IsNullOrWhiteSpace(connectionString) ? new SqlDBContext() : new SqlDBContext(connectionString))
             {
-                var contributorInstance = context.Contributors.FirstOrDefault(c => c.Id == contributor.Id);
+                var contributorInstance = context.Contributors.FirstOrDefault(c => c.Code == contributor.Code);
                 if (contributorInstance != null)
                 {
                     contributorInstance.HabilitationDate = contributorInstance.HabilitationDate ?? contributor.HabilitationDate;
