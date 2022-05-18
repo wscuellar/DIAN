@@ -1,4 +1,5 @@
 ﻿using OpenHtmlToPdf;
+using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -131,7 +132,11 @@ namespace Gosocket.Dian.Functions.Utils
         {
             _objects = new ConcurrentBag<object>();
 
-            int numInstances = 3;
+            int numInstances;
+            if(!int.TryParse(Environment.GetEnvironmentVariable("concurrenciapdf"),out numInstances))
+            {
+                numInstances = 3;
+            }
 
             for (var x = 0; x < numInstances; x++)
             {
