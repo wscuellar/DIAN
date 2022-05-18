@@ -404,6 +404,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                return Json(new ResponseMessage(
+                    TextResources.OperationNotAllowedInProduction,
+                    TextResources.alertType, 500),
+                    JsonRequestBehavior.AllowGet);
+            }
+
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
