@@ -112,6 +112,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+        #region Validate PaymentOfTransferEconomicRights
+        public List<ValidateListResponse> ValidatePaymentOfTransfer(XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Valida monto pago parcial o total
+            var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
+            if (responseListPayment != null)
+            {
+                foreach (var item in responseListPayment)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = item.IsValid,
+                        Mandatory = item.Mandatory,
+                        ErrorCode = item.ErrorCode,
+                        ErrorMessage = item.ErrorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+            else
+                return null;
+
+            return responses;
+        }
+        #endregion
+
+
         #region ValidatePartialPayment
         public List<ValidateListResponse> ValidatePartialPayment(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
@@ -2466,7 +2497,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor actual total factura TV
-            string valueActualInvoice = nitModel.ValorActualTituloValor;
+            string valueActualInvoice = nitModel.ValorActualTituloValor != "0.00" ? nitModel.ValorActualTituloValor : nitModel.InformacionTransferenciaDerechos;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validPayment = false;
 
@@ -2479,7 +2510,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
-            if (nitModel.CustomizationId == "452")
+            if (nitModel.CustomizationId == "452" || Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.TransferEconomicRights)
             {
                 //Valida Total valor pagado igual al valor actual del titulo valor
                 if (totalValueSender != double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
@@ -2495,7 +2526,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
-
+              
             //Valida Total valor pagado no supera el valor actual del titulo valor
             if (totalValueSender > double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
             {

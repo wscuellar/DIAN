@@ -5952,6 +5952,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                             }
                         }
+
+                        var validatePaymentOfTransfer = logicalEventRadianPaymentInfo.ValidatePaymentOfTransfer(xmlParserCude, nitModel);
+                        if (validatePaymentOfTransfer != null)
+                        {
+                            foreach (var itemValidatePaymentOfTransfer in validatePaymentOfTransfer)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemValidatePaymentOfTransfer.IsValid,
+                                    Mandatory = itemValidatePaymentOfTransfer.Mandatory,
+                                    ErrorCode = itemValidatePaymentOfTransfer.ErrorCode,
+                                    ErrorMessage = itemValidatePaymentOfTransfer.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+
                     }
                     break;
                 case (int)EventStatus.PaymentOfTransferEconomicRights:
@@ -5959,7 +5976,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     {
                         LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
                         var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
-                        //validateE(documentMeta);
+                        
                         if (eventRadianPaymentInfo != null)
                         {
                             foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
@@ -5973,7 +5990,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                        }
+                        }                       
+
                     }
                     break;
 
