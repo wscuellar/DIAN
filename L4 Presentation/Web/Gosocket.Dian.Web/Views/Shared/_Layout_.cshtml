@@ -75,10 +75,24 @@
 
         ul#mainnav-menu .menu-title {
             margin-left: 26px;
+            font-family: 'Ubuntu';
+            font-size: 14px;
+            color: #2b323d;
         }
 
         ul#mainnav-menu .arrow {
-            margin-top: 8px;
+            margin-top: 10px;
+        }
+
+        #mainnav li .arrow:before {
+            border-color: #2b323d;
+            height: 0.6em !important;
+            width: 0.6em !important;
+            transform: rotate(-45deg) !important;
+        }
+
+        #mainnav li.active > a > .arrow:before {
+            transform: rotate(135deg) !important;
         }
 
         ul#mainnav-menu ul a:hover {
@@ -113,8 +127,18 @@
         }
 
         .mainnav-md #mainnav-container span.menu-title,
-        .mainnav-md #mainnav-container i.arrow {
+        .mainnav-md #mainnav-container i.arrow,
+        .mainnav-md #mainnav-container i#close-menu-button {
             display: none;
+        }
+
+        .mainnav-lg #mainnav-container #mainnav-toggle {
+            display: none;
+        }
+        .mainnav-lg #mainnav-container .list-header .menu-title {
+            text-transform: initial !important;
+            margin-left: 0 !important;
+            font-size: 16px !important;
         }
 
         #content-container {
@@ -152,9 +176,28 @@
         #close-session-button {
             border-top: 1px solid #ccc;
         }
+
+        #close-menu-button {
+            font-size: 18px;
+        }
+
+        #mainnav .list-header {
+            display: flex;
+            align-items: center;
+        }
+        #mainnav .list-header a {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #content-container,
+        body {
+            background: #F6F7F9 !important;
+        }
     </style>
 </head>
-<body>
+<body bgcolor="F6F7F9">
     @{
         string mainTitle = string.Empty;
         if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
@@ -284,8 +327,12 @@
 
                                     <!--Category name-->
                                     <li class="list-header">
-                                        <a id="mainnav-toggle" href="#">
-                                            <img src="~/Content/img/lateral-menu-icons/hamburguerMenu.svg" />
+                                        <a href="#">
+                                            <img id="mainnav-toggle" src="~/Content/img/lateral-menu-icons/hamburguerMenu.svg" />
+                                            <span class="menu-title">
+                                                Menú
+                                            </span>
+                                            <i id="close-menu-button" class="fa fa-times"></i>
                                         </a>
                                     </li>
                                     <li class="list-divider"></li>
@@ -823,9 +870,15 @@
         }
 
         $(document).ready(function () {
+            $(".list-header").find("a").click(function (e) {
+                e.preventDefault();
+            })
             window.setTimeout(() => {
                 $("#mainnav-toggle").click();
             }, 200)
+            $("#close-menu-button").click(function () {
+                $("#mainnav-toggle").click();
+            })
 
             var free = "@Session["ShowFree"]";
             if (free == "1")
