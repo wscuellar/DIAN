@@ -432,7 +432,7 @@ namespace Gosocket.Dian.Functions.Batch
 								{
 									byte[] xmlBytesEvent = null;
 									var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
-									if (processRegistrateComplete.Code == "100")
+									if (processRegistrateComplete.Code == "100" && !String.IsNullOrEmpty(processRegistrateComplete.XmlBytesBase64))
 									{
 										xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
 										appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
@@ -460,7 +460,7 @@ namespace Gosocket.Dian.Functions.Batch
 								{
 									byte[] xmlBytesEvent = null;
 									var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
-									if (processRegistrateComplete.Code == "100")
+									if (processRegistrateComplete.Code == "100" && !String.IsNullOrEmpty(processRegistrateComplete.XmlBytesBase64))
 									{
 										xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
 										appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });

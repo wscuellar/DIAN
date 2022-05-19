@@ -358,6 +358,15 @@ namespace Gosocket.Dian.Common.Resources {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ¡Esta operación no está permitida en el ambiente de producción!.
+        /// </summary>
+        public static string OperationNotAllowedInProduction {
+            get {
+                return ResourceManager.GetString("OperationNotAllowedInProduction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Modo de operación adicionado correctamente.
         /// </summary>
         public static string OtherDocEleSuccesModeOperation {
