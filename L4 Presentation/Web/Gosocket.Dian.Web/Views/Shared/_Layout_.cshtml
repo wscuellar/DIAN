@@ -60,9 +60,18 @@
     @RenderSection("css", required: false)
     @Scripts.Render("~/bundles/modernizr")
     <style>
+        .nano > .nano-content {
+            bottom: 100px;
+        }
+
         ul#mainnav-menu li:not(li.list-divider) {
             min-height: 92px;
-            padding: 26px;
+            padding: 26px !important;
+            transition: none !important;
+        }
+
+        ul#mainnav-menu li:hover:not(li.list-header) {
+            background: #F0F2F4;
         }
 
         ul#mainnav-menu li a {
@@ -80,6 +89,11 @@
             color: #2b323d;
         }
 
+        ul#mainnav-menu li:not(.list-header):hover .menu-title {
+            font-weight: bold;
+            color: #00B4DC;
+        }
+
         ul#mainnav-menu .arrow {
             margin-top: 10px;
         }
@@ -88,10 +102,12 @@
             border-color: #2b323d;
             height: 0.6em !important;
             width: 0.6em !important;
+            border-width: .2em .2em 0 0;
             transform: rotate(-45deg) !important;
         }
 
         #mainnav li.active > a > .arrow:before {
+            border-color: #fff !important;
             transform: rotate(135deg) !important;
         }
 
@@ -103,15 +119,9 @@
             display: flex;
             align-items: center;
             padding: 0 0 26px 0 !important;
+            font-family: 'Ubuntu';
+            font-size: 14px;
         }
-
-            ul.collapse.in li:first-child {
-                padding-top: 26px !important;
-            }
-
-            ul.collapse.in li:last-child {
-                padding-bottom: 0 !important;
-            }
 
         ul#mainnav-menu .list-divider {
             margin: 0;
@@ -195,6 +205,23 @@
         body {
             background: #F6F7F9 !important;
         }
+        /**Estilos para la navbar cuando esta un item activo**/
+        ul#mainnav-menu li.active {
+            background: linear-gradient(90deg, rgba(0,180,220,1) 0%, 
+                rgba(15,187,203,1) 50%, 
+                rgba(65,215,140,1) 100%) !important;
+        }
+        ul#mainnav-menu li.active img {
+            filter: invert(1) brightness(10);
+        }
+        ul#mainnav-menu li.active .menu-title {
+            color: #fff !important;
+            font-weight: bold;
+        }
+        ul#mainnav-menu li.active ul.collapse {
+            background: #fff !important;
+            margin: 26px -20px -26px -26px !important;
+        }
     </style>
 </head>
 <body bgcolor="F6F7F9">
@@ -243,13 +270,13 @@
 
                 <ul id="right-nav" class="nav navbar-top-links pull-right">
                     @*@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
-                    {
-                        <li id="dropdown" class="dropdown">
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                <div class="username">@contributorName</div>
-                            </a>
-                        </li>
-                    }*@
+                        {
+                            <li id="dropdown" class="dropdown">
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                    <div class="username">@contributorName</div>
+                                </a>
+                            </li>
+                        }*@
                     <li id="dropdown" class="dropdown">
                         <a id="user-info" href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
                             <img height="36" src="~/Content/img/user-icon.svg" alt="UserName">
@@ -313,7 +340,6 @@
             </div>
             <!--===================================================-->
             <!--END CONTENT CONTAINER-->
-
             <!--NAVBAR-->
             <!--===================================================-->
             <nav id="mainnav-container" style="min-width:92px; padding-top:0;">
@@ -438,7 +464,7 @@
 
                                             }
                                             @*Rol Administrador
-                                        Rol Facturador and Proveedor*@
+                                                Rol Facturador and Proveedor*@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
 
@@ -459,32 +485,32 @@
 
 
                                                 @*if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
-                                                    {
-                                                        <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-                                                    }
+                                                            {
+                                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                            }
 
-                                                }
-                                            <!--Rol Facturador and Proveedor-->
-                                            <!--Rol Proveedor-->
-                                            <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
-                                            {
-                                                <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("Check", "Contributor")">Proveedor Tecnológico</a></li>
-                                                <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
-                                            }-->
-                                            <!--Rol Proveedor-->
-                                            <!--  RADIAN -->
-                                            <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
-                                            {
-                                                <li id="@Navigation.NavigationEnum.RADIAN">
-                                                    <a href="@Url.Action("Index", "Radian")">RADIAN</a>
-                                                </li>
-                                            }-->
-                                            <!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
-                                            <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
-                                                {
-                                                    <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
-                                                        <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
-                                                    </li>*@
+                                                        }
+                                                    <!--Rol Facturador and Proveedor-->
+                                                    <!--Rol Proveedor-->
+                                                    <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("Check", "Contributor")">Proveedor Tecnológico</a></li>
+                                                        <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
+                                                    }-->
+                                                    <!--Rol Proveedor-->
+                                                    <!--  RADIAN -->
+                                                    <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.RADIAN">
+                                                            <a href="@Url.Action("Index", "Radian")">RADIAN</a>
+                                                        </li>
+                                                    }-->
+                                                    <!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
+                                                    <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                                        {
+                                                            <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
+                                                                <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
+                                                            </li>*@
                                             }
 
                                         </ul>
@@ -527,23 +553,23 @@
 
                                     <!--Rol Administrador-->
                                     @*@if (User.IsInAnyRole("Administrador", "Super"))
-                                    {
-                                <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
-                                    <a href="@Url.Action("AddUser", "ExternalUsers")">
-                                        <i class="fa fa-user-circle-o"></i>
-                                        <span class="menu-title">
-                                            Crear Usuario
-                                        </span>
-                                    </a>
-                                </li>
-                                }*@
+                                            {
+                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
+                                            <a href="@Url.Action("AddUser", "ExternalUsers")">
+                                                <i class="fa fa-user-circle-o"></i>
+                                                <span class="menu-title">
+                                                    Crear Usuario
+                                                </span>
+                                            </a>
+                                        </li>
+                                        }*@
                                     @*<li id="@Navigation.NavigationEnum.BigContributors">
-                                     @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
-                                     {
-                                         <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-                                     }
+                                             @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                             {
+                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                             }
 
-                                </li>*@
+                                        </li>*@
 
 
                                     <!--Rol Administrador-->
@@ -672,7 +698,6 @@
             </nav>
             <!--===================================================-->
             <!--END NAVBAR-->
-            
             <!--ASIDE-->
             <!--===================================================-->
             <aside id="aside-container">
@@ -730,6 +755,8 @@
     </div>
 
     @Html.Partial("_ConfirmModal")
+
+    @Html.Partial("_LoadingPage")
     <!--===================================================-->
     <!-- END OF CONTAINER -->
     <!--JAVASCRIPT-->
@@ -872,13 +899,25 @@
         $(document).ready(function () {
             $(".list-header").find("a").click(function (e) {
                 e.preventDefault();
-            })
+            });
+
             window.setTimeout(() => {
                 $("#mainnav-toggle").click();
-            }, 200)
+            }, 200);
+
             $("#close-menu-button").click(function () {
+                $("#mainnav li.active").find("ul.collapse").removeClass("in");
+                $("#mainnav li.active").removeClass("active");
+
                 $("#mainnav-toggle").click();
-            })
+            });
+
+            $("#mainnav").find(".parent-link").click(function () {
+                const navbarIsCollapsible = $("body").find(".mainnav-md").length > 0;
+                if (navbarIsCollapsible) {
+                    $("#mainnav-toggle").click();
+                }
+            });
 
             var free = "@Session["ShowFree"]";
             if (free == "1")
@@ -893,6 +932,7 @@
         });
 
     </script>
+
     @if (Session["ShowFree"] == "1")
     {
         Session["ShowFree"] = "2";
