@@ -38,9 +38,11 @@
 
 </div>
 <div class="row">
-    <div class="alert custom-alert-primary" role="alert">
-        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+    <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block;">
+        <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" aria-hidden"true"="" style="margin:0px 10px;"></i><b>Importante!</b></h4>
         @Html.Raw(resolutionGloss)
-        <strong><a class="custom-alert-link" href="@Url.Action("DownloadResolutions", "Contributor")">Para mayor información descargue la resolución aquí.</a></strong>
+        <p style="margin: 0px 45px;">
+            <strong><a class="custom-alert-link" href="@Url.Action("DownloadResolutions", "Contributor")">Para mayor información descargue la resolución aquí.</a></strong>
+        </p>
     </div>
 </div>

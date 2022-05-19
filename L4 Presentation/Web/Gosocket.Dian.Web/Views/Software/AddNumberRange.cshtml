@@ -65,13 +65,13 @@
                                             </div>
                                         @*</div>
                                         <div class="row">*@
-                                            <div class="col-sm-5 padding-xs-0">
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.Softwares, new { @class = "control-label" })
                                                     @Html.DropDownListFor(m => m.SoftwareId, new SelectList(Model.Softwares.OrderBy(s => s.Name), "Id", "Name", Model.SoftwareId), "Seleccione...", new { @class = "form-control" })
                                                 </div>
                                             </div>
-                                            <div class="col-sm-4 padding-xs-0">
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.Prefixes, new { @class = "control-label" })
                                                     @Html.DropDownListFor(m => m.NumberRangeRowKey, new SelectList(Model.Prefixes.OrderBy(s => s.Serie), "RowKey", "Serie", Model.NumberRangeRowKey), "Seleccione...", new { @class = "form-control" })
