@@ -98,6 +98,7 @@ namespace Gosocket.Dian.Plugin.Functions.Models
             signingTime.DocumentTypeId = eventRadian.DocumentTypeId;
             signingTime.CustomizationID = eventRadian.CustomizationId;
             signingTime.EndDate = eventRadian.EndDate;
+            signingTime.TrackIdcude = eventRadian.TrackIdCude;
         }
     }
 }

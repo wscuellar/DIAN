@@ -79,6 +79,8 @@ namespace Gosocket.Dian.Plugin.Functions.SigningTime
         public string CustomizationID { get; set; }
         [JsonProperty(PropertyName = "EndDate")]
         public string EndDate { get; set; }
+        [JsonProperty(PropertyName = "trackIdCude")]
+        public string TrackIdcude { get; set; }
 
         public RequestObjectSigningTime()
         {

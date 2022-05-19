@@ -5417,8 +5417,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad ||
                        Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoGarantia ||
-                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion ||
-                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TransferEconomicRights)
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion)
                     {
                         //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                         if (documentMetaRef.ReceiverCode != documentMeta.IssuerPartyCode)
@@ -5444,27 +5443,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
-                        //Actualiza estado factura transaccion solo para endosos
-                        if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.TransferEconomicRights)
+                       
+                        var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
+                        if (responseListEndoso != null)
                         {
-                            var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
-                            if (responseListEndoso != null)
+                            foreach (var item in responseListEndoso)
                             {
-                                foreach (var item in responseListEndoso)
+                                responses.Add(new ValidateListResponse
                                 {
-                                    responses.Add(new ValidateListResponse
-                                    {
-                                        IsValid = item.IsValid,
-                                        Mandatory = item.Mandatory,
-                                        ErrorCode = item.ErrorCode,
-                                        ErrorMessage = item.ErrorMessage,
-                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                    });
-                                }
+                                    IsValid = item.IsValid,
+                                    Mandatory = item.Mandatory,
+                                    ErrorCode = item.ErrorCode,
+                                    ErrorMessage = item.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
                             }
-                        }
-                        
+                        }                                                
                     }
                 }
                 else
@@ -6223,7 +6217,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = errorCodeRef,
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6235,7 +6229,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             IsValid = false,
                             Mandatory = true,
                             ErrorCode = errorCodeRef,
-                            ErrorMessage = errorMessageSign,
+                            ErrorMessage = errorMesaageRef,
                             //ErrorMessage = errorMesaageRef,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6256,7 +6250,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24z",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6278,7 +6272,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24c",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6290,7 +6284,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24e",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -6379,7 +6373,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24h",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -6401,7 +6395,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "AAH59",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -6436,7 +6430,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24t",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -6456,7 +6450,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "DC24t",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         }
@@ -6478,7 +6472,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = true,
                            Mandatory = true,
-                           ErrorCode = "100",
+                           ErrorCode = "DC24g",
                            ErrorMessage = errorMessageSign,
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        }
@@ -6509,7 +6503,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                        {
                            IsValid = true,
                            Mandatory = true,
-                           ErrorCode = "100",
+                           ErrorCode = "DC24x",
                            ErrorMessage = errorMessageSign,
                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                        }
@@ -6533,7 +6527,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             IsValid = true,
                             Mandatory = true,
-                            ErrorCode = "100",
+                            ErrorCode = "AAH59",
                             ErrorMessage = errorMessageSign,
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6645,7 +6639,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "100",
+                                ErrorCode = "DC24s",
                                 ErrorMessage = errorMessageSign,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -6654,7 +6648,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             responses.Add(new ValidateListResponse
                             {
-                                IsValid = true,
+                                IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "DC24s",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24s"),
@@ -6672,7 +6666,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             {
                                 IsValid = true,
                                 Mandatory = true,
-                                ErrorCode = "100",
+                                ErrorCode = "DC24s",
                                 ErrorMessage = errorMessageSign,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
@@ -6681,7 +6675,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         {
                             responses.Add(new ValidateListResponse
                             {
-                                IsValid = true,
+                                IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "DC24s",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24s"),
@@ -6700,6 +6694,59 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+                    break;
+                case (int)EventStatus.TransferEconomicRights:                   
+                    DateTime responseEffectiveDate = Convert.ToDateTime(nitModel.ResponseEffectiveDate).Date;
+                    if(responseEffectiveDate > signingTimeEvent)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH34b",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH34b"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH34b",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
+                    DateTime transferPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime paymentDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+
+                    if(transferPaymentDueDate == paymentDueDateInvoice)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     break;
             }
 
@@ -7454,7 +7501,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public async Task<List<ValidateListResponse>> RequestValidateSigningTimeAsync(RequestObjectSigningTime data, GlobalDocValidatorDocumentMeta documentMetaRef)
         {
             var validateResponses = new List<ValidateListResponse>();
-            string originalTrackId = data.TrackId;
+            string originalTrackId = data.TrackId;            
             string parameterPaymentDueDateFE = null;
             ValidatorEngine validatorEngine = new ValidatorEngine();
             List<InvoiceWrapper> InvoiceWrapper = new List<InvoiceWrapper>();
@@ -7595,19 +7642,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
-                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion)
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.TransferEconomicRights
+                )
             {
 
                 documentMetaOriginal = originalTrackId == data.TrackId ? documentMeta : documentMetaRef;
 
                 if (string.IsNullOrEmpty(documentMetaOriginal.PaymentDueDate))
                 {
+                   
                     var originalXmlBytes = await validatorEngine.GetXmlFromStorageAsync(originalTrackId);
                     var originalXmlParser = new XmlParser(originalXmlBytes);
                     if (!originalXmlParser.Parser())
                         throw new Exception(originalXmlParser.ParserError);
 
                     parameterPaymentDueDateFE = originalXmlParser.PaymentDueDate;
+                    nitModel = originalXmlParser.Fields.ToObject<NitModel>();
 
                     //actualizar en GlobalDocValidatorDocumentMeta el campo en la documentMeta
                     UpdateInPaymentDueDate(documentMetaOriginal, parameterPaymentDueDateFE);
@@ -7617,6 +7668,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     parameterPaymentDueDateFE = documentMetaOriginal.PaymentDueDate;
                 }
             }
+
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.TransferEconomicRights)
+            {
+                var originalXmlBytes = await validatorEngine.GetXmlFromStorageAsync(data.TrackIdcude);
+                var originalXmlParser = new XmlParser(originalXmlBytes);
+                if (!originalXmlParser.Parser())
+                    throw new Exception(originalXmlParser.ParserError);
+
+                nitModel = originalXmlParser.Fields.ToObject<NitModel>();
+            }
+
+
 
             nitModel.CustomizationId = documentMeta.CustomizationID;
             nitModel.ValidityPeriodEndDate = documentMeta.ValidityPeriodEndDate;

@@ -50,6 +50,7 @@
         public string SenderPartyPersonID { get; set; }
         public string InformacionTransferenciaDerechos { get; set; }
         public string InformacionPagoTransferencia { get; set; }
+        public string ResponseEffectiveDate { get; set; }
 
         public NitModel() { }
 
