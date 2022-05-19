@@ -102,7 +102,7 @@
             }
 
             if ('@ConfigurationManager.GetValue("Environment")' == 'Test' || '@ConfigurationManager.GetValue("Environment")' == 'Hab') {
-                if (@User.ContributorTypeId() === @((int)ContributorType.Biller) || @User.ContributorTypeId() === @((int)ContributorType.Provider)) {
+                if (@Model.ContributorTypeId === @((int)ContributorType.Biller) || @Model.ContributorTypeId === @((int)ContributorType.Provider)) {
                     if ('@User.IsInAnyRole("Administrador", "Super")' === 'False' && @Model.ContributorAcceptanceStatusId === @((int)ContributorStatus.Enabled) && '@Model.ContributorProductionDate' === '') {
 
                         showRegisterProductionDateModal();
