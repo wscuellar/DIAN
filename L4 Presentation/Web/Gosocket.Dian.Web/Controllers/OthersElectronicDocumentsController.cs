@@ -1,4 +1,5 @@
 ﻿using Gosocket.Dian.Application;
+using Gosocket.Dian.Application.FreeBillerSoftwares;
 using Gosocket.Dian.Common.Resources;
 using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Domain;
@@ -14,6 +15,8 @@ using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +45,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IContributorOperationsService _contributorOperationsService;
         private readonly ITestSetOthersDocumentsResultService _testSetOthersDocumentsResultService;
         private readonly IEquivalentElectronicDocumentRepository _equivalentElectronicDocumentRepository;
+        private readonly TelemetryClient _telemetry;
+        private readonly IGlobalOtherDocElecOperationService _globalOtherDocElecOperationService;
 
         public OthersElectronicDocumentsController(IOthersElectronicDocumentsService othersElectronicDocumentsService,
             IOthersDocsElecContributorService othersDocsElecContributorService,
@@ -50,7 +55,9 @@ namespace Gosocket.Dian.Web.Controllers
             IOthersDocsElecSoftwareService othersDocsElecSoftwareService,
             IContributorOperationsService contributorOperationsService,
             ITestSetOthersDocumentsResultService testSetOthersDocumentsResultService,
-            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository)
+            IEquivalentElectronicDocumentRepository equivalentElectronicDocumentRepository,
+            TelemetryClient telemetry, 
+            IGlobalOtherDocElecOperationService globalOtherDocElecOperationService)
         {
             _othersElectronicDocumentsService = othersElectronicDocumentsService;
             _othersDocsElecContributorService = othersDocsElecContributorService;
@@ -60,6 +67,8 @@ namespace Gosocket.Dian.Web.Controllers
             _contributorOperationsService = contributorOperationsService;
             _equivalentElectronicDocumentRepository = equivalentElectronicDocumentRepository;
             _testSetOthersDocumentsResultService = testSetOthersDocumentsResultService;
+            _telemetry = telemetry;
+            _globalOtherDocElecOperationService = globalOtherDocElecOperationService;
         }
 
         /// <summary>
@@ -395,6 +404,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> AddOrUpdateContributor(OthersElectronicDocumentsViewModel model)
         {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                return Json(new ResponseMessage(
+                    TextResources.OperationNotAllowedInProduction,
+                    TextResources.alertType, 500),
+                    JsonRequestBehavior.AllowGet);
+            }
+
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = model.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
@@ -445,6 +462,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             var now = DateTime.Now;
+            string freeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocumentId);
 
             OtherDocElecContributor otherDocElecContributor = _othersDocsElecContributorService
                 .CreateContributorNew(
@@ -472,7 +490,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,
-                SoftwareId = model.OperationModeSelectedId != "3" ? new Guid(model.SoftwareId) : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeSelectedId != "3" ? new Guid(model.SoftwareId) : new Guid(freeBillerSoftwareId),
                 OtherDocElecContributorId = int.Parse(ContributorId)
             };
 
@@ -523,6 +541,11 @@ namespace Gosocket.Dian.Web.Controllers
                     ContributorTypeId: model.ContributorIdType,
                     actualState: OtherDocElecState.Registrado.GetDescription(),
                     description: string.Empty);
+
+            if(contributorIsOfe && electronicDocumentIsSupport)
+            {
+                await SycnToProductionElectronicDocument(otherDocElecContributor, software);
+            }
 
             if (electronicDocumentIsSupport || model.ElectronicDocumentIsEquivalent)
             {
@@ -1045,6 +1068,44 @@ namespace Gosocket.Dian.Web.Controllers
 
 
             return Json(response, JsonRequestBehavior.AllowGet);
+        }
+    
+        
+        /*********************************/
+        private async Task SycnToProductionElectronicDocument(OtherDocElecContributor otherDocContributor, OtherDocElecSoftware software)
+        {
+            var contributor = _contributorService.Get(otherDocContributor.ContributorId);
+            var globalOperation = _globalOtherDocElecOperationService.GetOperation(contributor.Code, software.SoftwareId);
+            var testSetResult = _testSetOthersDocumentsResultService.GetTestSetResult(contributor.Code, $"{globalOperation.OperationModeId}|{software.SoftwareId}");
+
+            var request = new OtherDocumentActivationRequest();
+            request.Code = contributor.Code;
+            request.ContributorId = otherDocContributor.ContributorId;
+            request.ContributorTypeId = int.Parse(testSetResult.ContributorTypeId);
+            request.Pin = software.Pin;
+            request.SoftwareId = software.SoftwareId.ToString();
+            request.SoftwareName = software.Name;
+            request.SoftwarePassword = software.SoftwarePassword;
+            request.SoftwareType = globalOperation.OperationModeId.ToString();
+            request.SoftwareUser = software.SoftwareUser;
+            request.Url = software.Url;
+            request.Enabled = true;
+            request.TestSetId = testSetResult.Id;
+            request.ContributorOpertaionModeId = globalOperation.OperationModeId;
+            request.OtherDocElecContributorId = testSetResult.OtherDocElecContributorId;
+            request.ElectronicDocumentId = testSetResult.ElectronicDocumentId;
+
+            var function = ConfigurationManager.GetValue("SendToActivateOtherDocumentContributorUrl");
+            var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, request);
+
+            if (!response.Success)
+            {
+                _telemetry.TrackTrace($"Fallo en la sincronización del Code {contributor.Code}:  Mensaje: {response.Message} ", SeverityLevel.Error);
+            }
+            else
+            {
+                _telemetry.TrackTrace($"Se sincronizó el Code {contributor.Code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
+            }
         }
     }
 }

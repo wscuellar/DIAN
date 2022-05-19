@@ -1,4 +1,5 @@
-﻿using Gosocket.Dian.Domain.Common;
+﻿using Gosocket.Dian.Application.FreeBillerSoftwares;
+using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Functions.Common;
@@ -415,7 +416,10 @@ namespace Gosocket.Dian.Functions.Batch
 						{
 							if (validateDocumentUrl)
 							{
-								if (softwareIdNomina == ConfigurationManager.GetValue("BillerSoftwareId"))
+								var documentTypeId = !string.IsNullOrWhiteSpace(xmlParser.globalDocPayrolls.CUNEPred)
+								? "103" : "102";
+								var freeBillerSoftwareId = FreeBillerSoftwareService.Get(documentTypeId);
+								if (softwareIdNomina == freeBillerSoftwareId)
 								{
 
 									ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegisterCompletedPayrollCosmosUrl"), new { TrackId = trackId });
@@ -428,7 +432,7 @@ namespace Gosocket.Dian.Functions.Batch
 								{
 									byte[] xmlBytesEvent = null;
 									var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
-									if (processRegistrateComplete.Code == "100")
+									if (processRegistrateComplete.Code == "100" && !String.IsNullOrEmpty(processRegistrateComplete.XmlBytesBase64))
 									{
 										xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
 										appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });
@@ -456,7 +460,7 @@ namespace Gosocket.Dian.Functions.Batch
 								{
 									byte[] xmlBytesEvent = null;
 									var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedRadianUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
-									if (processRegistrateComplete.Code == "100")
+									if (processRegistrateComplete.Code == "100" && !String.IsNullOrEmpty(processRegistrateComplete.XmlBytesBase64))
 									{
 										xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
 										appResponses.Add(new ResponseApplicationResponse { DocumentKey = trackId, Content = xmlBytesEvent, Success = true });

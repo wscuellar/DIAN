@@ -1049,7 +1049,7 @@ namespace Gosocket.Dian.Web.Services
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public DianResponse GetStatusBulkDocumentDownload(string trackId)
+        public DianResponseBulkDocumentDownload GetStatusBulkDocumentDownload(string trackId)
         {
             try
             {
@@ -1057,12 +1057,12 @@ namespace Gosocket.Dian.Web.Services
                 var email = GetAuthEmail();
 
                 if (string.IsNullOrEmpty(authCode))
-                    return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
+                    return new DianResponseBulkDocumentDownload { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
 
                 if (string.IsNullOrWhiteSpace(trackId))
                 {
                     Log($"{authCode} {email} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, "El trackId de la solciitud es obligatorio.");
-                    return new DianResponse { StatusCode = "89", StatusDescription = "El trackId de la solciitud es obligatorio." };
+                    return new DianResponseBulkDocumentDownload { StatusCode = "89", StatusDescription = "El trackId de la solciitud es obligatorio." };
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
@@ -1091,7 +1091,7 @@ namespace Gosocket.Dian.Web.Services
                 Log($"{trackId} GetStatusBulkDocumentDownload", (int)InsightsLogType.Error, ex.Message);
                 var exception = new GlobalLogger($"GetStatusBulkDocumentDownloadException-{DateTime.UtcNow.ToString("yyyyMMdd")}", Guid.NewGuid().ToString()) { Action = $"GetStatusBulkDocumentDownload, trackId: {trackId}", Message = ex.Message, StackTrace = ex.StackTrace };
                 tableManagerGlobalLogger.InsertOrUpdate(exception);
-                return new DianResponse { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
+                return new DianResponseBulkDocumentDownload { StatusCode = "500", StatusDescription = $"Ha ocurrido un error. Por favor inténtentelo de nuevo.", IsValid = false };
             }
         }
     }

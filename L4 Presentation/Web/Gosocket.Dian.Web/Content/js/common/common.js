@@ -3,15 +3,17 @@
 });
 
 function hideLoading(target) {
-    $(target).niftyOverlay('hide');
+    hideDianLoading();
+    //$(target).niftyOverlay('hide');
 }
 
 function showLoading(target, title, message) {
-    $(target).niftyOverlay({
-        title: title + '...',
-        desc: message
-    });
-    $(target).niftyOverlay('show');
+    showDianLoading();
+    //$(target).niftyOverlay({
+    //    title: title + '...',
+    //    desc: message
+    //});
+    //$(target).niftyOverlay('show');
 }
 
 function showNotification(type, icon, panel, title, message) {

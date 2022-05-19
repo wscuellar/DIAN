@@ -629,12 +629,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
 
                     if (response.IsValid || applicationResponseExist)
-                    if (response.IsValid)
+                    //if (response.IsValid)
                     {
                         response.IsValid = true;
                         response.StatusCode = "00";
                         response.StatusMessage = message;
-                        response.StatusDescription = "Procesado Correctamente.";
+                        response.StatusDescription = "Procesado Correctamente.";                   
                     }
                     else
                     {
@@ -1810,10 +1810,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             return dianResponse;
         }
 
-        public DianResponse GetStatusBulkDocumentsDownload(string trackId)
+        public DianResponseBulkDocumentDownload GetStatusBulkDocumentsDownload(string trackId)
         {
             var timer = new Stopwatch();
-            DianResponse dianResponse = new DianResponse
+            DianResponseBulkDocumentDownload dianResponse = new DianResponseBulkDocumentDownload
             {
                 StatusCode = Properties.Settings.Default.Msg_Procees_Sucessfull,
                 StatusDescription = "",
@@ -1826,7 +1826,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.IsCorrect)
             {
                 dianResponse.StatusDescription = $"La solicitud {trackId} se encuentra en estado: {response.State}, {response.Response}";
-                dianResponse.UrlDescarga = response.UrlFileCsv;
+                //dianResponse.UrlDescarga = response.UrlFileCsv;
             }
             else
             {

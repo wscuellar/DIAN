@@ -1469,7 +1469,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if (contributorInvoice.ContributorTypeId == '1' || contributorInvoice.ContributorTypeId == 1)
+            if ((contributorInvoice.ContributorTypeId == '1' || contributorInvoice.ContributorTypeId == 1) && contributorInvoice.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1598,7 +1598,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (!ModelState.IsValid)
                 return View("NotObligedInvoice", model);
 
-            var user = userService.GetByCodeAndIdentificationTyte(model.PersonCode, model.IdentificationType);
+            var user =  userService.GetByCodeAndIdentificationTyte(model.PersonCode, model.IdentificationType);
             if (user == null)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "La persona no se encuentre registrada en el Rut.");
@@ -1618,7 +1618,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("NotObligedInvoice", model);
             }
 
-            if (contributor.ContributorTypeId == '1' || contributor.ContributorTypeId == 1)
+            if ((contributor.ContributorTypeId == '1' || contributor.ContributorTypeId == 1) && contributor.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso la persona ya se encuentra habilitada como facturador.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
