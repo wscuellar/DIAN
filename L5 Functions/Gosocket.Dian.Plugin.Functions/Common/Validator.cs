@@ -4313,10 +4313,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 ? "Número de la resolución que autoriza la numeración[x] corresponde a un número de resolución de este contribuyente emisor para este Proveedor de Autorización."
                 : "Número del formato 1876 informado[x] corresponde a un número de autorización de este ABS";
             
-            errorCodeA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS ? errorCodeA05b : "DEAB05b";
-            errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS
-                ? errorMessageA05b
-                : "Número de la autorización de la numeración[x] corresponde a un número de autorización de este contribuyente emisor para este Proveedor de Autorización";
+            //errorCodeA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS ? errorCodeA05b : "DEAB05b";
+            //errorMessageA05b = Convert.ToInt32(documentMeta.DocumentTypeId) != (int)DocumentType.EquivalentDocumentPOS
+            //    ? errorMessageA05b
+            //    : "Número de la autorización de la numeración[x] corresponde a un número de autorización de este contribuyente emisor para este Proveedor de Autorización";
 
             if (range.ResolutionNumber == invoiceAuthorization)
                 responses.Add(new ValidateListResponse
