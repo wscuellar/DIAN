@@ -6748,6 +6748,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     break;
+
+                case (int)EventStatus.NotificationDebtorOfTransferEconomicRights:
+
+                    //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
+                    DateTime notificationDebtorPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime notificationDebtorDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+
+                    if (notificationDebtorPaymentDueDate == notificationDebtorDueDateInvoice)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
             }
 
             return responses;
