@@ -5873,6 +5873,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                     break;
+                case (int)EventStatus.Objection:
+                    if (documentMeta != null)
+                    {                        
+                        var eventEmbeddedDocumentBinaryObject = ValidateEmbeddedDocument(xmlParserCude);
+                        if (eventEmbeddedDocumentBinaryObject != null)
+                        {
+                            foreach (var itemEventEmbeddedDocumentBinaryObject in eventEmbeddedDocumentBinaryObject)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemEventEmbeddedDocumentBinaryObject.IsValid,
+                                    Mandatory = itemEventEmbeddedDocumentBinaryObject.Mandatory,
+                                    ErrorCode = itemEventEmbeddedDocumentBinaryObject.ErrorCode,
+                                    ErrorMessage = itemEventEmbeddedDocumentBinaryObject.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    break;
                 case (int)EventStatus.TransferEconomicRights:
                     if (documentMeta != null)
                     {
@@ -5917,7 +5937,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
 
                     }
-                    break;
+                    break;                
 
             }
 
@@ -6624,6 +6644,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
+                    break;
+
+                case (int)EventStatus.Objection:
+
+                    //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
+                    DateTime objectionPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime objectionDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+
+                    if (objectionPaymentDueDate == objectionDueDateInvoice)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     break;
 
                 case (int)EventStatus.TransferEconomicRights:
@@ -7636,7 +7687,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoPropiedad
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndosoProcuracion
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificationDebtorOfTransferEconomicRights
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.TransferEconomicRights
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.Objection
                 )
             {
 
@@ -7662,7 +7716,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.TransferEconomicRights)
+            //Obtener informacion fecha del campo EffectiveDate CUDE 
+            if (Convert.ToInt32(data.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights)
             {
                 var originalXmlBytes = await validatorEngine.GetXmlFromStorageAsync(data.TrackIdcude);
                 var originalXmlParser = new XmlParser(originalXmlBytes);
@@ -7915,9 +7970,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 nitModel = xmlParserCude.Fields.ToObject<NitModel>();
             }
-
-            var validator = new Validator();
-            validateResponses.AddRange(validator.ValidateEmitionEventPrev(eventPrev, totalInvoice, xmlParserCude, nitModel));
+           
+            validateResponses.AddRange(ValidateEmitionEventPrev(eventPrev, totalInvoice, xmlParserCude, nitModel));
 
             return validateResponses;
         }
@@ -8036,6 +8090,17 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     validateResponses.AddRange(responses);
                 }
                
+                //Si es documento protesto
+                if(Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.Objection)
+                {
+                    var xmlBytes = await GetXmlFromStorageAsync(trackId);
+                    var xmlParser = new XmlParser(xmlBytes);
+                    if (!xmlParser.Parser())
+                        throw new Exception(xmlParser.ParserError);
+
+                    validatorDocumentNameSpaces(xmlBytes);
+                }
+
                 if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.Mandato)
                 {
                     EventRadianModel.SetValuesDocReference(ref eventRadian, docReference);
@@ -8367,6 +8432,66 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 responses = null;
 
             return responses;
+
+        }
+
+        #endregion
+
+        #region ValidateEmbeddedDocument
+
+        private List<ValidateListResponse> ValidateEmbeddedDocument(XmlParser xmlParserCude)
+        {
+            DateTime startDate = DateTime.UtcNow;            
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            _ns.AddNamespace("cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+            _ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+
+            XmlNodeList AttachmentBase64List = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", _ns);
+            bool validate = true;
+            if (AttachmentBase64List.Count > 0)
+            {
+                for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
+                {
+                    string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", _ns).Item(i)?.InnerText.ToString().Trim();
+
+                    if (!IsBase64(AttachmentBase64))
+                    {
+                        validate = false;
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAI84",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI84"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                    else
+                    {
+                        byte[] data = Convert.FromBase64String(AttachmentBase64);
+                        var mimeType = GetMimeFromBytes(data);
+                        if (mimeType != pdfMimeType)
+                        {
+                            validate = false;
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAI84",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI84"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(validate)
+                return responses;
+
+            return null;
 
         }
 
