@@ -424,11 +424,12 @@ namespace Gosocket.Dian.Web.Controllers
 
             if (model.OperationModeSelectedId == "3")
             {
+                var freeBillerSoftwarePin = ConfigurationManager.GetValue("BillerSoftwarePin") ?? "0000";
                 Guid g = Guid.NewGuid();
                 model.OperationModeId = (int)Domain.Common.OtherDocElecOperationMode.FreeBiller;
                 model.SoftwareName = "Solución gratuita";
                 model.SoftwareId = !string.IsNullOrWhiteSpace(model.SoftwareIdPr) ? model.SoftwareIdPr : g.ToString();
-                model.PinSW = !string.IsNullOrWhiteSpace(model.PinSW) ? model.PinSW : "0000";
+                model.PinSW = !string.IsNullOrWhiteSpace(model.PinSW) ? model.PinSW : freeBillerSoftwarePin;
             }
 
             if (model.SoftwareId == null)
