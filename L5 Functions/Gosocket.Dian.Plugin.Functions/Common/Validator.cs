@@ -2905,155 +2905,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
         }
-        #endregion       
-
-        #region ValidateEndoso
-        private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode, double newAmountTV)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            //valor total Endoso Electronico AR
-            string valueTotalEndoso = nitModel.ValorTotalEndoso;
-            string valuePriceToPay = nitModel.PrecioPagarseFEV;
-            string valueDiscountRateEndoso = nitModel.TasaDescuento;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-            bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
-
-            //Valida informacion Endoso en propiedad                       
-            if ((Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad))
-            {
-                //Valida informacion Endoso                           
-                if (String.IsNullOrEmpty(valuePriceToPay) || String.IsNullOrEmpty(valueDiscountRateEndoso))
-                {
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateManadatory,
-                        ErrorCode = "AAI07b",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    return responses;
-                }
-
-                //Calculo valor de la negociación
-                int resultNegotiationValue = (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - Int32.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
-                resultNegotiationValue = resultNegotiationValue / 100;
-
-                //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-                if (Int32.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
-                {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateManadatory,
-                        ErrorCode = "AAI07b",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-            }
-
-            if (xmlParserCude.Fields["listID"].ToString() != "2")
-            {
-                XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueSender = 0;
-                for (int i = 0; i < valueListSender.Count; i++)
-                {
-                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
-
-                XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                int totalValueReceiver = 0;
-                for (int i = 0; i < valueListReceiver.Count; i++)
-                {
-                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueReceiver += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
-
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
-                {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateManadatory,
-                        ErrorCode = "AAF19",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                if (Int32.Parse(valueTotalEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
-                {
-                    validEndoso = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateManadatory,
-                        ErrorCode = "AAG20",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-            }
-
-            if (validEndoso)
-                return responses;
-
-            return null;
-        }
-        #endregion
-
-        #region ValidateEndosoNota
-        private List<ValidateListResponse> ValidateEndosoNota(List<GlobalDocValidatorDocumentMeta> documentMetaList, XmlParser xmlParserCude, string eventCode)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;
-
-            if (eventCode == "040")
-            {
-                // busca un Endoso en Procuración...
-                var documentMeta = documentMetaList.Where(x => x.EventCode == "039").OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
-                if (documentMeta != null)
-                {
-                    var document = documentValidatorTableManager.Find<GlobalDocValidatorDocument>(documentMeta.Identifier, documentMeta.Identifier);
-                    if (document == null)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "AAH07",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                        return responses;
-                    }
-
-                    if (string.IsNullOrWhiteSpace(xmlParserCude.NoteMandato))
-                    {
-                        validEndoso = true;
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "AAD11a",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAD11a_040"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                }
-            }
-
-            if (validEndoso)
-                return responses;
-
-            return null;
-        }
         #endregion
 
         #region ValidateFacultityAttorney
@@ -5127,8 +4978,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad ||
                        Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia ||
-                       Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+                       Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion ||
+                       Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
                     {
+                        string message_endoso = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
+                           ? ConfigurationManager.GetValue("ErrorMessage_AAH25b_047")
+                           : ConfigurationManager.GetValue("ErrorMessage_AAH25b");
+
                         //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                         if (documentMeta.ReceiverCode != issuerPartyCode)
                         {
@@ -5149,7 +5005,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAH25b",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH25b"),
+                                ErrorMessage =  message_endoso,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -5361,8 +5217,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad ||
                        Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoGarantia ||
                        Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion ||
-                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TransferEconomicRights)
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TransferEconomicRights ||
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
                     {
+                        string message_endoso = (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
+                           ? ConfigurationManager.GetValue("ErrorMessage_AAH25b_047")
+                           : ConfigurationManager.GetValue("ErrorMessage_AAH25b");
+
                         //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                         if (documentMetaRef.ReceiverCode != documentMeta.IssuerPartyCode)
                         {
@@ -5383,7 +5244,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 IsValid = false,
                                 Mandatory = true,
                                 ErrorCode = "AAH25b",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH25b"),
+                                ErrorMessage = message_endoso,
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
@@ -6646,6 +6507,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
                     break;
 
+                case (int)EventStatus.EndorsementWithEffectOrdinaryAssignment:
+
+                    //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
+                    DateTime endorsementPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime endorsementDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+
+                    if (endorsementPaymentDueDate == endorsementDueDateInvoice)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+
                 case (int)EventStatus.Objection:
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
@@ -7691,6 +7583,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.NotificationDebtorOfTransferEconomicRights
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.TransferEconomicRights
                 || Convert.ToInt32(data.EventCode) == (int)EventStatus.Objection
+                || Convert.ToInt32(data.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
                 )
             {
 
