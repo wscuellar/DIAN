@@ -879,8 +879,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				var soft = info.Descendants().Elements(def + "Value").ToArray();
 				if (soft.Count() > 0)
 				{
-					Html = Html.Replace("{CodigoComprador}", soft[1].Value);
-					Html = Html.Replace("{NombresComprador}", soft[0].Value);
+					Html = Html.Replace("{CodigoComprador}", soft[0].Value);
+					Html = Html.Replace("{NombresComprador}", soft[1].Value);
 					Html = Html.Replace("{Puntos}", soft[2].Value);
 				}
 			}
