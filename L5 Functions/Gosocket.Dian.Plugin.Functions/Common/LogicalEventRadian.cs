@@ -2365,16 +2365,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             switch (Convert.ToInt32(eventCode))
             {
-                case (int)EventStatus.TransferEconomicRights:
-                    valueTotalElements = nitModel.InformacionTransferenciaDerechos;
-                    break;
-                case (int)EventStatus.PaymentOfTransferEconomicRights:
-                    valueTotalElements = nitModel.InformacionPagoTransferencia;
-                    validaPago = true;
-                    break;
                 case (int)EventStatus.EndorsementWithEffectOrdinaryAssignment:
                     valueTotalElements = nitModel.ValorTotalEndoso;
                     break;
+                case (int)EventStatus.TransferEconomicRights:
+                    valueTotalElements = nitModel.InformacionTransferenciaDerechos;
+                    break;                               
                 default:
                     break;
             }
@@ -2383,58 +2379,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             bool validElements = false;
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateElementsSum"), out bool ValidateElementsSum);
 
-            if (validaPago)
+                        XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
             {
-                //AAF19b
-                //AAF19c
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
-            else
+
+            XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueReceiver = 0;
+            for (int i = 0; i < valueListReceiver.Count; i++)
             {
-                XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-                double totalValueSender = 0;
-                for (int i = 0; i < valueListSender.Count; i++)
-                {
-                    string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
-
-                XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
-                double totalValueReceiver = 0;
-                for (int i = 0; i < valueListReceiver.Count; i++)
-                {
-                    string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                    totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-                }
-
-                if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
-                {
-                    validElements = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAF19",
-                        ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
-                            ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAF19_Transferencia"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-
-                if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
-                {
-                    validElements = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAG20",
-                        ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
-                            ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAG20_Transferencia"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
+
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
+                        ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAF19_Transferencia"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
+                        ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAG20_Transferencia"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            
             if (validElements)
                 return responses;
 
@@ -2497,7 +2486,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor actual total factura TV
-            string valueActualInvoice = nitModel.ValorActualTituloValor != "0.00" ? nitModel.ValorActualTituloValor : nitModel.InformacionTransferenciaDerechos;
+            string valueActualInvoice = nitModel.ValorActualTituloValor != "0.00" ? nitModel.ValorActualTituloValor : nitModel.InformacionPagoTransferencia;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validPayment = false;
 
@@ -2510,7 +2499,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
-            if (nitModel.CustomizationId == "452" || Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.TransferEconomicRights)
+            if (nitModel.CustomizationId == "452" || Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.PaymentOfTransferEconomicRights)
             {
                 //Valida Total valor pagado igual al valor actual del titulo valor
                 if (totalValueSender != double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))

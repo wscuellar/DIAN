@@ -2905,64 +2905,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
             return responses;
         }
-        #endregion
-
-
-        #region ValidatePayment
-        private List<ValidateListResponse> ValidatePayment(XmlParser xmlParserCude, NitModel nitModel)
-        {
-            DateTime startDate = DateTime.UtcNow;
-            //valor actual total factura TV
-            string valueActualInvoice = nitModel.ValorActualTituloValor;
-            List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validPayment = false;
-
-            //Valor pago
-            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
-            int totalValueSender = 0;
-            for (int i = 0; i < valueListSender.Count; i++)
-            {
-                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                totalValueSender += Int32.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-            }
-
-            if (nitModel.CustomizationId == "452")
-            {
-                //Valida Total valor pagado igual al valor actual del titulo valor
-                if (totalValueSender != Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
-                {
-                    validPayment = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAF19c",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19c"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-            }
-
-            //Valida Total valor pagado no supera el valor actual del titulo valor
-            if (totalValueSender > Int32.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
-            {
-                validPayment = true;
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAF19b",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19b"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
-
-            if (validPayment)
-                return responses;
-
-            return null;
-        }
-        #endregion
+        #endregion       
 
         #region ValidateEndoso
         private List<ValidateListResponse> ValidateEndoso(XmlParser xmlParserCufe, XmlParser xmlParserCude, NitModel nitModel, string eventCode, double newAmountTV)
@@ -3289,8 +3232,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                                     {
                                                         IsValid = false,
                                                         Mandatory = true,
-                                                        ErrorCode = eventCode == "035" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
-                                                        ErrorMessage = eventCode == "035" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
+                                                        ErrorCode = eventCode == "035" || eventCode == "049" ? errorCodeMessage.errorCodeNoteA : errorCodeMessage.errorCodeNote,
+                                                        ErrorMessage = eventCode == "035" || eventCode == "049" ? errorCodeMessage.errorMessageNoteA : errorCodeMessage.errorMessageNote,
                                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                                     });
                                                     break;
@@ -5414,10 +5357,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
                     }
-
+                  
                     if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoPropiedad ||
                        Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoGarantia ||
-                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion)
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.EndosoProcuracion ||
+                       Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TransferEconomicRights)
                     {
                         //Valida número de identificación informado igual al número del adquiriente en la factura referenciada
                         if (documentMetaRef.ReceiverCode != documentMeta.IssuerPartyCode)
@@ -5444,21 +5388,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             });
                         }
                        
-                        var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
-                        if (responseListEndoso != null)
+                        if (Convert.ToInt32(documentMeta.EventCode) != (int)EventStatus.TransferEconomicRights)
                         {
-                            foreach (var item in responseListEndoso)
+                            var responseListEndoso = ValidateTransactionCufe(documentMetaRef);
+                            if (responseListEndoso != null)
                             {
-                                responses.Add(new ValidateListResponse
+                                foreach (var item in responseListEndoso)
                                 {
-                                    IsValid = item.IsValid,
-                                    Mandatory = item.Mandatory,
-                                    ErrorCode = item.ErrorCode,
-                                    ErrorMessage = item.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = item.IsValid,
+                                        Mandatory = item.Mandatory,
+                                        ErrorCode = item.ErrorCode,
+                                        ErrorMessage = item.ErrorMessage,
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                }
                             }
-                        }                                                
+                        }                                                                
                     }
                 }
                 else
@@ -5945,8 +5892,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                        }
-
+                        }                      
+                    }
+                    break;
+                case (int)EventStatus.PaymentOfTransferEconomicRights:
+                    if (documentMeta != null)
+                    {
+                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
+                      
                         var validatePaymentOfTransfer = logicalEventRadianPaymentInfo.ValidatePaymentOfTransfer(xmlParserCude, nitModel);
                         if (validatePaymentOfTransfer != null)
                         {
@@ -5962,29 +5915,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 });
                             }
                         }
-
-                    }
-                    break;
-                case (int)EventStatus.PaymentOfTransferEconomicRights:
-                    if (documentMeta != null)
-                    {
-                        LogicalEventRadian logicalEventRadianPaymentInfo = new LogicalEventRadian();
-                        var eventRadianPaymentInfo = logicalEventRadianPaymentInfo.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
-                        
-                        if (eventRadianPaymentInfo != null)
-                        {
-                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
-                            {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianPaymentInfo.IsValid,
-                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
-                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
-                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }                       
 
                     }
                     break;
@@ -6695,36 +6625,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
                     break;
-                case (int)EventStatus.TransferEconomicRights:                   
-                    DateTime responseEffectiveDate = Convert.ToDateTime(nitModel.ResponseEffectiveDate).Date;
-                    if(responseEffectiveDate > signingTimeEvent)
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = false,
-                            Mandatory = true,
-                            ErrorCode = "AAH34b",
-                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH34b"),
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "AAH34b",
-                            ErrorMessage = errorMessageSign,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }
+
+                case (int)EventStatus.TransferEconomicRights:
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
-                    DateTime transferPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime paymentDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime transferEconomicPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime transferEconomicDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
 
-                    if(transferPaymentDueDate == paymentDueDateInvoice)
+                    if (transferEconomicPaymentDueDate == transferEconomicDueDateInvoice)
                     {
                         responses.Add(new ValidateListResponse
                         {
@@ -6756,6 +6664,60 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     DateTime notificationDebtorDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
 
                     if (notificationDebtorPaymentDueDate == notificationDebtorDueDateInvoice)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH59",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+
+                case (int)EventStatus.PaymentOfTransferEconomicRights:
+                    DateTime responseEffectiveDate = Convert.ToDateTime(nitModel.ResponseEffectiveDate).Date;
+                    if (responseEffectiveDate > signingTimeEvent)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAH34b",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH34b"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "AAH34b",
+                            ErrorMessage = errorMessageSign,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
+                    DateTime transferPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
+                    DateTime paymentDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+
+                    if (transferPaymentDueDate == paymentDueDateInvoice)
                     {
                         responses.Add(new ValidateListResponse
                         {
