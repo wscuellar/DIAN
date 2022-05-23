@@ -191,6 +191,7 @@
                             }
                             hideLoading('#divMain');
                         }
+                        hideLoading('#divMain');
                         var buttons = AlertExec(operationCancel);
                         var clName = (success.Code == 200) ? "cancel-confirmation" : null;
                         showConfirmation(confirmMessage, buttons, clName, operationCancel)
@@ -199,6 +200,7 @@
                 }
             })
             $("#btnCancel").click(function (e) {
+                hideLoading('#divMain');
                 e.preventDefault()
                 window.location.href = urlNewUser;
             });

@@ -244,6 +244,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult CancelRegister(int id, string description)
         {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                return Json(new ResponseMessage(
+                    TextResources.OperationNotAllowedInProduction,
+                    TextResources.alertType, 500),
+                    JsonRequestBehavior.AllowGet);
+            }
+
             var result = DeleteOperationInStorage(id);
             if (result != null)
             {
