@@ -1408,7 +1408,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
+        //[CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         public async Task<JsonResult> SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
         {
 
