@@ -2509,6 +2509,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    //Valida disponibiliza tenedor legitimo el mismo Emiso factura
+                    if(Convert.ToInt32(documentMetaCude.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration
+                        || Convert.ToInt32(documentMetaCude.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment)
+                    {
+                        if(documentMetaCude.SenderCode == documentMetaCude.PartyLegalEntityCompanyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAM04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAM04"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
                     return responses;
 
                 case (int)EventStatus.EndosoPropiedad:
@@ -2557,7 +2574,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     // EndosoPropiedad
                     if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
-                        && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
+                        && (Convert.ToInt32(availabilityCustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration 
+                        || Convert.ToInt32(availabilityCustomizationId) == (int)EventCustomization.PriorDirectSubsequentEnrollment))
                     {
                         if (partyLegalEntityName != receiverNameEndoso)
                         {
@@ -2567,6 +2585,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 Mandatory = true,
                                 ErrorCode = "AAG03",
                                 ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG03_037"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
+                        if(documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAG04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
