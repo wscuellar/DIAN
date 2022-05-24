@@ -436,6 +436,17 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
+                else
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Certificate.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
             }
 
             user.Code = user.Code;
@@ -506,6 +517,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
                 if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Company.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
                 {
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
@@ -650,6 +672,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
                 if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Person.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
                 {
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
@@ -1376,6 +1409,17 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
+                else
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.ProfileUser.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
             }
 
             var accessUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
@@ -1501,6 +1545,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TimeSpan timeSpan = DateTime.UtcNow.Subtract(authInvoice.Timestamp.DateTime);
                 if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(authInvoice.Token))
+                {
+                    authInvoice.UserId = userInvoice.Id;
+                    authInvoice.Email = userInvoice.Email;
+                    authInvoice.ContributorId = contributorInvoice.Id;
+                    authInvoice.Type = AuthType.Company.GetDescription();
+                    authInvoice.Token = Guid.NewGuid().ToString();
+                    authInvoice.Status = true;
+                    authInvoice.LoginMenu = "NO OFE";
+                    dianAuthTableManager.InsertOrUpdate(authInvoice);
+                }
+                else
                 {
                     authInvoice.UserId = userInvoice.Id;
                     authInvoice.Email = userInvoice.Email;
@@ -1638,6 +1693,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
                 if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.Person.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "NO OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
                 {
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
@@ -1794,6 +1860,17 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 TimeSpan timeSpan = DateTime.UtcNow.Subtract(auth.Timestamp.DateTime);
                 if (timeSpan.TotalMinutes > 60 || string.IsNullOrEmpty(auth.Token))
+                {
+                    auth.UserId = user.Id;
+                    auth.Email = user.Email;
+                    auth.ContributorId = contributor.Id;
+                    auth.Type = AuthType.ProfileUser.GetDescription();
+                    auth.Token = Guid.NewGuid().ToString();
+                    auth.Status = true;
+                    auth.LoginMenu = "NO OFE";
+                    dianAuthTableManager.InsertOrUpdate(auth);
+                }
+                else
                 {
                     auth.UserId = user.Id;
                     auth.Email = user.Email;
