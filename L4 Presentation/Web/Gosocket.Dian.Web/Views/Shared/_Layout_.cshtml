@@ -126,15 +126,16 @@
         ul#mainnav-menu .list-divider {
             margin: 0;
         }
+
         #mainnav-menu-wrap {
-             margin-top: 0px; 
-             padding-top: 0px; 
+            margin-top: 0px;
+            padding-top: 0px;
         }
 
-        #mainnav-menu-wrap #mainnav-menu{
-            padding-top:0;
-            margin-bottom: 0;
-        }
+            #mainnav-menu-wrap #mainnav-menu {
+                padding-top: 0;
+                margin-bottom: 0;
+            }
 
         .mainnav-md #mainnav-container span.menu-title,
         .mainnav-md #mainnav-container i.arrow,
@@ -145,6 +146,7 @@
         .mainnav-lg #mainnav-container #mainnav-toggle {
             display: none;
         }
+
         .mainnav-lg #mainnav-container .list-header .menu-title {
             text-transform: initial !important;
             margin-left: 0 !important;
@@ -163,11 +165,12 @@
             line-height: 16px;
             margin: 0 12px;
         }
-        .username .type-person {
-            font-weight: bold;
-            margin:0 !important;
-            line-height: 20px;
-        }
+
+            .username .type-person {
+                font-weight: bold;
+                margin: 0 !important;
+                line-height: 20px;
+            }
 
         #user-info {
             display: flex;
@@ -183,6 +186,7 @@
             line-height: 16px;
             padding: 26px !important;
         }
+
         #close-session-button {
             border-top: 1px solid #ccc;
         }
@@ -195,12 +199,14 @@
             display: flex;
             align-items: center;
         }
-        #mainnav .list-header a {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+
+            #mainnav .list-header a {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
         #content-container,
         body {
             background: #F6F7F9 !important;
@@ -211,17 +217,20 @@
                 rgba(15,187,203,1) 50%, 
                 rgba(65,215,140,1) 100%) !important;
         }
-        ul#mainnav-menu li.active img {
-            filter: invert(1) brightness(10);
-        }
-        ul#mainnav-menu li.active .menu-title {
-            color: #fff !important;
-            font-weight: bold;
-        }
-        ul#mainnav-menu li.active ul.collapse {
-            background: #fff !important;
-            margin: 26px -21px -26px -26px !important;
-        }
+
+            ul#mainnav-menu li.active img {
+                filter: invert(1) brightness(10);
+            }
+
+            ul#mainnav-menu li.active .menu-title {
+                color: #fff !important;
+                font-weight: bold;
+            }
+
+            ul#mainnav-menu li.active ul.collapse {
+                background: #fff !important;
+                margin: 26px -21px -26px -26px !important;
+            }
 
         #mainnav-menu a.parent-active {
             box-shadow: initial !important;
@@ -233,6 +242,23 @@
         #mainnav-menu .active-link a:hover {
             background: initial !important;
             color: #00B4DC !important;
+        }
+
+        #mainnav-menu .collapse.in li a {
+            width: 100%;
+            line-height: 40px;
+        }
+
+        #user-info-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            grid-gap: 12px;
+        }
+        #user-info-wrapper .title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -280,73 +306,76 @@
             <div id="content-container">
                 <div id="page-alert"></div>
 
-                <ul id="right-nav" class="nav navbar-top-links pull-right">
-                    @*@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
-                        {
-                            <li id="dropdown" class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                                    <div class="username">@contributorName</div>
-                                </a>
-                            </li>
-                        }*@
-                    <li id="dropdown" class="dropdown">
-                        <a id="user-info" href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
-                            <img height="36" src="~/Content/img/user-icon.svg" alt="UserName">
-                            <div class="username">
-                                <p class="type-person">@((!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower()) ? contributorName : "Persona Natural")</p>
-                                @userFullName
-                            </div>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default" style="width:343px; border-radius:0 0 15px 15px;">
-                            <!-- User dropdown menu -->
-                            @if (User.IsInAnyRole("Administrador", "Super"))
+                <div id="user-info-wrapper">
+                    <p class="title">@ViewBag.Title</p>
+                    <ul id="right-nav" class="nav navbar-top-links pull-right">
+                        @*@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
                             {
-                                <ul class="head-list">
-                                    <li>
-                                        <a href="@Url.Action("ChangePassword", "User")">
-                                            <i class="fa fa-lock fa-fw fa-lg mr-9"></i> Cambiar contraseña
-                                        </a>
-                                    </li>
-                                </ul>
-                            }
-
-                            @if (contributorType == (int)ContributorType.Biller || contributorType == (int)ContributorType.Provider)
-                            {
-                                <ul class="head-list">
-                                    <li>
-                                        <a href="@Url.Action("Configuration", "Contributor")">
-                                            <i class="fa fa-cog fa-fw fa-lg mr-9"></i> Configuración
-                                        </a>
-                                    </li>
-                                </ul>
-                            }
-
-                            <!-- Dropdown footer -->
-                            @using Microsoft.AspNet.Identity
-                            @if (Request.IsAuthenticated)
-                            {
-                                //if (System.Configuration.ConfigurationManager.AppSettings["LoginType"] != "Certificate")
-                                //{
-                                using (Html.BeginForm("LogOut", "User", FormMethod.Post, new { id = "logoutForm" }))
+                                <li id="dropdown" class="dropdown">
+                                    <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                        <div class="username">@contributorName</div>
+                                    </a>
+                                </li>
+                            }*@
+                        <li id="dropdown" class="dropdown" style="border:0;">
+                            <a id="user-info" href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+                                <img height="36" src="~/Content/img/user-icon.svg" alt="UserName">
+                                <div class="username">
+                                    <p class="type-person">@((!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower()) ? contributorName : "Persona Natural")</p>
+                                    @userFullName
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default" style="width:343px; border-radius:0 0 15px 15px;">
+                                <!-- User dropdown menu -->
+                                @if (User.IsInAnyRole("Administrador", "Super"))
                                 {
-                                    <ul id="close-session-button" class="head-list">
+                                    <ul class="head-list">
                                         <li>
-                                            <a href="javascript:document.getElementById('logoutForm').submit()">
-                                                <i class="fa fa-sign-in fa-fw fa-lg mr-9"></i> Cerrar sesión
+                                            <a href="@Url.Action("ChangePassword", "User")">
+                                                <i class="fa fa-lock fa-fw fa-lg mr-9"></i> Cambiar contraseña
                                             </a>
                                         </li>
                                     </ul>
                                 }
-                                //}
-                                //else
-                                //{
-                                //    < a href = "javascript:logOutCertificate()" class="btn btn-primary">
-                                //        <i class="fa fa-sign-out fa-fw"></i> Salir
-                                //    </a>
-                            }
-                        </div>
-                    </li>
-                </ul>
+
+                                @if (contributorType == (int)ContributorType.Biller || contributorType == (int)ContributorType.Provider)
+                                {
+                                    <ul class="head-list">
+                                        <li>
+                                            <a href="@Url.Action("Configuration", "Contributor")">
+                                                <i class="fa fa-cog fa-fw fa-lg mr-9"></i> Configuración
+                                            </a>
+                                        </li>
+                                    </ul>
+                                }
+
+                                <!-- Dropdown footer -->
+                                @using Microsoft.AspNet.Identity
+                                @if (Request.IsAuthenticated)
+                                {
+                                    //if (System.Configuration.ConfigurationManager.AppSettings["LoginType"] != "Certificate")
+                                    //{
+                                    using (Html.BeginForm("LogOut", "User", FormMethod.Post, new { id = "logoutForm" }))
+                                    {
+                                        <ul id="close-session-button" class="head-list">
+                                            <li>
+                                                <a href="javascript:document.getElementById('logoutForm').submit()">
+                                                    <i class="fa fa-sign-in fa-fw fa-lg mr-9"></i> Cerrar sesión
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    < a href = "javascript:logOutCertificate()" class="btn btn-primary">
+                                    //        <i class="fa fa-sign-out fa-fw"></i> Salir
+                                    //    </a>
+                                }
+                            </div>
+                        </li>
+                    </ul>
+                </div>
 
                 @RenderBody()
             </div>
