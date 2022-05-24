@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Web.Controllers
         private static readonly TableManager tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
         private static readonly TableManager tableManagerGlobalDocValidatorStats = new TableManager("GlobalDocValidatorStats");
         private static readonly TableManager tableManagerGlobalDocValidatorNewStats = new TableManager("GlobalDocValidatorNewStats");
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
 
         // GET: Home
         public ActionResult Index()
@@ -172,7 +173,17 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorHabilitationDate = contributor.HabilitationDate ?? DateTime.UtcNow;
                 model.ContributorProductionDate = contributor.ProductionDate;
 
+                var identificatioType = User.IdentificationTypeId();
+
+                var pk = identificatioType + "|" + User.UserCode();
+                var rk = User.UserCode();
+                var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
+                ViewBag.LoginMenu = auth.LoginMenu;
+
                 if (contributor.ContributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+                {
+                    Session["Login_ContributorType"] = "- No OFE";
+                }else if (auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }
