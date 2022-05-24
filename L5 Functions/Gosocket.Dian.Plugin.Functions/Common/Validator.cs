@@ -5736,7 +5736,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     break;
                 case (int)EventStatus.Objection:
                     if (documentMeta != null)
-                    {                        
+                    {            
+                        //Valida informacion del documento embebido Base64 - Pdf
                         var eventEmbeddedDocumentBinaryObject = ValidateEmbeddedDocument(xmlParserCude);
                         if (eventEmbeddedDocumentBinaryObject != null)
                         {
@@ -5748,6 +5749,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     Mandatory = itemEventEmbeddedDocumentBinaryObject.Mandatory,
                                     ErrorCode = itemEventEmbeddedDocumentBinaryObject.ErrorCode,
                                     ErrorMessage = itemEventEmbeddedDocumentBinaryObject.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+
+                        //Valida seccion InformacionProtesto
+                        var validateObjection = ValidateObjection(nitModel);
+                        if (validateObjection != null)
+                        {
+                            foreach (var itemValidateObjection in validateObjection)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemValidateObjection.IsValid,
+                                    Mandatory = itemValidateObjection.Mandatory,
+                                    ErrorCode = itemValidateObjection.ErrorCode,
+                                    ErrorMessage = itemValidateObjection.ErrorMessage,
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
@@ -8386,6 +8404,67 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return null;
 
+        }
+
+        #endregion
+
+        #region ValidateObjection
+        private List<ValidateListResponse> ValidateObjection(NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validObjection = false;
+            //valor seccion InformacionProtesto
+            string valorTotalInformacionProtesto = nitModel.ValorTotalInformacionProtesto;
+            string valorAceptadoInformacionProtesto = nitModel.ValorAceptadoInformacionProtesto;
+            string valorPendienteInformacionProtesto = nitModel.ValorPendienteInformacionProtesto;
+
+            //Valida informacion valorTotalInformacionProtesto
+            if (String.IsNullOrEmpty(valorTotalInformacionProtesto))
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD05",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD05"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion valorTotalInformacionProtesto
+            if (String.IsNullOrEmpty(valorAceptadoInformacionProtesto))
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion valorTotalInformacionProtesto
+            if (String.IsNullOrEmpty(valorPendienteInformacionProtesto))
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD09",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD09"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (validObjection)
+                return responses;
+
+            return null;
         }
 
         #endregion

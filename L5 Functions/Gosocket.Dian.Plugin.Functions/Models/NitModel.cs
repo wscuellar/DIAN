@@ -51,6 +51,9 @@
         public string InformacionTransferenciaDerechos { get; set; }
         public string InformacionPagoTransferencia { get; set; }
         public string ResponseEffectiveDate { get; set; }
+        public string ValorTotalInformacionProtesto { get; set; }
+        public string ValorAceptadoInformacionProtesto { get; set; }
+        public string ValorPendienteInformacionProtesto { get; set; }
 
         public NitModel() { }
 
