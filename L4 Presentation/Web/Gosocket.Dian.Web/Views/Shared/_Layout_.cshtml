@@ -220,7 +220,19 @@
         }
         ul#mainnav-menu li.active ul.collapse {
             background: #fff !important;
-            margin: 26px -20px -26px -26px !important;
+            margin: 26px -21px -26px -26px !important;
+        }
+
+        #mainnav-menu a.parent-active {
+            box-shadow: initial !important;
+        }
+        /*#mainnav-menu .active-link {
+            background: #F0F2F4 !important;
+        }*/
+        #mainnav-menu .active-link a,
+        #mainnav-menu .active-link a:hover {
+            background: initial !important;
+            color: #00B4DC !important;
         }
     </style>
 </head>
@@ -902,8 +914,9 @@
             });
 
             window.setTimeout(() => {
-                $("#mainnav-toggle").click();
-            }, 200);
+                /*$("#mainnav-toggle").click();*/
+                $("#close-menu-button").click();
+            }, 250);
 
             $("#close-menu-button").click(function () {
                 $("#mainnav li.active").find("ul.collapse").removeClass("in");
