@@ -5791,7 +5791,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
-                        }                      
+                        }
+
+                        var validateTransferEconomicRights = ValidateTransferEconomicRights(xmlParserCude, nitModel);
+                        if (validateTransferEconomicRights != null)
+                        {
+                            foreach (var itemValidateTransferEconomicRights in validateTransferEconomicRights)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemValidateTransferEconomicRights.IsValid,
+                                    Mandatory = itemValidateTransferEconomicRights.Mandatory,
+                                    ErrorCode = itemValidateTransferEconomicRights.ErrorCode,
+                                    ErrorMessage = itemValidateTransferEconomicRights.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+
                     }
                     break;
                 case (int)EventStatus.PaymentOfTransferEconomicRights:
@@ -5810,6 +5827,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                     Mandatory = itemValidatePaymentOfTransfer.Mandatory,
                                     ErrorCode = itemValidatePaymentOfTransfer.ErrorCode,
                                     ErrorMessage = itemValidatePaymentOfTransfer.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+
+                        //Valida pago saldo insoluto 
+                        var validatePaymentTransferEconomic = ValidatePaymentTransferEconomic(xmlParserCude, nitModel);
+                        if (validatePaymentTransferEconomic != null)
+                        {
+                            foreach (var itemValidatePaymentTransferEconomic in validatePaymentTransferEconomic)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = itemValidatePaymentTransferEconomic.IsValid,
+                                    Mandatory = itemValidatePaymentTransferEconomic.Mandatory,
+                                    ErrorCode = itemValidatePaymentTransferEconomic.ErrorCode,
+                                    ErrorMessage = itemValidatePaymentTransferEconomic.ErrorMessage,
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
                             }
@@ -8192,7 +8226,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalRadianOperations softwareProviderRadian = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool radianEnabled = false;
+            
             string rowKey = string.Empty;
             responses.Add(new ValidateListResponse
             {
@@ -8468,6 +8502,171 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
 
         #endregion
+
+        #region ValidateTransferEconomicRights
+        private List<ValidateListResponse> ValidateTransferEconomicRights(XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validTransferEconomicRights = false;
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateTransferEconomicRights"), out bool ValidateTransferEconomicRights);
+
+            //valor seccion InformacionTransferenciaDerechos
+            string valorInformacionTransferenciaDerechos = nitModel.InformacionTransferenciaDerechos;
+            string valorPrecioPagarseInfoTransDerechos = nitModel.PrecioPagarseInfoTransDerechos;
+            string valorFactordeDescuentoInfoTransDerechos = nitModel.FactordeDescuentoInfoTransDerechos;
+            string valorMedioPagoInfoTransDerechos = nitModel.MedioPagoInfoTransDerechos;
+
+            //Valida informacion valorInformacionTransferenciaDerechos
+            if (String.IsNullOrEmpty(valorInformacionTransferenciaDerechos))
+            {
+                validTransferEconomicRights = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI05",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion valorPrecioPagarseInfoTransDerechos
+            if (String.IsNullOrEmpty(valorPrecioPagarseInfoTransDerechos))
+            {
+                validTransferEconomicRights = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI07a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion valorFactordeDescuentoInfoTransDerechos
+            if (String.IsNullOrEmpty(valorFactordeDescuentoInfoTransDerechos))
+            {
+                validTransferEconomicRights = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI09",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion valorMedioPagoInfoTransDerechos
+            if (String.IsNullOrEmpty(valorMedioPagoInfoTransDerechos))
+            {
+                validTransferEconomicRights = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI11",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI11"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (validTransferEconomicRights)
+                return responses;
+
+            bool validElements = false;
+            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
+            {
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
+
+            if (double.Parse(valorInformacionTransferenciaDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = "ErrorMessage_AAI05a",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Calculo valor de la negociación
+            double resultNegotiationValue = (double.Parse(valorInformacionTransferenciaDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - double.Parse(valorFactordeDescuentoInfoTransDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+            resultNegotiationValue = resultNegotiationValue / 100;
+
+            //Se debe comparar el valor de negociación contra el PrecioPagarseFEV
+            if (double.Parse(valorPrecioPagarseInfoTransDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (validElements)
+                return responses;
+
+            return null;
+
+        }
+        #endregion
+
+        #region ValidatePaymentTransferEconomic
+        private List<ValidateListResponse> ValidatePaymentTransferEconomic(XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validPaymentTrans = false;
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidatePaymentTransferEconomic"), out bool ValidatePaymentTransferEconomic);
+
+            //valor seccion InformacionPagoTransferencia
+            string valorInformacionPagoTransferencia = nitModel.InformacionPagoTransferencia;
+            string valorPendienteInfoPagoTrans = nitModel.ValorPendienteInfoPagoTrans;
+
+            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
+            {
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
+
+            //Calculo valor saldo insoluto
+            double resultNegotiationValue = double.Parse(valorInformacionPagoTransferencia, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) - totalValueSender;
+
+            if (double.Parse(valorPendienteInfoPagoTrans, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+            {
+                validPaymentTrans = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidatePaymentTransferEconomic,
+                    ErrorCode = "AAK07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAK07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if(validPaymentTrans)
+                return responses;
+
+            return null;
+        }
+
+         #endregion
 
     }
 }

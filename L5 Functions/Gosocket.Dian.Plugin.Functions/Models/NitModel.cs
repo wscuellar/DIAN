@@ -49,7 +49,11 @@
         public string SenderPartyPersonSchemeName { get; set; }
         public string SenderPartyPersonID { get; set; }
         public string InformacionTransferenciaDerechos { get; set; }
+        public string PrecioPagarseInfoTransDerechos { get; set; }
+        public string FactordeDescuentoInfoTransDerechos { get; set; }
+        public string MedioPagoInfoTransDerechos { get; set; }
         public string InformacionPagoTransferencia { get; set; }
+        public string ValorPendienteInfoPagoTrans { get; set; }
         public string ResponseEffectiveDate { get; set; }
         public string ValorTotalInformacionProtesto { get; set; }
         public string ValorAceptadoInformacionProtesto { get; set; }
