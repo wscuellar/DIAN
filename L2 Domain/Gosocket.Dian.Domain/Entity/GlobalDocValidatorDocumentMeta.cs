@@ -80,4 +80,5 @@ public class GlobalDocValidatorDocumentMeta : TableEntity
     /// la factura electrónica (Cuando el usuario selecciona el formato tipo parametrizable)
     /// </summary>
     public string SectionsToHide { get; set; }
+    public string DocumentCurrencyCode { get; set; }
 }
