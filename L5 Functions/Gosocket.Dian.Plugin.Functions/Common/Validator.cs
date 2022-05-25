@@ -2572,6 +2572,18 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    if (documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     // EndosoPropiedad
                     if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
                         && (Convert.ToInt32(availabilityCustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration 
@@ -2588,19 +2600,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
-                        if(documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
-                        {
-                            responses.Add(new ValidateListResponse
-                            {
-                                IsValid = false,
-                                Mandatory = true,
-                                ErrorCode = "AAG04",
-                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
-                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                            });
-                        }
-
+                     
                         if (partyLegalEntityCompanyID != receiverCodeEndoso)
                         {
                             responses.Add(new ValidateListResponse
