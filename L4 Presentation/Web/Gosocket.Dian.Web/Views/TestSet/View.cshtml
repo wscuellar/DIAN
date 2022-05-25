@@ -15,9 +15,6 @@
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
         <div class="panel padding-20">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
 
             @if (!User.IsInAnyRole("Administrador", "Super") && !string.IsNullOrEmpty(Model.TestSetId))
             {
