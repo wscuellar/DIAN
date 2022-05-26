@@ -48,7 +48,23 @@
                 </div>
             </div>
         }
-        else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Hab")
+        else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Prod" && ViewBag.ContributorAcceptanceStatusId != 4)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
+                    <a href="@Url.Action("Check", "Contributor")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Factura Electrónica</p>
+                            <p class="RadianTittleCard2">Factura Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+        else if (ViewBag.LoginMenu == "OFE")
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
