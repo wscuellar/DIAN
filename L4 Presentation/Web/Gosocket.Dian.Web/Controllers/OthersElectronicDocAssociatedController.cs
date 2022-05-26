@@ -23,6 +23,7 @@ using Gosocket.Dian.DataContext;
 using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
 using System.Threading.Tasks;
+using Gosocket.Dian.Application.FreeBillerSoftwares;
 
 namespace Gosocket.Dian.Web.Controllers
 {
@@ -243,6 +244,14 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public JsonResult CancelRegister(int id, string description)
         {
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
+            {
+                return Json(new ResponseMessage(
+                    TextResources.OperationNotAllowedInProduction,
+                    TextResources.alertType, 500),
+                    JsonRequestBehavior.AllowGet);
+            }
+
             var result = DeleteOperationInStorage(id);
             if (result != null)
             {
@@ -698,6 +707,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             var IdS = Guid.NewGuid();
             var now = DateTime.Now;
+            string freeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocId);
+
             OtherDocElecSoftware software = new OtherDocElecSoftware()
             {
                 Id = IdS,
@@ -712,7 +723,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareDate = now,
                 Timestamp = now,
                 Updated = now,                
-                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid("FA326CA7-C1F8-40D3-A6FC-24D7C1040607"),
+                SoftwareId = model.OperationModeId != (int)Domain.Common.OtherDocElecOperationMode.FreeBiller ? model.SoftwareId : new Guid(freeBillerSoftwareId),
                 OtherDocElecContributorId = otherDocElecContributor.Id
             };
 
@@ -1134,7 +1145,17 @@ namespace Gosocket.Dian.Web.Controllers
 
                 // OtherDocElecContributorOperations
                 var softwareOperation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationBySoftwareId(docElecSoftwareId);
-                softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                
+                /*Si es documento equivalente y ya está habilitado NO se cambia el estado de la operación*/
+                if(
+                    !(
+                        softwareOperation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent &&
+                        softwareOperation.OperationStatusId == (int)OtherDocElecState.Habilitado
+                    )                    
+                )
+                {
+                    softwareOperation.OperationStatusId = (int)OtherDocElecState.Test;
+                }
                 _othersElectronicDocumentsService.UpdateOtherDocElecContributorOperation(softwareOperation);
             }
             #endregion

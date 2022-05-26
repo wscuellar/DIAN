@@ -553,12 +553,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal subTotal = 0;
 			decimal DescDet = 0;
 			decimal RecDet = 0;
-
+			var _bandera = 0;
 			var OtrasEntidades = "";
 			/// Invoice / ext:UBLExtensions / ext:UBLExtension / ext:ExtensionContent / Services_SPD / SubscriberConsumption / ConsumptionSection / SubInvoiceLines / SubInvoiceLine / Balance / Transactions / Transaction / CreditLineAmount
 			var AcuerdosPagos = element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "SubscriberConsumption").Elements(def + "ConsumptionSection")
 						.Elements(def + "SubInvoiceLines").Elements(def + "SubInvoiceLine").Elements(def + "Balance").Elements(def + "Transactions").Elements(def + "Transaction").Elements(def + "CreditLineAmount");
-
 
 			var listaCont = new List<Cont>();
 
@@ -572,15 +571,22 @@ namespace Gosocket.Dian.Functions.Pdf
 				listaCont.Add(new Cont() { numero = item.Value, id = node.Value });
 
 			}
+			string[] info = new string[20];
+			int continfo = 0;
+			foreach (var item in AcuerdosPagos)
+			{
+				info[continfo] = item.Value;
+				continfo = continfo + 1;
+			}
 
 
-
+			var _bande = 0;
 			foreach (var detalle in model)
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
-				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount");
+				var ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxAmount");
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
@@ -609,31 +615,33 @@ namespace Gosocket.Dian.Functions.Pdf
 				var Descr = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "Description");
 
 				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
-
-				var cont = listaCont.Where(x => x.id == detalle.Elements(cbc + "AccountingCostCode").FirstOrDefault().Value);
+				
+				var cont = listaCont.Where(x => x.id == element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "ID").FirstOrDefault().Value);
 				var conta = cont.Any() ? cont.FirstOrDefault().numero : "";
-
+				
+               
 				rowDetalleProductosBuilder.Append($@"
                 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
 		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
-		            <td>{unit.CompositeName}</td>
-		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+		            <td>{unit.IdSubList}</td>
+		            <td>{detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		            
                     <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-					 <td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+					<td>{DescDet}</td>
+                    <td>{info[_bande]}</td>
+					<td class='text-right'>{RecDet:n2}</td>
+					<td class='text-right'>{IvaVal:n2}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
-
-
-		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
-					<td style='word-wrap: break-word;'>{conta}</td>
+					<td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		
+					<td style='word-wrap: break-word;'>{listaCont[_bande].numero}</td>
 		    
 	            </tr>");
 
 				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
 										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
+				_bande = _bande + 1;
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
 
@@ -656,7 +664,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		}
 		public static string GenerateQrBase64ForDocument(string code)
 		{
-			var urlSiteDian = ConfigurationManager.GetValue("SiteDian");
+			//var urlSiteDian = ConfigurationManager.GetValue("SiteDian");
+			var urlSiteDian = "https://gtpa-web-prototype-test-uat-utnxse.azurewebsites.net/";
 			var urlToQr = $"{urlSiteDian}document/searchqr?documentkey={code}";
 
 			QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -862,7 +871,28 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{FabricanteNombre}", string.Empty);
 				Html = Html.Replace("{FabricanteSoftware}", string.Empty);
 			}
-		
+
+			try
+			{
+				var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("BeneficiosComprador"));
+				var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionBeneficiosComprador"));
+				var soft = info.Descendants().Elements(def + "Value").ToArray();
+				if (soft.Count() > 0)
+				{
+					Html = Html.Replace("{CodigoComprador}", soft[0].Value);
+					Html = Html.Replace("{NombresComprador}", soft[1].Value);
+					Html = Html.Replace("{Puntos}", soft[2].Value);
+				}
+			}
+			catch (Exception)
+			{
+
+				Html = Html.Replace("{CodigoComprador}", string.Empty);
+				Html = Html.Replace("{NombresComprador}", string.Empty);
+				Html = Html.Replace("{Puntos}", string.Empty);
+			}
+
+			
 
 			//var FabricanteRazon = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext+ "ExtensionContent")
 			//    .Elements("FabricanteSoftware").Elements("InformacionDelFabricanteDelSoftware").Elements( "Name");//resta subtotal ? 

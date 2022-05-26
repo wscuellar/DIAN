@@ -1080,7 +1080,7 @@ namespace Gosocket.Dian.Web.Services
                 Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatusBulkDocumentDownload " + seconds);
                 if (seconds >= 10)
                 {
-                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.XmlDocumentKey) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
+                    var logger = new GlobalLogger($"MORETHAN10SECONDS-{DateTime.UtcNow.ToString("yyyyMMdd")}", result.UrlDescarga) { Message = seconds.ToString(), Action = "BulkDocumentDownloadAsync" };
                     tableManagerGlobalLogger.InsertOrUpdate(logger);
                 }
 

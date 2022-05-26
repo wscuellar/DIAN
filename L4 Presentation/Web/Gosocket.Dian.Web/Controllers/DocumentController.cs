@@ -5,6 +5,7 @@ using Gosocket.Dian.Domain.Common;
 using Gosocket.Dian.Domain.Cosmos;
 using Gosocket.Dian.Domain.Domain;
 using Gosocket.Dian.Domain.Entity;
+using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
 using Gosocket.Dian.Interfaces.Services;
@@ -56,7 +57,8 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
-        
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
@@ -293,13 +295,13 @@ namespace Gosocket.Dian.Web.Controllers
 
         }
 
-        public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code,string fecha)
+        public async Task<ActionResult> DownloadZipFilesEventos(string trackId, string code, string fecha)
         {
             try
             {
-                
-                var bytes = DownloadExportedFiles(trackId,DateTime.Parse(fecha));
-               // var zipFile = ZipExtensions.CreateZip(bytes, rk, "xlsx");
+
+                var bytes = DownloadExportedFiles(trackId, DateTime.Parse(fecha));
+                // var zipFile = ZipExtensions.CreateZip(bytes, rk, "xlsx");
                 return File(bytes, "application/zip", $"{trackId}.zip");
             }
             catch (Exception ex)
@@ -366,11 +368,11 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("Search", searchViewModel);
             }
 
-            DocValidatorModel model = await ReturnDocValidationModel (documentKey, globalDataDocument);
+            DocValidatorModel model = await ReturnDocValidationModel(documentKey, globalDataDocument);
 
             return View(model);
         }
-        
+
         [CustomRoleAuthorization(CustomRoles = "Administrador")]
         public async Task<ActionResult> Payroll()
         {
@@ -393,12 +395,12 @@ namespace Gosocket.Dian.Web.Controllers
 
             return View(model);
         }
-      
+
         [CustomRoleAuthorization(CustomRoles = "Administrador")]
         [HttpPost]
         public async Task<ActionResult> Payroll(PayrollViewModel model)
         {
-            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;            
+            ViewBag.CurrentPage = Navigation.NavigationEnum.Payroll;
 
             if (string.IsNullOrWhiteSpace(model.CUNE) && string.IsNullOrWhiteSpace(model.NumeroDocumento))
             {
@@ -522,7 +524,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-           return result;
+            return result;
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -617,7 +619,7 @@ namespace Gosocket.Dian.Web.Controllers
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> ShowDocumentToPublic(string Id)
-        {            
+        {
             List<DocValidatorModel> listDocValidatorModels = new List<DocValidatorModel>();
             List<GlobalDocValidatorDocumentMeta> listGlobalValidatorDocumentMeta = new List<GlobalDocValidatorDocumentMeta>();
 
@@ -898,7 +900,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             return _event;
         }
-        private async  Task<DocValidatorModel> ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
+        private async Task<DocValidatorModel> ReturnDocValidationModel(string documentKey, GlobalDataDocument globalDataDocument)
         {
             var model = new DocValidatorModel();
             model.Validations.AddRange(await GetValidatedRules(documentKey));
@@ -1015,22 +1017,22 @@ namespace Gosocket.Dian.Web.Controllers
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
         }
-        private byte[] DownloadExportedFiles(string rk,DateTime fecha)
+        private byte[] DownloadExportedFiles(string rk, DateTime fecha)
         {
             var me = "";
             var año = fecha.Year;
             var mes = fecha.ToString("MM");
             var dia = fecha.ToString("dd");
-       
+
             FileManager fileManager = new FileManager();
             return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
         }
-        private async Task<byte[]>DownloadXml(string trackId)
+        private async Task<byte[]> DownloadXml(string trackId)
         {
             string url = ConfigurationManager.GetValue("DownloadXmlUrl");
             dynamic requestObj = new { trackId };
-            var response =  await DownloadXml(requestObj);
-            
+            var response = await DownloadXml(requestObj);
+
             if (response.Success)
             {
                 byte[] xmlBytes = Convert.FromBase64String(response.XmlBase64);
@@ -1049,7 +1051,7 @@ namespace Gosocket.Dian.Web.Controllers
             return await ApiHelpers.ExecuteRequestAsync<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), requestObj);
         }
 
-        
+
         private static async Task<HttpResponseMessage> ConsumeApiAsync(string url, dynamic requestObj)
         {
 
@@ -1086,7 +1088,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 pks = new List<string> { $"co|{globalDocValidatorDocument.EmissionDateNumber.Substring(6, 2)}|{model.DocumentKey.Substring(0, 2)}" };
             }
-            if (model.DocumentTypeId=="030" || model.DocumentTypeId == "031"|| model.DocumentTypeId == "032"|| model.DocumentTypeId == "033"|| model.DocumentTypeId == "034")
+            if (model.DocumentTypeId == "030" || model.DocumentTypeId == "031" || model.DocumentTypeId == "032" || model.DocumentTypeId == "033" || model.DocumentTypeId == "034")
             {
                 model.MaxItemCount = 100;
                 idevento = model.DocumentTypeId;
@@ -1118,7 +1120,7 @@ namespace Gosocket.Dian.Web.Controllers
                                                                                                                       model.RadianStatus);
                     break;
                 case 2:
-                 
+
                     cosmosResponse = await CosmosDBService.Instance(model.EndDate).ReadDocumentsAsyncOrderByReception(continuationToken,
                                                                                                                       model.StartDate,
                                                                                                                       model.EndDate,
@@ -1201,12 +1203,12 @@ namespace Gosocket.Dian.Web.Controllers
                             DocumentKey = e.DocumentKey,
                             DateNumber = e.DateNumber,
                             SenderCode = e.SenderCode,
-                            SenderName =e.SenderName,
-                            ReceiverCode =e.ReceiverCode,
+                            SenderName = e.SenderName,
+                            ReceiverCode = e.ReceiverCode,
                             ReceiverName = e.ReceiverName,
                             TimeStamp = e.TimeStamp,
                             CustomizationID = e.CustomizationID,
-                            prefijo =e.prefijo
+                            prefijo = e.prefijo
                         }).ToList()
                 }).ToList();
 
@@ -1223,7 +1225,7 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
             }
-            if (idevento!="")
+            if (idevento != "")
             {
 
                 for (int i = 0; i < model.Documents.Count; i++)
@@ -1246,9 +1248,9 @@ namespace Gosocket.Dian.Web.Controllers
                 }
                 foreach (var item in model.Documents)
                 {
-                    
+
                 }
-               
+
             }
             if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
@@ -1495,6 +1497,8 @@ namespace Gosocket.Dian.Web.Controllers
             model.Ordenadores = OrdenarModel.List();
             model.Ciudades = GetCiudadModelLists();
         }
+
+
         private async Task GetPayrollData(int toTake, PayrollViewModel model)
         {
             this.PayrollList = null;
@@ -1562,14 +1566,20 @@ namespace Gosocket.Dian.Web.Controllers
                     }
                 }
 
+                if (model.RangoNumeracionMenor == null) model.RangoNumeracionMenor = 0;
+
+                if (model.RangoNumeracionMayor == null) model.RangoNumeracionMayor = 0;
+
                 if (model.TipoDocumento == "00") model.TipoDocumento = null;
 
                 if (model.NumeroDocumento == "00") model.NumeroDocumento = null;
 
                 if (model.Ciudad == "00") model.Ciudad = null;
-                                
+
+
                 var otherDocElecPayrolls = otherDocElecPayrollService.Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(toTake, monthStart, monthEnd, model.RangoNumeracionMenor, model.RangoNumeracionMayor, model.TipoDocumento,
                     model.NumeroDocumento, model.LetraPrimerApellido, employeeSalaryStart, employeeSalaryEnd, model.Ciudad);
+
 
                 this.PayrollList = DocumentParsedNomina.SetOtherDocElecPayrollsToGlobalDocPayrolls(otherDocElecPayrolls);
             }
@@ -1705,9 +1715,13 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.ContributorId = User.ContributorId();
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
+            ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
+            var identificatioType = User.IdentificationTypeId();
 
-
-
+            var pk = identificatioType + "|" + User.UserCode();
+            var rk = User.UserCode();
+            var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
+            ViewBag.LoginMenu = auth.LoginMenu;
 
             ContributorOperationsService contributorOperationsService = new ContributorOperationsService();
             var opes = contributorOperationsService.GetContributor(User.ContributorId());
@@ -1730,9 +1744,9 @@ namespace Gosocket.Dian.Web.Controllers
                 string codigo = "'" + code + "'";
 
                 consulta = consulta.Replace(reemplazar, codigo);
-                
+
                 string sqlQuery = consulta;
-              
+
                 SqlConnection conn = new SqlConnection(System.Configuration.ConfigurationManager.AppSettings["Dian"]);
                 conn.Open();
                 DataTable table = new DataTable();
@@ -1752,7 +1766,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             catch (Exception exc)
             {
-                return  null;
+                return null;
             }
         }
     }

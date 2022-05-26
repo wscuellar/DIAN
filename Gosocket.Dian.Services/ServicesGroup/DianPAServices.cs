@@ -629,12 +629,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
 
                     if (response.IsValid || applicationResponseExist)
-                    if (response.IsValid)
+                    //if (response.IsValid)
                     {
                         response.IsValid = true;
                         response.StatusCode = "00";
                         response.StatusMessage = message;
-                        response.StatusDescription = "Procesado Correctamente.";
+                        response.StatusDescription = "Procesado Correctamente.";                   
                     }
                     else
                     {

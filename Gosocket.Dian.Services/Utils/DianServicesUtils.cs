@@ -675,7 +675,7 @@ namespace Gosocket.Dian.Services.Utils
                 isValid = false;
             }
             
-            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]) && docTypeCode != "50")
+            if (string.IsNullOrEmpty(responseXpathValues.XpathsValues["SenderCodeXpath"]) && docTypeCode != "50" && codeMessage != "DEA")
             {
                 stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
                 errors.Add(stringBuilder.ToString());
@@ -1085,7 +1085,7 @@ namespace Gosocket.Dian.Services.Utils
                     isValid = false;
                 }
 
-                if (string.IsNullOrEmpty(senderCode))
+                if (string.IsNullOrEmpty(senderCode) && codeMessage != "DEA")
                 {
                     stringBuilder.AppendLine($"{codeMessage}J21: El NIT del Emisor no puede estar vacío.");
                     errors.Add(stringBuilder.ToString());
