@@ -1517,7 +1517,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if ((contributorInvoice.ContributorTypeId == '1' || contributorInvoice.ContributorTypeId == 1) && contributorInvoice.AcceptanceStatusId == 4)
+            if ((contributorInvoice.ContributorTypeId != '1' || contributorInvoice.ContributorTypeId != 1) && contributorInvoice.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1668,10 +1668,10 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("NotObligedInvoice", model);
             }
 
-            if ((contributor.ContributorTypeId == '1' || contributor.ContributorTypeId == 1) && contributor.AcceptanceStatusId == 4)
+            if ((contributor.ContributorTypeId != '4' || contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
-                return Json(new ResponseMessage("No es posible el ingreso la persona ya se encuentra habilitada como facturador.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage("No es posible el ingreso de la persona, ya que se encuentra habilitada.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)

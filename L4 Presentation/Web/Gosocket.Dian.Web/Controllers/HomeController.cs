@@ -188,18 +188,6 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     Session["Login_ContributorType"] = "";
                 }
-
-                //if (contributor.ContributorTypeId == (int)ContributorType.BillerNoObliged)
-                //{
-                //    Session["Login_ContributorType"] = "- No OFE";
-                //}else if (auth.LoginMenu == "NO OFE")
-                //{
-                //    Session["Login_ContributorType"] = "- No OFE";
-                //}
-                //else
-                //{
-                //    Session["Login_ContributorType"] = "";
-                //}
             }
 
             return View(model);
