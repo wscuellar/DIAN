@@ -44,7 +44,7 @@ namespace Gosocket.Dian.Web.Controllers
         private static readonly TableManager tableManagerGlobalContributor = new TableManager("GlobalContributor");
         private static readonly TableManager tableManagerGlobalExchangeEmail = new TableManager("GlobalExchangeEmail");
         private static readonly TableManager tableManagerGlobalSoftware = new TableManager("GlobalSoftware");
-
+        private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
         private IAuthenticationManager AuthenticationManager
         {
             get
@@ -235,43 +235,51 @@ namespace Gosocket.Dian.Web.Controllers
             var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
             var contributorTypeId = contributor.ContributorTypeId;
 
+            AuthToken auth = GetAuthData();
+            var contributorLoggedByOfe = auth.LoginMenu == "OFE";
+
             if (contributorId == 0)
-                return RedirectToAction(nameof(HomeController.Dashboard));
+                return RedirectToAction(nameof(HomeController.Dashboard), "Home");
 
             if (contributorTypeId == null || contributorTypeId == (int)Domain.Common.ContributorType.Zero)
                 return RedirectToAction(nameof(Register));
 
-            if (contributorTypeId == (int)Domain.Common.ContributorType.Biller && contributorAcceptanceStatusId == (int)ContributorStatus.Pending)
+            if (/*contributorTypeId == (int)Domain.Common.ContributorType.Biller &&*/ contributorLoggedByOfe && contributorAcceptanceStatusId == (int)ContributorStatus.Pending)
                 return RedirectToAction(nameof(Register));
 
-            if (contributorTypeId == (int)Domain.Common.ContributorType.Biller)
+            if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId != (int)ContributorStatus.Enabled)
+                return RedirectToAction(nameof(Wizard));
+
+            if (contributorLoggedByOfe/*contributorTypeId == (int)Domain.Common.ContributorType.Biller*/)
                 return RedirectToAction(nameof(View), new { id = contributorId });
 
             if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId == (int)ContributorStatus.Enabled)
                 return RedirectToAction(nameof(View), new { id = contributorId });
 
-            if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId != (int)ContributorStatus.Enabled)
-                return RedirectToAction(nameof(Wizard));
+            //if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId != (int)ContributorStatus.Enabled)
+            //    return RedirectToAction(nameof(Wizard));
 
-            return RedirectToAction(nameof(HomeController.Dashboard));
+            return RedirectToAction(nameof(HomeController.Dashboard), "Home");
         }
 
         public ActionResult CheckContributorRegister()
         {
             Contributor contributor = contributorService.Get(User.ContributorId());
-            var contributorId = contributor.Id;
             var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
             var contributorTypeId = contributor.ContributorTypeId;
             
-            if (contributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
+            AuthToken auth = GetAuthData();
+            var contributorLoggedByOfe = auth.LoginMenu == "OFE";
+
+            if (contributorAcceptanceStatusId == (int)ContributorStatus.Pending)
             {
-                if(contributorAcceptanceStatusId == (int)Domain.Common.ContributorStatus.Pending)
+                if (contributorLoggedByOfe)
                 {
-                    return RedirectToAction(nameof(RegisterNoOfe));
+                    return RedirectToAction(nameof(Check));
                 }
                 else
                 {
-                    return RedirectToAction(nameof(DocumentController.ElectronicDocuments), "Document");
+                    return RedirectToAction(nameof(RegisterNoOfe));
                 }
             }
             else
@@ -1949,5 +1957,15 @@ namespace Gosocket.Dian.Web.Controllers
         }
         #endregion
 
+        /************************/
+        private AuthToken GetAuthData()
+        {
+            var userIdentificationType = User.IdentificationTypeId();
+            var userCode = User.UserCode();
+            var partitionKey = $"{userIdentificationType}|{userCode}";
+            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, userCode);
+            return auth;
+        }
+        /************************/
     }
 }
