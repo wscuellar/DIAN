@@ -672,7 +672,11 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Título Valor")]
         SecurityTitle = 5,
         [Description("Factura Electrónica")]
-        ElectronicInvoice = 6
+        ElectronicInvoice = 6,
+        [Description("Transferida")]
+        TransferOfEconomicRights = 7,
+        [Description("Protestada")]
+        Objection = 8
     }
 
 

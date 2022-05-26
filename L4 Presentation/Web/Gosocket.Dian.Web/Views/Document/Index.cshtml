@@ -405,8 +405,7 @@
         $("#RadianStatus").change(function () {
             var radianStatusValue = parseInt($("#RadianStatus option:selected").val(), 10);
 
-            if (radianStatusValue > 0 && radianStatusValue < 7)
-            {
+            if (radianStatusValue >= 0 && radianStatusValue < 9) {
                 var documentTypeId = $("#DocumentTypeId").val();
 
                 if (documentTypeId == "00") {
@@ -414,6 +413,11 @@
                     $("#DocumentTypeId").parent().find("button").find("span").first()
                         .text($("#DocumentTypeId option:selected").text());
                 }
+            }
+            else if (radianStatusValue == 9) {
+                $("#DocumentTypeId").val("00");
+                $("#DocumentTypeId").parent().find("button").find("span").first()
+                    .text($("#DocumentTypeId option:selected").text());
             }
         });
 
