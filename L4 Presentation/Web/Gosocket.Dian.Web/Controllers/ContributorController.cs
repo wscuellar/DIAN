@@ -1276,12 +1276,29 @@ namespace Gosocket.Dian.Web.Controllers
 
             var rk = $"{contributorOperation.Contributor.ContributorTypeId}|{softwareId}";
             var testSetResult = tableManagerTestSetResult.Find<GlobalTestSetResult>(contributorOperation.Contributor.Code, rk);
+            if (testSetResult == null)
+            {
+                if (contributorOperation.Contributor.ContributorTypeId == 1)
+                    rk = $"2|{softwareId}";
+                else if(contributorOperation.Contributor.ContributorTypeId == 2)
+                    rk = $"1|{softwareId}";
+                testSetResult = tableManagerTestSetResult.Find<GlobalTestSetResult>(contributorOperation.Contributor.Code, rk);
+            }
+            if (testSetResult == null)
+            {
+                return Json(new
+                {
+                    id,
+                    messasge = "No se encontró la información del modo de operación.",
+                    success = false
+                }, JsonRequestBehavior.AllowGet);
+            }
             if (testSetResult.Status == (int)TestSetStatus.Accepted)
             {
                 return Json(new
                 {
                     id,
-                    messasge = "No puede eliminar un set de pruebas acpetado.",
+                    messasge = "No puede eliminar un set de pruebas aceptado.",
                     success = false
                 }, JsonRequestBehavior.AllowGet);
             }
@@ -1391,7 +1408,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        [CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
+        //[CustomRoleAuthorization(CustomRoles = "Facturador, Proveedor")]
         public async Task<JsonResult> SetHabilitationAndProductionDates(string habilitationDate, string productionDate)
         {
 
