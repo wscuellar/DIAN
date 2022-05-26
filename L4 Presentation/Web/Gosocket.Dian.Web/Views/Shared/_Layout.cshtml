@@ -58,16 +58,17 @@
 </head>
 <body>
 	@{
-		var alertClass = "danger";
-		var environment = "DIAN piloto";
-		if (ConfigurationManager.GetValue("Environment") == "Hab")
-		{
-			alertClass = "success";
-			environment = "DIAN habilitación";
-		}
-		var contributorType = User.ContributorTypeId();
-		var contributorName = User.ContributorName();
-		var userFullName = User.UserFullName();
+        var alertClass = "danger";
+        var environment = "DIAN piloto";
+        if (ConfigurationManager.GetValue("Environment") == "Hab")
+        {
+            alertClass = "success";
+            environment = "DIAN habilitación";
+        }
+        var contributorType = User.ContributorTypeId();
+        var contributorName = User.ContributorName();
+        var userFullName = User.UserFullName();
+        string sesion = ViewBag.LoginMenu;
 	}
 
 	@if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
@@ -350,7 +351,7 @@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller && sesion != "NO OFE")
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }
