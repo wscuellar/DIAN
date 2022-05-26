@@ -250,14 +250,11 @@ namespace Gosocket.Dian.Web.Controllers
             if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId != (int)ContributorStatus.Enabled)
                 return RedirectToAction(nameof(Wizard));
 
-            if (contributorLoggedByOfe/*contributorTypeId == (int)Domain.Common.ContributorType.Biller*/)
-                return RedirectToAction(nameof(View), new { id = contributorId });
-
             if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId == (int)ContributorStatus.Enabled)
                 return RedirectToAction(nameof(View), new { id = contributorId });
 
-            //if (contributorTypeId == (int)Domain.Common.ContributorType.Provider && contributorAcceptanceStatusId != (int)ContributorStatus.Enabled)
-            //    return RedirectToAction(nameof(Wizard));
+            if (contributorLoggedByOfe/*contributorTypeId == (int)Domain.Common.ContributorType.Biller*/)
+                return RedirectToAction(nameof(View), new { id = contributorId });
 
             return RedirectToAction(nameof(HomeController.Dashboard), "Home");
         }
