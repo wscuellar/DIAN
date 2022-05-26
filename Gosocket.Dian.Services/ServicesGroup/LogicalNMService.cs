@@ -291,27 +291,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     existDocument = TableManagerGlobalDocValidatorDocument.Exist<GlobalDocValidatorDocument>(documentMeta?.Identifier, documentMeta?.Identifier);
                     if (!existDocument) 
                         TableManagerGlobalDocValidatorDocument.InsertOrUpdate(validatorDocument);
-
-                    #region [ old code... ]
-                    // Se mira a una Función...
-                    //GlobalDocPayroll docGlobalPayroll = xmlParser.globalDocPayrolls;
-                    //docGlobalPayroll.Timestamp = DateTime.Now;
-
-                    //arrayTasks.Add(TableManagerGlobalDocPayroll.InsertOrUpdateAsync(docGlobalPayroll));
-
-                    //// Nómina Individual de Ajuste...
-                    //if (Convert.ToInt32(documentParsed.DocumentTypeId) == (int)DocumentType.IndividualPayrollAdjustments)
-                    //{
-                    //    var docGlobalPayrollHistoric = new GlobalDocPayrollHistoric(trackIdPred, trackId);
-                    //    arrayTasks.Add(TableManagerGlobalDocPayrollHistoric.InsertOrUpdateAsync(docGlobalPayrollHistoric));
-                    //    // se actualiza en la Meta el DocumentReferenceKey con el ID del último ajuste...
-                    //    var documentMetaAdjustment = TableManagerGlobalDocValidatorDocumentMeta.Find<GlobalDocValidatorDocumentMeta>(trackIdPred, trackIdPred);
-                    //    documentMetaAdjustment.DocumentReferencedKey = trackId;
-                    //    arrayTasks.Add(TableManagerGlobalDocValidatorDocumentMeta.InsertOrUpdateAsync(documentMetaAdjustment));
-                    //} 
-                    #endregion
-
-                    var processRegistrateComplete = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId });
+                  
+                    var processRegistrateComplete = await ApiHelpers.ExecuteRequestAsync<EventResponse>(ConfigurationManager.GetValue(Properties.Settings.Default.Param_RegistrateCompletedPayrollUrl), new { TrackId = trackId, AuthCode = authCode });
                     if (processRegistrateComplete.Code != Properties.Settings.Default.Code_100)
                     {
                         dianResponse.IsValid = false;

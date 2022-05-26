@@ -205,6 +205,11 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.Id = Id;
 
             var operation = _othersElectronicDocumentsService.GetOtherDocElecContributorOperationById(Id);
+            if (operation != null)
+            {
+                if (operation.OperationStatusId == 4)
+                    model.State = "Rechazado";
+            }
             OtherDocElecSoftware software = _othersDocsElecSoftwareService.Get(operation.SoftwareId);
             string key = model.OperationModeId.ToString() + "|" + software.SoftwareId.ToString();
             model.GTestSetOthersDocumentsResult = _testSetOthersDocumentsResultService.GetTestSetResult(model.Nit, key);

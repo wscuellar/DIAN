@@ -2509,6 +2509,23 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    //Valida disponibiliza tenedor legitimo el mismo Emiso factura
+                    if(Convert.ToInt32(documentMetaCude.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration
+                        || Convert.ToInt32(documentMetaCude.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment)
+                    {
+                        if(documentMetaCude.SenderCode == documentMetaCude.PartyLegalEntityCompanyID)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "AAM04",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAM04"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+                    }
+
                     return responses;
 
                 case (int)EventStatus.EndosoPropiedad:
@@ -2555,9 +2572,22 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    if (documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     // EndosoPropiedad
                     if (Convert.ToInt16(party.ResponseCode) == (int)EventStatus.EndosoPropiedad
-                        && (availabilityCustomizationId == "362" || availabilityCustomizationId == "364"))
+                        && (Convert.ToInt32(availabilityCustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration 
+                        || Convert.ToInt32(availabilityCustomizationId) == (int)EventCustomization.PriorDirectSubsequentEnrollment))
                     {
                         if (partyLegalEntityName != receiverNameEndoso)
                         {
@@ -2570,7 +2600,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                         }
-
+                     
                         if (partyLegalEntityCompanyID != receiverCodeEndoso)
                         {
                             responses.Add(new ValidateListResponse
@@ -7700,6 +7730,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+        #region Get XML Blob Sorage
+
         public async Task<byte[]> GetXmlFromStorageAsync(string trackId)
         {
             var TableManager = new TableManager("GlobalDocValidatorRuntime");
@@ -7715,6 +7748,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return xmlBytes;
         }
 
+        #endregion
 
         #region RequestValidateEmitionEventPrev
 
@@ -7955,6 +7989,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region Validator Document Name Space
+
         public void validatorDocumentNameSpaces(byte[] xmlBytes)
         {
             _xmlBytes = xmlBytes;
@@ -7981,6 +8017,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
             _ns.AddNamespace("xs", "http://www.w3.org/2001/XMLSchema");
         }
+
+        #endregion
 
         #region Evento Cuds
 
@@ -8144,6 +8182,45 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             return responses;
 
+        }
+
+        #endregion
+
+        #region ValidateSignDate
+
+        public List<ValidateListResponse> ValidateSignDate(GlobalDocValidatorDocumentMeta documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            DateTime dateNow = DateTime.UtcNow.Date;
+            var validateResponses = new List<ValidateListResponse>();
+
+            validateResponses.Add(new ValidateListResponse
+            {
+                IsValid = true,
+                Mandatory = true,
+                ErrorCode = "DC24",
+                ErrorMessage = "Evento Fecha firma ValidateSignDate referenciado correctamente",
+                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+            });
+
+            if (documentMeta != null)
+            {
+                DateTime signingTimeEvent = Convert.ToDateTime(documentMeta.SigningTimeStamp).Date;
+                if (signingTimeEvent > dateNow)
+                {
+                    validateResponses.Clear();
+                    validateResponses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "DC24",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+            return validateResponses;
         }
 
         #endregion
