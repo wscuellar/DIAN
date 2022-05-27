@@ -18,6 +18,10 @@
         /// </summary>
         public const string InvoiceTypeCode = "//*[local-name()='InvoiceTypeCode']";
         /// <summary>
+        /// /Invoice/cbc:InvoiceTypeCode=05
+        /// </summary>
+        public const string CreditNoteTypeCode = "//*[local-name()='CreditNoteTypeCode']";
+        /// <summary>
         /// Invoice/cbc:ID
         /// </summary>
         public const string NumFac = "//*[local-name()='Invoice']/*[local-name()='ID']";

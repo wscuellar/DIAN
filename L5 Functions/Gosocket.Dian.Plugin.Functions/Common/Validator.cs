@@ -8099,7 +8099,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 invoceCude.SoftwarePin = software?.Pin;
             }
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDE no está calculado correctamente." };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = (invoceCude.DocumentType == "94"? "NAAD06" : "DEAD06"), ErrorMessage = "Valor del CUDE no está calculado correctamente." };
             var hash = invoceCude.ToCombinacionToCude().EncryptSHA384();
             if (invoceCude.Cude.ToLower() == hash)
             {

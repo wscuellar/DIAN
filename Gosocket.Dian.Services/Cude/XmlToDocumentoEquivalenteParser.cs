@@ -21,7 +21,7 @@ namespace Gosocket.Dian.Services.Cude
                     xmlDocument.Load(stream);
                     invoiceDs.SoftwareId = SelectSingleNode(DocumentoEquivalenteXpath.SoftwareId);
                     invoiceDs.Cude = SelectSingleNode(DocumentoEquivalenteXpath.Cude);
-                    invoiceDs.DocumentType = SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode);
+                    invoiceDs.DocumentType = SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode) != "" ? SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode) : SelectSingleNode(DocumentoEquivalenteXpath.CreditNoteTypeCode);
                     invoiceDs.NumFac = SelectSingleNode(DocumentoEquivalenteXpath.NumFac);
                     invoiceDs.FecFac = SelectSingleNode(DocumentoEquivalenteXpath.FecFac);
                     invoiceDs.HorFac = SelectSingleNode(DocumentoEquivalenteXpath.HorFac);
