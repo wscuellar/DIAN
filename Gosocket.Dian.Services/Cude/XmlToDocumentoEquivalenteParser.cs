@@ -40,15 +40,18 @@ namespace Gosocket.Dian.Services.Cude
                     var valImp2 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp2);
                     if (!string.IsNullOrWhiteSpace(codImp2))
                     {
-                        impuestos.Add(codImp2, valImp2);
+                        if (!impuestos.ContainsKey(codImp2))
+                            impuestos.Add(codImp2, valImp2);
                     }
                     var codImp3 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp3);
                     var valImp3 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp3);
                     if (!string.IsNullOrWhiteSpace(codImp3))
                     {
-                        impuestos.Add(codImp3, valImp3);
+                        if (!impuestos.ContainsKey(codImp3))
+                            impuestos.Add(codImp3, valImp3);
                     }
-                    
+
+
                     invoiceDs.ValTol = SelectSingleNode(DocumentoEquivalenteXpath.ValTol);
                     invoiceDs.NumOfe = SelectSingleNode(DocumentoEquivalenteXpath.NumOfe);
                     invoiceDs.NitAdq = SelectSingleNode(DocumentoEquivalenteXpath.NumAdq);
