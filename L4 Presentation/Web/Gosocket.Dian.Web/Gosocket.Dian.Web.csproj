@@ -2822,7 +2822,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Layout_v1.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
@@ -3085,7 +3085,7 @@
     <Content Include="Views\Shared\_footer.cshtml" />
     <Content Include="Views\Shared\_ConfirmModal.cshtml" />
     <Content Include="Views\Shared\_LoadingPage.cshtml" />
-    <Content Include="Views\Shared\_Layout_.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

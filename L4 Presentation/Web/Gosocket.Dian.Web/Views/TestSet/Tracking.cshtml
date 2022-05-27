@@ -1,15 +1,12 @@
 ﻿@model Gosocket.Dian.Web.Models.TestSetResultViewModel
 @using Gosocket.Dian.Domain.Common
 @{
-    ViewBag.Title = "Detalle de set de pruebas";
+    ViewBag.Title = $"Detalle de set de pruebas - {Model.OperationModeName}";
 }
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
         <div class="panel padding-20">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title - @Model.OperationModeName</h3>
-            </div>
 
             @if (Model.Status == (int)TestSetStatus.InProcess)
             {

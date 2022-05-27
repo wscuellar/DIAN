@@ -419,7 +419,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Certificate.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Certificate.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -433,6 +433,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.Certificate.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
@@ -498,7 +499,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -512,6 +513,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.Company.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
@@ -559,7 +561,7 @@ namespace Gosocket.Dian.Web.Controllers
             /*Si el usuario tiene el campo ContributorTypeId en null 
              * al iniciar sesión por esta sección (Empresa: Representante Legal)
              * se asigna el contributorTypeId [ 1 | Facturador] para tratarlo como tal*/
-            if(contributor.ContributorTypeId is null)
+            if (contributor.ContributorTypeId is null)
             {
                 contributor.ContributorTypeId = (int)Domain.Common.ContributorType.Biller;
                 contributor.AcceptanceStatusId = (int)Domain.Common.ContributorStatus.Pending;
@@ -641,7 +643,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Person.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Person.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -655,6 +657,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.Person.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
@@ -837,7 +840,7 @@ namespace Gosocket.Dian.Web.Controllers
             };
             return View("CompanyLogin", model);
         }
-        
+
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult NotObligedInvoice(string returnUrl)
         {
@@ -852,7 +855,7 @@ namespace Gosocket.Dian.Web.Controllers
                 IdentificationType = (int)Domain.Common.IdentificationType.CC
             };
 
-            return View("NotObligedInvoice",model);
+            return View("NotObligedInvoice", model);
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -877,7 +880,7 @@ namespace Gosocket.Dian.Web.Controllers
         [ChildActionOnly]
         public ActionResult _companyLoginInvoice()
         {
-            return PartialView("_companyLoginInvoice","User");
+            return PartialView("_companyLoginInvoice", "User");
         }
 
         [ExcludeFilter(typeof(Authorization))]
@@ -1356,7 +1359,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -1370,6 +1373,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.ProfileUser.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
@@ -1450,7 +1454,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             var contributorInvoice = userInvoice.Contributors.FirstOrDefault(c => c.Code == modelInvoice.CompanyCode);
-            
+
             if (contributorInvoice == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "Empresa no asociada a representante legal.");
@@ -1481,7 +1485,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("La empresa no se encuentre registrada en el Rut.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if(contributorInvoice.Name == null)
+            if (contributorInvoice.Name == null)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "El representante legal no se encuentre registrado en el Rut.");
                 return Json(new ResponseMessage("El representante legal no se encuentre registrado en el Rut.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1490,7 +1494,7 @@ namespace Gosocket.Dian.Web.Controllers
             var authInvoice = dianAuthTableManager.Find<AuthToken>(pkInvoice, rkInvoice);
             if (authInvoice == null)
             {
-                authInvoice = new AuthToken(pkInvoice, rkInvoice) { UserId = userInvoice.Id, Email = userInvoice.Email, ContributorId = contributorInvoice.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                authInvoice = new AuthToken(pkInvoice, rkInvoice) { UserId = userInvoice.Id, Email = userInvoice.Email, ContributorId = contributorInvoice.Id, Type = AuthType.Company.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "NO OFE" };
                 dianAuthTableManager.InsertOrUpdate(authInvoice);
             }
             else
@@ -1504,6 +1508,7 @@ namespace Gosocket.Dian.Web.Controllers
                     authInvoice.Type = AuthType.Company.GetDescription();
                     authInvoice.Token = Guid.NewGuid().ToString();
                     authInvoice.Status = true;
+                    authInvoice.LoginMenu = "NO OFE";
                     dianAuthTableManager.InsertOrUpdate(authInvoice);
                 }
             }
@@ -1591,14 +1596,14 @@ namespace Gosocket.Dian.Web.Controllers
 
             var recaptchaValidation = IsValidCaptcha(model.RecaptchaToken);
             if (!recaptchaValidation.Item1)
-            { 
+            {
                 ModelState.AddModelError($"PersonLoginFailed", recaptchaValidation.Item2);
                 return View("NotObligedInvoice", model);
             }
             if (!ModelState.IsValid)
                 return View("NotObligedInvoice", model);
 
-            var user =  userService.GetByCodeAndIdentificationTyte(model.PersonCode, model.IdentificationType);
+            var user = userService.GetByCodeAndIdentificationTyte(model.PersonCode, model.IdentificationType);
             if (user == null)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "La persona no se encuentre registrada en el Rut.");
@@ -1636,7 +1641,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Person.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.Person.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "NO OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -1650,6 +1655,7 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.Person.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "NO OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
@@ -1663,12 +1669,12 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.Url = accessUrl;
             ViewBag.currentTab = "confirmed";
 
-           var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
-           var reportFromEmailRange = auth.Email;
-           var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
-           var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
-           var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
-           var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
+            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
+            var reportFromEmailRange = auth.Email;
+            var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
+            var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
+            var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
+            var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
 
             string msgRange = "Acceda a la plataforma mediante el siguiente link generado <br>" +
                                "<br> Acceder: " + accessUrl + " <br>" +
@@ -1679,7 +1685,7 @@ namespace Gosocket.Dian.Web.Controllers
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                 message.From = new System.Net.Mail.MailAddress(reportToEmailRange, "Token Acceso DIAN");//correo remitente
                 message.To.Add(new System.Net.Mail.MailAddress(reportFromEmailRange));//correo destinatarios
-                message.Subject = "Estimado (a),"+ reportFromEmailRange;//asunto
+                message.Subject = "Estimado (a)," + reportFromEmailRange;//asunto
                 message.IsBodyHtml = true; //to make message body as html
                 message.Body = msgRange;//mensaje
                 smtp.Port = reportPortSmtpRange;
@@ -1749,7 +1755,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
             if (!ModelState.IsValid)
                 return Json(new ResponseMessage(TextResources.IncompleteForm, TextResources.ModelError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
-            
+
             var user = userService.GetByCodeAndIdentificationTyte(model.UserCode, model.IdentificationType);
 
             if (user == null)
@@ -1757,8 +1763,8 @@ namespace Gosocket.Dian.Web.Controllers
                 ModelState.AddModelError($"ContributorUserLoginFailed", TextResources.UserDoesntExist);
                 return Json(new ResponseMessage(TextResources.UserDoesntExist, TextResources.UserError, (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
-            
-            
+
+
 
             var result = SignInManager.PasswordSignIn(user.Email, model.Password, true, shouldLockout: true);
 
@@ -1801,7 +1807,7 @@ namespace Gosocket.Dian.Web.Controllers
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             if (auth == null)
             {
-                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true };
+                auth = new AuthToken(pk, rk) { UserId = user.Id, Email = user.Email, ContributorId = contributor.Id, Type = AuthType.ProfileUser.GetDescription(), Token = Guid.NewGuid().ToString(), Status = true, LoginMenu = "NO OFE" };
                 dianAuthTableManager.InsertOrUpdate(auth);
             }
             else
@@ -1815,24 +1821,25 @@ namespace Gosocket.Dian.Web.Controllers
                     auth.Type = AuthType.ProfileUser.GetDescription();
                     auth.Token = Guid.NewGuid().ToString();
                     auth.Status = true;
+                    auth.LoginMenu = "NO OFE";
                     dianAuthTableManager.InsertOrUpdate(auth);
                 }
             }
 
             UserManager.AddClaim(user.Id, new System.Security.Claims.Claim(AuthType.ProfileUser.GetDescription(), user.Id));
-         
+
             var redirectUrl = ConfigurationManager.GetValue("UserAuthTokenUrl") + $"pk={auth.PartitionKey}&rk={auth.RowKey}&token={auth.Token}";
-           
+
             ViewBag.UserEmail = HideUserEmailParts(auth.Email);
             ViewBag.Url = redirectUrl;
             ViewBag.currentTab = "confirmed";
 
-           var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
-           var reportFromEmailRange = auth.Email;
-           var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
-           var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
-           var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
-           var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
+            var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
+            var reportFromEmailRange = auth.Email;
+            var reportUserSmtpRange = ConfigurationManager.GetValue("reportUserSmtp");
+            var reportPasswordSmtpRange = ConfigurationManager.GetValue("reportPasswordSmtp");
+            var reportHostSmtpRange = ConfigurationManager.GetValue("reportHostSmtp");
+            var reportPortSmtpRange = Convert.ToInt32(ConfigurationManager.GetValue("reportPortSmtp").ToString());
 
             string msgRange = "Acceda a la plataforma mediante el siguiente link generado <br>" +
                                "<br> Acceder: " + redirectUrl + " <br>" +
@@ -1843,7 +1850,7 @@ namespace Gosocket.Dian.Web.Controllers
                 System.Net.Mail.SmtpClient smtp = new System.Net.Mail.SmtpClient();
                 message.From = new System.Net.Mail.MailAddress(reportToEmailRange, "Token Acceso DIAN");//correo remitente
                 message.To.Add(new System.Net.Mail.MailAddress(reportFromEmailRange));//correo destinatarios
-                message.Subject = "Estimado (a),"+ reportFromEmailRange;//asunto
+                message.Subject = "Estimado (a)," + reportFromEmailRange;//asunto
                 message.IsBodyHtml = true; //to make message body as html
                 message.Body = msgRange;//mensaje
                 smtp.Port = reportPortSmtpRange;
@@ -1872,7 +1879,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
-            return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: "+ reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: " + reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
         }
 
@@ -1946,7 +1953,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (result.Succeeded)
             {
                 var resultEmail = SendMailRecoveryPasswordInvoice(email, password);
-                if(resultEmail == true)
+                if (resultEmail == true)
                 {
                     return Json(new ResponseMessage(TextResources.EmailSentSuccessfully, TextResources.alertType), JsonRequestBehavior.AllowGet);
                 }
@@ -1955,13 +1962,13 @@ namespace Gosocket.Dian.Web.Controllers
                     Response.StatusCode = 400;
                     return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
                 }
-                
+
             }
             Response.StatusCode = 400;
             return Json(new ResponseMessage(TextResources.SendEmailFailed, TextResources.alertType), JsonRequestBehavior.AllowGet);
         }
 
-       #endregion
+        #endregion
 
         #region SendMailRecoveryPassword
 
@@ -1973,10 +1980,10 @@ namespace Gosocket.Dian.Web.Controllers
         private bool SendMailRecoveryPassword(string email, string password)
         {
             var emailService = new Gosocket.Dian.Application.EmailService();
-           
+
             StringBuilder message = new StringBuilder();
             Dictionary<string, string> dic = new Dictionary<string, string>();
-            
+
             message.Append("<span><b>Comunicación de servicio</b></span><br>");
             message.Append("<br> <span><b>Su contraseña para ingresar al sistema es: </b></span><br>");
             message.AppendFormat("<br> Contraseña: {0}", password);
@@ -1998,7 +2005,7 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         private bool SendMailRecoveryPasswordInvoice(string email, string password)
         {
-         
+
             var reportToEmailRange = ConfigurationManager.GetValue("reportToEmail");
             //ConfigurationManager.GetValue("reportFromEmail");
             var reportFromEmailRange = email;
@@ -2042,7 +2049,7 @@ namespace Gosocket.Dian.Web.Controllers
                 };
                 return false;
             }
-                return true;
+            return true;
         }
 
         #endregion

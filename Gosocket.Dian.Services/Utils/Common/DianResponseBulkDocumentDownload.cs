@@ -7,12 +7,6 @@ namespace Gosocket.Dian.Services.Utils.Common
     public class DianResponseBulkDocumentDownload
     {
         [DataMember]
-        public byte[] XmlBytes { get; set; }
-
-        [DataMember]
-        public byte[] XmlBase64Bytes { get; set; }
-
-        [DataMember]
         public string StatusCode { get; set; }
 
         [DataMember]
@@ -23,12 +17,6 @@ namespace Gosocket.Dian.Services.Utils.Common
 
         [DataMember]
         public string StatusDescription { get; set; }
-
-        [DataMember]
-        public string XmlFileName { get; set; }
-
-        [DataMember]
-        public string XmlDocumentKey { get; set; }
 
         [DataMember]
         public List<string> ErrorMessage { get; set; }

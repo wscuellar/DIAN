@@ -871,7 +871,28 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{FabricanteNombre}", string.Empty);
 				Html = Html.Replace("{FabricanteSoftware}", string.Empty);
 			}
-		
+
+			try
+			{
+				var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("BeneficiosComprador"));
+				var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionBeneficiosComprador"));
+				var soft = info.Descendants().Elements(def + "Value").ToArray();
+				if (soft.Count() > 0)
+				{
+					Html = Html.Replace("{CodigoComprador}", soft[0].Value);
+					Html = Html.Replace("{NombresComprador}", soft[1].Value);
+					Html = Html.Replace("{Puntos}", soft[2].Value);
+				}
+			}
+			catch (Exception)
+			{
+
+				Html = Html.Replace("{CodigoComprador}", string.Empty);
+				Html = Html.Replace("{NombresComprador}", string.Empty);
+				Html = Html.Replace("{Puntos}", string.Empty);
+			}
+
+			
 
 			//var FabricanteRazon = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext+ "ExtensionContent")
 			//    .Elements("FabricanteSoftware").Elements("InformacionDelFabricanteDelSoftware").Elements( "Name");//resta subtotal ? 

@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Documentos Electrónicos";
+    string configurationManager = ViewBag.configurationManager;
 }
 @*<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />*@
 
@@ -10,10 +11,6 @@
 </style>
 
 <div class="page-content radian-view margin-20 margin-page-content">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
     </div>
     
     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="container-fluid RadianContainerBegin">
@@ -22,12 +19,19 @@
         <hr>
 
         <div class="hab-menu-container">
-            @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
+            @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
             {
                 <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
                     <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
                     Factura electrónica
                 </button>
+            }
+            else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Hab")
+            {
+                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                        <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                        Factura electrónica
+                    </button>
             }
 
             @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)

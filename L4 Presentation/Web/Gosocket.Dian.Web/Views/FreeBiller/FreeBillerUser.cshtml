@@ -23,10 +23,12 @@
 <div class="page-content margin-15">
 
     <div class="title-container">
-        <p class="title-view" style="margin: 0px 0px 30px 0px;">
+        <p class="title-view">
             @ViewBag.title
         </p>
-     </div>
+        <div class="underline-title"></div>
+    </div>
+
 
     <div class="row margin-horizontal-0">
         <div class="tab-base">
@@ -143,7 +145,6 @@
         });
 
         function activo(checkboxElem,Id,userID) {
-            showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
             if (checkboxElem.checked) {
                 var activo = "true";
                 var confirmMessage = bootboxMessage.CONFIRMATION_MESSAGE_ACTIVE;
@@ -152,6 +153,7 @@
                     hideLoading('#divMain');
                 }
                 var operation = () => {
+                    showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                     $.ajax({
                         url: '@Url.Action("EditUserActive", "FreeBiller")',
                         data: "Id=" + userID + "&activo=" + activo,
@@ -163,11 +165,14 @@
                             var buttons = null;
                             var clName = (data.Code == 200) ? "cancel-confirmation" : null;
                             var operationCancelA = () => {
+                                hideLoading('#divMain');
                                 window.location.reload();
-                            }; 
+                            };
+                            hideLoading('#divMain');
                             showConfirmation(confirmMessage, buttons, clName, operationCancelA)
                         },
                         error: function (xhr) {
+                            hideLoading('#divMain');
                             console.log(xhr);
                         }
                     });
@@ -182,6 +187,7 @@
                     hideLoading('#divMain');
                 }
                 var operation = () => {
+                    showLoading('#divMain', 'Guardando', 'Procesando datos, por favor espere.');
                     $.ajax({
                        url: '@Url.Action("EditUserActive", "FreeBiller")',
                         data: "Id=" + userID + "&activo=" + activo,
@@ -192,11 +198,14 @@
                             var buttons = null;
                             var clName = (data.Code == 200) ? "cancel-confirmation" : null;
                             var operationCancelA = () => {
+                                hideLoading('#divMain');
                                 window.location.reload();
-                            }; 
+                            };
+                            hideLoading('#divMain');
                             showConfirmation(confirmMessage, buttons, clName, operationCancelA)
                         },
                         error: function (xhr) {
+                            hideLoading('#divMain');
                             console.log(xhr);
                         }
                     });
