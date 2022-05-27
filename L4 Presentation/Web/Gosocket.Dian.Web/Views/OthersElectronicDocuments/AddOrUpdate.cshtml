@@ -201,17 +201,16 @@
                                                             <td nowrap class="text-center">
                                                                 @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
                                                                 <a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })" title="Pruebas de Aceptación"><i class="fa fa-eye" style="font-size: 22px;color: #348441;"></i></a>
-                                                                @if (isElectronicPayroll || isElectronicPayrollNoOfe)
+                                                                @if(ConfigurationManager.GetValue("Environment") != "Prod")
                                                                 {
-                                                                    <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                                else if (ViewBag.IsSupportDocument && Model.ContributorIsOfe)
-                                                                {
-                                                                    <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                                    if (isElectronicPayroll || isElectronicPayrollNoOfe || (ViewBag.IsSupportDocument && Model.ContributorIsOfe))
+                                                                    {
+                                                                        <a onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <a class="@(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" title="Eliminar"><i class="fa fa-times-circle" style="font-size: 22px;color: #348441;margin-left:8px;"></i></a>
+                                                                    }
                                                                 }
                                                                 @if (ViewBag.IsEquivalentDocument)
                                                                 {

@@ -1826,7 +1826,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.IsCorrect)
             {
                 dianResponse.StatusDescription = $"La solicitud {trackId} se encuentra en estado: {response.State}, {response.Response}";
-                //dianResponse.UrlDescarga = response.UrlFileCsv;
+                dianResponse.UrlDescarga = response.UrlFileCsv;
             }
             else
             {
