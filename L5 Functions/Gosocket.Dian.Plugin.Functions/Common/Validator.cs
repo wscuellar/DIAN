@@ -1245,8 +1245,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     else if (documentMeta.DocumentTypeId == "92") senderDvErrorCode = "DAJ24";
                     if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
                     {
-                        senderDvErrorCode = "DEAK24";
-                        senderDvrErrorDescription = "No está informado el DV del NIT";
+                        if (documentMeta.DocumentTypeId != "40") { 
+                            senderDvErrorCode = "DEAK24";
+                            senderDvrErrorDescription = "No está informado el DV del NIT";
+                        }
+                        
                     }
 
                     if (string.IsNullOrEmpty(senderCodeDigit) || senderCodeDigit == "undefined") senderCodeDigit = "11";
