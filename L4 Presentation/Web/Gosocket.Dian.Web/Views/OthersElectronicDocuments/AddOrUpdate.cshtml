@@ -125,21 +125,20 @@
                 @ViewBag.title
             }
         </p>
-        <div class="underline-title"></div>
-        <div class="divBackTop">
-            <span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
-            &nbsp;<a id="btnBackTop" href="#!" class="btnBackTop">Volver</a>
-        </div>
+        <!--<div class="divBackTop">
+        <span class="glyphicon glyphicon-chevron-left iconBackTop"></span>
+        &nbsp;<a id="btnBackTop" href="#!" class="btnBackTop">Volver</a>
+    </div>-->
     </div>
 
     <div class="row margin-horizontal-0" style="margin-top: 15px;">
         <div class="tab-base">
-            <div class="tab-content padding-0">
+            <div class="tab-content padding-0" style="background:transparent;">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div class="panel" id="panel-wrapper" data-target="#panel-wrapper">
-                        <div class="panel-body padding-top-20">
+                    <div class="panel" id="panel-wrapper" data-target="#panel-wrapper" style="background:transparent;">
+                        <div class="panel-body" style="padding:0px;">
                             <div class="row margin-horizontal-0">
-                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0" style="padding: 20px;">
 
                                     @using (Html.BeginForm("AddOrUpdateContributor", "OthersElectronicDocuments", FormMethod.Post, new { id = "frmOthersElectronicDocuments" }))
                                     {
@@ -158,7 +157,7 @@
                             </div>
                         </div>
 
-                        <div class="panel-body padding-top-20">
+                        <div class="panel-body" style="background:transparent;">
                             <p class="sub-title"> Listado de modos de operación asociados</p>
 
                             <div class="table-responsive">

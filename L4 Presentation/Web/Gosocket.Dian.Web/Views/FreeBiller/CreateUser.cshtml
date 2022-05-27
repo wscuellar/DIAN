@@ -55,7 +55,6 @@
         <p class="title-view">
             @ViewBag.title
         </p>
-        <div class="underline-title"></div>
     </div>
 
     <div class="row margin-horizontal-0">
@@ -99,8 +98,6 @@
                                                                 </div>
 
                                                             </div>
-                                                        </div>
-                                                        <div class="row">
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
@@ -109,6 +106,9 @@
                                                                     @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                        <div class="row">
+
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })

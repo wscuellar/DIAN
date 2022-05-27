@@ -16,7 +16,7 @@
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
 
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0" style="box-shadow: none;">
                         @using (Html.BeginForm("ProcessAuthorizationRequest", "BigContributor", FormMethod.Post, new { id = "process-authorization-request-form" }))
                         {
                             @Html.AntiForgeryToken()

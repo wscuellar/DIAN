@@ -13,11 +13,12 @@
 }
 
 <div class="page-content margin-15">
+    <div class="panel-heading">
+        <h3 class="panel-title">@ViewBag.Title</h3>
+    </div>
     <div class="row margin-horizontal-0">
         <div class="panel padding-20">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
+
 
             @if (!User.IsInAnyRole("Administrador", "Super") && !string.IsNullOrEmpty(Model.TestSetId))
             {
@@ -58,7 +59,7 @@
             <div class="panel-body">
                 <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="">
                     @Html.Partial("_form")
-                    <div class="panel-footer text-right">
+                    <div class="panel-footer text-left">
                         @if (User.IsInAnyRole("Administrador", "Super"))
                         {
                             <a href="@Url.Action("Edit", "TestSet", new { operationModeId = Model.OperationModeId })" class="btn btn-primary btn-hover-gosocket">Editar</a>

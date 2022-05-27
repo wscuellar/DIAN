@@ -26,7 +26,7 @@
 
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0 padding-20">
                         @using (Html.BeginForm("AddContributorOperations", "Contributor", FormMethod.Post, new { id = "add-operation-mode-form" }))
                         {
                             @Html.AntiForgeryToken()
@@ -61,10 +61,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-inline padding-bottom-10 padding-top-10 biller" style="display:none;">
+                                <div class="form-inline padding-bottom-20 padding-top-20 biller">
                                     <div class="row margin-horizontal-0">
                                         <div class="col-sm-12 table-toolbar-left padding-left-0 panel-heading padding-bottom-0" style="max-height:30px;">
-                                            <h3 class="panel-title">Datos de empresa y software </h3>
+                                            <h3 class="panel-title" style="padding:0px;">Datos de empresa y software </h3>
                                         </div>
                                     </div>                                  
                                 </div>

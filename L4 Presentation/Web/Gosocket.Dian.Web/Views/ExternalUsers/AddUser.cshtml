@@ -299,7 +299,7 @@
 
             </div>
         </div>
-        <div class="panel-footer footerRectangle" style="background-color: initial;">
+        <div class="footerRectangle" style="background-color: none !important;">
             @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
             <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
             <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
@@ -315,15 +315,15 @@
             @if (Model.Id == null || Model.Id == "")
             {
 
-                <div class="panel-body padding-top-20" style="background-color: initial;">
+                <div class="panel-body" style="background-color: initial; padding: 0px; margin-top: 10px;">
                     <div class="row">
                         <div class="col-lg-12  col-md-12  col-xs-12">
-                            <h4><strong> Usuarios Configurados</strong></h4>
+                            <h4 class="subtitle-view" style="margin-bottom:20px;"><strong> Usuarios Configurados</strong></h4>
                             
                         </div>
                         @*<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
                         </div>*@
-                        <div class="  col-lg-12 col-md-12  col-xs-12">
+                        <div class="col-lg-12 col-md-12  col-xs-12">
                             <div class="table-responsive">
 
                                 <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">

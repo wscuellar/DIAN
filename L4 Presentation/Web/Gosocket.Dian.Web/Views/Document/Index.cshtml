@@ -55,10 +55,9 @@
 <div class="page-content margin-15">
 
     <div class="title-container">
-        <p class="title-view">
+        <p class="title-view">            
             @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
+        </p>       
     </div>
 
     <div class="tab-base" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
@@ -66,10 +65,10 @@
         <div class="row margin-horizontal-0">
             <div class="tab-base">
                 <!--Tabs Content-->
-                <div class="tab-content transparency">
+                <div class="tab-content transparency" style="padding:0px !important;">
                     <div id="tab-current-country" class="tab-pane fade active in">
                         <div class="panel" id="panel-form1" data-target="#panel-form1" data-toggle="panel-overlay" style="background-color: #ffffff00;">
-                            <div class="panel-body padding-top-20">
+                            <div class="panel-body" style="padding:0px !important;">
                                 <div class="pad-btm padding-bottom-0">
                                     <div class="row margin-horizontal-0">
                                         @{ string action = ViewBag.ViewType; }

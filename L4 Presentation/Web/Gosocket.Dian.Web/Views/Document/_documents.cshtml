@@ -12,14 +12,12 @@
 </style>
 
 <div class="row radian-subtitle-container">
-    <p class="subtitle-view">
-        Resultados de búsqueda
-    </p>
-    <div class="radian-subtitle-line"></div>
+    <p class="subtitle-view" style="margin-bottom: 15px;">Resultados de búsqueda</p>
+    
 </div>
 
 <div class="table-responsive padding-bottom-15">
-    <table colspan="13" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table colspan="13" class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th style="width: 50px;"></th>
@@ -46,7 +44,7 @@
             {
                 <tr style="background-color: transparent !important;">
                     <td class="text-nowrap text-center" colspan="@(Model.ContributorTypeId != 4 ? 13 : 14)" style="padding-left: 0 !important; padding-right: 0 !important;">
-                        <div class="alert panel-footer-grey">
+                        <div class="alert dataTables_empty">
                             Ningún documento disponible para mostrar.
                         </div>
                     </td>
