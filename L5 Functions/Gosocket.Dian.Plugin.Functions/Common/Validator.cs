@@ -1232,7 +1232,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId != "96")
             {
                 // Sender
-                if (senderSchemeCode == "31")
+                if (senderSchemeCode == "31" && !_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) )
                 {
                     string senderDvErrorCode = "FAJ24";
                     string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
