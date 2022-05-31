@@ -1617,7 +1617,7 @@ namespace Gosocket.Dian.Web.Controllers
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
 
             /*Si el usuario tiene el campo ContributorTypeId en null 
-             * al iniciar sesión por esta sección (Persona)
+             * al iniciar sesión por esta sección (Empresa: Representante Legal)
              * se asigna el contributorTypeId [ 4 | No Obligado a Facturar] para tratarlo como tal*/
             if (contributorInvoice.ContributorTypeId is null)
             {

@@ -1232,7 +1232,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentMeta.DocumentTypeId != "96")
             {
                 // Sender
-                if (senderSchemeCode == "31")
+                if (senderSchemeCode == "31" && !_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) )
                 {
                     string senderDvErrorCode = "FAJ24";
                     string senderDvrErrorDescription = "DV del NIT del emsior del documento no está correctamente calculado";
@@ -8099,7 +8099,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 invoceCude.SoftwarePin = software?.Pin;
             }
 
-            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = "DEAD06", ErrorMessage = "Valor del CUDE no está calculado correctamente." };
+            var response = new ValidateListResponse { IsValid = false, Mandatory = true, ErrorCode = (invoceCude.DocumentType == "94"? "NAAD06" : "DEAD06"), ErrorMessage = "Valor del CUDE no está calculado correctamente." };
             var hash = invoceCude.ToCombinacionToCude().EncryptSHA384();
             if (invoceCude.Cude.ToLower() == hash)
             {

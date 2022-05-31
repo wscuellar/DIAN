@@ -913,7 +913,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{RangoDesde}", string.Empty);
 
 			var RangoHasta = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent")
-			   .Elements(sts + "DianExtensions").Elements(sts + "InvoiceControl").Elements(sts + "AuthorizedInvoices").Elements(sts + "From");
+			   .Elements(sts + "DianExtensions").Elements(sts + "InvoiceControl").Elements(sts + "AuthorizedInvoices").Elements(sts + "To");
+
 			if (RangoHasta.Any())
 				Html = Html.Replace("{RangoHasta}", RangoHasta.FirstOrDefault().Value);
 			else

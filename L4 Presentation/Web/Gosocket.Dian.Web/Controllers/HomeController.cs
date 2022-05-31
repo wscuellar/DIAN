@@ -180,11 +180,7 @@ namespace Gosocket.Dian.Web.Controllers
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
                 ViewBag.LoginMenu = auth.LoginMenu;
 
-                //if (contributor.ContributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
-                //{
-                //    Session["Login_ContributorType"] = "- No OFE";
-                //}else 
-                if (auth.LoginMenu == "NO OFE")
+                if(auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }
