@@ -172,6 +172,7 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = contributor.AcceptanceStatusId;
                 model.ContributorHabilitationDate = contributor.HabilitationDate ?? DateTime.UtcNow;
                 model.ContributorProductionDate = contributor.ProductionDate;
+                model.ContributorTypeId = contributor.ContributorTypeId.GetValueOrDefault();
 
                 var identificatioType = User.IdentificationTypeId();
 
