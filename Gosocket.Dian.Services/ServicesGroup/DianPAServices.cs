@@ -1790,6 +1790,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             var user = GetGlobalContributor(authCode);
 
+            var authorization = GetAuthorization(nit, authCode);
+
+            if(authorization is null)
+            {
+                dianResponse.StatusCode = "89";
+                dianResponse.StatusDescription = "Usted no está autorizado para realizar esta operación.";
+                return dianResponse;
+            }
+
             var request = new BulkDocumentDownloadRequest(user.Code, email, nit, startDate, endDate, documentGroup);
             var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);
             timer.Stop();
