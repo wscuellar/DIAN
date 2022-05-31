@@ -1014,6 +1014,13 @@ namespace Gosocket.Dian.Web.Services
                     return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
                 }
 
+                /*2022-05-31 Agregar el campo nit como obligatorio*/
+                if (string.IsNullOrWhiteSpace(nit))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio." };
+                }
+
                 DianPAServices customerDianPa = new DianPAServices();
 
                 Stopwatch stopwatch = new Stopwatch();
