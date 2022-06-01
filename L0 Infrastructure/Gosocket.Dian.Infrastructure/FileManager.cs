@@ -18,7 +18,7 @@ namespace Gosocket.Dian.Infrastructure
 
     public class FileManager
     {
-        private static FileManager _instance = null;
+        
 
         //public CloudBlobClient BlobClient { get; set; }
 
@@ -70,8 +70,8 @@ namespace Gosocket.Dian.Infrastructure
                 return bytes;
             }
             catch (Exception ex)
-            {
-                _ = ex.Message;
+            {                
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -90,8 +90,9 @@ namespace Gosocket.Dian.Infrastructure
                 }
                 return bytes;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -113,7 +114,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (StorageException ex)
             {
-                Console.WriteLine(ex.Message);                
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 contentType = "";
                 return null;
             }
@@ -128,8 +129,9 @@ namespace Gosocket.Dian.Infrastructure
                 blob.DownloadToStream(target);
                 return target;
             }
-            catch (StorageException)
+            catch (StorageException ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -146,8 +148,9 @@ namespace Gosocket.Dian.Infrastructure
                     return Encoding.UTF8.GetString(ms.ToArray());
                 }
             }
-            catch (StorageException)
+            catch (StorageException ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -166,8 +169,9 @@ namespace Gosocket.Dian.Infrastructure
                 }
                 return text;
             }
-            catch (StorageException)
+            catch (StorageException ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -186,8 +190,9 @@ namespace Gosocket.Dian.Infrastructure
                 }
                 return text;
             }
-            catch (StorageException)
+            catch (StorageException ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -199,8 +204,9 @@ namespace Gosocket.Dian.Infrastructure
                 var blob = BlobContainer.GetBlockBlobReference(name);
                 return blob.Uri.AbsoluteUri;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -218,7 +224,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
-                _ = ex.Message;
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
 
@@ -238,7 +244,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
-                _ = ex.Message;
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -262,8 +268,9 @@ namespace Gosocket.Dian.Infrastructure
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -279,7 +286,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
-                _ = ex.Message;
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -319,8 +326,9 @@ namespace Gosocket.Dian.Infrastructure
                 var blob = BlobContainer.GetBlockBlobReference(name);
                 return blob.Exists();
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -333,8 +341,9 @@ namespace Gosocket.Dian.Infrastructure
                 var blob = blobContainer.GetBlockBlobReference(name);
                 return blob.Exists();                
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -359,9 +368,10 @@ namespace Gosocket.Dian.Infrastructure
             {
                 leaseId = blob.AcquireLease(timeout, null);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // ignored
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
+                
             }
 
             return leaseId;
@@ -379,8 +389,9 @@ namespace Gosocket.Dian.Infrastructure
                 blob.RenewLease(AccessCondition.GenerateLeaseCondition(leaseId));
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -423,7 +434,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
-                _ = ex.Message;
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return false;
             }
         }
@@ -450,8 +461,9 @@ namespace Gosocket.Dian.Infrastructure
 
                 return leaseId;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
@@ -487,7 +499,7 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (Exception ex)
             {
-                _ = ex.Message;
+                Console.Error.WriteLine($"{ ex.Message}______{ex.StackTrace}");
                 return null;
             }
         }
