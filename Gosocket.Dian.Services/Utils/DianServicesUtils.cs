@@ -19,7 +19,8 @@ namespace Gosocket.Dian.Services.Utils
 {
     public class DianServicesUtils
     {
-        private const string CategoryContainerName = "dian";
+        private static string CategoryContainerName = "dian";
+        private static FileManager DianFileManager = new FileManager(CategoryContainerName);
         private static readonly TableManager tableManagerDianFileMapper = new TableManager("DianFileMapper");
         private static readonly TableManager tableManagerDianProcessResult = new TableManager("DianProcessResult");
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
@@ -341,7 +342,7 @@ namespace Gosocket.Dian.Services.Utils
             var serieFolder = string.IsNullOrEmpty(series) ? "Sin Serie" : series;
 
             string cdrFileName = $"responses/{entityProcessResult.Timestamp.Year}/{entityProcessResult.Timestamp.Month.ToString().PadLeft(2, '0')}/{entityProcessResult.Timestamp.Day.ToString().PadLeft(2, '0')}/{folder}/{senderCode}/{documentType.ToString()}/{serieFolder}/{number}.xml";
-            if (new FileManager().Exists(container, cdrFileName))
+            if (DianFileManager.Exists(cdrFileName))
             {
                 return new Tuple<string, string>(container, cdrFileName);
             }

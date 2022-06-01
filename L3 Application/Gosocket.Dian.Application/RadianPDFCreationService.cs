@@ -25,16 +25,17 @@ namespace Gosocket.Dian.Application
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
         private readonly IGlobalDocValidationDocumentMetaService _globalDocValidationDocumentMetaService;
         private readonly IAssociateDocuments _associateDocuments;
-        private readonly FileManager _fileManager;
+        private readonly FileManager RadianDocumentsTemplatesFileManager=new FileManager("radian-documents-templates");
+        private readonly FileManager RadianDianLogosFileManager = new FileManager("radian-dian-logos");
+        
 
         #endregion
 
         #region Constructor
 
-        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService, IAssociateDocuments associateDocuments)
+        public RadianPdfCreationService(IQueryAssociatedEventsService queryAssociatedEventsService, IGlobalDocValidationDocumentMetaService globalDocValidationDocumentMetaService, IAssociateDocuments associateDocuments)
         {
-            _queryAssociatedEventsService = queryAssociatedEventsService;
-            _fileManager = fileManager;
+            _queryAssociatedEventsService = queryAssociatedEventsService;            
             _globalDocValidationDocumentMetaService = globalDocValidationDocumentMetaService;
             _associateDocuments = associateDocuments;
         }
@@ -58,10 +59,10 @@ namespace Gosocket.Dian.Application
             //string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
 
 
-            StringBuilder templateFirstPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistencia.html"));
-            StringBuilder templateLastPage = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFinal.html"));
-            StringBuilder footerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFooter.html"));
-            StringBuilder firstEvent = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaFirstEvent.html"));
+            StringBuilder templateFirstPage = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistencia.html"));
+            StringBuilder templateLastPage = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaFinal.html"));
+            StringBuilder footerTemplate = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaFooter.html"));
+            StringBuilder firstEvent = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaFirstEvent.html"));
             GlobalDocValidatorDocumentMeta documentMeta = _queryAssociatedEventsService.DocumentValidation(eventItemIdentifier);
 
 
@@ -214,8 +215,8 @@ namespace Gosocket.Dian.Application
                     if (i % 2 == 1)
                     {
                         page++;
-                        middleTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
-                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                        middleTemplate = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaHeader.html"));
+                        eventTemplate = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaInterna.html"));
                         eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
                         middleTemplate = middleTemplate.Append(eventTemplate);
                         middleTemplate = CommonDataTemplateMapping(middleTemplate, expeditionDate, page, documentMeta, invoiceStatus);
@@ -223,7 +224,7 @@ namespace Gosocket.Dian.Application
                     }
                     if (i % 2 == 0)
                     {
-                        eventTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaInterna.html"));
+                        eventTemplate = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaInterna.html"));
                         eventTemplate = EventTemplateMapping(eventTemplate, events[i], string.Empty);
                         templateFirstPage = templateFirstPage.Append(eventTemplate);
                         footerTemplate = CommonDataTemplateMapping(footerTemplate, expeditionDate, page, documentMeta, invoiceStatus);
@@ -246,7 +247,7 @@ namespace Gosocket.Dian.Application
             else
             {
                 page++;
-                headerTemplate = new StringBuilder(_fileManager.GetText("radian-documents-templates", "CertificadoExistenciaHeader.html"));
+                headerTemplate = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("CertificadoExistenciaHeader.html"));
                 templateLastPage = templateLastPage.Replace("{DocumentsTotal}", documents.Count.ToString());
                 templateLastPage = templateLastPage.Replace("{EventsTotal}", eventCount.ToString());
                 templateLastPage = templateLastPage.Replace("{ExpeditionDate}", expeditionDate.ToShortDateString());
@@ -327,8 +328,8 @@ namespace Gosocket.Dian.Application
 
         private StringBuilder CommonDataTemplateMapping(StringBuilder template, DateTime expeditionDate, int page, GlobalDocValidatorDocumentMeta documentMeta, string invoiceStatus)
         {
-            byte[] bytesLogo = _fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg");
-            byte[] bytesFooter = _fileManager.GetBytes("radian-dian-logos", "GroupFooter.png");
+            byte[] bytesLogo = RadianDianLogosFileManager.GetBytes("Logo-DIAN-2020-color.jpg");
+            byte[] bytesFooter = RadianDianLogosFileManager.GetBytes("GroupFooter.png");
             string imgLogo = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesLogo)}'>";
             string imgFooter = $"<img src='data:image/jpg;base64,{Convert.ToBase64String(bytesFooter)}' class='img-footer'>";
 

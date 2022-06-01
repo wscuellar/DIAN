@@ -19,6 +19,8 @@ namespace Gosocket.Dian.Functions.Pdf
     public static class GetPdf
     {
         private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
+        private static readonly FileManager RadianLogosFileManager = new FileManager("radian-dian-logos");
+        private static readonly FileManager LogosFileManager = new FileManager("GlobalStorageBiller", "logo");
 
         [FunctionName("GetPdf")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
@@ -71,11 +73,9 @@ namespace Gosocket.Dian.Functions.Pdf
                     {"showRefButton", "0"},
                 };
 
-                // Objeto que se Conecta al Storage 
-                var fileManager = new FileManager();
+                
 
-                //var storageBiller = "DefaultEndpointsProtocol=https;AccountName=gtpabillerstoragetest;AccountKey=JAuJKjEWIsOU0e4VhpuY2VH5gk5CEfZyFp3xm3NffTZug7HzUNdJdX4DT+4/UIdE0qfrwG9asG730Zv6QBVFcA==";
-                var fileManagerBiller = new FileManager("GlobalStorageBiller");
+                
 
 
                 // Transformar **XML** to **HTML**
@@ -87,11 +87,11 @@ namespace Gosocket.Dian.Functions.Pdf
                 //-------------------------------------------------------------------------------------------------------------------------
 
                 // Obtener en el Storage el Byte Array del **LOGO** a poner en el Documento - Convertir a Base 64 Image
-                MemoryStream logoDianStream = new MemoryStream(fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+                MemoryStream logoDianStream = new MemoryStream(RadianLogosFileManager.GetBytes("Logo-DIAN-2020-color.jpg"));
                 string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
                 var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
 
-                MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller("logo", $"{documentMetaEntity.SenderCode}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+                MemoryStream logoStream = new MemoryStream(LogosFileManager.GetBytesBiller($"{documentMetaEntity.SenderCode}.jpg") ?? RadianLogosFileManager.GetBytes("Logo-DIAN-2020-color.jpg"));
                 string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
                 var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
@@ -136,7 +136,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 // File.WriteAllText(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.html", Html_Content);
 
                 // Salvar PDF generado de HTML en el Storage
-                var pdfBytes = await PdfCreator.Instance.PdfRenderAsync(Html_Content, trackId, getPaperSize(typeFormat));
+                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId, getPaperSize(typeFormat));
 
                 // Guardar en disco el pdf generado
                 // File.WriteAllBytes(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.pdf", pdfBytes);

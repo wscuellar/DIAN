@@ -26,15 +26,17 @@ namespace Gosocket.Dian.Application
     {   
         #region Properties
 
-        private readonly FileManager _fileManager;
+        private static readonly FileManager RadianDocumentsTemplatesFileManager=new FileManager("radian-documents-templates");
+        private static readonly FileManager DianFileManager = new FileManager("dian");
+        private static readonly FileManager GlobalFileManager = new FileManager("global");
 
         #endregion
 
         #region Constructor
 
-        public RadianSupportDocument(FileManager fileManager)
+        public RadianSupportDocument()
         {
-            _fileManager = fileManager;
+            
         }
 
         #endregion
@@ -44,7 +46,7 @@ namespace Gosocket.Dian.Application
         public async Task<byte[]> GetGraphicRepresentation(string cude, string webPath)
         {
             // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaDocumentoSoporte.html"));
+            StringBuilder template = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("RepresentacionGraficaDocumentoSoporte.html"));
 
             // Load xml
             byte[] xmlBytes = GetXmlFromStorageAsync(cude);
@@ -108,11 +110,10 @@ namespace Gosocket.Dian.Application
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
            
-            var xmlBytes = fileManager.GetBytes(container, fileName);
+            var xmlBytes = GlobalFileManager.GetBytes(fileName);
 
             return xmlBytes;
         }
@@ -124,10 +125,10 @@ namespace Gosocket.Dian.Application
 
         {
 
-            var fileManager = new FileManager();
-            var container = $"dian";
+            
+            
             var fileName = $"responses/{documentMeta.SigningTimeStamp.Date.Year}/{documentMeta.SigningTimeStamp.Date.Month.ToString().PadLeft(2, '0')}/{documentMeta.SigningTimeStamp.Date.Day.ToString().PadLeft(2, '0')}/Success/{documentMeta.SenderCode}/01/SETG/{documentMeta.Number}/{trackId}.xml";
-            var xmlBytes = fileManager.GetBytes(container, fileName);
+            var xmlBytes = DianFileManager.GetBytes(fileName);
             return xmlBytes;
 
         }

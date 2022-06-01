@@ -15,9 +15,9 @@ namespace Gosocket.Dian.Functions.Exchange
     public static class UpdateContributorExchangeEmailFile
     {
         private static readonly TableManager exchangeEmailTableManager = new TableManager("GlobalExchangeEmail");
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
-        private static readonly string blobContainer = "dian";
+        
         private static readonly string blobContainerFolder = "exchange";
 
         [FunctionName("UpdateContributorExchangeEmailFile")]
@@ -37,7 +37,7 @@ namespace Gosocket.Dian.Functions.Exchange
                 var csv = Services.Utils.StringUtil.ToCSV(items);
                 var csvBytes = Encoding.UTF8.GetBytes(csv);
 
-                var result = await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/emails.csv", csvBytes);
+                var result = await DianFileManager.UploadAsync($"{blobContainerFolder}/emails.csv", csvBytes);
                 if (!result) return req.CreateResponse(HttpStatusCode.InternalServerError, "Error uploading csv file to blob.");
             }
             catch (Exception ex)

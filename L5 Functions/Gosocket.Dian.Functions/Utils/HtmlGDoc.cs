@@ -14,6 +14,8 @@ namespace Gosocket.Dian.Functions.Utils
         readonly XmlNamespaceManager _nsmgr;
         readonly byte[] _document;
 
+        private static readonly FileManager DianFileManager = new FileManager("dian");
+
         public HtmlGDoc(byte[] document, byte[] application)
         {
             _document = document;
@@ -104,7 +106,7 @@ namespace Gosocket.Dian.Functions.Utils
             var result = new StringWriter();
 
             // Create a serializer.
-            Serializer serializer = processor.NewSerializer();
+            Serializer serializer = new Serializer();
             serializer.SetOutputWriter(result);
 
             // Transform the source XML to System.out.
@@ -115,19 +117,19 @@ namespace Gosocket.Dian.Functions.Utils
 
         private static byte[] GetTemplate(string typeFormat)
         {
-            var fileManager = new FileManager();
+            
             byte[] htmlXsltBytes;
             if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "formato tipo carta")
             {
-                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE.xslt");
+                htmlXsltBytes = DianFileManager.GetBytes("configurations/transform_gdoc_to_htmlSE.xslt");
             }
             else if (string.IsNullOrWhiteSpace(typeFormat) || typeFormat?.ToLower() == "formato tipo tirilla")
             {
-                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE_Tirilla.xslt");
+                htmlXsltBytes = DianFileManager.GetBytes("configurations/transform_gdoc_to_htmlSE_Tirilla.xslt");
             }
             else
             {
-                htmlXsltBytes = fileManager.GetBytes("dian", "configurations/transform_gdoc_to_htmlSE_customizable.xslt");
+                htmlXsltBytes = DianFileManager.GetBytes("configurations/transform_gdoc_to_htmlSE_customizable.xslt");
             }
 
             return htmlXsltBytes;
@@ -150,8 +152,8 @@ namespace Gosocket.Dian.Functions.Utils
 
         public Stream TransformToGDoc(Dictionary<string, string> parameters = null)
         {
-            var fileManager = new FileManager();
-            var xsltBytes = fileManager.GetBytes("dian", "configurations/transform_dte_to_gdocSE.xslt");
+            
+            var xsltBytes = DianFileManager.GetBytes("configurations/transform_dte_to_gdocSE.xslt");
 
             var processor = new Processor();
             var input = processor.NewDocumentBuilder().Build(_xml);
@@ -167,7 +169,7 @@ namespace Gosocket.Dian.Functions.Utils
                 }
             }
 
-            var serializer = processor.NewSerializer();
+            var serializer = new Serializer();
             var ms = new MemoryStream();
             serializer.SetOutputStream(ms);
             transformer.Run(serializer);

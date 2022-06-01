@@ -41,9 +41,11 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private static readonly TableManager TableManagerGlobalDocEvent = new TableManager("GlobalDocEvent");
         private static readonly TableManager TableManagerGlobalDocumentWithEventRegistered = new TableManager("GlobalDocumentWithEventRegistered");
 
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly string blobContainer = "global";
+        private static readonly FileManager GlobalFileManager = new FileManager(blobContainer);
+        private static readonly FileManager DianFileManager = new FileManager("dian");
 
-        private readonly string blobContainer = "global";
+
         private readonly string blobContainerFolder = "batchValidator";
 
         public DianPAServices()
@@ -78,7 +80,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             };
             var utcNow = DateTime.UtcNow;
             var blobPath = $"{utcNow.Year}/{utcNow.Month.ToString().PadLeft(2, '0')}/{utcNow.Day.ToString().PadLeft(2, '0')}";
-            var result = await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
+            var result = await GlobalFileManager.UploadAsync($"{blobContainerFolder}/{blobPath}/{zipKey}.zip", contentFile);
             if (!result)
             {
                 responseMessages.ZipKey = "";
@@ -433,7 +435,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (contributor == null)
                 return new ExchangeEmailResponse { StatusCode = "89", Success = false, Message = $"NIT {authCode} no autorizado para consultar correos de recepción de facturas.", CsvBase64Bytes = null };
 
-            var bytes = await fileManager.GetBytesAsync("dian", $"exchange/emails.csv");
+            var bytes = await DianFileManager.GetBytesAsync( $"exchange/emails.csv");
             var response = new ExchangeEmailResponse { StatusCode = "0", Success = true, CsvBase64Bytes = bytes };
             return response;
         }
@@ -463,7 +465,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var resultsEntities = TableManagerGlobalBatchFileResult.FindByPartition<GlobalBatchFileResult>(trackId);
             if (resultsEntities.Count == 1) return GetStatusZip(trackId);
 
-            var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
+            var exist = GlobalFileManager.Exists($"{blobContainerFolder}/applicationResponses/{trackId}.zip");
             if (!exist)
             {
                 responses.Add(new DianResponse
@@ -476,7 +478,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
             if (exist)
             {
-                var zipBytes = await fileManager.GetBytesAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
+                var zipBytes = await GlobalFileManager.GetBytesAsync($"{blobContainerFolder}/applicationResponses/{trackId}.zip");
                 if (zipBytes != null)
                 {
                     responses.Add(new DianResponse { IsValid = true, StatusCode = "00", StatusDescription = "Procesado Correctamente.", XmlBase64Bytes = zipBytes });
@@ -1724,10 +1726,10 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync( fileName);
 
             tableManager = null;
             return xmlBytes;

@@ -27,7 +27,7 @@
     {
         #region Properties
 
-        private readonly FileManager _fileManager;
+        private readonly FileManager RadianDocumentsTemplatesFileManager=new FileManager("radian-documents-templates");
         private readonly CosmosDBService _cosmosDBService;
         private readonly TableManager globalDocValidatorDocumentTableManager = new TableManager("GlobalDocValidatorDocument");
         private readonly IQueryAssociatedEventsService _queryAssociatedEventsService;
@@ -37,10 +37,10 @@
 
         #region Constructor
 
-        public RadianGraphicRepresentationService(IContributorService contributorService, IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager, CosmosDBService cosmosDBService)
+        public RadianGraphicRepresentationService(IContributorService contributorService, IQueryAssociatedEventsService queryAssociatedEventsService, CosmosDBService cosmosDBService)
         {
             _queryAssociatedEventsService = queryAssociatedEventsService;
-            _fileManager = fileManager;
+            
             _cosmosDBService = cosmosDBService;
             _contributorService = contributorService;
         }
@@ -52,7 +52,7 @@
         public async Task<byte[]> GetPdfReport(string cude, string urlBase)
         {
             // Load Templates            
-            StringBuilder template = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNew1.html"));
+            StringBuilder template = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("RepresentacionGraficaNew1.html"));
 
             // Load Document Data
             Domain.Entity.EventDataModel model = await GetEventDataModel(cude);
@@ -438,7 +438,7 @@
 
             if (!string.IsNullOrEmpty(model.ReceiverName) && !string.IsNullOrEmpty(model.ReceiverCode))
             {
-                StringBuilder templateSujeto = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaSujetoNew.html"));
+                StringBuilder templateSujeto = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("RepresentaciónGraficaSujetoNew.html"));
 
                 StringBuilder subjects = new StringBuilder();
 
@@ -481,7 +481,7 @@
 
             if (model.ShowTitleValueSection)
             {
-                StringBuilder templateTitleValue = new StringBuilder(_fileManager.GetText("radian-documents-templates", "RepresentaciónGraficaFacturaTituloValor.html"));
+                StringBuilder templateTitleValue = new StringBuilder(RadianDocumentsTemplatesFileManager.GetText("RepresentaciónGraficaFacturaTituloValor.html"));
 
                 for (int i = 0; i < model.ValueTitleEvents[0].Events.Count; i++)
                 {

@@ -7,6 +7,8 @@ namespace Gosocket.Dian.Infrastructure
 {
     public static class ConfigurationManager
     {
+        private static readonly FileManager Configurations = new FileManager("configurations");
+
         public static string GetValue(string key)
         {
             string value;
@@ -32,10 +34,10 @@ namespace Gosocket.Dian.Infrastructure
 
                 _settings = new Dictionary<string, string>();
 
-                var fileManager = new FileManager();
+                
 
                 var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(fileManager.GetText("configurations", "Ose.config"));
+                xmlDoc.LoadXml(Configurations.GetText("Ose.config"));
 
                 var nodes = xmlDoc.SelectNodes("Settings/Setting");
                 if (nodes == null)
@@ -55,9 +57,9 @@ namespace Gosocket.Dian.Infrastructure
             var settings = new Dictionary<string, string>();
             try
             {
-                var fileManager = new FileManager();
+                
                 var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(fileManager.GetText("configurations", configFileName));
+                xmlDoc.LoadXml(Configurations.GetText(configFileName));
 
                 var nodes = xmlDoc.SelectNodes("Settings/Setting");
                 if (nodes == null)

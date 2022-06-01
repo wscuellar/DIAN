@@ -45,6 +45,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager TableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
         private readonly string[] _equivalentDocumentTypes = new string[]{"20", "25", "27", "32", "35", "40", "45", "50", "55", "60", "94" };
 
+        private static FileManager FileManagerGlobal = new FileManager("global");
+
         #region Global properties        
         static readonly TableManager documentHolderExchangeTableManager = new TableManager("GlobalDocHolderExchange");
         static readonly TableManager contributorTableManager = new TableManager("GlobalContributor");
@@ -7739,11 +7741,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var documentStatusValidation = TableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;
-
-            var fileManager = new FileManager();
-            var container = $"global";
+                        
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await FileManagerGlobal.GetBytesAsync( fileName);
 
             return xmlBytes;
         }

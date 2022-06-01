@@ -8,14 +8,14 @@ namespace Gosocket.Dian.Infrastructure
 {
     public static class EmailTemplateManager
     {
+        private static FileManager fileManager = new FileManager("templates-emails");
         public static string GenerateHtmlBody(string templateName, Dictionary<string, string> replacements,string templateBase = "template.html")
         {
             try
             {
-                var emailId = Guid.NewGuid();
-                var fileManager = new FileManager();
-                var templateBaseContent = fileManager.GetText("templates-emails", templateBase);
-                var templateContent = fileManager.GetText("templates-emails", templateName + ".html");
+                var emailId = Guid.NewGuid();                
+                var templateBaseContent = fileManager.GetText(templateBase);
+                var templateContent = fileManager.GetText(templateName + ".html");
 
                 var body = templateContent;
 

@@ -26,6 +26,8 @@ namespace Gosocket.Dian.Infrastructure
         public static CloudBlobClient BlobClient => lazyClient.Value;
 
         public CloudBlobClient BlobClientBiller;
+        private CloudBlobContainer BlobContainer;
+        private string ContainerName;
 
         private static CloudBlobClient InitializeBlobClient()
         {
@@ -34,26 +36,30 @@ namespace Gosocket.Dian.Infrastructure
             return blobClient;
         }
 
-        public FileManager()
+        public FileManager(string container, bool createIfNotExists = false)
         {
-            
+            ContainerName = container;
+            BlobContainer = BlobClient.GetContainerReference(container);
+            if (createIfNotExists)
+                BlobContainer.CreateIfNotExists();
         }
 
-        public FileManager(string blobBiller)
+        public FileManager(string blobBiller, string container)
         {
-            var account = CloudStorageAccount.Parse(ConfigurationManager.GetValue(blobBiller));
+            var account = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(blobBiller));
             var blobClient = account.CreateCloudBlobClient();
-            BlobClientBiller = blobClient;
+            BlobContainer = blobClient.GetContainerReference(container);
+
         }
 
-        public static FileManager Instance => _instance ?? (_instance = new FileManager());
 
-        public byte[] GetBytes(string container, string name)
+
+        public byte[] GetBytes(string name)
         {
             try
             {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+                
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 byte[] bytes;
                 using (var ms = new MemoryStream())
@@ -70,12 +76,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public async Task<byte[]> GetBytesAsync(string container, string name)
+        public async Task<byte[]> GetBytesAsync(string name)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 byte[] bytes;
                 using (var ms = new MemoryStream())
@@ -91,12 +96,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public byte[] GetBytes(string container, string name, out string contentType)
+        public byte[] GetBytes(string name, out string contentType)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                CloudBlockBlob blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                CloudBlockBlob blob = BlobContainer.GetBlockBlobReference(name);
 
                 byte[] bytes;
                 using (var ms = new MemoryStream())
@@ -109,20 +113,18 @@ namespace Gosocket.Dian.Infrastructure
             }
             catch (StorageException ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.Out.WriteLine(ex.Message);
+                Console.WriteLine(ex.Message);                
                 contentType = "";
                 return null;
             }
         }
 
-        public Stream GetStream(string container, string name)
+        public Stream GetStream(string name)
         {
             try
             {
-                Stream target = new MemoryStream();
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+                Stream target = new MemoryStream();                
+                var blob = BlobContainer.GetBlockBlobReference(name);
                 blob.DownloadToStream(target);
                 return target;
             }
@@ -132,12 +134,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public async Task<string> GetTextAsync(string container, string name)
+        public async Task<string> GetTextAsync(string name)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 using (var ms = new MemoryStream())
                 {
@@ -151,12 +152,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public string GetText(string container, string name)
+        public string GetText(string name)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 string text;
                 using (var ms = new MemoryStream())
@@ -172,12 +172,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public string GetText(string container, string name, Encoding encoding)
+        public string GetText(string name, Encoding encoding)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {             
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 string text;
                 using (var ms = new MemoryStream())
@@ -193,12 +192,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public string GetUrl(string container, string name)
+        public string GetUrl(string name)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);
                 return blob.Uri.AbsoluteUri;
             }
             catch (Exception)
@@ -207,13 +205,11 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public async Task<bool> UploadAsync(string container, string name, byte[] content)
+        public async Task<bool> UploadAsync(string name, byte[] content)
         {
             try
-            {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
-                blobContainer.CreateIfNotExists();
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);                
                 using (var ms = new MemoryStream(content))
                 {
                     await blob.UploadFromStreamAsync(ms);
@@ -227,13 +223,13 @@ namespace Gosocket.Dian.Infrastructure
             }
 
         }
-        public bool Upload(string container, string name, byte[] content)
+        public bool Upload(string name, byte[] content)
         {
             try
             {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
-                blobContainer.CreateIfNotExists();
+                
+                var blob = BlobContainer.GetBlockBlobReference(name);
+                
                 using (var ms = new MemoryStream(content))
                 {
                     blob.UploadFromStream(ms);
@@ -247,14 +243,14 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public bool Upload(string container, string name, Stream content,
+        public bool Upload(string name, Stream content,
             string cacheControl = null, AccessLevel accessLevel = AccessLevel.Private)
         {
             try
             {
-                var blobContainer = BlobClient.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
-                blobContainer.CreateIfNotExists();
+                
+                var blob = BlobContainer.GetBlockBlobReference(name);
+                
                 blob.UploadFromStream(content);
                 if (cacheControl != null)
                 {
@@ -262,7 +258,7 @@ namespace Gosocket.Dian.Infrastructure
                     blob.SetProperties();
                 }
                 if (accessLevel != AccessLevel.Private)
-                    SetContainerACL(blobContainer, accessLevel.ToString().ToLower());
+                    SetContainerACL(BlobContainer, accessLevel.ToString().ToLower());
 
                 return true;
             }
@@ -272,12 +268,12 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public bool Delete(string container, string name)
+        public bool Delete( string name)
         {
             try
             {
-                var containerReference = BlobClient.GetContainerReference(container);
-                var blobReference = containerReference.GetBlockBlobReference(name);
+                
+                var blobReference = BlobContainer.GetBlockBlobReference(name);
                 blobReference.Delete();
                 return true;
             }
@@ -315,6 +311,20 @@ namespace Gosocket.Dian.Infrastructure
             container.SetPermissions(permissions);
         }
 
+        public bool Exists(string name)
+        {
+            try
+            {
+
+                var blob = BlobContainer.GetBlockBlobReference(name);
+                return blob.Exists();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public bool Exists(string container, string name)
         {
             try
@@ -329,19 +339,19 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public string TryAcquireLease(string container, string name, TimeSpan timeout)
+        public string TryAcquireLease( string name, TimeSpan timeout)
         {
             var content = Encoding.UTF8.GetBytes("content");
 
             name = name + ".lock";
 
-            if (!Exists(container, name))
+            if (!Exists(name))
             {
-                Upload(container, name, content);
+                Upload(name, content);
             }
 
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var blob = blobContainer.GetBlockBlobReference(name);
+            
+            var blob = BlobContainer.GetBlockBlobReference(name);
 
             string leaseId = null;
 
@@ -357,12 +367,12 @@ namespace Gosocket.Dian.Infrastructure
             return leaseId;
         }
 
-        public bool TryRenewLease(string container, string name, string leaseId)
+        public bool TryRenewLease(string name, string leaseId)
         {
             name = name + ".lock";
 
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var blob = blobContainer.GetBlockBlobReference(name);
+            
+            var blob = BlobContainer.GetBlockBlobReference(name);
 
             try
             {
@@ -375,27 +385,47 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public void ReleaseLease(string container, string name, string leaseId)
+        public void ReleaseLease(string name, string leaseId)
         {
             name = name + ".lock";
 
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var blob = blobContainer.GetBlockBlobReference(name);
+            
+            var blob = BlobContainer.GetBlockBlobReference(name);
 
             blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
 
             var leaseIdContent = Encoding.UTF8.GetBytes("free");
-            Upload(container, name + ".leaseid", leaseIdContent);
+            Upload(name + ".leaseid", leaseIdContent);
         }
 
-        public void BreakLease(string container, string name, string leaseId)
+        public void BreakLease(string name, string leaseId)
         {
             name = name + ".lock";
 
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var blob = blobContainer.GetBlockBlobReference(name);
+            
+            var blob = BlobContainer.GetBlockBlobReference(name);
 
             blob.BreakLease(TimeSpan.MinValue);
+        }
+
+        private bool Upload(string container, string name, byte[] content)
+        {
+            try
+            {
+                var BlobContainer = BlobClient.GetContainerReference(container);
+                var blob = BlobContainer.GetBlockBlobReference(name);
+                BlobContainer.CreateIfNotExists();
+                using (var ms = new MemoryStream(content))
+                {
+                    blob.UploadFromStream(ms);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _ = ex.Message;
+                return false;
+            }
         }
 
         public string TryAcquireLease(TimeSpan? time, string leaseName)
@@ -426,28 +456,26 @@ namespace Gosocket.Dian.Infrastructure
             }
         }
 
-        public List<string> GetFileNameList(string container, string ext = ".config")
+        public List<string> GetFileNameList(string ext = ".config")
         {
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var result = blobContainer.ListBlobs(null, true)
+            
+            var result = BlobContainer.ListBlobs(null, true)
                 .Where(t => t.Uri.AbsolutePath.ToLower().EndsWith(ext.ToLower()))
-                .Select(t => t.Uri.AbsolutePath.Substring(container.Length + 2)).ToList();
+                .Select(t => t.Uri.AbsolutePath.Substring(ContainerName.Length + 2)).ToList();
             return result;
         }
 
-        public IEnumerable<IListBlobItem> GetFilesDirectory(string container, string directory)
-        {
-            var blobContainer = BlobClient.GetContainerReference(container);
-            var blobDirectory = blobContainer.GetDirectoryReference(directory);
+        public IEnumerable<IListBlobItem> GetFilesDirectory(string directory)
+        {            
+            var blobDirectory = BlobContainer.GetDirectoryReference(directory);
             return blobDirectory.ListBlobs();
         }
 
-        public byte[] GetBytesBiller(string container, string name)
+        public byte[] GetBytesBiller( string name)
         {
             try
-            {
-                var blobContainer = BlobClientBiller.GetContainerReference(container);
-                var blob = blobContainer.GetBlockBlobReference(name);
+            {                
+                var blob = BlobContainer.GetBlockBlobReference(name);
 
                 byte[] bytes;
                 using (var ms = new MemoryStream())

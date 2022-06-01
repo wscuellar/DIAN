@@ -34,7 +34,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
         private static readonly TableManager tableManager = new TableManager("GlobalDocValidatorRuntime");
 
-        private static readonly FileManager fileManager = new FileManager();
+        
 
         private readonly string blobContainer = "global";
         private readonly string blobContainerFolder = "batchValidator";

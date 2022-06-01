@@ -25,8 +25,8 @@ namespace Gosocket.Dian.Web.Services
     public class WcfDianCustomerServices : IWcfDianCustomerServices
     {
         private static readonly TableManager tableManagerGlobalLogger = new TableManager("GlobalLogger");
-        private static readonly FileManager fileManager = new FileManager();
-        private static readonly string blobContainer = "global";
+        private static readonly FileManager FileManagerGlobal = new FileManager("global");
+        
         private static readonly string blobContainerFolder = "syncValidator";
         private static readonly string zipMimeType = "application/x-zip-compressed";
 
@@ -92,10 +92,10 @@ namespace Gosocket.Dian.Web.Services
                 {
                     var start = DateTime.UtcNow;
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                    var exist = FileManagerGlobal.Exists($"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
                     if (exist)
                     {
-                        var previusResult = await fileManager.GetTextAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
+                        var previusResult = await FileManagerGlobal.GetTextAsync($"{blobContainerFolder}/applicationResponses/{trackId.ToUpper()}.json");
 
                         if (!string.IsNullOrEmpty(previusResult))
                         {
@@ -433,9 +433,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = await customerDianPa.UploadDocumentSync(fileName, contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = FileManagerGlobal.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await FileManagerGlobal.UploadAsync($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -576,9 +576,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = await customerDianPa.SendEventUpdateStatus(contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = FileManagerGlobal.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await FileManagerGlobal.UploadAsync($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerDianPa = null;
 
@@ -666,9 +666,9 @@ namespace Gosocket.Dian.Web.Services
                     stopwatch.Start();
                     var result = await customerNomina.SendNominaUpdateStatusAsync(contentFile, authCode);
 
-                    var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
+                    var exist = FileManagerGlobal.Exists($"{blobContainerFolder}/applicationResponses/{result?.XmlDocumentKey?.ToUpper()}.json");
                     if (!exist && result.IsValid && result.XmlBase64Bytes != null)
-                        await fileManager.UploadAsync(blobContainer, $"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
+                        await FileManagerGlobal.UploadAsync($"{blobContainerFolder}/applicationResponses/{result.XmlDocumentKey.ToUpper()}.json", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(result)));
 
                     customerNomina = null;
 

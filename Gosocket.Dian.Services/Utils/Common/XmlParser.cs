@@ -51,6 +51,8 @@ namespace Gosocket.Dian.Services.Utils.Common
         public string AgentPartyPersonSchemeName { get; set; }
         public GlobalDocPayroll globalDocPayrolls { get; set; }
 
+        private static FileManager ConfigurationsFileManager = new FileManager("configurations");
+
         public XmlParser()
         {
             Fields = new Dictionary<string, object>();
@@ -266,8 +268,8 @@ namespace Gosocket.Dian.Services.Utils.Common
             var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitions");
             if (cacheItem == null)
             {
-                var fileManager = new FileManager();
-                xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitions.config");
+                
+                xmlParserDefinitions = ConfigurationsFileManager.GetText("XmlParserDefinitions.config");
                 CacheItemPolicy policy = new CacheItemPolicy
                 {
                     AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)

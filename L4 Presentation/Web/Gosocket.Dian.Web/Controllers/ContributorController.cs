@@ -45,6 +45,9 @@ namespace Gosocket.Dian.Web.Controllers
         private static readonly TableManager tableManagerGlobalExchangeEmail = new TableManager("GlobalExchangeEmail");
         private static readonly TableManager tableManagerGlobalSoftware = new TableManager("GlobalSoftware");
 
+        private static FileManager ContributorFileManager = new FileManager("contributor-files");
+        private static FileManager DianFileManager = new FileManager("dian");
+
         private IAuthenticationManager AuthenticationManager
         {
             get
@@ -1546,8 +1549,8 @@ namespace Gosocket.Dian.Web.Controllers
                     if (postedFile != null && postedFile.ContentLength > 0)
                     {
                         fileName = StringTools.MakeValidFileName(postedFile.FileName);
-                        var fileManager = new FileManager();
-                        result = fileManager.Upload("contributor-files", model.Code.ToLower() + "/" + fileName, postedFile.InputStream);
+                        
+                        result = ContributorFileManager.Upload(model.Code.ToLower() + "/" + fileName, postedFile.InputStream);
 
                         if (result)
                         {
@@ -1609,8 +1612,8 @@ namespace Gosocket.Dian.Web.Controllers
             try
             {
                 string fileNameURL = code + "/" + StringTools.MakeValidFileName(fileName);
-                var fileManager = new FileManager();
-                var result = fileManager.GetBytes("contributor-files", fileNameURL, out string contentType);
+                
+                var result = ContributorFileManager.GetBytes(fileNameURL, out string contentType);
                 return File(result, contentType, $"{fileName}");
             }
             catch (Exception ex)
@@ -1627,8 +1630,8 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 var resolutionZipFileName = ConfigurationManager.GetValue("ResolutionFileName");
                 string fileNameURL = "normative" + "/" + StringTools.MakeValidFileName(resolutionZipFileName);
-                var fileManager = new FileManager();
-                var result = fileManager.GetBytes("dian", fileNameURL, out string contentType);
+                
+                var result = DianFileManager.GetBytes(fileNameURL, out string contentType);
                 return File(result, contentType, $"{resolutionZipFileName}");
             }
             catch (Exception ex)

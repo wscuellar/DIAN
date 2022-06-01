@@ -4,9 +4,10 @@ namespace Gosocket.Dian.Services.Utils.Common
 {
     public static class Schemas
     {
+        private static FileManager SchemasFileManager = new FileManager("schemas");
         public static byte[] GetSchema(string schemaName)
         {
-            return new FileManager().GetBytes("schemas", schemaName);
+            return SchemasFileManager.GetBytes(schemaName);
         }
     }
 }

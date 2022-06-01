@@ -67,7 +67,7 @@ namespace Gosocket.Dian.Web.Controllers
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
 
-        private static readonly FileManager fileManager = new FileManager();
+        private static readonly FileManager fileManager = new FileManager("global");
         private static readonly string blobContainer = "global";
         private static readonly string blobContainerFolder = "docvalidator";
         private static readonly string blobContainerFolderTwo = "new-dian-ubl21";
@@ -91,7 +91,7 @@ namespace Gosocket.Dian.Web.Controllers
         #region Properties
 
 
-        private readonly FileManager _fileManager;
+        
 
         #endregion
 
@@ -101,7 +101,7 @@ namespace Gosocket.Dian.Web.Controllers
         public DocumentController(IRadianPdfCreationService radianPdfCreationService,
                                   IRadianGraphicRepresentationService radianGraphicRepresentationService,
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
-                                  IRadianSupportDocument radianSupportDocument, FileManager fileManager,
+                                  IRadianSupportDocument radianSupportDocument, 
                                   IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService,
                                   IAssociateDocuments associateDocuments)
         {
@@ -109,8 +109,7 @@ namespace Gosocket.Dian.Web.Controllers
             _radianPdfCreationService = radianPdfCreationService;
             _radianPdfCreationService = radianPdfCreationService;
             _radianGraphicRepresentationService = radianGraphicRepresentationService;
-            _queryAssociatedEventsService = queryAssociatedEventsService;
-            _fileManager = fileManager;
+            _queryAssociatedEventsService = queryAssociatedEventsService;            
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
             _associateDocuments = associateDocuments;
         }
@@ -1013,8 +1012,8 @@ namespace Gosocket.Dian.Web.Controllers
 
         private byte[] DownloadExportedFile(string pk, string rk)
         {
-            FileManager fileManager = new FileManager();
-            return fileManager.GetBytes("global", $"export/{pk}/{rk}.xlsx");
+            
+            return fileManager.GetBytes($"export/{pk}/{rk}.xlsx");
         }
         private byte[] DownloadExportedFiles(string rk,DateTime fecha)
         {
@@ -1023,8 +1022,8 @@ namespace Gosocket.Dian.Web.Controllers
             var mes = fecha.ToString("MM");
             var dia = fecha.ToString("dd");
        
-            FileManager fileManager = new FileManager();
-            return fileManager.GetBytes("global", $"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
+            
+            return fileManager.GetBytes($"syncValidator/{año}/{mes}/{dia}/{rk}.zip");
         }
         private async Task<byte[]>DownloadXml(string trackId)
         {

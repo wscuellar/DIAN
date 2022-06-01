@@ -12,7 +12,8 @@ namespace Gosocket.Dian.Application.Managers
     {
         private static readonly object _lock = new object();
 
-        private static readonly string container = $"dian";
+        
+        private static FileManager BlobsFileManager = new FileManager("dian");
         private static readonly string crtFilesFolder = $"certificates/crts/";
         private static readonly string crlFilesFolder = $"certificates/crls/";
 
@@ -43,7 +44,7 @@ namespace Gosocket.Dian.Application.Managers
 
             if (data == null)
             {
-                var buffers = GetBytesFromStorage(container, crtFilesFolder);
+                var buffers = GetBytesFromStorage(crtFilesFolder);
                 var parser = new X509CertificateParser();
                 certificates = buffers.Select(b => parser.ReadCertificate(b)).ToArray();
 
@@ -64,7 +65,7 @@ namespace Gosocket.Dian.Application.Managers
 
             if (data == null)
             {
-                var buffers = GetBytesFromStorage(container, crlFilesFolder);
+                var buffers = GetBytesFromStorage(crlFilesFolder);
                 var parser = new X509CrlParser();
                 crls = buffers.Select(b => parser.ReadCrl(b)).ToArray();
 
@@ -78,14 +79,14 @@ namespace Gosocket.Dian.Application.Managers
             return crls;
         }
 
-        public static IEnumerable<byte[]> GetBytesFromStorage(string container, string directory)
+        public static IEnumerable<byte[]> GetBytesFromStorage(string directory)
         {
-            var blobs = FileManager.Instance.GetFilesDirectory(container, directory);
+            var blobs = BlobsFileManager.GetFilesDirectory(directory);
 
             foreach (var blob in blobs)
             {
                 var fileName = blob.Uri.Segments[blob.Uri.Segments.Length - 1];
-                var bytes = FileManager.Instance.GetBytes(container, $"{directory}{fileName}");
+                var bytes = BlobsFileManager.GetBytes($"{directory}{fileName}");
                 if (bytes != null)
                     yield return bytes;
             }

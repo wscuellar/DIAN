@@ -29,6 +29,10 @@ namespace Gosocket.Dian.Functions.Pdf
 	{
 		private static readonly TableManager tableManagerGlobalDocValidatorDocumentMeta = new TableManager("GlobalDocValidatorDocumentMeta");
 
+		private static FileManager fileManager = new FileManager("radian-dian-logos");
+		private static FileManager fileManagerDian = new FileManager("dian");
+		private static FileManager fileManagerBiller = new FileManager("GlobalStorageBiller", "logo");
+
 		[FunctionName("PdfDS")]
 		public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req, TraceWriter log)
 		{
@@ -1238,14 +1242,13 @@ namespace Gosocket.Dian.Functions.Pdf
 
 		public static string CruzarLogosEnHeader(string plantillaHtml, string identificationUser)
 		{
-			var fileManager = new FileManager();
-			var fileManagerBiller = new FileManager("GlobalStorageBiller");
+			
 
-			MemoryStream logoDianStream = new MemoryStream(fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+			MemoryStream logoDianStream = new MemoryStream(fileManager.GetBytes("Logo-DIAN-2020-color.jpg"));
 			string logoDianaStrBase64 = Convert.ToBase64String(logoDianStream.ToArray());
 			var logoDianBase64 = $@"data:image/png;base64,{logoDianaStrBase64}";
 
-			MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller("logo", $"{identificationUser}.jpg") ?? fileManager.GetBytes("radian-dian-logos", "Logo-DIAN-2020-color.jpg"));
+			MemoryStream logoStream = new MemoryStream(fileManagerBiller.GetBytesBiller($"{identificationUser}.jpg") ?? fileManager.GetBytes("Logo-DIAN-2020-color.jpg"));
 			string logoStrBase64 = Convert.ToBase64String(logoStream.ToArray());
 			var logoBase64 = $@"data:image/png;base64,{logoStrBase64}";
 
@@ -1364,27 +1367,27 @@ namespace Gosocket.Dian.Functions.Pdf
 		}
 		private static string GetTemplate(string tipo)
 		{
-			var fileManager = new FileManager();
+			
 			if (tipo == "20")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentPOS_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentPOS_template.html");
 			else if (tipo == "40")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentPeaje_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentPeaje_template.html");
 			else if (tipo == "50")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentAereo_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentAereo_template.html");
 			else if (tipo == "35")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentTransporte_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentTransporte_template.html");
 			else if (tipo == "55")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBolsa_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentBolsa_template.html");
 			else if (tipo == "45")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentExtracto_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentExtracto_template.html");
 			else if ( tipo == "27")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentBoleta_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentBoleta_template.html");
 			else if (tipo == "32")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentJuegos_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentJuegos_template.html");
 			else if (tipo == "60")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentSPD_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentSPD_template.html");
 			else if (tipo == "Nota")
-				return fileManager.GetText("dian", "configurations/SupportDocument/supportDocumentNota_template.html");
+				return fileManagerDian.GetText("configurations/SupportDocument/supportDocumentNota_template.html");
 			else return null;
 		}
 

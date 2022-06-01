@@ -20,6 +20,8 @@ namespace Gosocket.Dian.Functions.Utils
         private static HttpClient client = new HttpClient();
         private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorRuntime");
 
+        private static FileManager GlobalFileManager = new FileManager("global");
+
         public static HttpResponseMessage ConsumeApi(string url, dynamic requestObj)
         {
             
@@ -127,10 +129,10 @@ namespace Gosocket.Dian.Functions.Utils
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }

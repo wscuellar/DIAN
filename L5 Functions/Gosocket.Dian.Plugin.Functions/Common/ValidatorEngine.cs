@@ -35,6 +35,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         private static readonly TableManager TableManager = new TableManager("GlobalDocValidatorRuntime");
         private static readonly AssociateDocumentService associateDocumentService = new AssociateDocumentService();
 
+        private static FileManager GlobalFileManager = new FileManager("global");
+
         XmlDocument _xmlDocument;
         XPathDocument _document;
         XPathNavigator _navigator;
@@ -879,10 +881,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (documentStatusValidation == null)
                 return null;
 
-            var fileManager = new FileManager();
-            var container = $"global";
+            
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }
@@ -890,10 +891,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
         public async Task<byte[]> GetXmlPayrollDocumentAsync(string file)
         {
-            var fileManager = new FileManager();
-            var container = "global";
+            
             var fileName = $"schemes/schemes/new-nomina-1.0/01/{file}.xml";
-            var xmlBytes = await fileManager.GetBytesAsync(container, fileName);
+            var xmlBytes = await GlobalFileManager.GetBytesAsync(fileName);
 
             return xmlBytes;
         }

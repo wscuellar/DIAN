@@ -13,7 +13,7 @@ namespace Gosocket.Dian.Application
         #region [ properties ]
 
         protected IQueryAssociatedEventsService _queryAssociatedEventsService;
-        private readonly FileManager _fileManager;
+        private readonly FileManager RadianDocumentsTemplatesFileManager = new FileManager("radian-documents-templates");
         private readonly TableManager _countryTableManager = new TableManager("Country", ConfigurationManager.GetValue("GlobalBillerStorage"));
         private readonly TableManager _departmentByCodeTableManager = new TableManager("DepartmentByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
         private readonly TableManager _municipalityByCodeTableManager = new TableManager("MunicipalityByCode", ConfigurationManager.GetValue("GlobalBillerStorage"));
@@ -22,10 +22,10 @@ namespace Gosocket.Dian.Application
 
         #region [ constructor ]
 
-        public RadianPayrollGraphicRepresentationService(IQueryAssociatedEventsService queryAssociatedEventsService, FileManager fileManager)
+        public RadianPayrollGraphicRepresentationService(IQueryAssociatedEventsService queryAssociatedEventsService)
         {
             this._queryAssociatedEventsService = queryAssociatedEventsService;
-            this._fileManager = fileManager;
+            
         }
 
         #endregion
@@ -401,7 +401,7 @@ namespace Gosocket.Dian.Application
             {
                 documentName = "AjusteNóminaIndividualElectrónica";
                 // Load template
-                template.Append(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNominaAjuste.html"));
+                template.Append(RadianDocumentsTemplatesFileManager.GetText("RepresentacionGraficaNominaAjuste.html"));
                 // Adjustment data...
                 var adjustmentDocumentMeta = this._queryAssociatedEventsService.DocumentValidation(documentMeta.DocumentReferencedKey);
                 template = this.AdjustmentIndividualPayrollDataTemplateMapping(template, payrollModel, adjustmentDocumentMeta);
@@ -409,7 +409,7 @@ namespace Gosocket.Dian.Application
             else
             {
                 // Load template
-                template.Append(_fileManager.GetText("radian-documents-templates", "RepresentacionGraficaNomina.html"));
+                template.Append(RadianDocumentsTemplatesFileManager.GetText("RepresentacionGraficaNomina.html"));
                 // Mapping Labels common data
                 template = this.IndividualPayrollDataTemplateMapping(template, payrollModel);
             }

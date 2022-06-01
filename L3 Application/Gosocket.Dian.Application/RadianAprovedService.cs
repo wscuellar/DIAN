@@ -27,6 +27,8 @@ namespace Gosocket.Dian.Application
         private readonly IRadianCallSoftwareService _radianCallSoftwareService;
         private readonly IGlobalRadianOperationService _globalRadianOperationService;
 
+        private static FileManager RadianContributorFileManager = new FileManager("radiancontributor-files");
+
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
                                     IRadianTestSetService radianTestSetService,
@@ -139,9 +141,9 @@ namespace Gosocket.Dian.Application
         {
             string fileName = StringTools.MakeValidFileName(radianContributorFile.FileName);
             //var fileManager = new FileManager(ConfigurationManager.GetValue("GlobalStorage"));
-            var fileManager = new FileManager();
             
-            bool result = fileManager.Upload("radiancontributor-files", code.ToLower() + "/" + fileName, fileStream);
+            
+            bool result = RadianContributorFileManager.Upload(code.ToLower() + "/" + fileName, fileStream);
             string idFile = string.Empty;
 
             if (result)
