@@ -2981,6 +2981,7 @@
     <Content Include="Views\Contributor\RegisterNoOfe.cshtml" />
     <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
     <Content Include="Views\Shared\_LoadingPage.cshtml" />
+    <Content Include="Views\Contributor\_defaultNoOFE.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
