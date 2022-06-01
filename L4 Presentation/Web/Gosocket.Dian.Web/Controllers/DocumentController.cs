@@ -16,6 +16,7 @@ using Gosocket.Dian.Web.Common;
 using Gosocket.Dian.Web.Filters;
 using Gosocket.Dian.Web.Models;
 using Gosocket.Dian.Web.Utils;
+using Ionic.Zip;
 using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
@@ -310,7 +311,62 @@ namespace Gosocket.Dian.Web.Controllers
                 return File(new byte[1], "application/zip", $"error");
             }
         }
+        [ExcludeFilter(typeof(Authorization))]
+        public async Task<ActionResult> DownloadpdfFilesEventos(string trackId, string code, string fecha)
+        {
+            try
+            {
 
+                var bytes = DownloadExportedFiles(trackId, DateTime.Parse(fecha));
+                var arreglobytes = FuncZip(bytes, "name");
+                // var zipFile = ZipExtensions.CreateZip(bytes, rk, "xlsx");
+                var docmento = File(bytes, "application/zip", $"{trackId}.zip");
+                var pdf = arreglobytes[2];
+                var respuesta_final = new { Status = true, codigo = "00", nombre = trackId + ".pdf", archivoZip = arreglobytes[2] };
+                return Json(respuesta_final);
+
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return File(new byte[1], "application/zip", $"error");
+            }
+        }
+
+        public string[] FuncZip(byte[] Array, string FileName)
+        {
+            string baseXml;
+            string basePdf;
+            string NameXml;
+            string NamePdf;
+            using (var outputStream = new MemoryStream())
+            using (var outputStream2 = new MemoryStream())
+            using (var inputStream = new MemoryStream(Array))
+            {
+                using (var zipInputStream = new ZipInputStream(inputStream))
+                {
+                    zipInputStream.GetNextEntry();
+                    zipInputStream.CopyTo(outputStream);
+
+                    zipInputStream.GetNextEntry();
+                    zipInputStream.CopyTo(outputStream2);
+                }
+                var xml = outputStream.ToArray();
+                var pdf = outputStream2.ToArray();
+                baseXml = Convert.ToBase64String(xml);
+                basePdf = Convert.ToBase64String(pdf);
+            }
+            using (ZipInputStream s = new ZipInputStream(new MemoryStream(Array)))
+            {
+                ZipEntry theEntry;
+                theEntry = s.GetNextEntry();
+                NameXml = theEntry.FileName;
+                theEntry = s.GetNextEntry();
+                NamePdf = theEntry.FileName;
+            }
+            return new[] { baseXml, NameXml, basePdf, NamePdf };
+        }
 
         [ExcludeFilter(typeof(Authorization))]
         public async Task<ActionResult> DownloadPDF(string trackId, string recaptchaToken)
