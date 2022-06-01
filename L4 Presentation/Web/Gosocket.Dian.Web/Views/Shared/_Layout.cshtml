@@ -351,7 +351,7 @@
                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                             {
 
-                                                if (User.ContributorTypeId() == (int)ContributorType.Biller && sesion != "NO OFE")
+                                                if (sesion != "NO OFE")
                                                 {
                                                     <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
                                                 }

@@ -65,6 +65,10 @@ namespace Gosocket.Dian.Web.Models
         [EmailAddress(ErrorMessage = "Por favor registre un correo electrónico válido.")]
         public string ExchangeEmail { get; set; }
 
+        [Display(Name = "Correo electrónico para recepción")]
+        [EmailAddress(ErrorMessage = "Por favor registre un correo electrónico válido.")]
+        public string NoOFeEmail { get; set; }
+
         [Display(Name = "Fecha inicio autorización")]
         public DateTime? StartDate { get; set; }
 
