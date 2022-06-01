@@ -106,7 +106,7 @@ namespace Gosocket.Dian.Functions.Utils
             var result = new StringWriter();
 
             // Create a serializer.
-            Serializer serializer = new Serializer();
+            Serializer serializer = processor.NewSerializer();
             serializer.SetOutputWriter(result);
 
             // Transform the source XML to System.out.
@@ -169,7 +169,7 @@ namespace Gosocket.Dian.Functions.Utils
                 }
             }
 
-            var serializer = new Serializer();
+            var serializer = processor.NewSerializer();
             var ms = new MemoryStream();
             serializer.SetOutputStream(ms);
             transformer.Run(serializer);
