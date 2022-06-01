@@ -961,36 +961,41 @@ namespace Gosocket.Dian.Web.Services
         /// <param name="endDate" type="DateTime"></param>
         /// <param name="documentGroup" type="string"></param>
         /// <returns></returns>
-        public DianResponse BulkDocumentDownloadAsync(string nit, DateTime startDate, DateTime endDate, string documentGroup)
+        public DianResponse BulkDocumentDownloadAsync(string nit, string startDate, string endDate, string documentGroup)
         {
             string[] allowedDocumentGroups = new string[] { "Todos", "Emitido", "Recibido" };
             try
             {
+                DateTime dateStart, dateEnd;
+
                 var authCode = GetAuthCode();
                 var email = GetAuthEmail();
 
                 if (string.IsNullOrEmpty(authCode))
                     return new DianResponse { StatusCode = "89", StatusDescription = "NIT de la empresa no informado en el certificado." };
 
-                if (startDate.Date <= DateTime.MinValue)
+                DateTime.TryParse(startDate, out dateStart);
+                DateTime.TryParse(endDate, out dateEnd);
+
+                if (dateStart.Date <= DateTime.MinValue)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha inicio es obligatoria.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha inicio es obligatoria." };
                 }
 
-                if (endDate.Date <= DateTime.MinValue)
+                if (dateEnd.Date <= DateTime.MinValue)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final es obligatoria.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final es obligatoria." };
                 }
 
-                if (endDate.Date < startDate.Date)
+                if (dateEnd.Date < dateStart.Date)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final debe ser mayor o igual a la fecha inicial.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final debe ser mayor o igual a la fecha inicial." };
                 }
                 int maxQuantyDays = Convert.ToInt32(ConfigurationManager.GetValue("BulkDocumentsDownload_QuantyMaxDaysFoDateRange"));
-                if ((endDate.Date - startDate.Date).TotalDays > maxQuantyDays)
+                if ((dateEnd.Date - dateStart.Date).TotalDays > maxQuantyDays)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses).");
                     return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
@@ -1008,7 +1013,7 @@ namespace Gosocket.Dian.Web.Services
                 }
 
                 /*agregar validacion de que la fecha inicial no debe ser mayor a 3 meses a partir de hoy*/
-                if ((DateTime.Now.Date - startDate.Date).TotalDays > maxQuantyDays)
+                if ((DateTime.Now.Date - dateStart.Date).TotalDays > maxQuantyDays)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "la fecha de inicio supera el rango máximo de fechas permitido (3 meses).");
                     return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
@@ -1026,7 +1031,7 @@ namespace Gosocket.Dian.Web.Services
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                var result = customerDianPa.SendRequestBulkDocumentsDownload(authCode, email, nit, startDate, endDate, documentGroup);
+                var result = customerDianPa.SendRequestBulkDocumentsDownload(authCode, email, nit, dateStart, dateEnd, documentGroup);
 
                 stopwatch.Stop();
                 double ms = stopwatch.ElapsedMilliseconds;
