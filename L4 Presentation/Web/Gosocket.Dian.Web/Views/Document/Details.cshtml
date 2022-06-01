@@ -100,6 +100,42 @@
             showPdfModalDirect(cude, '@Url.Action("PrintGraphicRepresentation", "Document")', '#panel-form_1');
         }
 
+           function DescargarDoc(cude,fecha) {
+            debugger;
+
+            var code = '';
+            var jsonData = { trackId: cude, code: code, fecha: fecha};
+            $.ajax({
+                url: '@Url.Action("DownloadpdfFilesEventos", "Document", new { })',
+                type: 'POST',
+                cache: false,
+                data: JSON.stringify(jsonData),
+                contentType: "application/json",
+                error: function (error) {
+
+                },
+                success: function (response) {
+                    debugger;
+                    download(response.nombre, response.archivoZip);
+                }
+            });
+           
+
+        }
+        function download(filename, data) {
+            debugger;
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;base64,' + data);
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+
         $(document).ready(function () {
             if (window.location.pathname == "/Document/Details") $(".downloadPDFUrl").hide()
             SetCapcthatoken('@ConfigurationManager.GetValue("Recaptcha")');
