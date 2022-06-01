@@ -29,6 +29,8 @@ namespace Gosocket.Dian.Application
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+        const string PROTESTADACODES = "048";
+        const string TRANSFERENCIACODES = "049";
 
         const string CREDITNOTE = "91";
         const string DEBITNOTE = "92";
@@ -284,6 +286,18 @@ namespace Gosocket.Dian.Application
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
                     index++;
                 }
+
+                if (PROTESTADACODES.Contains(documentMeta.EventCode.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Objection.GetDescription()}");
+                    index++;
+                }
+
+                if (TRANSFERENCIACODES.Contains(documentMeta.EventCode.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.TransferOfEconomicRights.GetDescription()}");
+                    index++;
+                }
             }
 
             Dictionary<int, string> cleanDictionary = statusValue.GroupBy(pair => pair.Value)
@@ -362,7 +376,7 @@ namespace Gosocket.Dian.Application
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim()) || PROTESTADACODES.Contains(e.EventCode.Trim()) || TRANSFERENCIACODES.Contains(e.EventCode.Trim())).ToList();
         }
 
         public GlobalDocPayroll GetPayrollById(string partitionKey)

@@ -240,14 +240,14 @@ namespace Gosocket.Dian.Web.Controllers.Tests
             switch (input)
             {
                 case 1:
-                    redirectToAction = _current.GetSetTestResult(id) as RedirectToRouteResult;
+                    redirectToAction = _current.GetSetTestResult(id).Result as RedirectToRouteResult;
                     break;
                 case 2:
                 case 4:
-                    viewResult = _current.GetSetTestResult(id) as ViewResult;
+                    viewResult = _current.GetSetTestResult(id).Result as ViewResult;
                     break;
                 case 3:
-                    JsonResult jsonResult = _current.GetSetTestResult(id) as JsonResult;
+                    JsonResult jsonResult = _current.GetSetTestResult(id).Result as JsonResult;
                     responseMessage = jsonResult.Data as ResponseMessage;
                     break;
 
