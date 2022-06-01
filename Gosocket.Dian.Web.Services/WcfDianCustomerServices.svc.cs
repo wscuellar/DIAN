@@ -982,7 +982,7 @@ namespace Gosocket.Dian.Web.Services
                     string.IsNullOrWhiteSpace(documentGroup) &&
                     string.IsNullOrWhiteSpace(nit))
                 {
-                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "No se recibieron parametros de consulta.");
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "No se recibieron parámetros de consulta.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "No se recibieron parametros de consulta." };
                 }
 
