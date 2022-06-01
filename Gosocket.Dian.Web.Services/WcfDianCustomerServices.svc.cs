@@ -977,13 +977,22 @@ namespace Gosocket.Dian.Web.Services
                 DateTime.TryParse(startDate, out dateStart);
                 DateTime.TryParse(endDate, out dateEnd);
 
-                if (dateStart.Date <= DateTime.MinValue)
+                if(dateStart.Date <= DateTime.MinValue.Date && 
+                    dateEnd.Date <= DateTime.MinValue.Date && 
+                    string.IsNullOrWhiteSpace(documentGroup) &&
+                    string.IsNullOrWhiteSpace(nit))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "No se recibieron parametros de consulta.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "No se recibieron parametros de consulta." };
+                }
+
+                if (dateStart.Date <= DateTime.MinValue.Date)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha inicio es obligatoria.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha inicio es obligatoria." };
                 }
 
-                if (dateEnd.Date <= DateTime.MinValue)
+                if (dateEnd.Date <= DateTime.MinValue.Date)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final es obligatoria.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final es obligatoria." };
