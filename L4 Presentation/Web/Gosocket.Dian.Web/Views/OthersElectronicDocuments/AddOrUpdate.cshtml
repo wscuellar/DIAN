@@ -350,6 +350,7 @@
         $(document).ready(function ($) {
             OperationModesAsociatedInElectronicBiller = @Html.Raw(JsonConvert.SerializeObject(Model.OperationModesAsociatedInElectronicBiller));
             SoftwaresIds = @Html.Raw(JsonConvert.SerializeObject(Model.ListTable.Select(s => s.SoftwareId)));
+
             if ('@ViewBag.softwareActive' == 'True') {
                 var sms = 'No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
                 bootbox.dialog({
@@ -374,9 +375,14 @@
                 }
 
                 var form = $('#frmOthersElectronicDocuments');
-                console.log(form);
-                console.log(form.valid());
 
+                /*Esta validación aplica cuando el modo de operacion es SP o PT*/
+                if ((SoftwaresIds.find(s => s == $('#SoftwareId').val()) || SoftwaresIds.find(s => s == $('#SoftwareIdPr').val()))
+                    && $('#OperationModeSelectedId').val() != 3 ) {
+                    showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
+                    return;
+                }
+                
                 if ($('#OperationModeSelectedId').val() == 1) {
                     $('#ErrorSoftwareName').hide()
                     $('#ErrorPinSW').hide()
@@ -414,20 +420,21 @@
                                 $('input[name="SoftwareName"]').val($('#SoftwareId option:selected').text());
                                 $('#ErrorProviderId').hide();
                                 $('#ErrorSoftwareId').hide();
-                                if (SoftwaresIds.find(s => s == $('#SoftwareId').val())) {
-                                        showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
-                                }
-                                else
-                                {
-                                    showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
-                                    form.submit();
-                                    hideLoading("#panel-wrapper");
-                                }
+
+                                showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
+                                form.submit();
+                                hideLoading("#panel-wrapper");
                             }
                         }
                     } else {
                         if ($('#OperationModeSelectedId').val() == 3)
                         {
+                            /*Esta validación aplica cuando el modo de operacion es SG*/
+                            if (SoftwaresIds.find(s => s == "@Model.FreeBillerSoftwareId")) {
+                                showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
+                                return;
+                            }
+
                             showLoading('#panel-wrapper', 'Cargando', 'asociando modo de operación, por favor espere.');
                             form.submit();
                             hideLoading("#panel-wrapper");
@@ -701,7 +708,7 @@
 
                              if (result != null && result.res != null) {
 
-                        $.each(result.res, function (index, value) {
+                                 $.each(result.res, function (index, value) {
                             $('#SoftwareId').append('<option value="' + value.Id + '">' + value.Name + '</option>');
                             $('#ulSoftwareId').append('<li data-original-index="' + (index + 1) + '"><a tabindex="0" class=""' +
                                 ' data-normalized-text="' + value.Name + '"><span class="text">' + value.Name + '</span>' +
