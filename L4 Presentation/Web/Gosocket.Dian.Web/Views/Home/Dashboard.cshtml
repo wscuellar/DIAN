@@ -102,19 +102,21 @@
             }
 
             if ('@ConfigurationManager.GetValue("Environment")' == 'Test' || '@ConfigurationManager.GetValue("Environment")' == 'Hab') {
-                if ('@User.IsInAnyRole("Administrador", "Super")' === 'False' && @Model.ContributorAcceptanceStatusId === @((int)ContributorStatus.Enabled) && '@Model.ContributorProductionDate' === '') {
+                if (@Model.ContributorTypeId === @((int)ContributorType.Biller) || @Model.ContributorTypeId === @((int)ContributorType.Provider)) {
+                    if ('@User.IsInAnyRole("Administrador", "Super")' === 'False' && @Model.ContributorAcceptanceStatusId === @((int)ContributorStatus.Enabled) && '@Model.ContributorProductionDate' === '') {
 
-                    showRegisterProductionDateModal();
+                        showRegisterProductionDateModal();
 
-                    $('#productionDate').datepicker({
-                        format: 'dd-mm-yyyy',
-                        language: 'es',
-                        todayBtn: 'linked',
-                        autoclose: true,
-                        todayHighlight: true,
-                        startDate: '@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")',
-                        endDate: '@Model.ContributorHabilitationDate.Value.AddYears(1).ToString("dd-MM-yyyy")'
-                    });
+                        $('#productionDate').datepicker({
+                            format: 'dd-mm-yyyy',
+                            language: 'es',
+                            todayBtn: 'linked',
+                            autoclose: true,
+                            todayHighlight: true,
+                            startDate: '@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")',
+                            endDate: '@Model.ContributorHabilitationDate.Value.AddYears(1).ToString("dd-MM-yyyy")'
+                        });
+                    }
                 }
             }
 

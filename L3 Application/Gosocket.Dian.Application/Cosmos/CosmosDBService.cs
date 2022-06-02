@@ -235,7 +235,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 //RequestContinuation = null
             };
 
-            var partitionKeys = GeneratePartitionKeys(model.LastDateTimeUpdate, model.UtcNow);
+            
             IOrderedQueryable<GlobalDataDocument> query = null;
 
             do
@@ -246,7 +246,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 
 
                 query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
-                        .Where(e => partitionKeys.Contains(e.PartitionKey) && e.GenerationTimeStamp >= model.LastDateTimeUpdate).AsDocumentQuery();
+                        .Where(e => e.GenerationTimeStamp >= model.LastDateTimeUpdate).AsDocumentQuery();
                 var result = await ((IDocumentQuery<GlobalDataDocument>)query).ExecuteNextAsync<GlobalDataDocument>();
                 options.RequestContinuation = result.ResponseContinuation;
                 documents.AddRange(result.ToList());
@@ -289,8 +289,7 @@ namespace Gosocket.Dian.Application.Cosmos
             var collectionName = GetCollectionName(filter.EFrom);
             var collectionLink = collections[collectionName].SelfLink;
 
-            List<string> partitionKeys = new List<string>();
-            partitionKeys = GeneratePartitionKeys(filter.EFrom, filter.ETo);
+            
 
             if (string.IsNullOrEmpty(filter.ContinuationToken))
             {
@@ -318,11 +317,7 @@ namespace Gosocket.Dian.Application.Cosmos
 
             var predicate = PredicateBuilder.New<GlobalDataDocument>();
 
-            //PartitionKey
-            if (partitionKeys.Any())
-            {
-                predicate = predicate.And(p => partitionKeys.Contains(p.PartitionKey));
-            }
+            
 
             if (filter.EFrom != new DateTime(DateTime.UtcNow.Year, 1, 1) && filter.ETo.Date != new DateTime(DateTime.UtcNow.Year, 12, 31))
             {
@@ -365,7 +360,7 @@ namespace Gosocket.Dian.Application.Cosmos
                 RequestContinuation = null
             };
 
-            var partitionKeys = GeneratePartitionKeys(filter.RFrom, filter.RTo);
+            
 
             var predicate = PredicateBuilder.New<GlobalDataDocument>();
 
@@ -514,12 +509,11 @@ namespace Gosocket.Dian.Application.Cosmos
             }
             else
             {
-                List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+                
 
                 query = (IOrderedQueryable<GlobalDataDocument>)client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
                 .Where(
-                    e => partitionKeys.Contains(e.PartitionKey)
-                    && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
+                    e => e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
                     && (status == 0 || e.ValidationResultInfo.Status == status)
                     && (documentTypeId == "00"
                         || e.DocumentTypeId == documentTypeId
@@ -633,8 +627,8 @@ namespace Gosocket.Dian.Application.Cosmos
             int fromNumber = int.Parse($"{from.Value:yyyyMMdd}");
             int toNumber = int.Parse($"{to.Value:yyyyMMdd}");
 
-            List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
-            predicate = predicate.And(g => partitionKeys.Contains(g.PartitionKey));
+            
+            
             predicate = predicate.And(g => g.EmissionDateNumber >= fromNumber && g.EmissionDateNumber <= toNumber);
 
             if (status != 0)
@@ -1146,15 +1140,14 @@ namespace Gosocket.Dian.Application.Cosmos
             };
 
 
-            List<string> partitionKeys = GeneratePartitionKeys(from.Value, to.Value);
+            
 
             
             var start = DateTime.UtcNow;
 
             var query = client.CreateDocumentQuery<GlobalDataDocument>(collectionLink, options)
             .Where(
-                e => partitionKeys.Contains(e.PartitionKey)
-                && e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
+                e => e.EmissionDateNumber >= fromNumber && e.EmissionDateNumber <= toNumber
                 && (status == 0 || e.ValidationResultInfo.Status == status)
                 && (documentTypeId == "00"
                     || e.DocumentTypeId == documentTypeId
@@ -1176,29 +1169,8 @@ namespace Gosocket.Dian.Application.Cosmos
         }
 
         #region Utils
-        public static List<string> GeneratePartitionKeys(DateTime from, DateTime to)
-        {
-            List<string> partitionKeys = new List<string>();
-            List<string> dayList = new List<string>();
-            var permutations = GetPermutations(new[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f" }, 2);
-
-            foreach (DateTime date in EachDay(from, to))
-                dayList.Add($"co|{date.Day.ToString().PadLeft(2, '0')}");
-
-            var distinctDays = dayList.Distinct().ToList();
-            foreach (var day in distinctDays)
-                foreach (var p in permutations)
-                    partitionKeys.Add(day + "|" + string.Join("", p));
-
-            return partitionKeys;
-        }
-        private static IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
-        {
-            for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
-            {
-                yield return day;
-            }
-        }
+        
+        
         private static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
         {
             if (length == 1) return list.Select(t => new T[] { t });
