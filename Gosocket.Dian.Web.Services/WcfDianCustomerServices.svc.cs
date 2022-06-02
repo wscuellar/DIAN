@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.ServiceModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Gosocket.Dian.Logger.Logger;
 
@@ -964,8 +965,9 @@ namespace Gosocket.Dian.Web.Services
         public DianResponse BulkDocumentDownloadAsync(string nit, string startDate, string endDate, string documentGroup)
         {
             string[] allowedDocumentGroups = new string[] { "Todos", "Emitido", "Recibido" };
+            
             try
-            {
+            {    
                 DateTime dateStart, dateEnd;
 
                 var authCode = GetAuthCode();
@@ -977,14 +979,53 @@ namespace Gosocket.Dian.Web.Services
                 DateTime.TryParse(startDate, out dateStart);
                 DateTime.TryParse(endDate, out dateEnd);
 
+                /*validación de todos los campos deben ser obligatorios*/
                 if(dateStart.Date <= DateTime.MinValue.Date && 
                     dateEnd.Date <= DateTime.MinValue.Date && 
                     string.IsNullOrWhiteSpace(documentGroup) &&
                     string.IsNullOrWhiteSpace(nit))
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "No se recibieron parámetros de consulta.");
-                    return new DianResponse { StatusCode = "89", StatusDescription = "No se recibieron parametros de consulta." };
+                    return new DianResponse { StatusCode = "89", StatusDescription = "No se recibieron parámetros de consulta." };
                 }
+
+                /*2022-05-31 Agregar el campo nit como obligatorio*/
+                if (string.IsNullOrWhiteSpace(nit))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio." };
+                }
+
+                #region Validaciones de tipo de dato y/o formato
+                if (!Regex.IsMatch(nit, @"^[0-9]+$")) /*nit solo contener numeros*/
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El parámetro de consulta 'nit' NO cumple con el tipo de dato y/o formato.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El parámetro de consulta 'nit' NO cumple con el tipo de dato y/o formato." };
+                }
+
+                if (!Regex.IsMatch(startDate, @"^[0-9/-]+$")) /*fecha inicial solo contener numeros con guion o slash*/
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El parámetro de consulta 'fecha inicial' NO cumple con el tipo de dato y/o formato.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El parámetro de consulta 'fecha inicial' NO cumple con el tipo de dato y/o formato." };
+                }
+
+                if (!Regex.IsMatch(endDate, @"^[0-9/-]+$"))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El parámetro de consulta 'fecha final' NO cumple con el tipo de dato y/o formato.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = "El parámetro de consulta 'fecha final' NO cumple con el tipo de dato y/o formato." };
+                }
+
+                if (string.IsNullOrWhiteSpace(documentGroup))
+                {
+                    documentGroup = "Todos";
+                }
+
+                if (!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
+                {
+                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, $"El grupo de documento solicitado ({documentGroup}) es inválido.");
+                    return new DianResponse { StatusCode = "89", StatusDescription = $"El grupo de documento solicitado ({ documentGroup }) es inválido." };
+                }
+                #endregion
 
                 if (dateStart.Date <= DateTime.MinValue.Date)
                 {
@@ -1003,6 +1044,7 @@ namespace Gosocket.Dian.Web.Services
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "La fecha final debe ser mayor o igual a la fecha inicial.");
                     return new DianResponse { StatusCode = "89", StatusDescription = "La fecha final debe ser mayor o igual a la fecha inicial." };
                 }
+
                 int maxQuantyDays = Convert.ToInt32(ConfigurationManager.GetValue("BulkDocumentsDownload_QuantyMaxDaysFoDateRange"));
                 if ((dateEnd.Date - dateStart.Date).TotalDays > maxQuantyDays)
                 {
@@ -1010,29 +1052,11 @@ namespace Gosocket.Dian.Web.Services
                     return new DianResponse { StatusCode = "89", StatusDescription = "El rango de fechas especificado para esta solicitud, supera el rango máximo de fechas permitido (3 meses)." };
                 }
 
-                if (string.IsNullOrWhiteSpace(documentGroup))
-                {
-                    documentGroup = "Todos";
-                }
-
-                if (!allowedDocumentGroups.Any(t => t.ToLower() == documentGroup.ToLower()))
-                {
-                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, $"El grupo de documento solicitado ({documentGroup}) es inválido.");
-                    return new DianResponse { StatusCode = "89", StatusDescription = $"El grupo de documento solicitado({ documentGroup }) es inválido." };
-                }
-
                 /*agregar validacion de que la fecha inicial no debe ser mayor a 3 meses a partir de hoy*/
                 if ((DateTime.Now.Date - dateStart.Date).TotalDays > maxQuantyDays)
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "la fecha de inicio supera el rango máximo de fechas permitido (3 meses).");
                     return new DianResponse { StatusCode = "89", StatusDescription = "la fecha de inicio supera el rango máximo de fechas permitido (3 meses)." };
-                }
-
-                /*2022-05-31 Agregar el campo nit como obligatorio*/
-                if (string.IsNullOrWhiteSpace(nit))
-                {
-                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio.");
-                    return new DianResponse { StatusCode = "89", StatusDescription = "Para realizar la solicitud de descarga masiva de documentos, el nit es obligatorio." };
                 }
 
                 DianPAServices customerDianPa = new DianPAServices();
