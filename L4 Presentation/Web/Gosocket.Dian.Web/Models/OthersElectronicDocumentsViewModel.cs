@@ -64,6 +64,8 @@ namespace Gosocket.Dian.Web.Models
         public bool ElectronicDocumentIsSupport => ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
         public bool ElectronicDocumentIsEquivalent => ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
         public List<OperationModeElectronicBillerViewModel> OperationModesAsociatedInElectronicBiller { get; set; }
+
+        public string FreeBillerSoftwareId { get; set; }
     }
 
     public class OperationModeElectronicBillerViewModel

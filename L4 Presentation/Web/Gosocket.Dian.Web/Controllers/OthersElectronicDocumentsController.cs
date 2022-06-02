@@ -310,6 +310,8 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.FreeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocumentId);
+
             return View(model);
         }
 
