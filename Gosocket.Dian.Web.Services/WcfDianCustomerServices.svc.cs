@@ -997,12 +997,6 @@ namespace Gosocket.Dian.Web.Services
                 }
 
                 #region Validaciones de tipo de dato y/o formato
-                if (!Regex.IsMatch(nit, @"^[0-9]+$")) /*nit solo contener numeros*/
-                {
-                    Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El parámetro de consulta 'nit' NO cumple con el tipo de dato y/o formato.");
-                    return new DianResponse { StatusCode = "89", StatusDescription = "El parámetro de consulta 'nit' NO cumple con el tipo de dato y/o formato." };
-                }
-
                 if (!Regex.IsMatch(startDate, @"^[0-9/-]+$")) /*fecha inicial solo contener numeros con guion o slash*/
                 {
                     Log($"{authCode} {email} BulkDocumentDownloadAsync", (int)InsightsLogType.Error, "El parámetro de consulta 'fecha inicial' NO cumple con el tipo de dato y/o formato.");
