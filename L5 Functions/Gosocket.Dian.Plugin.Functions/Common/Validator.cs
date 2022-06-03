@@ -1276,10 +1276,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string softwareproviderDvErrorCode = string.Empty;
             if (documentMeta.DocumentTypeId == "05") softwareproviderDvErrorCode = "DSAB22b";
             if (documentMeta.DocumentTypeId == "95") softwareproviderDvErrorCode = "NSAB22b";
+            if (documentMeta.DocumentTypeId == "94") softwareproviderDvErrorCode = "NAAB22b";
             //else if (documentMeta.DocumentTypeId == "91") softwareproviderDvErrorCode = "CAB22";
             //else if (documentMeta.DocumentTypeId == "92") softwareproviderDvErrorCode = "DAB22";
             else if (documentMeta.DocumentTypeId == "96") softwareproviderDvErrorCode = Properties.Settings.Default.COD_VN_DocumentMeta_AAB22;
-            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) && documentMeta.DocumentTypeId != "40")
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) && documentMeta.DocumentTypeId != "40" && documentMeta.DocumentTypeId != "94")
             {
                 softwareproviderDvErrorCode = "DEAB22b";
             }
@@ -1380,7 +1381,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             else if (documentMeta.DocumentTypeId == "91") softwareProviderErrorCode = "CAB19b";
             else if (documentMeta.DocumentTypeId == "92") softwareProviderErrorCode = "DAB19b";
             else if (documentMeta.DocumentTypeId == "95") softwareProviderErrorCode = "NSAB19b";
-            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            else if (documentMeta.DocumentTypeId == "94") softwareProviderErrorCode = "NAAB19b";
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) && documentMeta.DocumentTypeId != "94")
             {
                 softwareProviderErrorCode = "DEAB19b";
             }
@@ -4673,7 +4675,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.ErrorCode = "NSAB27b";
                 response.ErrorMessage = "Huella no corresponde a un software autorizado para este ABS.";
             }
-            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId))
+            if (documentMeta.DocumentTypeId == "94")
+            {
+                response.ErrorCode = "NAAB27b";
+                response.ErrorMessage = "Huella no corresponde a un software autorizado para este OFE.";
+            }
+            if (_equivalentDocumentTypes.Contains(documentMeta.DocumentTypeId) && documentMeta.DocumentTypeId != "94")
             {
                 response.ErrorCode = "DEAB27b";
             }
