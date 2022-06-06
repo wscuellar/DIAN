@@ -310,6 +310,8 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.FreeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocumentId);
+
             return View(model);
         }
 
@@ -560,7 +562,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             NotificationsController notification = new NotificationsController();
-            await notification.EventNotificationsAsync("04", User.UserCode());
+            int id = model.OperationModeSelectedId == "3" ? 1 : model.OperationModeSelectedId == "2" ? 3 : 2;
+            notification.EventNotificationsAsyncOperationMode("04", User.UserCode(), id);
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }

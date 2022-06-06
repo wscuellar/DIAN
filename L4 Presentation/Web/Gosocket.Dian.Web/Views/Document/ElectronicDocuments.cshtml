@@ -81,7 +81,7 @@
             </div>
         }
 
-        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
+        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4 && ViewBag.LoginMenu == "NO OFE")
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
@@ -98,7 +98,7 @@
             </div>
         }
 
-       else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0"))
+        else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
@@ -115,7 +115,55 @@
             </div>
         }
 
-        @if (ViewBag.ContributorTypeIde != null)
+        else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.LoginMenu == "NO OFE")
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
+                     onclick="EnabledSupportDocumentForNoOfe()">
+                    <div class="RadianImgContainer">
+                        <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
+                    </div>
+                    <div class="card-body">
+                        <p class="RadianTittleCard">Documento soporte para no obligados a facturar</p>
+                    </div>
+                </div>
+            </div>
+        }
+        
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"

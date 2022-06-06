@@ -1267,7 +1267,7 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             NotificationsController notification = new NotificationsController();
-            notification.EventNotificationsAsync("04", User.UserCode());
+            notification.EventNotificationsAsyncOperationMode("04", User.UserCode(), (int)model.OperationModeId);
 
             return RedirectToAction("ConfigureOperationModes", new { id = model.Id });
         }
