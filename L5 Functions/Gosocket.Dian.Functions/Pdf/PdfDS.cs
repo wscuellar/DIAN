@@ -451,11 +451,18 @@ namespace Gosocket.Dian.Functions.Pdf
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
-				var ivaValor =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount") : detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount"); ;
+				var ivaValor =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount") : detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount"); 
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
+                if (tipoD =="55")
+                {
+
+					ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");
+					IvaVal = decimal.Parse(ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value.ToString()).ToString("N0");
+
+				}
 				var Desc = "";
 				var Reca = "";
 				var recargos = detalle.Elements(cac + "AllowanceCharge").ToList();
