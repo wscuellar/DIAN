@@ -529,14 +529,29 @@ namespace Gosocket.Dian.Functions.Pdf
 					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
 										decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value);
 				else
+					if (tipoD =="55")
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()) *
+										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString().Split('.')[0]);
+				else
+						subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
+										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString());
 
-				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
-										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
-			//var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
-			plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString().Split('.')[0]).ToString("N0"));
-			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
+            //var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
+
+            if (tipoD =="55")
+            {
+				plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString()).ToString("N0"));
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", decimal.Parse(DescDet.ToString()).ToString("N0"));
+			}
+            else
+            {
+
+			  plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString().Split('.')[0]).ToString("N0"));
+			  plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
+            }
+
 			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", Decimal.Parse(RecDet.ToString().Split('.')[0]).ToString("N0"));
 			return plantillaHtml;
 		}
@@ -813,18 +828,23 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			
 			var TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxExclusiveAmount");
-			Html = Html.Replace("{TotalBrutoDocumento}", Decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
-			var TotalIVA = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 			
+			var TotalIVA = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");
+			var TotalNetoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
+			var TotalFactura = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "PayableAmount");//resta subtotal ? 
 			if (typeDocument.FirstOrDefault().Value =="55")
             {
 				
-				TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 
-																							
+				TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 																							
 				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value)).ToString("N0"));
-            }
+				Html = Html.Replace("{TotalBrutoDocumento}", decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString()).ToString("N0"));
+				Html = Html.Replace("{TotalNetoDocumento}", decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value.ToString()).ToString("N0"));
+				Html = Html.Replace("{TotalFactura}", decimal.Parse(TotalFactura.FirstOrDefault().Value.ToString()).ToString("N0"));
+			}
             else
             {
-					
+				Html = Html.Replace("{TotalFactura}", Decimal.Parse(TotalFactura.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
+				Html = Html.Replace("{TotalNetoDocumento}", Decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
+				Html = Html.Replace("{TotalBrutoDocumento}", Decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
 				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value) - decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value)).ToString("N0"));
             }
           
@@ -839,8 +859,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TotalImpuestos = decimal.Parse(OtrosImp.Any() ? OtrosImp.FirstOrDefault().Value : "0") + decimal.Parse(TotalIVA.Any() ? TotalIVA.FirstOrDefault().Value : "0");
 			Html = Html.Replace("{TotalImpuestos}", TotalImpuestos.ToString("N0"));
 
-			var TotalNetoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
-			Html = Html.Replace("{TotalNetoDocumento}", Decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")); ;
+			
+			
 
 			var DescuentoGlobal = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "AllowanceTotalAmount");//resta subtotal ? 
 			if (DescuentoGlobal.Any())
@@ -858,11 +878,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			else
 				Html = Html.Replace("{RecargoGlobal}", string.Empty);
 
-			var TotalFactura = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "PayableAmount");//resta subtotal ? 
+			
 
 			//var (TotalFactura.FirstOrDefault().Value.ToString("N", new CultureInfo("is-IS")));
 
-			Html = Html.Replace("{TotalFactura}", Decimal.Parse(TotalFactura.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
+			
 
 			try
 			{
