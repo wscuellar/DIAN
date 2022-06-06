@@ -697,6 +697,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var Regimen = await cosmos.getRegimen();
 			var Depto = await cosmos.getDepartament();
 			var UUID = model.Elements(cbc + "UUID");
+			var typeDocument = model.Elements(cbc + "InvoiceTypeCode");
 			Html = Html.Replace("{CodigoUnicoDocumentoSoporte}", UUID.FirstOrDefault().Value);
 
 			var ID = model.Elements(cbc + "ID");
@@ -810,12 +811,23 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			//falta caculos subtotal
 
-
+			
 			var TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxExclusiveAmount");
-			Html = Html.Replace("{TotalBrutoDocumento}", Decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")); ;
-
-			var TotalIVA = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
-			Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value) - decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value)).ToString("N0"));
+			Html = Html.Replace("{TotalBrutoDocumento}", Decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
+			var TotalIVA = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 			
+			if (typeDocument.FirstOrDefault().Value =="55")
+            {
+				
+				TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 
+																							
+				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value)).ToString("N0"));
+            }
+            else
+            {
+					
+				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value) - decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value)).ToString("N0"));
+            }
+          
 
 			var OtrosImp = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 
 			if (OtrosImp.Any())
