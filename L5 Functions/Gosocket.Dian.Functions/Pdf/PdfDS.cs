@@ -833,7 +833,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TotalFactura = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "PayableAmount");//resta subtotal ? 
 			if (typeDocument.FirstOrDefault().Value =="55")
             {
-				
+				TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
 				TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 																							
 				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value)).ToString("N0"));
 				Html = Html.Replace("{TotalBrutoDocumento}", decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString()).ToString("N0"));
