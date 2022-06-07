@@ -478,7 +478,16 @@ namespace Gosocket.Dian.Functions.Pdf
 					else
 					{
 						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
-						DescDet = DescDet + decimal.Parse(Desc);
+						if (tipoD == "55")
+                        {
+							
+							DescDet = decimal.Parse(item.Elements(cbc + "Amount").FirstOrDefault().Value.ToString());
+						}
+                        else
+                        {
+
+							DescDet = DescDet + decimal.Parse(Desc);
+                        }
 					}
 				}
 				var fechaPeriodo = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "StartDate");
@@ -491,7 +500,8 @@ namespace Gosocket.Dian.Functions.Pdf
 				var desc2 = detalle.Elements(cac + "Item").Elements(cbc + "Description");
 				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
 
-				if (tipoD == "50" || tipoD == "Nota"|| tipoD == "55"|| tipoD == "27"|| tipoD == "32")
+				
+				if (tipoD == "50" || tipoD == "Nota" || tipoD == "27"|| tipoD == "32")
 				{
 					rowDetalleProductosBuilder.Append($@"
                 <tr>
@@ -500,16 +510,35 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{des2}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")}</td>
+                    <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
 					<td class='text-right'>{Desc:n2}</td>
                     <td class='text-right'>{Reca:n2}</td>
 		            <td class='text-right'>{IvaVal:n2}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0")}</td>
+		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
 
 	            </tr>");
+				}else if(tipoD == "55")
+				{
+					rowDetalleProductosBuilder.Append($@"
+					 <tr>
+		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{des2}</td>
+		            <td>{unit.CompositeName}</td>
+		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+                    <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
+					<td class='text-right'>{decimal.Parse(Desc).ToString("N0"):n2}</td>
+                    <td class='text-right'>{Reca:n2}</td>
+		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td class='text-right'>{IvaPor:n2}</td>
+
+
+		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
+
+					 </tr>");
 				}
 				else
 				{
