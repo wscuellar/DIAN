@@ -1,0 +1,806 @@
+﻿@using Gosocket.Dian.Web.Common;
+@using Gosocket.Dian.Web.Utils
+@using Gosocket.Dian.Domain.Common
+@using Gosocket.Dian.Infrastructure
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DIAN | @ViewBag.Title</title>
+
+    <meta name="description" content="dian">
+    <meta name="keywords" content="dian" />
+    <meta name="author" content="Gosocket Corp SpA">
+    <link rel="shortcut icon" href="~/Content/img/favicon_dian.ico">
+    @*<link rel="manifest" href="/manifest.json">*@
+    <!--STYLESHEET-->
+    <!--=================================================-->
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+    <!--Bootstrap Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/jquery-ui.css" rel="stylesheet">
+    <link href="~/Content/css/bootstrap.min.css" rel="stylesheet">
+    <!--Nifty Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/nifty.min.css" rel="stylesheet">
+    <!--Font Awesome [ OPTIONAL ]-->
+    <link href="~/Content/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!--Flag Icons [ OPTIONAL ]-->
+    <link href="~/Content/plugins/flag-icon-css/flag-icon.min.css" rel="stylesheet">
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
+    <!--Chosen [ OPTIONAL ]-->
+    <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
+    <!--Select2 [ OPTIONAL ]-->
+    <link href="~/Content/plugins/select2/select2.min.css" rel="stylesheet">
+    <link href="~/Content/css/gosocket/typeahead.css" rel="stylesheet" />
+    <link href="~/Content/css/daterangepicker.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.css" rel="stylesheet" />
+    <link href="~/Content/jquery.steps.css" rel="stylesheet" />
+    <link href="~/Content/css/custom-form.css" rel="stylesheet" />
+    <link href="~/Content/plugins/data-tables/datatables.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/custom-select/customSelect.jquery.css" rel="stylesheet" />
+
+    @*<link href="~/Content/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker-standalone.min.css" rel="stylesheet">*@
+    <!--Gosocket Stylesheet [ REQUIRED ]-->
+    <link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet">
+    <link href="~/Content/css/Radian/RadianResponsive.css" rel="stylesheet">
+    <link href="~/Content/css/gosocket/gosocket.css?v=3.2.3" rel="stylesheet">
+    <link href="~/Content/css/gosocket/gosocket-specific.css" rel="stylesheet">
+    <link href="~/Scripts/font-awesome-animation.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/switchery/switchery.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Content/css/app-new-style.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,400italic,700,800" rel="stylesheet" type="text/css">
+
+    @RenderSection("css", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    @{
+        var alertClass = "danger";
+        var environment = "DIAN piloto";
+        if (ConfigurationManager.GetValue("Environment") == "Hab")
+        {
+            alertClass = "success";
+            environment = "DIAN habilitación";
+        }
+        var contributorType = User.ContributorTypeId();
+        var contributorName = User.ContributorName();
+        var userFullName = User.UserFullName();
+    }
+
+    @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+    {
+        <div class="alert custom-alert-@alertClass fade in" style="margin-bottom: 0px; top: 40px; z-index: 9;">
+            <strong>@environment</strong>
+        </div>
+    }
+
+    <div id="container" class="effect mainnav-lg navbar-fixed">
+        <!--NAVBAR-->
+        <!--===================================================-->
+        <header id="navbar">
+            <div id="navbar-container" class="boxed">
+                <!--Brand logo & name-->
+                <!--================================-->
+                <div class="navbar-header">
+                    <a href="/" class="navbar-brand">
+                        <img src="~/Content/img/LogoDian.png" alt="Gosocket" class="brand-icon gologo-xs">
+                        @*<img src="~/Content/img/logoNoSlogan.png" alt="Gosocket" class="brand-icon gologo-lg">*@
+                    </a>
+                </div>
+                <!--================================-->
+                <!--End brand logo & name-->
+                <!--Navbar Dropdown-->
+                <!--================================-->
+                <div class="navbar-content clearfix">
+                    <ul class="nav navbar-top-links pull-left">
+                        <li>
+                            <a id="mainnav-toggle" href="#">
+                                <i class="fa fa-navicon fa-lg"></i>
+                            </a>
+                        </li>
+                        <li class="dropdown-litopsearch dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                <i class="fa fa-search fa-lg"></i>
+                            </a>
+                            <!--litopsearch dropdown menu-->
+                            <div class="dropdown-menu dropdown-menu-lg">
+                                <div class="input-group mar-btm searchtop">
+                                    <span class="typeahead-spinner"><i class="fa fa-lg fa-spin fa-spinner"></i></span>
+                                    <input id="input-search-dropdown" class="form-control" type="text" data-provide="typeahead" placeholder="Buscar">
+                                    <span class="input-group-btn">
+                                        <button id="button-search-dropdown" class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div>
+                        <ul>
+                            <li>
+                                <center>
+                                    <h4>
+                                        @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Habilitación @Session["Login_ContributorType"]</b>
+                                        }
+                                        else
+                                        if (ConfigurationManager.GetValue("Environment") == "Prod")
+                                        {
+                                            <b>Sistema de facturación electrónica – Ambiente de Producción @Session["Login_ContributorType"]</b>
+                                        }
+
+                                    </h4>
+                                </center>
+                            </li>
+                        </ul>
+                    </div>
+                    <ul id="right-nav" class="nav navbar-top-links pull-right">
+                        @if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
+                        {
+                            <li id="dropdown" class="dropdown">
+                                <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                                    <div class="username">@contributorName</div>
+                                </a>
+                            </li>
+                        }
+                        <li id="dropdown" class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+                                <span class="pull-right">
+                                    <img class="img-circle img-user media-object" src="~/Content/img/av1.png" alt="UserName">
+                                </span>
+                                <div class="username">@userFullName</div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default">
+
+                                <div class="pad-all bord-btm">
+
+                                </div>
+
+                                <!-- User dropdown menu -->
+                                @if (User.IsInAnyRole("Administrador", "Super"))
+                                {
+                                    <ul class="head-list">
+                                        <li>
+                                            <a href="@Url.Action("ChangePassword", "User")">
+                                                <i class="fa fa-lock fa-fw fa-lg"></i> Cambiar contraseña
+                                            </a>
+                                        </li>
+                                    </ul>
+                                }
+
+                                @if (contributorType == (int)ContributorType.Biller || contributorType == (int)ContributorType.Provider)
+                                {
+                                    <ul class="head-list">
+                                        <li>
+                                            <a href="@Url.Action("Configuration", "Contributor")">
+                                                <i class="fa fa-cog fa-fw fa-lg"></i> Configuración
+                                            </a>
+                                        </li>
+                                    </ul>
+                                }
+
+                                <!-- Dropdown footer -->
+                                <div class="pad-all text-right">
+                                    @using Microsoft.AspNet.Identity
+                                    @if (Request.IsAuthenticated)
+                                    {
+                                        //if (System.Configuration.ConfigurationManager.AppSettings["LoginType"] != "Certificate")
+                                        //{
+                                        using (Html.BeginForm("LogOut", "User", FormMethod.Post, new { id = "logoutForm" }))
+                                        {
+                                            <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-primary">
+                                                <i class="fa fa-sign-out fa-fw"></i> Salir
+                                            </a>
+                                        }
+                                        //}
+                                        //else
+                                        //{
+                                        //    < a href = "javascript:logOutCertificate()" class="btn btn-primary">
+                                        //        <i class="fa fa-sign-out fa-fw"></i> Salir
+                                        //    </a>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End user dropdown-->
+                        <!--Mega dropdown-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End mega dropdown-->
+                        <!--Notification dropdown-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                        <!--End Chat button-->
+                    </ul>
+                </div>
+                <!--================================-->
+                <!--End Navbar Dropdown-->
+            </div>
+        </header>
+        <!--===================================================-->
+        <!--END NAVBAR-->
+        <div class="boxed">
+            <!--CONTENT CONTAINER-->
+            <!--===================================================-->
+            <div id="content-container">
+
+                <div id="page-alert">
+                </div>
+                @RenderBody()
+            </div>
+            <!--===================================================-->
+            <!--END CONTENT CONTAINER-->
+
+            <nav id="mainnav-container" style="min-width:223px">
+                <div id="mainnav">
+                    <!--Menu-->
+                    <!--================================-->
+                    <div id="mainnav-menu-wrap">
+                        <div class="nano has-scrollbar">
+                            <div class="nano-content" tabindex="0">
+                                <ul class="list-group" id="mainnav-menu" style="min-width: 233px;padding-right:3px;padding-left:1px">
+
+
+                                    <!--Category name-->
+                                    <li class="list-header">Inicio</li>
+                                    <li id="@Navigation.NavigationEnum.Dashboard">
+                                        <a href="@Url.Action("Dashboard", "Home")">
+                                            <i class="fa fa-dashboard"></i>
+                                            <span class="menu-title">
+                                                Inicio
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <!--Rol Administrador-->
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.DocumentValidatorIndex" class="parent-link" href="#">
+                                                <i class="fa fa-check-square"></i>
+                                                <span class="menu-title">
+                                                    Validador
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorReglas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorReglas"), pageName = "Reglas", navigation = @Navigation.NavigationEnum.DocumentValidatorReglas})">Reglas</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorEsquemas"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorEsquemas"), pageName = "Configuraciones", navigation = @Navigation.NavigationEnum.DocumentValidatorEsquemas})">Configuraciones</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidator"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("Validator"), pageName = "Validar documento", navigation = @Navigation.NavigationEnum.DocumentValidator})">Validar documento</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentValidatorCheck"><a href="@Url.Action("Open", "Gadget",new { url = @ConfigurationManager.GetValue("ValidatorCheck"), pageName = "Consultar validación", navigation = @Navigation.NavigationEnum.DocumentValidatorCheck})">Consultar validación</a></li>
+                                            </ul>
+                                        </li>
+                                    }
+                                    <!--Rol Administrador-->
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.DocumentIndex" class="parent-link" href="#">
+                                            <i class="fa fa-inbox"></i>
+                                            <span class="menu-title">
+                                                Histórico
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <!--Rol Administrador-->
+                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                        {
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
+                                                <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                                <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
+                                            </ul>
+                                        }
+                                        <!--Rol Administrador-->
+                                        <!--Rol Facturador and Proveedor-->
+                                        @if (!User.IsInAnyRole("Administrador", "Super") && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == null))
+                                        {
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.DocumentSent"><a href="@Url.Action("Sent", "Document" )">Documentos enviados</a></li>
+                                                <li id="@Navigation.NavigationEnum.DocumentReceived"><a href="@Url.Action("Received", "Document" )">Documentos recibidos</a></li>
+                                                @if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                {
+                                                    if (new string[] { "Dev", "Local", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.DocumentProvider"><a href="@Url.Action("Provider", "Document")">Documentos usuarios</a></li>
+                                                    }
+
+                                                }
+                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                            </ul>
+                                        }
+                                        <!--Rol Facturador and Proveedor-->
+                                    </li>
+                                    <li>
+                                        <a id="@Navigation.NavigationEnum.ClientIndex" class="parent-link" href="#">
+                                            <i class="fa fa-users"></i>
+                                            <span class="menu-title">
+                                                Registro y habilitación
+                                            </span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <!--Submenu-->
+                                        <ul class="collapse">
+                                            <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
+                                        </ul>
+                                        <ul class="collapse">
+                                            <!--Rol Administrador-->
+                                            @if (User.IsInAnyRole("Administrador", "Super"))
+                                            {
+                                                <!--RADIAN Administrador-->
+                                                if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.AdminRadian"><a href="@Url.Action("AdminRadianView", "Radian")">Habilitación RADIAN</a></li>
+                                                }
+                                                <!--RADIAN Administrador-->
+                                                <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("List", "Contributor", new {type = 2 })">Proveedores Tecnológicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.ProviderAuthorized"><a href="@Url.Action("List", "Contributor", new {type = 3 })">Proveedores Autorizados</a></li>
+                                                <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor", new {type = 1 })">Facturadores Electrónicos</a></li>
+                                                <li id="@Navigation.NavigationEnum.LegalRepresentative"><a href="@Url.Action("List", "User")">Representantes Legales</a></li>
+                                                <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
+                                                <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("List", "Contributor")">Contribuyentes</a></li>
+
+                                            }
+                                            @*Rol Administrador
+                                                Rol Facturador and Proveedor*@
+                                            @if (!User.IsInAnyRole("Administrador", "Super"))
+                                            {
+
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
+                                                }
+
+                                                if (User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorOperationModeId() == (int)Gosocket.Dian.Domain.Common.OperationMode.Own)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.Software"><a href="@Url.Action("List", "Software")">Softwares</a></li>
+                                                }
+
+                                                if (User.ShowTestSet())
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("ConfigureTestSet", "Contributor", new { contributorId = User.ContributorId() })">Set de Pruebas</a></li>
+                                                }
+
+
+                                                @*if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                            {
+                                                                <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                            }
+
+                                                        }
+                                                    <!--Rol Facturador and Proveedor-->
+                                                    <!--Rol Proveedor-->
+                                                    <!--@if (User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.Provider"><a href="@Url.Action("Check", "Contributor")">Proveedor Tecnológico</a></li>
+                                                        <li id="@Navigation.NavigationEnum.HFE"><a href="@Url.Action("List", "Contributor")">Facturadores</a></li>
+                                                    }-->
+                                                    <!--Rol Proveedor-->
+                                                    <!--  RADIAN -->
+                                                    <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.RADIAN">
+                                                            <a href="@Url.Action("Index", "Radian")">RADIAN</a>
+                                                        </li>
+                                                    }-->
+                                                    <!--Rol Para Facturador Electronico y Proveedor Tecnologico-->
+                                                    <!--@if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled && (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider))
+                                                        {
+                                                            <li id="@Navigation.NavigationEnum.OthersEletronicDocuments">
+                                                                <a href="@Url.Action("Index", "OthersElectronicDocuments")">Otros Documentos Electrónicos</a>
+                                                            </li>*@
+                                            }
+
+                                        </ul>
+                                    </li>
+
+                                    @if (!User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
+                                                <i class="fa fa-users"></i>
+                                                <span class="menu-title">
+                                                    Configuración
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                            </ul>
+                                            <ul>
+                                                @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                }
+                                            </ul>
+                                            <ul>
+                                                @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                {
+                                                    //if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                                    if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Cancelled)
+                                                    {
+                                                        <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
+                                                    }
+                                                }
+                                            </ul>
+
+                                        </li>
+                                    }
+
+                                    <!--Rol Administrador-->
+                                    @*@if (User.IsInAnyRole("Administrador", "Super"))
+                                            {
+                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate">
+                                            <a href="@Url.Action("AddUser", "ExternalUsers")">
+                                                <i class="fa fa-user-circle-o"></i>
+                                                <span class="menu-title">
+                                                    Crear Usuario
+                                                </span>
+                                            </a>
+                                        </li>
+                                        }*@
+                                    @*<li id="@Navigation.NavigationEnum.BigContributors">
+                                             @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                             {
+                                                 <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                             }
+
+                                        </li>*@
+
+
+                                    <!--Rol Administrador-->
+                                    @if (User.IsInAnyRole("Administrador", "Super"))
+                                    {
+                                        <!--  RADIAN -->
+
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.ConfigurationIndex" class="parent-link" href="#">
+
+                                                <i class="fa fa-cog"></i>
+                                                <span class="menu-title">
+                                                    Configuración
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                            </ul>
+                                            <ul>
+                                                @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider)
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                                }
+                                            </ul>
+                                            <ul>
+                                                @if (new string[] { "Local", "Hab", "Test", "Prod" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Gestionar Solicitudes Recepción por Lote - Asíncrono</a></li>
+                                                }
+                                            </ul>
+                                            <ul class="collapse">
+                                                @if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.ContributorFileType"><a href="@Url.Action("List", "ContributorFileType")">Tipos de Ficheros</a></li>
+                                                    <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("List", "TestSet")">Set de Pruebas</a></li>
+                                                    <li id="@Navigation.NavigationEnum.TestSetOtherDocuments"><a href="@Url.Action("List", "TestSetOthersDocuments")">Set de Pruebas - Otros Documentos</a></li>
+                                                }
+                                                <!-- Configuracion RADIAN -->
+                                                @if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros RADIAN</a></li>
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
+                                                    <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
+                                                    <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
+                                                }
+                                            </ul>
+
+                                        </li>
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.Bi" class="parent-link" href="#">
+                                                <i class="fa fa-bar-chart"></i>
+                                                <span class="menu-title">
+                                                    Business Intelligence
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <ul class="collapse">
+                                                @if (ConfigurationManager.GetValue("Environment") == "Hab")
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.StatisticsBI"><a href="@Url.Action("Open", "Gadget",new { url = "https://app.powerbi.com/view?r=eyJrIjoiNDk4M2FjYzQtY2YzOC00ZjA1LTlkOGMtODk2ZGYzY2YwYzBlIiwidCI6ImJlMjhhODUyLTg4Y2ItNDUzMy05MWI4LTBkMzI3MTI1MDI2YiIsImMiOjR9", pageName = "Estadísticas", navigation = @Navigation.NavigationEnum.StatisticsBI})">Estadísticas</a></li>
+                                                }
+                                                @if (ConfigurationManager.GetValue("Environment") == "Prod")
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.StatisticsBI"><a href="@Url.Action("Open", "Gadget",new { url = "https://app.powerbi.com/view?r=eyJrIjoiM2ViYzZhMjQtNDQ4Yi00NzljLThhZDMtYmNiYTk2ZmVhMGJkIiwidCI6ImJlMjhhODUyLTg4Y2ItNDUzMy05MWI4LTBkMzI3MTI1MDI2YiIsImMiOjR9", pageName = "Estadísticas", navigation = @Navigation.NavigationEnum.StatisticsBI})">Estadísticas</a></li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                    <!--Rol Administrador-->
+                                    <!--Rol Facturador-->
+                                    @if (User.GoToInvoicer() || Session["ShowFree"] == "2")
+                                    {
+                                        <li>
+                                            <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
+                                                <i class="fa fa-dollar"></i>
+                                                <span class="menu-title">
+                                                    Solución Gratuita
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
+                                        </li>
+                                    }
+                                    else
+                                    if (Session["ShowFree"] == "1")
+                                    {
+
+                                        <li id="LiFree" class="active">
+                                            <a id="@Navigation.NavigationEnum.Invoice" class="parent-link" href="#">
+                                                <i class="fa fa-dollar"></i>
+                                                <span class="menu-title">
+                                                    Facturador Gratuito
+                                                </span>
+                                                <i class="arrow"></i>
+                                            </a>
+                                            <!--Submenu-->
+                                            <ul class="collapse in" aria-expanded="true">
+                                                <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("RedirectToBiller", "User")" target="_new">Ingresar</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("FreeBillerUser", "FreeBiller")">Crear perfil SG</a></li>
+                                                <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("CreateUser", "FreeBiller")">Crear Usuarios SG</a></li>
+
+
+                                            </ul>
+                                        </li>
+                                    }
+
+
+
+                                    <!--Rol Facturador-->
+                                    <li class="list-divider"></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--================================-->
+                    <!--End menu-->
+                </div>
+            </nav>
+            <!--ASIDE-->
+            <!--===================================================-->
+            <aside id="aside-container">
+                <div id="aside">
+                    <div class="nano">
+                        <div class="nano-content">
+                            <!--Nav tabs-->
+                            <!--================================-->
+                            @if (ViewBag.HasActions != null && ViewBag.HasActions)
+                            {
+                                <ul class="nav nav-tabs nav-justified">
+                                    <li style="display: none" id="li-aside-actions">
+                                        <a href="#tab-aside-actions" data-toggle="tab" class="padding-bottom-0" style="display: none;">
+
+                                        </a>
+                                    </li>
+                                </ul>
+                            }
+                            <!--================================-->
+                            <!--End nav tabs-->
+                            <!-- Tabs Content -->
+                            <!--================================-->
+                            <div class="tab-content">
+                                <!--First tab (Actions)-->
+                                <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                                @if (ViewBag.HasActions != null && ViewBag.HasActions)
+                                {
+                                    <div class="tab-pane" id="tab-aside-actions">
+                                        <hr class="mar-no" />
+                                        <div class="pad-all">
+                                            <p class="text-lg mar-no aside-normal-text text-semibold">Acciones</p>
+                                            @*<button id="download-xml " data-docid="b04b38f1-f7f6-48e1-8b7d-82465aca7a14" class="btn btn-block btn-default btn-hover-gosocket margin-top-15"><i class="fa fa-download"></i>&nbsp;&nbsp;Descargar XML</button>*@
+
+                                            <button id="download-pdf" class="btn btn-block btn-default btn-hover-gosocket margin-top-15"><i class="fa fa-download"></i>&nbsp;&nbsp;Descargar PDF</button>
+
+                                        </div>
+                                        <hr class="mar-no" />
+                                    </div>
+                                }
+                                <!--End second tab (Chat)-->
+                                <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <!--===================================================-->
+            <!--END ASIDE-->
+        </div>
+        <!-- SCROLL TOP BUTTON -->
+        <!--===================================================-->
+        <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+        <!--===================================================-->
+        <!-- Support phone -->
+        <a id="support-tel" href="tel:600 600 0060" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 600 600 0060</a>
+        <a id="support-tel-pe" href="tel:0 801 10880" style="display: none; position: fixed;bottom: -210px;right: 10px;background-color: #696969;z-index: 4000;padding: 10px 10px 8px 10px;color: #ffffff;width: 210px;text-align: center;">Soporte <i class="fa fa-phone" aria-hidden="true"></i> : 0 801 10880</a>
+        <!-- END Support phone -->
+    </div>
+
+    @Html.Partial("_ConfirmModal")
+    <!--===================================================-->
+    <!-- END OF CONTAINER -->
+    <!--JAVASCRIPT-->
+    <!--=================================================-->
+    <!--jQuery [ REQUIRED ]-->
+
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Scripts/jquery-ui.js"></script>
+    <script src="~/Content/js/combobox-autocomplete.js"></script>
+
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    <!--Nifty Admin [ RECOMMENDED ]-->
+    <script src="~/Content/js/nifty.js"></script>
+    <!--Bootstrap Select [ OPTIONAL ]-->
+    <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js?1.0.0"></script>
+    <!--Select2 [ OPTIONAL ]-->
+    <script src="~/Content/plugins/select2/select2.min.js"></script>
+    <script src="~/Content/plugins/select2/i18n/es.js"></script>
+    <!--Chosen [ OPTIONAL ]-->
+    <script src="~/Content/plugins/chosen/chosen.jquery.js"></script>
+    <!--Handlebars [ REQUIRED ]-->
+    <script src="~/Content/plugins/handlebars/handlebars.js"></script>
+    <!--Mail -->
+    <script src="~/Content/js/demo/mail.js"></script>
+    @*<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>*@
+    <script type="text/javascript" src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script src="~/Content/js/daterangepicker.min.js"></script>
+    <script src="~/Content/plugins/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+    <script src="~/Content/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.es.js"></script>
+    @*<script src="~/Content/js/bootstrap-datepicker.es.min.js"></script>*@
+    <script src="~/Content/plugins/custom-select/customSelect.jquery.js"></script>
+
+    <script type="text/javascript" src="~/Content/plugins/masked-input/jquery.maskedinput.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+    <script src="~/Content/plugins/switchery/switchery.min.js"></script>
+    <script src="~/Content/plugins/data-tables/datatables.min.js"></script>
+    <!--Gosocket Js [ REQUIRED ]-->
+    <script src="~/Content/js/gosocket/gosocket.js?1.6.11"></script>
+    <script src="~/Content/js/gosocket/typeahead.js"></script>
+    <script src="~/Content/plugins/bootbox/bootbox.min.js"></script>
+    <script src="~/Content/js/common/common.js?1.2.0"></script>
+
+    <script src="~/Scripts/jquery.steps.js"></script>
+
+    <!-- highchart-->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <script>
+        $(function () {
+            @if (ViewBag.CurrentPage != null)
+            {
+                var currentPage = (Navigation.NavigationEnum)ViewBag.CurrentPage;
+                if (currentPage != Navigation.NavigationEnum.Undefined)
+                {
+                    <text>
+                        var selectedLi = $("#@currentPage");
+                        if (selectedLi.length > 0) {
+                            if (selectedLi.parent().attr("id") === "mainnav-menu") {
+                                selectedLi.addClass("active active-link");
+                            } else {
+                                selectedLi.addClass("active-link");
+                                var parentUl = selectedLi.parent("ul");
+                                parentUl.addClass("in");
+                                var parentLi = parentUl.parent("li");
+                                if (parentLi.parent().attr("id") === "mainnav-menu") {
+                                    parentLi.addClass("active").children("a").addClass("parent-active");
+                                } else {
+                                    parentUl = parentLi.parent("ul");
+                                    parentUl.addClass("in");
+                                    parentUl.parent("li").addClass("active").children("a").addClass("parent-active");
+                                }
+                            }
+                        }
+                    </text>
+                }
+            }
+        });
+    </script>
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+
+        if ('@ConfigurationManager.GetValue("Environment")' !== 'Local' || '@ConfigurationManager.GetValue("Environment")' !== 'Test') {
+            window.onload = function () {
+                document.addEventListener("contextmenu", function (e) {
+                    e.preventDefault();
+                }, false);
+                document.addEventListener("keydown", function (e) {
+                    //document.onkeydown = function(e) {
+                    // "I" key
+                    if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+                        disabledEvent(e);
+                    }
+                    // Mac chrome
+                    if (e.altKey && e.metaKey && e.keyCode == 73) {
+                        disabledEvent(e);
+                    }
+                    // Mac firefox
+                    if (e.altKey && e.metaKey && e.keyCode == 75) {
+                        disabledEvent(e);
+                    }
+                    // Mac safari
+                    if (e.altKey && e.metaKey && e.keyCode == 67) {
+                        disabledEvent(e);
+                    }
+                    // "J" key
+                    if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+                        disabledEvent(e);
+                    }
+                    // "S" key + macOS
+                    if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                        disabledEvent(e);
+                    }
+                    // "U" key
+                    if (e.ctrlKey && e.keyCode == 85) {
+                        disabledEvent(e);
+                    }
+                    // "F12" key
+                    if (event.keyCode == 123) {
+                        disabledEvent(e);
+                    }
+                }, false);
+                function disabledEvent(e) {
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                    } else if (window.event) {
+                        window.event.cancelBubble = true;
+                    }
+                    e.preventDefault();
+                    return false;
+                }
+            };
+        }
+
+        $(document).ready(function () {
+            var free = "@Session["ShowFree"]";
+            if (free == "1")
+            {
+
+				$('#LiFree').css("background", "#41D78C");
+				setTimeout(function () { $('#LiFree').css("background", "transparent") }, 1500);
+            }
+            $(".clickable-row").click(function () {
+                window.location = $(this).data("href");
+            });
+            $('.select2').select2();
+        });
+
+    </script>
+    @if (Session["ShowFree"] == "1")
+    {
+        Session["ShowFree"] = "2";
+	}
+
+	@Html.Partial("_LoadingPage")
+</body>
+</html>

@@ -77,18 +77,19 @@
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="padding: 0px;">@ViewBag.Title</h3>
+        </div>
         <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
 
-            <div class="panel-body padding-top-20">
+
+            <div class="panel-body margin-20 padding-top-20">
                 <div class="pad-btm padding-bottom-0">
                     <div class="row margin-horizontal-0">
-                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                        <div class="row margin-horizontal-0 margin-bottom-10" style="padding:10px">
                             <div class="col-md-12 padding-horizontal-0">
 
-                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
+                                <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian" style="box-shadow:none;">
                                     <div class="panel-body padding-top-10 padding-left-5 padding-right-5 padding-bottom-0">
                                         <div class="row">
                                             <div class="col-sm-12 padding-xs-0">
@@ -99,8 +100,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="panel-footer-grey text-right">
-                                        <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = ViewBag.ContributorId})" class="btn btn-default btn-hover-gosocket">Volver</a>
+                                    <div class="text-left">
+                                        <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = ViewBag.ContributorId})" class="btn btn-success btn-radian-success">Volver</a>
                                     </div>
                                 </div>
 

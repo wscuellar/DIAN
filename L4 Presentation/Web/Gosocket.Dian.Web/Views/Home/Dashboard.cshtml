@@ -10,12 +10,8 @@
 <div id="page-content" data-target="#page-content" data-toggle="panel-overlay" class="page-content margin-15">
     <div class="row margin-horizontal-0">
 
-        <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
-
-            <div class="panel-body" padding-top-20">
+        <div class="">
+            <div class="panel-body">
                 <div class="row margin-horizontal-0">
                     @if (User.IsInAnyRole("Administrador", "Super"))
                     {
@@ -42,27 +38,27 @@
                     @if (!User.IsInAnyRole("Administrador", "Super"))
                     {
                         <div class="col-md-6 col-lg-3">
-                            <div class="panel panel-mint panel-colorful">
-                                <div class="panel-body text-center">
-                                    <p class="text-uppercase mar-btm text-sm">Documentos emitidos</p>
-                                    <i class="fa fa-arrow-circle-right fa-5x"></i>
-                                    <hr>
-                                    <p id="total-documents-emitted" class="h2 text-thin">
+                            <div class="panel panel-mint" style="border-radius: 30px;">
+                                <div class="panel-body text-center" style="height: 300px;display: flex;align-items: center;flex-direction: column;justify-content: center;">
+                                    <p style="font-family: Work Sans;font-size: 18px; font-weight: bold; color: #262944; line-height:26px;" class="text-uppercase mar-btm text-sm">Documentos emitidos</p>
+                                    
+                                    
+                                    <p id="total-documents-emitted"  style="font-family: Work sans; font-size: 81px; font-weight: bold; color: #262944; line-height: 117px;" class="h2 text-thin">
                                         <i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
                                     </p>
-                                    <small><span class="text-semibold"><i class="fa fa-calendar fa-fw"></i></span> Documentos emitidos en los últimos 30 días.</small>
+                                    <small style="font-family: Ubuntu;font-size: 14px; font-weight: 400; color: #262944; line-height:26px;"> Documentos emitidos <br/> en los últimos <small style="color: #00B4DC; font-weight: bold; font-size:14px;">30 días</small>.</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-md-6 col-lg-3">
-                            <div class="panel panel-info panel-colorful">
-                                <div class="panel-body text-center">
-                                    <p class="text-uppercase mar-btm text-sm">Documentos recibidos</p>
-                                    <i class="fa fa-arrow-circle-left fa-5x"></i>
-                                    <hr>
-                                    <p id="total-documents-received" class="h2 text-thin"><i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i></p>
-                                    <small><span class="text-semibold"><i class="fa fa-calendar fa-fw"></i></span> Documentos recibidos en los últimos 30 días.</small>
+                            <div class="panel panel-info" style="border-radius: 30px;">
+                                <div class="panel-body text-center" style="height: 300px;display: flex;align-items: center;flex-direction: column;justify-content: center;">
+                                    <p style="font-family: Work Sans;font-size: 18px; font-weight: bold; color: #262944; line-height:26px;" class="text-uppercase mar-btm text-sm">Documentos recibidos</p>
+                                    
+                                    
+                                    <p id="total-documents-received" class="h2 text-thin" style="font-family: Work sans; font-size: 81px; font-weight: bold; color: #262944; line-height: 117px;"><i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i></p>
+                                    <small style="font-family: Ubuntu;font-size: 14px; font-weight: 400; color: #262944; line-height:26px;"> Documentos recibidos <br /> en los últimos <small style="color: #00B4DC; font-weight: bold; font-size:14px;">30 días</small>.</small>
                                 </div>
                             </div>
                         </div>

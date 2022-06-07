@@ -5,215 +5,104 @@
 @*<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />*@
 
 <style>
-    .RadianCardContainer {
-        cursor: pointer;
-    }
-
     .margin-page-content {
         margin-top: 50px !important;
     }
-
-    .imgSvg110px {
-        height: 110px;
-    }
 </style>
 
-<div class="page-content radian-view margin-20 margin-page-content">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
-    </div>
-    <div class="container-fluid RadianContainerBegin" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="container-fluid RadianContainerBegin">
 
-        <p class="RadianTextSelected">Seleccione el tipo de documento:</p>
-        <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
-        </svg>
+    <p class="sub-title">Seleccione el tipo de documento:</p>
+    <hr>
 
+    <div class="hab-menu-container">
         @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
-                    <a href="@Url.Action("Check", "Contributor")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Factura Electrónica</p>
-                            <p class="RadianTittleCard2">Factura Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>    
         }
         else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Prod" && ViewBag.ContributorAcceptanceStatusId != 4)
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
-                    <a href="@Url.Action("Check", "Contributor")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Factura Electrónica</p>
-                            <p class="RadianTittleCard2">Factura Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>
         }
         else if (ViewBag.LoginMenu == "OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" id="1" contributorType="1" operationMode="0">
-                    <a href="@Url.Action("Check", "Contributor")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/FacturadorElectronico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Factura Electrónica</p>
-                            <p class="RadianTittleCard2">Factura Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>
         }
 
         @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4 && ViewBag.LoginMenu == "NO OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Nomina Electrónica</p>
-                            <p class="RadianTittleCard2">Nomina Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
         }
 
         else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Nomina Electrónica</p>
-                            <p class="RadianTittleCard2">Nomina Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
         }
 
         else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Nomina Electrónica</p>
-                            <p class="RadianTittleCard2">Nomina Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
         }
         else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
-                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Nomina Electrónica</p>
-                            <p class="RadianTittleCard2">Nomina Electrónica</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
         }
 
         @if (ViewBag.ContributorTypeIde != null && ViewBag.LoginMenu == "NO OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
-                     onclick="EnabledSupportDocumentForNoOfe()">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Documento soporte para no obligados a facturar</p>
-                    </div>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
+                Documento para no obligados a facturar
+            </button>
         }
         
         else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
-                     onclick="EnabledSupportDocumentForNoOfe()">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/SistemaNegociacion.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Documento soporte para no obligados a facturar</p>
-                    </div>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
+                Documento para no obligados a facturar
+            </button>
         }
 
         @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4 && ViewBag.LoginMenu == "OFE")
         {
-            <div class="row-fluid">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="card RadianCardContainer" contributorType="4" operationMode="1" id="4">
-                        <a href="@Url.Action("Index", "Radian")">
-                            <div class="RadianImgContainer">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard">Eventos RADIAN</p>
-                                <p class="RadianTittleCard2">Eventos RADIAN</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "Radian")'" contributorType="4" operationMode="1" id="4">
+                <img src="~/Content/img/electronic-document-icons/eventos-radian-icon.svg" height="130" />
+                Eventos RADIAN
+            </button>
         }
 
         @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
         {
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
-                     onclick="EnabledEquivalentDocuments()">
-                    <div class="RadianImgContainer">
-                        <img style="height:115px;" class="RadianimgSvg imgSvg110px" src="~/Content/images/Svg/documentos_equivalentes_icono_principal_Mesa_de_trabajo.svg" />
-                    </div>
-                    <div class="card-body" style="padding: 0 16px;">
-                        <p class="RadianTittleCard">Documentos equivalentes </p>
-                    </div>
-                </div>
-            </div>
+            <button class="hab-menu-button" onclick="EnabledEquivalentDocuments()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documentos-equivalentes-icon.svg" height="130" />
+                Documentos equivalentes
+            </button>
         }
     </div>
 </div>
+
 
 @section scripts
 {

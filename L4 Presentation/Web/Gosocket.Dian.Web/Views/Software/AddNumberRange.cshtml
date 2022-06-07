@@ -1,42 +1,43 @@
 ﻿@model Gosocket.Dian.Web.Models.SoftwareTableViewModel
 
 @{
-    ViewBag.Title = "Gestionar Asociación de Prefijos";
+    ViewBag.Title = "Configuración / Gestionar Asociación de Prefijos";
     var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control software-props" }, { "readonly", "readonly" } };
 }
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
+        <div class="panel-heading">
+            <h3 class="panel-title">@ViewBag.Title</h3>
+        </div>
         <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
 
-            <div class="panel-body padding-top-20">
+
+            <div class="panel-body" style="background: none !important; padding: 0px;">
                 <div class="pad-btm padding-bottom-0">
 
                     @if (!Model.Softwares.Any())
                     {
-                        <div class="alert custom-alert-primary margin-bottom-5">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, no tiene disponible software en estado aceptado para permitir la asociación de prefijos.<br />
-                        </div>
+                    <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;" >
+                        <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                        <p style="margin: 0px 40px;">Estimado contribuyente, no tiene disponible software en estado aceptado para permitir la asociación de prefijos.</p>
+                    </div>
                     }
 
                     @if (!Model.Prefixes.Any() && !Model.AssociatedRanges.Any())
                     {
-                        <div class="alert custom-alert-primary margin-bottom-10">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, no tiene autorizados rangos de numeración.<br />
-                        </div>
+                <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;">
+                    <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                    <p style="margin: 0px 40px;">Estimado contribuyente, no tiene autorizados rangos de numeración.</p>
+                </div>
                     }
 
                     @if (!Model.Prefixes.Any() && Model.AssociatedRanges.Any())
                     {
-                        <div class="alert custom-alert-primary margin-bottom-10">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, no tiene mas prefijos de numeración para asociar a un software.<br />
-                        </div>
+                <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;">
+                    <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                    <p style="margin: 0px 40px;">Estimado contribuyente, no tiene mas prefijos de numeración para asociar a un software.</p>
+                </div>
                     }
 
                     @using (Html.BeginForm("AddNumberRange", "Software", FormMethod.Post, new { id = "add-prefix-form" }))
@@ -49,40 +50,40 @@
                             <div class="col-md-12 padding-horizontal-0">
                                 <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian">
 
-                                    <div class="panel-body padding-20 padding-bottom-10">
+                                    <div class="panel-body padding-550 padding-bottom-10">
                                         <div class="row">
-                                            <div class="col-sm-6 padding-xs-0">
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.ContributorCode, new { @class = "control-label" })
                                                     @Html.TextBoxFor(m => m.ContributorCode, defaultHtmlAttr)
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6 padding-xs-0">
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.ContributorName, new { @class = "control-label" })
                                                     @Html.TextBoxFor(m => m.ContributorName, defaultHtmlAttr)
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-8 padding-xs-0">
+                                            @*</div>
+                                            <div class="row">*@
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.Softwares, new { @class = "control-label" })
-                                                    @Html.DropDownListFor(m => m.SoftwareId, new SelectList(Model.Softwares.OrderBy(s => s.Name), "Id", "Name", Model.SoftwareId), "Seleccione...", new { @class = "form-control selectpicker" })
+                                                    @Html.DropDownListFor(m => m.SoftwareId, new SelectList(Model.Softwares.OrderBy(s => s.Name), "Id", "Name", Model.SoftwareId), "Seleccione...", new { @class = "form-control" })
                                                 </div>
                                             </div>
-                                            <div class="col-sm-4 padding-xs-0">
+                                            <div class="col-sm-3 padding-xs-0">
                                                 <div class="form-group">
                                                     @Html.LabelFor(m => m.Prefixes, new { @class = "control-label" })
-                                                    @Html.DropDownListFor(m => m.NumberRangeRowKey, new SelectList(Model.Prefixes.OrderBy(s => s.Serie), "RowKey", "Serie", Model.NumberRangeRowKey), "Seleccione...", new { @class = "form-control selectpicker" })
+                                                    @Html.DropDownListFor(m => m.NumberRangeRowKey, new SelectList(Model.Prefixes.OrderBy(s => s.Serie), "RowKey", "Serie", Model.NumberRangeRowKey), "Seleccione...", new { @class = "form-control" })
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="panel-footer text-right">
+                                    <div class="panel-footer text-center" style="background-color: #f6f7f9 !important;/* margin: 28px 0px; */padding: 30px 0px !important;">
                                         @*<a href="@Url.Action("List", "Software")" class="btn btn-default">Volver</a>*@
-                                        <button type="button" class="btn btn-default btn-hover-gosocket btn-add-prefix">Agregar</button>
+                                        <button type="button" class="btn btn-primary btn-default btn-hover-gosocket btn-add-prefix">Agregar</button>
                                     </div>
 
                                 </div>
@@ -146,6 +147,8 @@
 @section scripts
 {
     <script src="~/Content/js/contributor/contributor.js?1.0.0"></script>
+    <link href="~/Content/css/app-new-style.css" rel="stylesheet" />
+
 
     <script>
 

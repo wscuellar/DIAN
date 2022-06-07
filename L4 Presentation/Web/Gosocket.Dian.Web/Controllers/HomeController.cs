@@ -154,18 +154,31 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     var testSetResult = testSetResults.FirstOrDefault(t => !t.Deleted && t.ContributorTypeId == contributorTypeId && t.Status == (int)TestSetStatus.InProcess);
                     var softwareId = testSetResult.SoftwareId;
-                    model.ContributorTestSetMessageInfo = $@"<div class='alert custom-alert-success col-sm-12'><h4><i class='fa fa-info-circle' aria-hidden'true'=''></i> Estimado(a) contribuyente:</h4>
-                                                        Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)}</strong>.<br />
-                                                        Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong style='font - size: 14px; font - weight: bold;'>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas.
-                                                        <br/>Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}' class='custom-alert-link'>aquí</a>.</div>";
+                    model.ContributorTestSetMessageInfo = $@"
+                        <div class='dian-alert dian-alert-info mb-20'>
+                            <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
+                            <p>
+                                Estimado contribuyente: <br>
+                                Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)}</strong> <br>
+                                Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
+                                Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
+                            </p>
+                        </div>";
                 }
                 else if (testSetResults.Any(t => !t.Deleted && t.ContributorTypeId == contributorTypeId && t.Status == (int)TestSetStatus.Rejected))
                 {
                     var testSetResult = testSetResults.SingleOrDefault(t => !t.Deleted && t.ContributorTypeId == contributorTypeId && t.Status == (int)TestSetStatus.Rejected);
                     var softwareId = testSetResult.SoftwareId;
-                    model.ContributorTestSetMessageInfo = $@"<div class='alert custom-alert-danger col-sm-12'><h4><i class='fa fa-exclamation-circle' aria-hidden'true'=''></i> Estimado(a) contribuyente:</h4>
-                                                        Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}</strong>.
-                                                        <br/>Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}' class='custom-alert-link'>aquí</a>.</div>";
+                    model.ContributorTestSetMessageInfo = $@"
+                        <div class='dian-alert dian-alert-danger mb-20'>
+                            <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
+                            <p>
+                                Estimado contribuyente <br>
+                                Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}</strong> <br>
+                                Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
+                                Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
+                            </p>
+                        </div>";
                 }
 
                 var contributor = contributorService.Get(User.ContributorId());

@@ -6,42 +6,28 @@
     <div class="title-container">
         <p class="title-view">
             @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
+        </p>      
     </div>
+
+
 
     <div class="container-fluid RadianContainerBegin"  id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
-        <p class="RadianTextSelected">Seleccione el modo de operación en el Registro de Facturas Electrónicas :</p>
-        <svg width="100%" height="2" viewBox="0 0 1110 2" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 1C0 0.447715 0.447715 0 1 0H1109C1109.55 0 1110 0.447715 1110 1C1110 1.55228 1109.55 2 1109 2H1.00003C0.447741 2 0 1.55228 0 1Z" fill="#E9E8E8" />
-        </svg>
-        <div class="row-fluid">
-
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div id="1" contributorType="1" operationMode="1" class="card RadianCardContainer">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionDirecta.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Operación Directa</p>
-                        <p class="RadianTittleCard2">Software Propio</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div id="2" contributorType="1" operationMode="2" class="card RadianCardContainer">
-                    <div class="RadianImgContainer">
-                        <img class="RadianimgSvg" src="~/Content/images/Svg/OperacionIndirecta.svg" />
-                    </div>
-                    <div class="card-body">
-                        <p class="RadianTittleCard">Operación Indirecta</p>
-                        <p class="RadianTittleCard2">A través de un aliado</p>
-                    </div>
-                </div>
-            </div>
-
+        <p class="sub-title">Seleccione el modo de operación en el Registro de Facturas Electrónicas:</p>
+        <hr>
+        
+        <div class="hab-menu-container">
+            <button class="hab-menu-button" id="1" contributorType="1" operationMode="1">
+                <img src="~/Content/img/electronic-document-icons/nomina-participante-emisor.svg" height="130" />
+                Operación Directa
+                <p class="hab-menu-button-subtitle">Software propio</p>
+            </button>
+            
+            <button class="hab-menu-button" id="2" contributorType="1" operationMode="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-proveedor-servicios-tecnologicos.svg" height="130" />
+                Operación Indirecta
+                <p class="hab-menu-button-subtitle">A través de un aliado</p>
+            </button>
         </div>
     </div>
 </div>
@@ -56,7 +42,7 @@
             var contributorId = '@ViewBag.ContributorId';
             var operationClick = false;
 
-        $('.RadianCardContainer').click(function () {
+        $('.hab-menu-button').click(function () {
             showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
                 if (!operationClick) {
                     operationClick = true;
