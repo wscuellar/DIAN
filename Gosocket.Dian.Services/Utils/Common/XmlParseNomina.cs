@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Caching;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Gosocket.Dian.Services.Utils.Common
 {
@@ -216,6 +217,13 @@ namespace Gosocket.Dian.Services.Utils.Common
             return XPathQuery.Select(xmlDocument, relative);
         }
 
+        private static string CleanInput(string strIn)
+        {
+            // Replace invalid characters with empty strings.
+            return Regex.Replace(strIn, @"[^\w\.@-]", "");
+        }
+
+
         private string GetXmlParserDefinitions()
         {
             var xmlParserDefinitions = "";
@@ -288,10 +296,10 @@ namespace Gosocket.Dian.Services.Utils.Common
                 for (int i = 0; i < paymentsDatesList.Count; i++)
                 {
                     int j = 0;
-                    while (j < paymentsDatesList[i]?.InnerText.Length)
+                    while (j < CleanInput(paymentsDatesList[i]?.InnerText).Length)
                     {
                         var initIndex = j;
-                        datesList.Add(paymentsDatesList[i]?.InnerText.Substring(initIndex, 10));
+                        datesList.Add(CleanInput(paymentsDatesList[i]?.InnerText).Substring(initIndex, 10));
                         j = initIndex + 10;
                     }
                 }

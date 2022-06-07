@@ -53,5 +53,6 @@ namespace Gosocket.Dian.Web.Models
         public int TotalDocumentsEmitted { get; set; }
         public int TotalDocumentsReceived { get; set; }
 
+        public int ContributorTypeId { get; set; }
     }
 }

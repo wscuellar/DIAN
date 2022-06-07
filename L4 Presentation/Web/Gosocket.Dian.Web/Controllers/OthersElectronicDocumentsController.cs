@@ -310,6 +310,8 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.IsEquivalentDocument = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicEquivalent;
             ViewBag.IsElectronicPayroll = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayroll;
             ViewBag.IsElectronicPayrollNoOfe = model.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
+            model.FreeBillerSoftwareId = FreeBillerSoftwareService.Get(model.ElectronicDocumentId);
+
             return View(model);
         }
 
@@ -560,7 +562,8 @@ namespace Gosocket.Dian.Web.Controllers
             }
 
             NotificationsController notification = new NotificationsController();
-            await notification.EventNotificationsAsync("04", User.UserCode());
+            int id = model.OperationModeSelectedId == "3" ? 1 : model.OperationModeSelectedId == "2" ? 3 : 2;
+            notification.EventNotificationsAsyncOperationMode("04", User.UserCode(), id);
 
             return RedirectToAction("Index", "OthersElectronicDocAssociated", new { id = contributorOperation.Id });
         }
@@ -716,14 +719,21 @@ namespace Gosocket.Dian.Web.Controllers
         {
             bool contributorIsOfe = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller;
             bool electronicDocumentIsSupport = ValidacionOtherDocs.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
+            AuthToken auth = GetAuthData();
+            var contributorLoggedByOfe = auth.LoginMenu == "OFE";
 
             if (ValidacionOtherDocs.Accion == "SeleccionElectronicDocument")
             {
-                if (contributorIsOfe && electronicDocumentIsSupport)
+                if (contributorLoggedByOfe && electronicDocumentIsSupport)
                 {
                     /*Se debe consultar si el usuario ya tiene un proceso de habilitacion de facturación electronica habilitado*/
                     var contributor = _contributorService.Get(User.ContributorId());
-                    if (contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
+                    var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
+                    var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+                    var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
+                    var hasTestSetResultsAccepted = testSetResults.Any(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted);
+
+                    if (!hasTestSetResultsAccepted && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
                     {
                         return Json(new ResponseMessage(TextResources.ElectronicBillerNoEnabled, TextResources.alertType), JsonRequestBehavior.AllowGet);
                     }
@@ -1107,6 +1117,16 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 _telemetry.TrackTrace($"Se sincronizó el Code {contributor.Code}. Mensaje: {response.Message}", SeverityLevel.Verbose);
             }
+        }
+
+        private AuthToken GetAuthData()
+        {
+            var dianAuthTableManager = new TableManager("AuthToken");
+            var userIdentificationType = User.IdentificationTypeId();
+            var userCode = User.UserCode();
+            var partitionKey = $"{userIdentificationType}|{userCode}";
+            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, userCode);
+            return auth;
         }
     }
 }
