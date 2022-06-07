@@ -423,7 +423,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				else
 					plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", string.Empty);
 
-				var AdquirienteDireccion = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
+				var AdquirienteDireccion = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "AddressLine").Elements(cbc + "Line");
 				if (AdquirienteDireccion.Any())
 					plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", AdquirienteDireccion.FirstOrDefault().Value);
 				else
