@@ -783,6 +783,10 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             // Validator instance
             var validator = new Validator();
             validateResponses.AddRange(validator.ValidateIndividualPayroll(documentParsed));
+
+            //Valida fecha firma
+            validateResponses.AddRange(validator.ValidateSignDate(documentMeta));
+
             return validateResponses;
         }
 

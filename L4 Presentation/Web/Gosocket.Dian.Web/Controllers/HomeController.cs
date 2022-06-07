@@ -185,6 +185,7 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = contributor.AcceptanceStatusId;
                 model.ContributorHabilitationDate = contributor.HabilitationDate ?? DateTime.UtcNow;
                 model.ContributorProductionDate = contributor.ProductionDate;
+                model.ContributorTypeId = contributor.ContributorTypeId.GetValueOrDefault();
 
                 var identificatioType = User.IdentificationTypeId();
 
@@ -193,10 +194,7 @@ namespace Gosocket.Dian.Web.Controllers
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
                 ViewBag.LoginMenu = auth.LoginMenu;
 
-                if (contributor.ContributorTypeId == (int)Domain.Common.ContributorType.BillerNoObliged)
-                {
-                    Session["Login_ContributorType"] = "- No OFE";
-                }else if (auth.LoginMenu == "NO OFE")
+                if(auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }
