@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Web.Controllers
     public class NotificationsController : Controller
     {
         private readonly ContributorService contributorService = new ContributorService();
+        private int operationModeId = 0;
         // GET: Notifications
         public ActionResult Index() 
         {
@@ -41,7 +42,9 @@ namespace Gosocket.Dian.Web.Controllers
             notification.PetitionName = contributor.ExchangeEmail;
             notification.UserName = contributor.Code;
             notification.PartitionKey = accountId.ToString();
-            notification.RecipientEmail = contributor.ExchangeEmail; 
+            notification.RecipientEmail = contributor.ExchangeEmail;
+
+            string []modosOperacion = new string[]{"", "Solución Gratuita", "Software Propio", "Proveedor tecnológico" };
 
             switch (type)
             {
@@ -65,8 +68,8 @@ namespace Gosocket.Dian.Web.Controllers
                     break;
                 case "02":
                     notification.Menssage = "Estimad@ usuari@ Nombre de la Empresa "+ business + "<br>" +
-                            " Se informa que se encuentra en el proceso de pruebas de validación y su set de pruebas se encuentra rechazado, si desea continuar con el proceso deberá dirigirse a la pantalla configurar modos de operación y Reiniciarlo." +   
-                            " Saludes cordiales.";
+                            " Se informa que se encuentra en el proceso de pruebas de validación y su set de pruebas se encuentra rechazado, si desea continuar con el proceso deberá dirigirse a la pantalla configurar modos de operación y Reiniciarlo." +
+                            " Saludes cordiales.<br><br><br><br><br>";
                     notification.Description = "Su set de pruebas se encuentra rechazado, si desea continuar con el proceso deberá dirigirse a la pantalla configurar modos de operación y allí encontrará el botón para Reiniciarlo.";
                     notification.Subject = "Rechazo del Set de pruebas ";
                     notification.Matters = "Rechazo del Set de pruebas";
@@ -82,7 +85,7 @@ namespace Gosocket.Dian.Web.Controllers
                         " 2.         Verificar que su certificado digital se encuentre cargado. <br>" +
                         " 3.         Asociar y crear la numeración necesaria. <br>" +
                         " 4.         Cada vez que configure un modo de operación en producción deberá crear nuevamente sus insumos (Compradores / Vendedores / Trabajadores /Productos y Servicios). <br>" +
-                        " Saludes cordiales ";
+                        " Saludes cordiales <br><br><br><br><br>";
                     notification.Description = "Se encuentra Habilitado para generar… Nomina/Factura/D.S. para elaborar sus documentos desde Producción deberá ingresar desde la opción “Facturando Electrónicamente” ";
                     notification.Subject = "Aprobación del set de pruebas ";
                     notification.Matters = "Aprobación del set de pruebas ";
@@ -91,7 +94,7 @@ namespace Gosocket.Dian.Web.Controllers
                     SentEvent(notification);
                     break;
                 case "04":
-                    notification.Menssage = "Estimad@ usuari@ Nombre de la Empresa " + business + " Se informa que se encuentra registrado y ha seleccionado el modo de operación software Solución Gratuita / Proveedor tecnológico / Software Propio, se recuerda que debe surtir el proceso de pruebas para finalizar la habilitación.";
+                    notification.Menssage = "Estimad@ usuari@ Nombre de la Empresa " + business + " Se informa que se encuentra registrado y ha seleccionado el modo de operación software <strong>" + modosOperacion[operationModeId] + "</strong>, se recuerda que debe surtir el proceso de pruebas para finalizar la habilitación. <br><br><br><br><br>";
                     notification.Matters = "Inicio Modo de Operación";
                     SentEmail(notification);
                     break;        
@@ -173,6 +176,14 @@ namespace Gosocket.Dian.Web.Controllers
             return null;
         }
 
+        public async Task<ActionResult> EventNotificationsAsyncOperationMode(string type, string id, int operationModeId)
+        {
+            this.operationModeId = operationModeId;
+
+            this.EventNotificationsAsync(type, id);
+            return null;
+        }
+
     }
   
     public class RequestNotification
@@ -202,5 +213,5 @@ namespace Gosocket.Dian.Web.Controllers
 
         [JsonProperty("PetitionName")]
         public string PetitionName { get; set; }
-    }
+    }   
 }
