@@ -335,7 +335,6 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 
-
 			var AdquirienteNombre = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyName").Elements(cbc + "Name");
 			if (AdquirienteNombre.Any())
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteNombre}", AdquirienteNombre.FirstOrDefault().Value);
@@ -401,30 +400,62 @@ namespace Gosocket.Dian.Functions.Pdf
 			else
 				plantillaHtml = plantillaHtml.Replace("{AdquirienteResponsabilidad}", string.Empty);
 
-			var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "Country").Elements(cbc + "Name");
-			if (AdquirientePais.Any())
-				plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", AdquirientePais.FirstOrDefault().Value);
-			else
-				plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", string.Empty);
 
-			var AdquirienteDepartamento = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CountrySubentityCode");
-			if (AdquirienteDepartamento.Any())
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", Depto.Where(x => x.IdDepartament == AdquirienteDepartamento.FirstOrDefault().Value).FirstOrDefault().NameDepartament);
-			else
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", string.Empty);
-			//AdquirienteRegimenFiscal
 
-			var AdquirienteCiudad = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CityName");
-			if (AdquirienteCiudad.Any())
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", AdquirienteCiudad.FirstOrDefault().Value);
-			else
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", string.Empty);
+			if (TipoOperacion.FirstOrDefault().Value == "55")
+			{
+				var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "Country").Elements(cbc + "Name");
+				if (AdquirientePais.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", AdquirientePais.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", string.Empty);
 
-			var AdquirienteDireccion = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
-			if (AdquirienteDireccion.Any())
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", AdquirienteDireccion.FirstOrDefault().Value);
-			else
-				plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", string.Empty);
+				var AdquirienteDepartamento = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cbc + "CountrySubentityCode");
+				if (AdquirienteDepartamento.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", Depto.Where(x => x.IdDepartament == AdquirienteDepartamento.FirstOrDefault().Value).FirstOrDefault().NameDepartament);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", string.Empty);
+				//AdquirienteRegimenFiscal
+
+				var AdquirienteCiudad = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cbc + "CityName");
+				if (AdquirienteCiudad.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", AdquirienteCiudad.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", string.Empty);
+
+				var AdquirienteDireccion = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "AddressLine").Elements(cbc + "Line");
+				if (AdquirienteDireccion.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", AdquirienteDireccion.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", string.Empty);
+			}
+            else
+            {
+				var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "Country").Elements(cbc + "Name");
+				if (AdquirientePais.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", AdquirientePais.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirientePais}", string.Empty);
+
+				var AdquirienteDepartamento = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CountrySubentityCode");
+				if (AdquirienteDepartamento.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", Depto.Where(x => x.IdDepartament == AdquirienteDepartamento.FirstOrDefault().Value).FirstOrDefault().NameDepartament);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDepartamento}", string.Empty);
+				//AdquirienteRegimenFiscal
+
+				var AdquirienteCiudad = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cbc + "CityName");
+				if (AdquirienteCiudad.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", AdquirienteCiudad.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteCiudad}", string.Empty);
+
+				var AdquirienteDireccion = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cac + "RegistrationAddress").Elements(cac + "AddressLine").Elements(cbc + "Line");
+				if (AdquirienteDireccion.Any())
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", AdquirienteDireccion.FirstOrDefault().Value);
+				else
+					plantillaHtml = plantillaHtml.Replace("{AdquirienteDireccion}", string.Empty);
+			}
 
 			var AdquirienteCorreo = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "Contact").Elements(cbc + "ElectronicMail");
 			if (AdquirienteCorreo.Any())
@@ -922,15 +953,31 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			try
 			{
-				var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("FabricanteSoftware"));
-				var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
-				var soft = info.Descendants().Elements(def + "Value").ToArray();
-				if (soft.Count() > 0)
-				{
-					Html = Html.Replace("{FabricanteRazon}", soft[1].Value);
-					Html = Html.Replace("{FabricanteNombre}", soft[0].Value);
-					Html = Html.Replace("{FabricanteSoftware}", soft[2].Value);
+				if (typeDocument.FirstOrDefault().Value == "55")
+                {
+					var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
+					var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
+					var soft = info.Descendants().Elements(def + "Value").ToArray();
+					if (soft.Count() > 0)
+					{
+						Html = Html.Replace("{FabricanteRazon}", soft[1].Value);
+						Html = Html.Replace("{FabricanteNombre}", soft[0].Value);
+						Html = Html.Replace("{FabricanteSoftware}", soft[2].Value);
+					}
 				}
+                else
+                {
+					var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("FabricanteSoftware"));
+					var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
+					var soft = info.Descendants().Elements(def + "Value").ToArray();
+					if (soft.Count() > 0)
+					{
+						Html = Html.Replace("{FabricanteRazon}", soft[1].Value);
+						Html = Html.Replace("{FabricanteNombre}", soft[0].Value);
+						Html = Html.Replace("{FabricanteSoftware}", soft[2].Value);
+					}
+				}
+				
 			}
 			catch (Exception)
 			{
