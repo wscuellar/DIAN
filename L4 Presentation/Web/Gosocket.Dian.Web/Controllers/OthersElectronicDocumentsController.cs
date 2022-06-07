@@ -728,7 +728,6 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     /*Se debe consultar si el usuario ya tiene un proceso de habilitacion de facturación electronica habilitado*/
                     var contributor = _contributorService.Get(User.ContributorId());
-                    var contributorOperations = contributor.ContributorOperations.Where(o => !o.Deleted);
                     var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
                     var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
                     var hasTestSetResultsAccepted = testSetResults.Any(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted);
@@ -755,7 +754,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 if (!mode.Any())
                 {
-                    if (contributorIsOfe && electronicDocumentIsSupport)
+                    if (contributorLoggedByOfe && electronicDocumentIsSupport)
                     {
                         return Json(ResponseMessageRedirectTo, JsonRequestBehavior.AllowGet);
                     }
