@@ -55,7 +55,7 @@ namespace Gosocket.Dian.Functions.Utils
             }
             notification.PetitionName = contributor.Email;
             notification.UserName = contributor.Code;
-            notification.PartitionKey = contributor.Code;
+            notification.PartitionKey = accountId;
             notification.RecipientEmail = contributor.Email;
 
             SentEvent(notification);
