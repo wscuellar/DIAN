@@ -164,15 +164,15 @@
                                 <table class="simple-table" data-int="0">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">Modo de operación</th>
-                                            <th class="text-center">Documento Electrónico</th>
-                                            <th class="text-center">Registro</th>
-                                            <th class="text-center">Estado</th>
-                                            <th class="text-center">Nombre del Software</th>
-                                            <th class="text-center">ID</th>
-                                            <th class="text-center">PIN del SW </th>
-                                            <th class="text-center">URL</th>
-                                            <th class="text-center">Acciones</th>
+                                            <th class="text-left">Modo de operación</th>
+                                            <th class="text-left">Documento Electrónico</th>
+                                            <th class="text-left">Registro</th>
+                                            <th class="text-left">Estado</th>
+                                            <th class="text-left">Nombre del Software</th>
+                                            <th class="text-left">ID</th>
+                                            <th class="text-left">PIN del SW </th>
+                                            <th class="text-left">URL</th>
+                                            <th class="text-left">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -186,27 +186,27 @@
                                                         @item.OperationMode @if (isElectronicPayroll)
                                                         {<span>- @item.ContributorType</span>}
                                                     </td>
-                                                    <td nowrap class="text-center">@item.ElectronicDoc</td>
-                                                    <td nowrap class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-                                                    <td class="text-center">@item.StateSoftware</td>
-                                                    <td class="text-center">@item.Software</td>
-                                                    <td class="text-center">@item.SoftwareId</td>
-                                                    <td class="text-center">@item.PinSW</td>
-                                                    <td class="text-center">  @item.Url  </td>
+                                                    <td nowrap class="text-left">@item.ElectronicDoc</td>
+                                                    <td nowrap class="text-left">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                    <td class="text-left">@item.StateSoftware</td>
+                                                    <td class="text-left">@item.Software</td>
+                                                    <td class="text-left">@item.SoftwareId</td>
+                                                    <td class="text-left">@item.PinSW</td>
+                                                    <td class="text-left">  @item.Url  </td>
                                                     <td nowrap class="text-center">
                                                         @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-                                                        <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Pruebas de aceptación" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })">
+                                                        <a class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Pruebas de aceptación" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })">
                                                             <i class="fa fa-eye"></i>
                                                         </a>
                                                         @if(ConfigurationManager.GetValue("Environment") != "Prod")
                                                         {
                                                             if (isElectronicPayroll || isElectronicPayrollNoOfe || (ViewBag.IsSupportDocument && Model.ContributorIsOfe))
                                                             {
-                                                                <a onclick="EliminarRegistro(@item.Id)" class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
+                                                                <a onclick="EliminarRegistro(@item.Id)" class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Eliminar modo de operación"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
                                                             }
                                                             else
                                                             {
-                                                                <a class="btn btn-xs @(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" data-tooltip="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
+                                                                <a class="btn btn-xs add-tooltip @(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" data-tooltip="tooltip" data-placement="bottom" title="Eliminar  modo de operación"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
                                                             }
                                                         }
                                                         @if (ViewBag.IsEquivalentDocument)
@@ -480,7 +480,7 @@
                     function () {
                         removeOperationAsociated(id);
                     }
-                , "", () => hideLoading('#panel-wrapper')));
+                    , "", () => hideLoading('#panel-wrapper')));
             }
             else
             {

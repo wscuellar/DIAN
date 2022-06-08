@@ -112,7 +112,7 @@ table.simple-table tbody tr td:not(.dataTables_empty) {
     font-weight: normal !important;
     /*text-align: left !important;*/
     background: #fff !important;
-    padding: 25px 4px !important;
+    padding: 25px 14px !important;
     border: 0 !important;
     border-bottom: 1px solid #CCCCCC !important;
 }
@@ -426,6 +426,31 @@ label.sub-title-2 {
     .fa-pencil::before {
         content: '' !important;
     }
+
+.fa-toggle-on {
+    background: url(/Content/font/custom/fa-toggle-on.svg);
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+    .fa-toggle-on::before {
+        content: '' !important;
+    }
+
+.fa-toggle-off {
+    background: url(/Content/font/custom/fa-toggle-off.svg);
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+.fa-toggle-off::before {
+    content: '' !important;
+}
+
 
 .fa-eye {
     background: url(/Content/font/custom/fa-eye.svg);
@@ -887,3 +912,86 @@ table.simple-table {
     background: #fff !important;
     border: 0 !important;
 }
+table.simple-table tbody tr td:not(.dataTables_empty) {
+text-align:left !important;
+}
+
+
+/* tooltips */
+
+.tooltip-inner {
+    background-color: #262944;
+    font-family: 'Ubuntu';
+    font-weight: normal;
+    color: #fff;
+    text-align: left;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 18px;
+    border-radius: 6px;
+    min-width: 117px;
+    min-height: 50px;
+}
+
+.tooltip.top {
+    margin-top: -10px;
+}
+
+    .tooltip.top .tooltip-arrow {
+        border-top-color: #262944 !important;
+        bottom: -3px;
+        margin-left: -10px;
+        border-width: 10px 10px 0;
+    }
+
+.tooltip.right {
+    margin-left: 10px;
+}
+
+    .tooltip.right .tooltip-arrow {
+        border-right-color: #262944 !important;
+        left: -3px !important;
+        margin-top: -10px;
+        border-width: 10px 10px 10px 0;
+    }
+
+.tooltip.left {
+    margin-left: -10px;
+}
+
+    .tooltip.left .tooltip-arrow {
+        border-left-color: #262944 !important;
+        right: -3px !important;
+        margin-top: -10px;
+        border-width: 10px 0 10px 10px;
+    }
+
+.tooltip.bottom {
+    margin-top: 10px;
+}
+
+    .tooltip.bottom .tooltip-arrow {
+        border-bottom-color: #262944 !important;
+        top: -3px !important;
+        margin-left: -10px;
+        border-width: 0 10px 10px;
+    }
+
+.custom-label-success {
+    background-color: #D5F4E6;
+    color: #00AC57;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+a.label-table:hover {
+   color: #00AC57;
+}
+
+.subTitleMenu {
+    margin-top: -37px;
+    margin-bottom: 15px;
+    font-family: 'Ubuntu';
+}
+

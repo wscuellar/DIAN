@@ -20,7 +20,7 @@
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
 
-        <div class="panel">
+        <div class="panel" style="background: transparent;">
             <div class="panel-body padding-top-20">
                 @if (User.IsInAnyRole("Super"))
                 {
@@ -56,8 +56,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                        <div class="text-left" style="padding-left: 20px;padding-bottom: 30px;">
+                                            <button type="button" class="btn btn-secondary btn-hover-gosocket btn-search text-left">Buscar</button>
                                         </div>
 
                                     </div>
@@ -92,7 +92,7 @@
 
                 @if (Model.Users.Count == 0)
                 {
-                    <div class="alert panel-footer-grey text-center contributor-alert">
+                    <div class="alert dataTables_empty text-center contributor-alert">
                         Ningún resultado disponible para mostrar.
                     </div>
                 }
