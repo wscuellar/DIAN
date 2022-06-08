@@ -1,0 +1,55 @@
+﻿@model string
+
+<style>
+    .header-gov {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        background: #3366CC;
+        padding-left: 62px;
+    }
+
+    .header-logo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 107px;
+        background: #fff;
+        padding: 0 50px 0 62px;
+        border-bottom: 2px solid #0DB4DC;
+    }
+
+        .header-logo div:not(.header-linea-divisoria) {
+            display: flex;
+            align-items: center;
+        }
+
+    .header-linea-divisoria {
+        display: inline-block;
+        height: 40px;
+        width: 1px;
+        border: none;
+        background: #A6ADB4;
+        margin: 0 29px;
+    }
+    
+    .header-title {
+        font-weight: bold;
+        font-size: 16px;
+    }
+</style>
+
+<div class="header-gov">
+    <img src="~/Content/img/Gov.co.png" height="21" />
+</div>
+<div class="header-logo">
+    <div>
+        <img src="~/Content/img/Sistema_Facturacion_Logo.png" height="40" />
+        <div class="header-linea-divisoria"></div>
+        <a href="/">
+            <img src="~/Content/img/LogoDian.png" height="40" />
+        </a>
+    </div>
+    <span class="header-title">@Model</span>
+    <img src="~/Content/img/Minhacienda_Logo.png" height="40" />
+</div>

@@ -1,4 +1,4 @@
 {
-  //"functions": [ "ValidateSoftware","ValidateCude","ValidateNit" ],
+  //"functions": [ "ValidateNumberingRange", "ValidateCude", "ValidateNit" ],
   "functionTimeout": "00:10:30"
 }

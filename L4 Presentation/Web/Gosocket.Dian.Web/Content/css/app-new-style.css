@@ -1,0 +1,889 @@
+﻿/*body {
+    background: #F6F8F9 !important;
+}*/
+
+/***************Inputs************************/
+.form-group .label-form-group,
+.control-label {
+    font-family: 'Ubuntu' !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    line-height: 20px !important;
+    text-align: left !important;
+    color: #2B323D !important;
+    margin-bottom: 8px;
+}
+
+    .form-group .label-form-group.required::after, .product-responsive.required::after,
+    .control-label.required::after {
+        content: '*';
+        margin-left: 2px !important;
+        color: #F54E41 !important;
+    }
+
+.form-control,
+button.btn.dropdown-toggle.btn-default {
+    min-height: 40px !important;
+    border: 1px solid #ccc !important;
+    background: #fff !important;
+    font-family: 'Ubuntu' !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    line-height: 20px !important;
+    text-align: left !important;
+    color: #2B323D !important;
+    padding: 10px 16px !important;
+    border-radius: 4px !important;
+}
+
+    .form-control::placeholder {
+        text-transform: initial;
+        color: #ccc !important;
+    }
+
+    .form-control[readonly],
+    .form-control[disabled] {
+        background: #F0F2F4 !important;
+        cursor: not-allowed !important;
+        pointer-events: none;
+    }
+
+.input-validation-error {
+    border: 2px solid #F54E41 !important;
+    color: #F54E41 !important;
+}
+
+.field-validation-error,
+.input-helper-text-wrong {
+    color: #F54E41 !important;
+}
+
+.dropdown.bootstrap-select.bs3 {
+    width: 100% !important;
+}
+
+button.btn.dropdown-toggle.btn-default .filter-option {
+    line-height: initial;
+}
+
+.input-group .form-control {
+    border-right: 0 !important;
+    border-bottom-right-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+}
+
+.input-group .input-group-btn .btn {
+    height: 40px !important;
+    width: 40px;
+    padding: 0;
+    line-height: 2 !important;
+    background: white;
+    border: 1px solid #ccc;
+    color: #41D78C !important;
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    border-left: 0;
+}
+
+.input-group input[disabled='disabled'] ~ .input-group-btn .btn,
+.input-group input.disabled ~ .input-group-btn .btn {
+    pointer-events: none;
+    background: #F0F2F4 !important;
+}
+/******************Tablas*********************/
+table.simple-table thead tr {
+    height: 70px !important;
+    background: #E2E7EB !important;
+    color: #2B323D !important;
+}
+
+    table.simple-table thead tr th {
+        vertical-align: middle !important;
+        border: 0 !important;
+        border-bottom: 1px solid #CCCCCC !important;
+        font-weight: bold;
+        font-size: 16px !important;
+        text-align: left;
+    }
+
+table.simple-table tbody tr td:not(.dataTables_empty) {
+    font-family: 'Ubuntu' !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+    /*text-align: left !important;*/
+    background: #fff !important;
+    padding: 25px 4px !important;
+    border: 0 !important;
+    border-bottom: 1px solid #CCCCCC !important;
+}
+
+table.dataTable.no-footer {
+    border-bottom: 0 !important;
+}
+
+table.simple-table tbody tr td.dataTables_empty {
+    font-family: 'Work Sans';
+    font-size: 22px;
+    color: #ccc;
+    padding: 60px 0 !important;
+    font-weight: bold !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-bottom: 1px solid !important;
+}
+/*table.simple-table tbody tr td:nth-child(1) {
+        padding-left: 54px;
+    }
+    table.simple-table tbody tr td:nth-last-child() {
+        padding-right: 54px;
+    }*/
+/**************Botones********************/
+.mt-12 {
+    margin-top: 12px !important;
+}
+
+.mt-28 {
+    margin-top: 28px !important;
+}
+
+.mr-4 {
+    margin-right: 4px !important;
+}
+
+.mr-9 {
+    margin-right: 9px !important;
+}
+
+.mr-32 {
+    margin-right: 32px !important;
+}
+
+.ml-9 {
+    margin-left: 9px !important;
+}
+
+.ml-32 {
+    margin-left: 32px !important;
+}
+
+.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+.btn {
+    border-radius: 6px !important;
+    font-family: 'Work Sans' !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 24px !important;
+    text-align: center !important;
+    padding: 11px 24px;
+    height: 46px !important;
+    background: #fafafa;
+    border: 0;
+    color: #262944 !important;
+}
+
+    .btn.btn-primary .fa,
+    .btn.btn-secondary .fa {
+        font-size: 16px;
+    }
+
+    .btn.btn-xs .fa {
+        font-size: 18px;
+    }
+
+    .btn.btn-primary {
+        background: #41D78C !important;
+    }
+
+        /*.btn.btn-primary {
+    background: #fff!important;
+    border-color: #41D78C !important;
+    border: 1px solid;
+    margin-bottom: 25px;
+}*/
+
+        .btn.btn-primary:hover {
+            background: #32BF79 !important;
+        }
+
+    .btn.btn-secondary {
+        border: 2px solid #41D78C;
+        background: #FFF !important;
+    }
+
+        .btn.btn-secondary:hover {
+            background: #F0F2F4 !important;
+        }
+
+.add-line-btn .btn {
+    border-radius: 50px !important;
+    padding: 11px 24px !important;
+}
+
+    .add-line-btn .btn::after {
+        font-family: 'FontAwesome';
+        content: "\f067";
+        margin-left: 12px !important;
+        font-size: 16px !important;
+    }
+
+.btn.btn-xs {
+    width: 46px !important;
+    height: 46px !important;
+    border: 0 !important;
+    padding: 10px !important;
+    box-shadow: none !important;
+    /*margin-left: 20px !important;*/
+    background: transparent !important;
+    color: #262944 !important;
+}
+
+    .btn.btn-xs:hover {
+        background: #41D78C !important;
+        border-radius: 50% !important;
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    .btn.btn-xs.disabled * {
+        color: #ccc !important;
+    }
+
+@media (max-width: 700px) {
+    #menu-container {
+        flex-direction: column;
+        padding: 24px 0;
+    }
+
+        #menu-container button.menu-button {
+            margin-bottom: 16px;
+        }
+
+            #menu-container button.menu-button:last-child {
+                margin-bottom: 0;
+            }
+
+    button.menu-button:hover {
+        background: linear-gradient(90deg, rgba(32,203,169,1) 0%, rgba(29,181,217,1) 100%);
+        color: #ffffff;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+
+    button.menu-button.factura img:hover {
+        filter: brightness(0) invert(1);
+    }
+
+    button.menu-button.nomina img:hover {
+        filter: brightness(0) invert(1);
+    }
+
+    button.menu-button.documento img:hover {
+        filter: brightness(0) invert(1);
+    }
+}
+/******************Titulos******************************/
+.title {
+    font-family: 'Work Sans' !important;
+    font-size: 30px !important;
+    font-weight: bold !important;
+    line-height: 36px !important;
+    text-align: left !important;
+    color: #262944 !important;
+    /*margin-bottom: 30px;
+    padding-left: 55px;*/
+}
+
+.sub-title {
+    font-family: 'Work Sans' !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+    line-height: 30px !important;
+    text-align: left !important;
+    color: #262944 !important;
+}
+
+.panel-heading .panel-title {
+    font-family: 'Work Sans';
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 30px;
+    text-align: left;
+    color: #262944;
+}
+
+    .panel-heading .panel-title .ioFacturo-accordion {
+        padding: 25px 60px !important;
+    }
+
+/**Estilos para los titulos dentro del acordion de nomina electronica secciones de devengados y deducidos (semi acordeones dentro) **/
+label.sub-title,
+label.sub-title-2 {
+    position: relative;
+    padding-left: 28px;
+    font-size: 22px !important;
+    color: #262944 !important;
+    margin-top: 8px;
+}
+
+    label.sub-title::before {
+        font-family: 'FontAwesome';
+        content: "\f105";
+        color: #41D78C;
+        transition: transform 200ms ease-in-out;
+        transform: rotate(90deg);
+        position: absolute;
+        top: 0;
+        left: 8px;
+    }
+
+    label.sub-title.collapsed::before {
+        transform: rotate(-90deg);
+    }
+
+    label.sub-title-2::before {
+        content: "";
+    }
+
+/*************Helpers********************/
+.mb-20 {
+    margin-bottom: 20px !important;
+}
+
+.mb-30 {
+    margin-bottom: 30px !important;
+}
+
+.container {
+    width: calc(100% - 120px) !important;
+    margin: 30px auto !important;
+    padding: 0 !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-bold {
+    font-weight: bold !important;
+}
+
+.employe-state {
+    height: 41px;
+    width: 129px;
+    border-radius: 6px;
+    background: #FCD5D3;
+    color: #F54E41;
+    margin: 0;
+    padding: 9px 0px;
+    font-family: 'Ubuntu';
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 24px;
+    text-align: center;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+    /* width */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+        background: #F0F2F4;
+    }
+
+    /* Handle */
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #00B4DC;
+        border-radius: 4px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #0199bb;
+        }
+
+.fa-pencil {
+    background: url(/Content/font/custom/fa-edit.svg);
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+    .fa-pencil::before {
+        content: '' !important;
+    }
+
+.fa-eye {
+    background: url(/Content/font/custom/fa-eye.svg);
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    margin-top: 5px;
+}
+
+    .fa-eye::before {
+        content: '' !important;
+    }
+
+.fa-arrow-left {
+    background: url(/Content/font/custom/fa-arrow-left.svg);
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+    margin-top: 5px;
+}
+
+    .fa-arrow-left::before {
+        content: '' !important;
+    }
+
+.fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle.svg);
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+}
+
+.dian-alert-warning .fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle-warn.svg);
+}
+
+.dian-alert-danger .fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle-danger.svg);
+}
+
+.dian-alert-success .fa-info-circle {
+    background: url(/Content/font/custom/fa-info-circle-success.svg);
+}
+
+.fa-info-circle::before {
+    content: '' !important;
+}
+
+/***************************/
+.dataTables_length {
+    position: relative;
+    margin-bottom: 30px !important;
+    margin-top: 0 !important;
+}
+
+    .dataTables_length label {
+        font-size: 22px;
+        font-family: 'Work Sans';
+        font-weight: bold;
+        line-height: 30px;
+        text-align: left;
+        color: #BEC8D2;
+        margin: 0;
+    }
+
+    .dataTables_length select {
+        margin-left: 12px !important;
+        color: #262944 !important;
+        border: 0 !important;
+        padding: 0;
+        width: 165px;
+        margin-bottom: 0;
+    }
+
+.dataTables_info {
+    font-family: 'Ubuntu';
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 22px;
+    padding-left: 120px;
+    padding-top: 25px;
+}
+
+.dataTables_paginate {
+    margin-top: 25px;
+    padding: 0 !important;
+}
+
+    .dataTables_paginate .paginate_button:first-child {
+        margin-left: 0 !important;
+    }
+
+    .dataTables_paginate .paginate_button:last-child {
+        margin-right: 0 !important;
+    }
+
+    .dataTables_paginate a.paginate_button {
+        color: #262944 !important;
+        font-size: 14px;
+        font-family: 'Ubuntu';
+        padding: 0 4px 4px !important;
+        margin: 0 10px !important;
+        line-height: 22px;
+        border: 0 !important;
+    }
+
+        .dataTables_paginate a.paginate_button.current {
+            font-weight: bold;
+            border-bottom: 2px solid #41D78C !important;
+            background: transparent !important;
+        }
+
+        .dataTables_paginate a.paginate_button:hover:not(.disabled) {
+            background: transparent !important;
+            color: #262944 !important;
+            font-weight: bold;
+            border-bottom: 2px solid #41D78C !important;
+        }
+
+        .dataTables_paginate a.paginate_button:active:not(.disabled) {
+            box-shadow: none !important;
+            background: #41D78C !important;
+            font-weight: bold;
+            border-top: 2px solid #41D78C !important;
+        }
+/***********Alertas**************/
+.dian-alert {
+    display: flex;
+    border-radius: 6px;
+    padding: 15px 20px;
+}
+
+    .dian-alert *:not(i.fa) {
+        font-family: 'Ubuntu';
+        font-size: 14px;
+        text-align: left;
+        color: #2B323D;
+        margin: 0;
+    }
+
+    .dian-alert i.fa {
+        flex: 0 0 24px;
+        font-size: 24px;
+        color: #262944;
+    }
+
+    .dian-alert a {
+        color: #00B4DC !important;
+        /*text-decoration: underline;*/
+    }
+
+.dian-alert-info {
+    background: #CCF0F8;
+}
+
+.dian-alert-warning {
+    background: #FBF0D7;
+}
+
+    .dian-alert-warning * {
+        color: #C98802 !important;
+    }
+
+
+.dian-alert-danger {
+    background: #fcd5d3;
+}
+
+    .dian-alert-danger * {
+        color: #F54E41 !important;
+    }
+
+.dian-alert-success {
+    background: #d5f4e6;
+}
+
+    .dian-alert-success * {
+        color: #00ac57 !important;
+    }
+/*********Calendario Doble**************/
+.input-group.double-calendar .input-group-addon {
+    border-radius: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    background: #F6F8F9;
+    border: 1px solid #BEC8D2;
+    cursor: pointer;
+}
+
+    .input-group.double-calendar .input-group-addon:hover {
+        background: #eee !important;
+    }
+
+    .input-group.double-calendar .input-group-addon:first-child {
+        border-right: 0 !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+    .input-group.double-calendar .input-group-addon:last-child {
+        border-left: 0 !important;
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+    }
+
+    .input-group.double-calendar .input-group-addon i.fa {
+        color: #2B323D
+    }
+
+.input-group.double-calendar input.form-control {
+    border-radius: initial !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+}
+
+    .input-group.double-calendar input.form-control:focus-visible {
+        border: 2px solid #0DB4DC !important;
+    }
+
+.daterangepicker {
+    margin-top: 10px !important;
+}
+
+    .daterangepicker .drp-calendar {
+        padding: 0 0 12px !important;
+        border: 2px solid #0DB4DC;
+        border-radius: 6px;
+        max-width: 50% !important;
+    }
+
+        .daterangepicker .drp-calendar.left {
+            border-right: 0;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .daterangepicker .drp-calendar.right {
+            border-left: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            width: fit-content !important;
+        }
+
+        .daterangepicker .drp-calendar .calendar-table table {
+            font-family: 'Ubuntu';
+            color: #2B323D;
+        }
+
+            .daterangepicker .drp-calendar .calendar-table table tr th,
+            .daterangepicker .drp-calendar .calendar-table table tr td {
+                border-radius: 0;
+                width: 35px;
+                padding: 9px;
+                /*font-size: 14px;*/
+            }
+
+    .daterangepicker tr:first-child th {
+        height: 54px;
+        background: #F6F7F9;
+        font-weight: bold;
+    }
+
+        .daterangepicker tr:first-child th:first-child span,
+        .daterangepicker tr:first-child th:last-child span {
+            border-color: #41D78C;
+        }
+
+    .daterangepicker .drp-calendar .calendar-table table thead tr:last-child th {
+        height: 42px;
+        min-width: 43px;
+        background: #E2E7EB;
+        font-weight: bold;
+        /*padding: 14px 18px;*/ /***/
+    }
+
+    .daterangepicker td {
+        background: #fff;
+        border-bottom: 1px solid #ccc !important;
+    }
+
+        .daterangepicker td.in-range:not(.off) {
+            background: #D5F4E6;
+        }
+
+        .daterangepicker td.active.available:not(.off) {
+            font-weight: bold;
+            background: #41D78C;
+            border-radius: 50%;
+            color: #2B323D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            margin: 3px !important;
+            /*min-width: 30px !important;
+            padding: 8px !important;*/
+        }
+
+    .daterangepicker .drp-calendar .calendar-table table tr td.off {
+        background: #F0F2F4 !important;
+    }
+
+.drp-buttons {
+    display: none !important;
+}
+
+    .drp-buttons .drp-selected {
+        font-size: 14px !important;
+        font-family: 'Ubuntu';
+        font-weight: 600;
+        padding-right: 16px !important;
+    }
+
+@media (min-width: 564px) {
+    .daterangepicker .drp-calendar.left .calendar-table {
+        padding: 0px;
+        border-right: 2px solid #220202;
+    }
+
+    .daterangepicker {
+        width: 620px;
+    }
+}
+/*Botones del proceso de habilitacion*/
+button.hab-menu-button {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    width: 286px;
+    height: 286px;
+    padding: 25px 30px 55px;
+    font-family: 'Work Sans';
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 26px;
+    text-align: center;
+    color: #2B323D;
+    box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+    webkit-box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+    moz-box-shadow: 0px 7px 16px -7px rgba(0,0,0,0.75);
+}
+
+    button.hab-menu-button img {
+        display: block;
+        margin: 0 auto 12px;
+    }
+
+    button.hab-menu-button:hover {
+        background: linear-gradient(90deg, #41D78C, #00B4DC);
+        color: #fff;
+    }
+
+        button.hab-menu-button:hover img {
+            filter: invert(1) brightness(10);
+        }
+
+.hab-menu-button-subtitle {
+    font-weight: normal;
+}
+
+.hab-menu-container {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 30px;
+    column-gap: 30px;
+}
+/*****************************/
+.RadianContainerBegin {
+    margin-top: 40px;
+    margin-bottom: 0px;
+    padding: 45px 60px;
+}
+
+button.btn.dropdown-toggle.btn-default {
+    display: contents !important;
+}
+
+button.selectpicker .fa-caret-down {
+    top: 13px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00B4DC;
+    border-radius: 120px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #F0F2F4;
+}
+
+.btn-radian-success {
+    background: #41D78C !important
+}
+
+div#dashboard-report-range {
+    background: white;
+    border: 1px solid #cccccc;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    font-family: Ubuntu !important;
+    padding: 9px;
+    text-align: left !important;
+    padding-left: 9px !important;
+}
+
+.panel-bordered-dian, .panel-dian.panel-bordered {
+    border: none;
+}
+
+.transparency {
+    background-color: #ffffff00 !important;
+}
+
+.form-control {
+    max-height: 40px !important;
+}
+
+.panel-footer-grey {
+    background-color: #f6f7f9 !important;
+    padding: 30px 0px 30px 0px !important;
+}
+
+.panel {
+    border-radius: 10px !important;
+}
+
+.panel-footer {
+    background-color: white !important;
+    border: none !important;
+}
+.title-view {
+    font-family: 'Work Sans';
+    font-weight: bold;
+}
+.subtitle-view {
+    font-family: 'Work Sans';
+    font-size: 22px;
+}
+
+.panel-title {
+    font-family: 'Work Sans';
+    font-size: 30px !important;
+}
+button#btnUser:hover {
+    background: none !important;
+}
+table.simple-table {
+    width: 100% !important;
+}
+.dataTables_empty {
+    font-family: 'Work Sans';
+    font-size: 22px;
+    color: #ccc;
+    padding: 60px 0 !important;
+    font-weight: bold !important;
+    background: #fff !important;
+    border: 0 !important;
+}

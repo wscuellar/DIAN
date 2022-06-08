@@ -19,54 +19,54 @@
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
-
+        <div class="panel" style="background-color: #ffffff00;">
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
                     @if (ConfigurationManager.GetValue("Environment") == "Prod")
                     {
-                        <div class="alert custom-alert-primary fade in">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado usuario, en el ambiente de producción no se pueden agregar modos de operación.<br />
-                            Haga click <strong><a href="@ConfigurationManager.GetValue("HabUrl")">aquí</a></strong> para acceder al ambiente de habilitación.
+                        <div class="dian-alert dian-alert-info">
+                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                            <p>
+                                <strong>¡Importante!</strong> <br>
+                                Estimado usuario, en el ambiente de producción no se pueden agregar modos de operación.<br />
+                                Haga click <strong><a href="@ConfigurationManager.GetValue("HabUrl")">aquí</a></strong> 
+                                para acceder al ambiente de habilitación.
+                            </p>
                         </div>
                     }
                     <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
                         @Html.Partial("_form")
-                        <div class="panel-footer text-right">
+                        <div class="panel-footer text-left padding-20">
                             @{
                                 var hasOwnSoftwareEnabled = Model.ContributorOperations.Any(x => x.OperationModeId == (int)OperationMode.Own & x.Software?.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
                             }
 
                             @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
                             {
-                                <button type="button" data-id="@Model.Id" class="btn btn-default btn-sync-to-production">@ConfigurationManager.GetValue("SyncToProdGloss")</button>
+                                <button type="button" data-id="@Model.Id" class="btn btn-secondary btn-sync-to-production">@ConfigurationManager.GetValue("SyncToProdGloss")</button>
                             }
 
                             @if (ConfigurationManager.GetValue("Environment") != "Prod" && User.ContributorTypeId() == (int)ContributorType.Biller && hasOwnSoftwareEnabled && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled)
                             {
-                                <button type="button" data-id="@Model.Id" class="btn btn-default btn-gosocket pull-left btn-set-to-provider">Operar como proveedor</button>
+                                <button type="button" data-id="@Model.Id" class="btn btn-secondary btn-gosocket pull-left btn-set-to-provider">Operar como proveedor</button>
                             }
                             @if (User.IsInAnyRole("Administrador", "Super"))
                             {
-                                <a href="@Url.Action("List", "Contributor", new { type = Model.ContributorTypeId })" class="btn btn-default">Volver</a>
+                                <a href="@Url.Action("List", "Contributor", new { type = Model.ContributorTypeId })" class="btn btn-secondary">Volver</a>
                             }
 
                             @if (!User.IsInAnyRole("Administrador", "Super") && ConfigurationManager.GetValue("Environment") != "Prod")
                             {
-                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-default">Configurar modos de operación</a>
+                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-success btn-radian-success">Configurar modos de operación</a>
                             }
 
                             @if (User.IsInRole("Administrador") || User.IsInRole("Super"))
                             {
-                                <a href="@Url.Action("Edit", "Contributor", new { id = Model.Id, type = Model.ContributorTypeId })" class="btn btn-default btn-hover-gosocket">Editar</a>
+                                <a href="@Url.Action("Edit", "Contributor", new { id = Model.Id, type = Model.ContributorTypeId })" class="btn btn-secondary btn-hover-gosocket">Editar</a>
                             }
                             @if (ConfigurationManager.GetValue("Environment") == "Prod" && !User.IsInRole("Administrador"))
                             {
-                                <a href="@Url.Action("OperationModes", "Contributor", new { id = Model.Id})" class="btn btn-default">Modos de operación</a>
+                                <a href="@Url.Action("OperationModes", "Contributor", new { id = Model.Id})" class="btn btn-secondary">Modos de operación</a>
                             }
                         </div>
                     </div>
