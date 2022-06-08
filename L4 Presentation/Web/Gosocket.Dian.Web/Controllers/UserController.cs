@@ -1678,7 +1678,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Contribuyente tiene RUT en estado cancelado.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if ((contributor.ContributorTypeId != '4' || contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
+            if ((/*contributor.ContributorTypeId != '4' ||*/ contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso de la persona, ya que se encuentra habilitada.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
