@@ -21,10 +21,10 @@ namespace Gosocket.Dian.Services.Cude
                     xmlDocument.Load(stream);
                     invoiceDs.SoftwareId = SelectSingleNode(DocumentoEquivalenteXpath.SoftwareId);
                     invoiceDs.Cude = SelectSingleNode(DocumentoEquivalenteXpath.Cude);
-                    invoiceDs.DocumentType = SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode);
-                    invoiceDs.NumFac = SelectSingleNode(DocumentoEquivalenteXpath.NumFac);
-                    invoiceDs.FecFac = SelectSingleNode(DocumentoEquivalenteXpath.FecFac);
-                    invoiceDs.HorFac = SelectSingleNode(DocumentoEquivalenteXpath.HorFac);
+                    invoiceDs.DocumentType = SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode) != "" ? SelectSingleNode(DocumentoEquivalenteXpath.InvoiceTypeCode) : SelectSingleNode(DocumentoEquivalenteXpath.CreditNoteTypeCode);
+                    invoiceDs.NumFac = SelectSingleNode(DocumentoEquivalenteXpath.NumFac) != "" ? SelectSingleNode(DocumentoEquivalenteXpath.NumFac) : SelectSingleNode(DocumentoEquivalenteXpath.NumFac1);
+                    invoiceDs.FecFac = SelectSingleNode(DocumentoEquivalenteXpath.FecFac) != "" ? SelectSingleNode(DocumentoEquivalenteXpath.FecFac): SelectSingleNode(DocumentoEquivalenteXpath.FecFac1);
+                    invoiceDs.HorFac = SelectSingleNode(DocumentoEquivalenteXpath.HorFac) != "" ? SelectSingleNode(DocumentoEquivalenteXpath.HorFac) : SelectSingleNode(DocumentoEquivalenteXpath.HorFac1);
                     invoiceDs.ValFac = SelectSingleNode(DocumentoEquivalenteXpath.ValFac);
                     invoiceDs.CodImp1 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp1);
                     invoiceDs.ValImp1 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp1);
@@ -40,15 +40,18 @@ namespace Gosocket.Dian.Services.Cude
                     var valImp2 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp2);
                     if (!string.IsNullOrWhiteSpace(codImp2))
                     {
-                        impuestos.Add(codImp2, valImp2);
+                        if (!impuestos.ContainsKey(codImp2))
+                            impuestos.Add(codImp2, valImp2);
                     }
                     var codImp3 = SelectSingleNode(DocumentoEquivalenteXpath.CodImp3);
                     var valImp3 = SelectSingleNode(DocumentoEquivalenteXpath.ValImp3);
                     if (!string.IsNullOrWhiteSpace(codImp3))
                     {
-                        impuestos.Add(codImp3, valImp3);
+                        if (!impuestos.ContainsKey(codImp3))
+                            impuestos.Add(codImp3, valImp3);
                     }
-                    
+
+
                     invoiceDs.ValTol = SelectSingleNode(DocumentoEquivalenteXpath.ValTol);
                     invoiceDs.NumOfe = SelectSingleNode(DocumentoEquivalenteXpath.NumOfe);
                     invoiceDs.NitAdq = SelectSingleNode(DocumentoEquivalenteXpath.NumAdq);

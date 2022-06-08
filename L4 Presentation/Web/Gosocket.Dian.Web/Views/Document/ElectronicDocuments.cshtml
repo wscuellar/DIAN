@@ -10,71 +10,99 @@
     }
 </style>
 
-<div class="page-content radian-view margin-20 margin-page-content">
-    </div>
-    
-    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="container-fluid RadianContainerBegin">
+<div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="container-fluid RadianContainerBegin">
 
-        <p class="sub-title">Seleccione el tipo de documento:</p>
-        <hr>
+    <p class="sub-title">Seleccione el tipo de documento:</p>
+    <hr>
 
-        <div class="hab-menu-container">
-            @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
-            {
-                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
-                    <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
-                    Factura electrónica
-                </button>
-            }
-            else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Hab")
-            {
-                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
-                        <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
-                        Factura electrónica
-                    </button>
-            }
+    <div class="hab-menu-container">
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>    
+        }
+        else if (ViewBag.ContributorTypeIde == 4 && ViewBag.LoginMenu == "OFE" && configurationManager == "Prod" && ViewBag.ContributorAcceptanceStatusId != 4)
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>
+        }
+        else if (ViewBag.LoginMenu == "OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Check", "Contributor")'" id="1" contributorType="1" operationMode="0">
+                <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" height="130" />
+                Factura electrónica
+            </button>
+        }
 
-            @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
-            {
-                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
-                    <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
-                    Nómina electrónica
-                </button>
-            }
-            else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0"))
-            {
-                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
-                    <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
-                    Nómina electrónica
-                </button>
-            }
+        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4 && ViewBag.LoginMenu == "NO OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
+        }
 
-            @if (ViewBag.ContributorTypeIde != null)
-            {
-                <button class="hab-menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
-                    <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
-                    Documento para no obligados a facturar
-                </button>
-            }
+        else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
+        }
 
-            @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
-            {
-                <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "Radian")'" contributorType="4" operationMode="1" id="4">
-                    <img src="~/Content/img/electronic-document-icons/eventos-radian-icon.svg" height="130" />
-                    Eventos RADIAN
-                </button>
-            }
+        else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0") && ViewBag.LoginMenu == "NO OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
+        }
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
+                <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                Nómina electrónica
+            </button>
+        }
 
-            @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
-            {
-                <button class="hab-menu-button" onclick="EnabledEquivalentDocuments()" contributorType="3" operationMode="1" id="3">
-                    <img src="~/Content/img/electronic-document-icons/documentos-equivalentes-icon.svg" height="130" />
-                    Documentos equivalentes
-                </button>
-            }
-        </div>
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.LoginMenu == "NO OFE")
+        {
+            <button class="hab-menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
+                Documento para no obligados a facturar
+            </button>
+        }
+        
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
+        {
+            <button class="hab-menu-button" onclick="EnabledSupportDocumentForNoOfe()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" height="130" />
+                Documento para no obligados a facturar
+            </button>
+        }
+
+        @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4 && ViewBag.LoginMenu == "OFE")
+        {
+            <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "Radian")'" contributorType="4" operationMode="1" id="4">
+                <img src="~/Content/img/electronic-document-icons/eventos-radian-icon.svg" height="130" />
+                Eventos RADIAN
+            </button>
+        }
+
+        @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4 && ViewBag.LoginMenu == "OFE")
+        {
+            <button class="hab-menu-button" onclick="EnabledEquivalentDocuments()" contributorType="3" operationMode="1" id="3">
+                <img src="~/Content/img/electronic-document-icons/documentos-equivalentes-icon.svg" height="130" />
+                Documentos equivalentes
+            </button>
+        }
     </div>
 </div>
+
 
 @section scripts
 {

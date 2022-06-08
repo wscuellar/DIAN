@@ -73,22 +73,22 @@ namespace Gosocket.Dian.Services.Cuds
         /// <returns></returns>
         public string ToCombinacionToCuds(string sep = "")
         {
-            var valDsTruncado = TruncarValoresNumericos(ValDs);  
-            var valImpTruncado = TruncarValoresNumericos(ValImp);  
-            var valTot = TruncarValoresNumericos(ValTol);  
+            var valDsTruncado = TruncarValoresNumericos(ValDs);
+            var valImpTruncado = TruncarValoresNumericos(ValImp);
+            var valTot = TruncarValoresNumericos(ValTol);
             return $"{NumDs}{sep}{FecDs}{sep}{HorDs}{sep}{valDsTruncado}{sep}{CodImp}{sep}{valImpTruncado}{sep}{valTot}{sep}{NumSno}{sep}{NitAbs}{sep}{SoftwarePin}{sep}{TipoAmb}";
         }
 
         public static string TruncarValoresNumericos(string cadena)
         {
             var indexPuntoDecimal = cadena.IndexOf('.');
-            if(indexPuntoDecimal == -1)
+            if (indexPuntoDecimal == -1)
             {
                 return cadena;
             }
             else
             {
-                if(indexPuntoDecimal + 2 <= cadena.Length - 1)
+                if (indexPuntoDecimal + 2 <= cadena.Length - 1)
                 {
                     return cadena.Substring(0, indexPuntoDecimal + 2 + 1);
                 }

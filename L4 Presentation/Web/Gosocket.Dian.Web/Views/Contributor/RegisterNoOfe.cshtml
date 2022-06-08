@@ -17,7 +17,7 @@
                             @Html.HiddenFor(x => x.Id)
                             @Html.HiddenFor(x => x.AcceptanceStatusId)
                             <div class="panel-body padding-20 padding-bottom-10">
-                                @Html.Partial("_default")
+                                @Html.Partial("_defaultNoOFE")
                                 @Html.Partial("_noOfeObligation")
                             </div>
                             if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)

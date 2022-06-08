@@ -27,16 +27,16 @@
     </div>
     <div class="col-sm-3 padding-xs-0">
         <div class="form-group">
-            @Html.LabelFor(m => m.ExchangeEmail, new { @class = "control-label" })
+            @Html.LabelFor(m => m.NoOFeEmail, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.ExchangeEmail, readOnlyHtmlAttr)
             @Html.ValidationMessageFor(m => m.ExchangeEmail, "", new { @class = "text-danger" })
         </div>
     </div>
 </div>
-<div class="row">
+<!--<div class="row">
     <div class="alert custom-alert-primary" role="alert">
-        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-        @Html.Raw(resolutionGloss)
-        <strong><a class="custom-alert-link" href="@Url.Action("DownloadResolutions", "Contributor")">Para mayor información descargue la resolución aquí.</a></strong>
+        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>-->
+        @*@Html.Raw(resolutionGloss)*@
+        <!--<strong><a class="custom-alert-link" href="@Url.Action("DownloadResolutions", "Contributor")">Para mayor información descargue la resolución aquí.</a></strong>
     </div>
-</div>
+</div>-->
