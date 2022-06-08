@@ -239,6 +239,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var DocumentType = await cosmos.getDocumentType();
 			var tipoOper = await cosmos.getTipoOperacion();
 			var TipoOperacion = model.Elements(cbc + "CustomizationID");
+			var TipoDoc = model.Elements(cbc + "InvoiceTypeCode");
 			if (TipoOperacion.Any())
 				plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
 
@@ -402,7 +403,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 
-			if (TipoOperacion.FirstOrDefault().Value == "55" || TipoOperacion.FirstOrDefault().Value == "50") 
+			if (TipoDoc.FirstOrDefault().Value == "55" || TipoDoc.FirstOrDefault().Value == "50") 
 			{
 				var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "Country").Elements(cbc + "Name");
 				if (AdquirientePais.Any())
