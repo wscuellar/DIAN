@@ -1,61 +1,51 @@
 ﻿@model Gosocket.Dian.Web.Models.TestSetResultViewModel
 @using Gosocket.Dian.Domain.Common
 @{
-    ViewBag.Title = "Detalle de set de pruebas";
+    ViewBag.Title = $"Detalle de set de pruebas - {Model.OperationModeName}";
 }
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title - @Model.OperationModeName</h3>
-            </div>
+        <div class="panel padding-20">
 
             @if (Model.Status == (int)TestSetStatus.InProcess)
             {
-                <div class="row padding-25 padding-bottom-0">
-                    <div class="alert custom-alert-success col-sm-12">
-                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                <div class="dian-alert dian-alert-warning">
+                    <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                    <p>
+                        <strong>¡Importante!</strong> <br>
                         Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)</strong>.<br />
                         Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong style="font-size: 14px; font-weight: bold;">@Model.Id</strong> en el web services para el envío de su set de pruebas.
-                    </div>
+                    </p>
                 </div>
             }
             @if (Model.Status == (int)TestSetStatus.Accepted)
             {
-                <div class="row padding-25 padding-bottom-0">
-                    <div class="alert custom-alert-success col-sm-12">
-                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+                <div class="dian-alert dian-alert-success">
+                    <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                    <p>
+                        <strong>¡Importante!</strong> <br>
                         Su empresa ha superado satisfactoriamente las pruebas de validación de su set de pruebas.
-                    </div>
+                    </p>
                 </div>
             }
             @if (Model.Status == (int)TestSetStatus.Rejected)
             {
-                <div class="row padding-25 padding-bottom-0">
-                    <div class="alert custom-alert-danger col-sm-12">
-                        <h4><i class="fa fa-exclamation-circle" aria-hidden"true"=""></i> Importante!</h4>
+                <div class="dian-alert dian-alert-success">
+                    <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                    <p>
+                        <strong>¡Importante!</strong> <br>
                         Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)</strong>.<br />
                         Usted debe reiniciar el proceso para poder poder enviar nuevos documentos a su set de pruebas con indentificador <strong style="font-size: 14px; font-weight: bold;">@Model.Id</strong>
-                    </div>
+                    </p>
                 </div>
             }
 
-            <div class="panel-body padding-top-0">
-                <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                        <div class="panel-body padding-0 padding-bottom-0">
-                            <div class="row">
-                                <div id="chart" style="height:320px; margin: 0 auto"></div>
-
-                            </div>
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("View", "TestSet", new {operationModeId = Model.OperationModeId, contributorId = Model.ContributorId, contributorCode = Model.ContributorCode, softwareId = Model.SoftwareId })" class="btn btn-default">Volver</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="panel-body" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
+                <div id="chart" style="height:320px; margin: 0 auto"></div>
             </div>
+            
+            <a href="@Url.Action("View", "TestSet", new {operationModeId = Model.OperationModeId, contributorId = Model.ContributorId, contributorCode = Model.ContributorCode, softwareId = Model.SoftwareId })" class="btn btn-secondary">Volver</a>
         </div>
     </div>
 </div>
@@ -113,12 +103,20 @@
                     shared: true,
                     useHTML: true
                 },
+                legend: {
+                    align: 'left',
+                    verticalAlign: 'top',
+                    margin: 32,
+                    symbolRadius: 0,
+                    x: 0,
+                    y: 12
+                },
                 plotOptions: {
                     column: {
                         pointPadding: 0.2,
                         borderWidth: 0
                     }
-                }, colors: ['#0778D7', '#D7B707', '#FF8000', '#348441', '#DC2D08'],
+                }, colors: ['#FED064', '#C98802', '#41D78C', '#00B4DC', '#F54E41'],
                 series: [{
                     name: 'Requeridos',
                     data: [@Model.TotalDocumentRequired,@Model.InvoicesTotalRequired,@Model.TotalCreditNotesRequired,@Model.TotalDebitNotesRequired]

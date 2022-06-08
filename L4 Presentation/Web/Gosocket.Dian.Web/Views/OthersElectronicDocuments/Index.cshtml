@@ -51,38 +51,19 @@
 }
 
 <div class="page-content radian-view margin-20">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
-    </div>
     <div class="container-fluid RadianContainerBegin" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
-        <div class="row">
-            <div class="col-lg-12  col-md-12  col-xs-12" style="margin-top:30px">
-                <h4><b>Seleccione el tipo de documento:</b></h4>
-            </div>
-            <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-            </div>
+        <p class="sub-title">Seleccione el tipo de documento:</p>
+        <hr>
 
-       
-
-            <div class="row-fluid">
-                @foreach (var item in ListDocs)
-                {
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer" style="width: 95% !important; height: 230px !important;" idElectronicDocument="@item.Value" textElectronicDocument="@item.Text">
-                            <div class="RadianImgContainer">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/Factor.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard" style="margin: 20px;">@item.Text</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
+        <div class="hab-menu-container">
+            @foreach (var item in ListDocs)
+            {
+                <button class="hab-menu-button" idElectronicDocument="@item.Value" textElectronicDocument="@item.Text">
+                    <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
+                    @item.Text
+                </button>
+            }
         </div>
     </div>
 </div>
@@ -98,7 +79,7 @@
 
         console.log("ContributorTypeIde", @ViewBag.ContributorTypeIde);
 
-        $('.RadianCardContainer').click(function () {
+        $('.hab-menu-button').click(function () {
             showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
 
                 if (!operationClick) {

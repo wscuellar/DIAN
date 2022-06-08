@@ -40,65 +40,35 @@
     </style>
 }
 <div class="page-content radian-view margin-20">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
-    </div>
     <div class="container-fluid RadianContainerBegin" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
-        <div class="row">
-            <div class="col-lg-12  col-md-12  col-xs-12" style="margin-top:30px">
-                <h4><b>Seleccione el participante que va a emitir otros documentos electrónicos</b></h4>
-            </div>
-            <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-            </div>
+        <p class="sub-title">Seleccione el participante que va a emitir otros documentos electrónicos</p>
+        <hr>
 
-            <div class="row-fluid">
+        <div class="hab-menu-container">
 
-                @if (ViewBag.electronicDocumentId == 13)
-                {
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
-                            <div class="RadianImgContainer" style="margin:10px;">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard">Emisor</p>
-                                <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer pull-left" style="width: 90% !important; height: 244px !important;" id="1" ContributorIdType="1" Participantetexto="Emisor">
-                            <div class="RadianImgContainer" style="margin:10px;">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/Emisor.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard">Emisor</p>
-                                <p class="RadianTittleCard2" style="margin-top: -8px !important;">Otros documentos electrónicos</p>
-                            </div>
-                        </div>
-                    </div>
+            @if (ViewBag.electronicDocumentId == 13)
+            {
+                <button style="padding-top: calc(25px + 16.25px)" class="hab-menu-button" id="1" ContributorIdType="1" Participantetexto="Emisor">
+                    Emisor
+                    <img style="margin-top:16.25px" src="~/Content/img/electronic-document-icons/nomina-participante-emisor.svg" height="130" />
+                    <p class="hab-menu-button-subtitle">Otros documentos electrónicos</p>
+                </button>
+            }
+            else
+            {
+                <button style="padding-top: calc(25px + 16.25px)" class="hab-menu-button" id="1" ContributorIdType="1" Participantetexto="Emisor">
+                    Emisor
+                    <img style="margin-top:16.25px" src="~/Content/img/electronic-document-icons/nomina-participante-emisor.svg" height="130" />
+                    <p class="hab-menu-button-subtitle">Otros documentos electrónicos</p>
+                </button>
 
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                        <div class="card RadianCardContainer pull-right" style="width: 90% !important; height: 244px !important;" ContributorIdType="2" Participantetexto="Proveedor de Servicios Tecnológicos">
-                            <div class="RadianImgContainer" style="margin:10px;">
-                                <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologicoII.svg" />
-                            </div>
-                            <div class="card-body">
-                                <p class="RadianTittleCard">Proveedor de Servicios Tecnológicos</p>
-                                <p class="RadianTittleCard2" tyle="margin-top: -8px !important;">Otros Documentos Electrónicos</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-
-            </div>
+                <button class="hab-menu-button" ContributorIdType="2" Participantetexto="Proveedor de Servicios Tecnológicos">
+                    Proveedor de servicios tecnológicos
+                    <img src="~/Content/img/electronic-document-icons/nomina-proveedor-servicios-tecnologicos.svg" height="130" />
+                    <p class="hab-menu-button-subtitle">Otros documentos electrónicos</p>
+                </button>
+            }
         </div>
 
         @*<div class="modal fade prompt-comment" id="dialogModeOperation" tabindex="-1" aria-labelledby="dialogModeOperationActiveLabel" aria-hidden="true">
@@ -128,9 +98,6 @@
                 </div>
             </div>
         </div>*@
-
-
-
     </div>
 </div>
 
@@ -156,7 +123,7 @@
         var ContributorIdType =0;
         var requeridoOperationMode = "Seleccionar un modo de operación";
 
-        $('.RadianCardContainer').click(function () {
+        $('.hab-menu-button').click(function () {
             showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
                 if (!operationClick) {
                     operationClick = true;

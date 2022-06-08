@@ -1,33 +1,35 @@
 ﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
 
-@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general fields captureFields" } };}
+@{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control" } };}
 
-<div class="panel-body padding-20">
-    <div class="row">
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
+<div class="panel-body" style="padding: 10px;">
+    <div class="row" style="margin-bottom:24px">
+        <div class="form-group">
+            <div class="col-md-6">
                 @Html.LabelFor(m => m.Names, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Names, defaultHtmlAttr)
+                @Html.TextBoxFor(m => m.Names, new { @class = "form-control", placeholder = "Escribe aquí el nombre", autocomplete = "off" })
                 @Html.ValidationMessageFor(m => m.Names, "", new { @class = "text-danger" })
             </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
+            @*</div>
+                <div class="col-sm-3 padding-xs-0">*@
+            <div class="col-md-6">
                 @Html.LabelFor(m => m.IdentificationTypeId, new { @class = "control-label" })
-                @Html.DropDownListFor(m => m.IdentificationTypeId, new SelectList(ViewBag.IdentificationTypesList, "Id", "Description"), new { @class = "form-control selectpicker" })
+                @Html.DropDownListFor(m => m.IdentificationTypeId, new SelectList(ViewBag.IdentificationTypesList, "Id", "Description"), new { @class = "form-control", placeholder = "Escribe aquí el nombre", autocomplete = "off" })
             </div>
         </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
+    </div>
+    <div class="row" style="margin-bottom:24px">
+        <div class="form-group">
+            <div class="col-md-6">
                 @Html.LabelFor(m => m.IdentificationId, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.IdentificationId, defaultHtmlAttr)
+                @Html.TextBoxFor(m => m.IdentificationId, new { @class = "form-control", placeholder = "Escribe aquí el número de documento", autocomplete = "off" })
                 @Html.ValidationMessageFor(m => m.IdentificationId, "", new { @class = "text-danger" })
             </div>
-        </div>
-        <div class="col-sm-3 padding-xs-0">
-            <div class="form-group">
+            @*</div>
+                <div class="col-sm-3 padding-xs-0">*@
+            <div class="col-md-6">
                 @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.Email, defaultHtmlAttr)
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Escribe aquí el correo electrónico", autocomplete = "off" })
                 @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
             </div>
         </div>

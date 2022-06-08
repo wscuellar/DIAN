@@ -55,7 +55,6 @@
         <p class="title-view">
             @ViewBag.title
         </p>
-        <div class="underline-title"></div>
     </div>
 
     <div class="row margin-horizontal-0">
@@ -70,14 +69,14 @@
                                     {
                                         <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
                                             <div class="col-md-12 padding-horizontal-0">
-                                                <div id="document-list" class="panel panel-bordered-dian">
+                                                <div id="document-list" class="panel">
 
                                                     <div class="panel-body padding-20 padding-bottom-0">
                                                         <div class="row">
                                                             <div class="col-sm-@columnSize padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.TypeDocId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control selectpicker" })
+                                                                    @Html.DropDownListFor(m => m.TypeDocId, Model.TypesDoc, new { @class = "form-control" })
                                                                     @Html.ValidationMessageFor(m => m.TypeDocId, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
@@ -99,8 +98,6 @@
                                                                 </div>
 
                                                             </div>
-                                                        </div>
-                                                        <div class="row">
 
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
@@ -109,23 +106,23 @@
                                                                     @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                        <div class="row">
+
                                                             <div class="col-sm-3 padding-xs-0">
                                                                 <div class="form-group">
                                                                     @Html.LabelFor(m => m.ProfileId, new { @class = "control-label" })
-                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control selectpicker" })
+                                                                    @Html.DropDownListFor(m => m.ProfileId, Model.Profiles, new { @class = "form-control" })
                                                                     @Html.ValidationMessageFor(m => m.ProfileId, "", new { @class = "text-danger" })
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-3 padding-xs-0 div-add-profile">
-                                                                <div class="add-profile"><i class="fa fa-plus-circle"></i>Añadir perfil</div>
+                                                                <div class="add-profile btn btn-secondary" style="border-radius:20px!important;"> Añadir perfil <i class="fa fa-plus-circle"></i></div>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div class="panel-footer-grey text-right submit-container">
-                                                        <button id="btnCancel" class="btn btn-success btn-radian-default">Cancelar</button>
-                                                        <button type="submit" id="btnSend" class="btn btn-success btn-radian-success">Crear Usuario</button>
-                                                    </div>
+                                                    <hr class="margin-0 margin-bottom-10">
 
                                                 </div>
                                             </div>
@@ -138,7 +135,11 @@
                             @Html.Partial("_checksGrid")
 
                         </div>
+                        <div class="panel-footer-grey text-left submit-container">
+                            <button type="submit" id="btnSend" class="btn btn-primary">Crear Usuario</button>
+                            <button id="btnCancel" class="btn btn-secondary">Salir</button>
 
+                        </div>
                     </div>
 
                 </div>

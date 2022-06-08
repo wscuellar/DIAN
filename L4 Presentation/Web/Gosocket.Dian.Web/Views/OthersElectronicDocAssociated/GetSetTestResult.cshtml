@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @{var defaultHtmlAttr = new Dictionary<string, object> { { "class", "form-control input-general" }, { "readonly", "true" } };}
 @{
-    ViewBag.title = "Detalle del SET de pruebas " + ViewBag.EquivalentElectronicDocumentName;
+    ViewBag.Title = "Detalle del SET de pruebas " + ViewBag.EquivalentElectronicDocumentName;
     Layout = "~/Views/Shared/_Layout.cshtml";
     int? equivalentDocumentId = ViewBag?.EquivalentDocumentId;
 }
@@ -34,46 +34,27 @@
     </style>
 }
 
-
-
 <div class="page-content radian-view margin-20  margin-page-content">
     <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
         <div class="back-button"><a href="@Url.Action("Index", new { Id = ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
     </div>
     <div class="row margin-horizontal-0">
         <div class="panel">
 
             <div class="panel-body padding-top-20">
-                <div class="row warning-wrapper">
-                    <div class="col-sm-1 icon-warning">
-                        <i class="fa fa-exclamation-circle"></i>
-                    </div>
-                    <div class="col-sm-11">
-                        <span class="warning-title">¡Importante!</span>
-                        <p>
-                            Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@(Model.Software.OtherDocElecSoftwareStatusName)</b>.<br>
-                            Usted debe proporcinar el identificador del set de pruebas (TestSetld) <b>@(ViewBag.TestSetId)</b> en el web service  para el envío de su set de pruebas.
-                        </p>
-                    </div>
+                <div class="dian-alert dian-alert-warning">
+                    <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                    <p>
+                        <strong>¡Importante!</strong> <br>
+                        Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta 
+                        <strong>@(Model.Software.OtherDocElecSoftwareStatusName)</strong>. <br>
+                        Usted debe proporcinar el identificador del set de pruebas (TestSetld) <strong>@(ViewBag.TestSetId)</strong> 
+                        en el web service para el envío de su set de pruebas.
+                    </p>
                 </div>
-                @*@if (Model.Software.OtherDocElecSoftwareStatusName == "Rechazado")
-                {
-                    <div>
-                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15">Reiniciar set de pruebas</button>
-                    </div>
-                }
-                else
-                {
-                    <div>
-                        <button onclick="restartCountersTest('@Url.Action("RestartSetTestResult")', @JsonConvert.SerializeObject(Model.GTestSetOthersDocumentsResult), '@Model.Software.Id')" class="btn btn-radian-success margin-top-15 disabled">Reiniciar set de pruebas</button>
-                    </div>
-                }*@
+                
                 <div class="row margin-horizontal-0 margin-top-20">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
 
                         @using (Html.BeginForm("SetTestDetails", "OthersElectronicDocAssociated", FormMethod.Post))
                         {
@@ -82,11 +63,10 @@
                                 @Html.Hidden("equivalentElectronicDocumentId", equivalentDocumentId)
                                 @Html.Partial("_setTestResult")
                             </div>
-                            <div class="panel-footer text-right">
-                                <button type="submit" class="btn btn-success btn-radian-success">Gráfico</button>
-                                @Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-success btn-radian-success" })
+                            <div class="panel-footer">
+                                <button type="submit" class="btn btn-primary mr-9">Gráfico</button>
+                                @Html.ActionLink("Cerrar", "Index", "OthersElectronicDocAssociated", new { Id = ViewBag.Id }, new { @class = "btn btn-secondary" })
                             </div>
-
                         }
                     </div>
                 </div>

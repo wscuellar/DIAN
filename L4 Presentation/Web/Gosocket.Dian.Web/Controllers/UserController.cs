@@ -1626,7 +1626,17 @@ namespace Gosocket.Dian.Web.Controllers
                 contributorService.AddOrUpdate(contributorInvoice);
             }
 
-            return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: " + reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage($@"
+                <div class='dian-alert dian-alert-info mt-12'>
+                    <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
+                    <p>
+                        Se ha enviado la ruta de acceso al correo facturacion: <strong>{reportFromEmailRange}</strong> 
+                        registrado en el RUT de la persona natural que se autentico en el sistema. <br> 
+                        <strong>El acceso estará disponible por 60 minutos.</strong>
+                    </p>    
+                </div>
+                ",
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
         }
 
@@ -1781,7 +1791,17 @@ namespace Gosocket.Dian.Web.Controllers
                 contributorService.AddOrUpdate(contributor);
             }
 
-            return Json(new ResponseMessage("Se ha enviado la ruta de acceso al correo facturacion: " + reportFromEmailRange + " registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+            return Json(new ResponseMessage($@"
+                <div class='dian-alert dian-alert-info mt-12'>
+                    <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
+                    <p>
+                        Se ha enviado la ruta de acceso al correo facturacion: <strong>{reportFromEmailRange}</strong> 
+                        registrado en el RUT de la persona natural que se autentico en el sistema. <br> 
+                        <strong>El acceso estará disponible por 60 minutos.</strong>
+                    </p>    
+                </div>
+                ", 
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
         }
 

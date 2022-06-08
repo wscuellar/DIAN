@@ -1,15 +1,10 @@
 ﻿@model Gosocket.Dian.Web.Models.OtherDocElecSetupOperationModeViewModel
 @{
-	ViewBag.title = "Configurar modo de operación - " + @Model.ContributorType;
+	ViewBag.Title = "Configurar modo de operación - " + @Model.ContributorType;
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="page-content radian-view margin-20">
 	<div class="title-container">
-		<p class="title-view">
-			@ViewBag.title
-		</p>
-		<div class="underline-title"></div>
-
 		<div class="back-button"><a href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id = (int)ViewBag.Id })"><i class="fa fa-chevron-left"></i> Volver</a></div>
 	</div>
 	<div class="margin-top-50">

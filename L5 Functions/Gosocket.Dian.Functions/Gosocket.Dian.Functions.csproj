@@ -37,6 +37,7 @@
     <PackageReference Include="Rebex.Networking" Version="3.5.6821" />
     <PackageReference Include="Rebex.Pop3" Version="2.0.6821" />
     <PackageReference Include="Rebex.Smtp" Version="2.0.6821" />
+    <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="Saxon-HE" Version="10.8.0" />
     <PackageReference Include="SecureBlackbox" Version="15.0.295" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="4.5.0" />
