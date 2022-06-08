@@ -8,7 +8,7 @@ function OnSuccessAjax(response) {
         window.location.href = response.Message;
     } else {
         hideLoading("#panel-forma");
-        if (!response.Message) {
+        if (response.Code == 400) {
             ErrorDialogV2("", response.Message || "Ocurrió un error por favor intente nuevamente.");
             return;
         }

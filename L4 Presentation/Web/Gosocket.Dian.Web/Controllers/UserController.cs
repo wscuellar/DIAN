@@ -1669,13 +1669,13 @@ namespace Gosocket.Dian.Web.Controllers
             if (contributor == null)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Persona natural sin permisos asociados.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Persona natural sin permisos asociados.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Contribuyente tiene RUT en estado cancelado.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if ((contributor.ContributorTypeId != '4' || contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
@@ -1687,7 +1687,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Usted no se ecuentra habilitado.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Usted no se ecuentra habilitado.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var pk = $"{model.IdentificationType}|{model.PersonCode}";
@@ -1776,7 +1776,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 tableManager.InsertOrUpdate(logger);
                 ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
