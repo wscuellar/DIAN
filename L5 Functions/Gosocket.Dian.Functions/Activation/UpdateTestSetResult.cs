@@ -689,7 +689,7 @@ namespace Gosocket.Dian.Functions.Activation
                                 var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
                                 await contributorTableManager.InsertOrUpdateAsync(globalContributor);
 
-                                log.Info($"Se envia notificacion de usuario Habilitado...");
+                                log.Info($"Se envia notificacion de usuario Habilitado... "+ contributor.Code);
                                 notificationBell.EventNotificationsAsync("03", contributor.Code);
                             }
 
@@ -743,7 +743,7 @@ namespace Gosocket.Dian.Functions.Activation
                         }
                         else if(globalTesSetResult.Status == (int)TestSetStatus.Rejected)
                         {
-                            log.Info($"Se envia notificacion de rechazo set de pruebas...");
+                            log.Info($"Se envia notificacion de rechazo set de pruebas... " + globalTestSetTracking.SenderCode);
                             notificationBell.EventNotificationsAsync("02", globalTestSetTracking.SenderCode);
                         }
                     }
