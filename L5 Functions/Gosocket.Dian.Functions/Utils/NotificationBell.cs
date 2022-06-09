@@ -46,7 +46,7 @@ namespace Gosocket.Dian.Functions.Utils
                         " 3.         Asociar y crear la numeración necesaria. <br>" +
                         " 4.         Cada vez que configure un modo de operación en producción deberá crear nuevamente sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). <br>" +
                         " Saludes cordiales.<br><br> ";
-                    notification.Description = "Se encuentra Habilitado para generar… Nomina/Factura/D.S. para elaborar sus documentos desde Producción deberá ingresar desde la opción “Facturando Electrónicamente”. ";
+                    notification.Description = "Se encuentra Habilitado para generar… Factura. para elaborar sus documentos desde Producción deberá ingresar desde la opción “Facturando Electrónicamente”. ";
                     notification.Subject = "Aprobación del set de pruebas ";
                     notification.Matters = "Aprobación del set de pruebas ";
                     notification.NotificationId = 2;
