@@ -63,7 +63,7 @@
                             <a href="@Url.Action("Edit", "TestSet", new { operationModeId = Model.OperationModeId })" class="btn btn-primary btn-hover-gosocket">Editar</a>
                             <a href="@Url.Action("List", "TestSet")" class="btn btn-secondary">Volver</a>
                         }
-                        else if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                        else if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
                         {
                             <a href="@Url.Action("Tracking", "TestSet", new { contributorCode = ViewBag.ContributorCode, softwareId = ViewBag.SoftwareId, contributorTypeId = User.ContributorTypeId() })" class="btn btn-primary btn-hover-gosocket">Detalles</a>
                             <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = ViewBag.ContributorId })" class="btn btn-secondary">Volver</a>

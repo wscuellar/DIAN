@@ -129,7 +129,9 @@
                         Folio: @Model.Document.Number<br>
                         Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br />
                         @if (Model.Document.DocumentTypeId == "20" || Model.Document.DocumentTypeId == "35" || Model.Document.DocumentTypeId == "40"
-                             || Model.Document.DocumentTypeId == "55" || Model.Document.DocumentTypeId == "60" || Model.Document.DocumentTypeId == "50" || Model.Document.DocumentTypeId == "95" || Model.Document.DocumentTypeId == "27" || Model.Document.DocumentTypeId == "45" || Model.Document.DocumentTypeId == "32")
+                             || Model.Document.DocumentTypeId == "55" || Model.Document.DocumentTypeId == "60" || Model.Document.DocumentTypeId == "50"
+                             || Model.Document.DocumentTypeId == "95" || Model.Document.DocumentTypeId == "27" || Model.Document.DocumentTypeId == "45" 
+                             || Model.Document.DocumentTypeId == "32" || Model.Document.DocumentTypeId == "94")
                         {
                             <a href="@Url.Action("DownloadPDFDocEquivalente", "Document", new { trackId = Model.Document.Id, FechaValidacionDIAN = Model.Document.EmissionDate, FechaGeneracionDIAN = Model.Document.EmissionDate })" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
                                 <i class="fa fa-download"></i> Descargar PDF

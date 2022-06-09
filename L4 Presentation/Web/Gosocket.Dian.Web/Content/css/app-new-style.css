@@ -22,7 +22,9 @@
     }
 
 .form-control,
-button.btn.dropdown-toggle.btn-default {
+button.btn.dropdown-toggle.btn-default,
+[name="daterangepicker_start"],
+[name="daterangepicker_end"] {
     min-height: 40px !important;
     border: 1px solid #ccc !important;
     background: #fff !important;
@@ -36,7 +38,9 @@ button.btn.dropdown-toggle.btn-default {
     border-radius: 4px !important;
 }
 
-    .form-control::placeholder {
+    .form-control::placeholder,
+    [name="daterangepicker_start"]::placeholder,
+    [name="daterangepicker_end"]::placeholder {
         text-transform: initial;
         color: #ccc !important;
     }
@@ -674,36 +678,52 @@ label.sub-title-2 {
     margin-top: 10px !important;
 }
 
-    .daterangepicker .drp-calendar {
+    .daterangepicker .daterangepicker_input {
+        padding: 8px;
+    }
+
+    .daterangepicker .daterangepicker_input i {
+        display: none;
+    }
+
+    .daterangepicker .drp-calendar,
+    .daterangepicker .calendar {
         padding: 0 0 12px !important;
         border: 2px solid #0DB4DC;
         border-radius: 6px;
         max-width: 50% !important;
     }
 
-        .daterangepicker .drp-calendar.left {
+        .daterangepicker .drp-calendar.left,
+        .daterangepicker .calendar.left {
             border-right: 0;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
 
-        .daterangepicker .drp-calendar.right {
+        .daterangepicker .drp-calendar.right,
+        .daterangepicker .calendar.right {
             border-left: 0;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             width: fit-content !important;
         }
 
-        .daterangepicker .drp-calendar .calendar-table table {
+        .daterangepicker .drp-calendar .calendar-table table,
+        .daterangepicker .calendar .calendar-table table {
             font-family: 'Ubuntu';
             color: #2B323D;
         }
 
             .daterangepicker .drp-calendar .calendar-table table tr th,
-            .daterangepicker .drp-calendar .calendar-table table tr td {
+            .daterangepicker .drp-calendar .calendar-table table tr td,
+            .daterangepicker .calendar .calendar-table table tr th,
+            .daterangepicker .calendar .calendar-table table tr td {
                 border-radius: 0;
                 width: 35px;
+                height: 40px;
                 padding: 9px;
+                font-family: 'Ubuntu';
                 /*font-size: 14px;*/
             }
 
@@ -717,8 +737,14 @@ label.sub-title-2 {
         .daterangepicker tr:first-child th:last-child span {
             border-color: #41D78C;
         }
+        .daterangepicker tr:first-child th:first-child,
+        .daterangepicker tr:first-child th:last-child {
+            color: #41D78C;
+            font-size: 18px;
+        }
 
-    .daterangepicker .drp-calendar .calendar-table table thead tr:last-child th {
+    .daterangepicker .drp-calendar .calendar-table table thead tr:last-child th,
+    .daterangepicker .calendar .calendar-table table thead tr:last-child th {
         height: 42px;
         min-width: 43px;
         background: #E2E7EB;
@@ -743,17 +769,19 @@ label.sub-title-2 {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 34px;
+            height: 33.5px;
             margin: 3px !important;
             /*min-width: 30px !important;
             padding: 8px !important;*/
         }
 
-    .daterangepicker .drp-calendar .calendar-table table tr td.off {
+    .daterangepicker .drp-calendar .calendar-table table tr td.off,
+    .daterangepicker .calendar .calendar-table table tr td.off {
         background: #F0F2F4 !important;
     }
 
-.drp-buttons {
+.drp-buttons,
+.ranges {
     display: none !important;
 }
 
@@ -765,13 +793,19 @@ label.sub-title-2 {
     }
 
 @media (min-width: 564px) {
-    .daterangepicker .drp-calendar.left .calendar-table {
+    .daterangepicker .drp-calendar.left .calendar-table,
+    .daterangepicker .calendar.left .calendar-table {
         padding: 0px;
         border-right: 2px solid #220202;
     }
 
+    .daterangepicker .drp-calendar.right .calendar-table,
+    .daterangepicker .calendar.right .calendar-table {
+        padding: 0px;
+    }
+
     .daterangepicker {
-        width: 620px;
+        width: 630px;
     }
 }
 /*Botones del proceso de habilitacion*/

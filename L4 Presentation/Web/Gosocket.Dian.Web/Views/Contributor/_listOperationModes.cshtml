@@ -65,15 +65,21 @@
                         <a>@ConfigurationManager.GetValue("WebServiceUrl")</a>
                     </td>
                     <td class="text-left">
-                        <a href="@Url.Action("ListTests", "NumberRange", new { contributorId = Model.Id, operationModeId = contributorOperation.OperationModeId })" class="btn btn-xs" data-index-contributorOperations="@contributorOperation.Id" data-index-operationModeId="@contributorOperation.OperationModeId" onclick="redirectToTestNumberRange(this);"> <i class="fa fa-tasks add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Rangos de numeración de pruebas"></i></a>
+                        <a href="@Url.Action("ListTests", "NumberRange", new { contributorId = Model.Id, operationModeId = contributorOperation.OperationModeId })" class="btn btn-xs" data-index-contributorOperations="@contributorOperation.Id" data-index-operationModeId="@contributorOperation.OperationModeId" onclick="redirectToTestNumberRange(this);"> 
+                            <i class="fa fa-tasks add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Rangos de numeración de pruebas"></i>
+                        </a>
                     </td>
                     <td class="text-left">
                         @{var softwareId = contributorOperation.SoftwareId != null ? contributorOperation.SoftwareId.ToString() : ConfigurationManager.GetValue("BillerSoftwareId");}
                         @if (contributorOperation.StatusId != 1)
                         {
-                            <a href="javascript:void(0)" class="text-center" data-index-contributorOperations="@contributorOperation.Id" onclick="removeLine(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar modo de operación"></i></a>
+                            <a href="javascript:void(0)" class="btn btn-xs" data-index-contributorOperations="@contributorOperation.Id" onclick="removeLine(this)"> 
+                                <i class="fa fa-times-circle add-tooltip" style="color:#262944 !important" data-original-title="Eliminar modo de operación"></i>
+                            </a>
                         }
-                        <a href="@Url.Action("View", "TestSet", new { operationModeId = contributorOperation.OperationModeId, contributorId = Model.Id, contributorCode = Model.Code, softwareId = @softwareId})" class="btn btn-xs"> <i class="fa fa-eye add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Detalles de set de pruebas"></i></a>
+                        <a href="@Url.Action("View", "TestSet", new { operationModeId = contributorOperation.OperationModeId, contributorId = Model.Id, contributorCode = Model.Code, softwareId = @softwareId})" class="btn btn-xs"> 
+                            <i class="fa fa-eye add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Detalles de set de pruebas"></i>
+                        </a>
                     </td>
                 </tr>
             }

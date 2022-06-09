@@ -260,6 +260,10 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        #btn-back {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body bgcolor="F6F7F9">
@@ -308,7 +312,13 @@
                 <div id="page-alert"></div>
 
                 <div id="user-info-wrapper">
-                    <p class="title">@ViewBag.Title</p>
+                    <p class="title">
+                        @if(ViewBag.Title != "Inicio")
+                        {
+                            <i id="btn-back" class="fa fa-arrow-left mr-9" data-tooltip="tooltip" data-placement="bottom" title="Volver"></i> 
+                        }
+                        @ViewBag.Title
+                    </p>
                     <ul id="right-nav" class="nav navbar-top-links pull-right">
                         @*@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
                             {
@@ -970,6 +980,12 @@
                 window.location = $(this).data("href");
             });
             $('.select2').select2();
+
+            $("#btn-back").click(function () {
+                window.history.back();
+            });
+
+            $("[data-tooltip='tooltip']").tooltip();
         });
 
     </script>
