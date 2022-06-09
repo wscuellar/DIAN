@@ -10,18 +10,18 @@
     recoverPasswordModel.IdentificationTypesRecover = Model.IdentificationTypes;
 
 }
-<style>
-    .bhoechie-tab-menu {
-        padding: 0px !important;
-    }
 
+<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+<style>
     .textRecovery {
-        margin-top: 15px;
-        margin-bottom: 15px;
+        display: inline-block;
+        float: right;
+        margin-top: 12px;
+        /*margin-bottom: 15px;*/
         font-style: normal;
         font-size: 14px;
+        font-family: 'Ubuntu';
         line-height: 14px;
-        color: #348441;
         cursor: pointer;
     }
 
@@ -29,91 +29,77 @@
         padding-left: 0px;
         padding-top: 2px;
         text-decoration: underline;
-        color: #348441;
+        color: #00B4DC !important;
     }
 </style>
 
-<link href="~/Content/css/Radian/RadianIndex.css" rel="stylesheet" />
+<div class="login-wrapper" id="panel-forma" data-target="#panel-forma" data-toogle="panel-overlay">
+    <div class="bhoechie-tab-menu">
+        <div class="list-group">
+            <!-- admin -->
+            <a href="@Url.Action("Login", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/Administrator.svg" /> <br>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Administrator)
+            </a>
 
-<div class="row" id="panel-forma" data-target="#panel-forma" data-toogle="panel-overlay">
-    <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
-            <div class="list-group">
-                <!-- admin -->
-                <a href="@Url.Action("Login", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-globe"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Administrator)
-                </a>
+            <!-- company -->
+            <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/Company.svg" /> <br>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
+            </a>
 
-                <!-- company -->
-                <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
-                </a>
+            <!-- external user -->
+            @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
+                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
+                </a>*@
 
-                <!-- external user -->
-                @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
-                        <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
-                    </a>*@
+            <!-- person -->
+            <a href="@Url.Action("PersonLogin", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/Person.svg" /> <br>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
+            </a>
 
-                <!-- person -->
-                <a href="@Url.Action("PersonLogin", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
-                </a>
+            <!-- Not obliged to invoice -->
+            <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center active">
+                <img src="~/Content/img/login-icons/NotObligued.svg" /> <br>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
+            </a>
 
-                <!-- Not obliged to invoice -->
-                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center active" >
-                    <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
-                </a>
+            <!-- certificate -->
+            <a href="#" class="list-group-item text-center certificate-login-link">
+                <img src="~/Content/img/login-icons/Certificate.svg" /> <br>@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)
+            </a>
 
-                <!-- certificate -->
-                <a href="#" class="list-group-item text-center certificate-login-link">
-                    <h4 class="glyphicon glyphicon-star"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)
-                </a>
-
-                <a href="@Url.Action("SearchDocument", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-search"></h4><br />Documento
-                </a>
-            </div>
-        </div>
-        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab cardsLogin" style="display: none">
-
-            <div class="container-fluid" id="panel-form-login">
-                <center><a href="@Url.Action("NotObligedInvoice", "User")" ><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a></center>
-                <div class="row-fluid">
-                    <div class="card RadianCardContainer RadianCardContainerLogin" id="legalRepresentative">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/RepresentanteLegal.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Representante legal</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row-fluid">
-                    <div class="card RadianCardContainer RadianCardContainerLogin" id="authorizedUser">
-                        <div class="RadianImgContainer">
-                            <img class="RadianimgSvg" src="~/Content/images/Svg/UsuarioAutorizado.svg" />
-                        </div>
-                        <div class="card-body">
-                            <p class="RadianTittleCard">Usuario Autorizado</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- company section -->
-            <div class="companyLogin pxLogin">
-
-                @Html.Partial("_companyInvoiceLogin")
-            </div>
-            <!-- company section -->
-            <div class="userExLogin pxLogin">
-
-                @Html.Partial("_userexInvoiceLogin")
-            </div>
-
+            <a href="@Url.Action("SearchDocument", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/SearchDocument.svg" /> <br> Buscar Documento
+            </a>
         </div>
     </div>
-</div>
 
+    <div class="bhoechie-tab cardsLogin" style="display: none">
+        <div class="bhoechie-tab-content active" id="panel-form-login">
+            <span class="sub-title">Iniciar sesión</span>
+            <p class="mt-28">Selecciona una opción para continuar:</p>
+
+            <div id="menu-container">
+                <button class="menu-button" id="legalRepresentative">
+                    <img src="~/Content/img/login-icons/LegalRepresentative.svg" height="77" />
+                    Representante legal
+                </button>
+                <button class="menu-button" id="authorizedUser">
+                    <img src="~/Content/img/login-icons/AuthorizedUser.svg" height="77" />
+                    Usuario Autorizado
+                </button>
+            </div>
+        </div>
+
+        <!-- company section -->
+        <div class="companyLogin pxLogin">
+            @Html.Partial("_companyInvoiceLogin")
+        </div>
+        <!-- company section -->
+        <div class="userExLogin pxLogin">
+            @Html.Partial("_userexInvoiceLogin")
+        </div>
+
+    </div>
+</div>
 
 @section Scripts
 {
@@ -141,7 +127,7 @@
                 hideLoading("#panel-forma");
             }
             else {
-                
+
                     $(".pxLogin").hide();
 
                     $('.cCompany').click(function () {

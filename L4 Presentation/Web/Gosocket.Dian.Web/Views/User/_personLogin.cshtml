@@ -2,28 +2,26 @@
 @model UserLoginViewModel
 
 <div class="bhoechie-tab-content active">
-    <center>
-        <a href=""><img alt="Dian" src="../Content/img/LogoDian.png" width="180" class=""></a>
-        <form method="post" action="@Url.Action("PersonAuthentication","User")" style="margin-top: 20px;">
-            @Html.AntiForgeryToken()
-            @Html.HiddenFor(x => x.RecaptchaToken, new { id = "PersonRecaptchaToken", @class = "RecaptchaToken" })
-            <div class="form-group">
-                @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { id = "PersonIdentificationType", @class = "form-control selectpicker" })
-            </div>
-            <div class="form-group">
-                <div class="input-group">
-                    <div class="input-group-addon">
-                        <i class="fa fa-user-circle-o"></i>
-                    </div>
-                    @Html.TextBoxFor(m => m.PersonCode, new { @class = "form-control", placeholder = "Cédula del contribuyente", autocomplete = "off" })
-                </div>
-                @Html.ValidationMessageFor(m => m.PersonCode, "", new { @class = "text-danger text-left" })
-                @Html.ValidationMessageFor(m => m.PersonLoginFailed, "", new { @class = "text-danger text-left" })
-            </div>
+    <span class="sub-title">Iniciar sesión</span>
+    <p class="mt-28">Por favor diligencia los siguientes datos:</p>
 
-            <button class="btn btn-gosocket btn-lg btn-block" style="margin-top: 10px;">
-                <i class=""></i> Entrar
-            </button>
-        </form>
-    </center>
+    <form method="post" action="@Url.Action("PersonAuthentication","User")" style="margin-top: 20px;">
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.RecaptchaToken, new { id = "PersonRecaptchaToken", @class = "RecaptchaToken" })
+        <div class="form-group">
+            @Html.LabelFor(t => t.IdentificationType, new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.IdentificationType, new SelectList(Model.IdentificationTypes, "Id", "Description", Model.IdentificationType), new { id = "PersonIdentificationType", @class = "form-control selectpicker" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(t => t.PersonCode, new { @class = "control-label" })
+            @Html.TextBoxFor(m => m.PersonCode, new { @class = "form-control", placeholder = "Ingrese la identificación del contribuyente", autocomplete = "off" })
+            @Html.ValidationMessageFor(m => m.PersonCode, "", new { @class = "" })
+            @Html.ValidationMessageFor(m => m.PersonLoginFailed, "", new { @class = "" })
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 40px;">
+            Entrar
+        </button>
+    </form>
+
 </div>

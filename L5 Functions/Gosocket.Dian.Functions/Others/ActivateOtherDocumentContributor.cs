@@ -8,6 +8,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 using System;
+using System.Data.Entity.Core;
 using System.Globalization;
 
 namespace Gosocket.Dian.Functions.Others
@@ -51,6 +52,11 @@ namespace Gosocket.Dian.Functions.Others
 
                 try
                 {
+                    var contributor = contributorService.Get(requestObject.ContributorId);
+
+                    if (contributor == null)
+                        throw new ObjectNotFoundException($"Not found contributor with given id {requestObject.ContributorId}");
+
                     // Step 1  Validate OtherDocumentActivateContributor
                     EventGridEvent eventGridEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
                     requestObject = JsonConvert.DeserializeObject<OtherDocumentActivateContributorRequestObject>(eventGridEvent.Data.ToString());
@@ -106,6 +112,8 @@ namespace Gosocket.Dian.Functions.Others
 
                     try
                     {
+                        contributorService.Activate(contributor);
+
                         var guid = Guid.NewGuid().ToString();
                         contributorActivation = new GlobalContributorActivation(requestObject.Code.ToString(), guid)
                         {

@@ -14,16 +14,15 @@
 }
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Datos del modo de operación</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
+    <p class="sub-title mb-20">Datos del modo de operación</p>
 
-    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Modo de operación", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OperationModeName, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-12 col-xs-12 col-md-3 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Descripción", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.StatusDescription, defaultHtmlAttr)
@@ -31,39 +30,32 @@
     </div>
     @if (Model.EsSupportDocument && !Model.OperationModeIsFree)
     {
-        <div class="col-sm-12 col-xs-12 col-md-3 padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
-                @Html.Label("Fecha de inicio", new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.StartDate, "{0:dd/MM/yyyy hh:mm:ss tt}", defaultHtmlAttr)
-            </div>
-        </div>
-        <div class="col-sm-12 col-xs-12 col-md-3 padding-xs-0">
-            <div class="form-group">
-                @Html.Label("Fecha de terminación", new { @class = "control-label" })
-                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.EndDate, "{0:dd/MM/yyyy hh:mm:ss tt}", defaultHtmlAttr)
+                @Html.Label("Fecha de inicio - fecha de termino", new { @class = "control-label" })
+                @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.RangeDate, defaultHtmlAttr)
             </div>
         </div>
     }
 </div>
 @if ((Model.EsSupportDocument && !Model.OperationModeIsFree) || (Model.EsEquivalentDocument && Model.NumberingRange != null)) {
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Rango de numeración asignado</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
-
+    <p class="sub-title mb-20">Rango de numeración asignado</p>
+    
     <div class="row">
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Prefijo", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.Prefix, defaultHtmlAttr)
             </div>
         </div>
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Número de resolución", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.ResolucionNumber, defaultHtmlAttr)
             </div>
         </div>
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Rango desde", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.NumberFrom, defaultHtmlAttr)
@@ -72,19 +64,19 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Rango hasta", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.NumberTo, defaultHtmlAttr)
             </div>
         </div>
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Fecha desde", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.CreationDate, defaultHtmlAttr)
             </div>
         </div>
-        <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+        <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="form-group">
                 @Html.Label("Fecha hasta", new { @class = "control-label" })
                 @Html.TextBoxFor(m => m.NumberingRange.ExpirationDate, defaultHtmlAttr)
@@ -95,22 +87,21 @@
 }
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Información del Software</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
+    <p class="sub-title mb-20">Información del software</p>
 
-    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Identificación", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.Software.SoftwareId, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Nombre", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.Software.Name, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-12 col-xs-12 col-md-3  padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Pin", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.Software.Pin, defaultHtmlAttr)
@@ -119,22 +110,21 @@
 </div>
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
+    <p class="sub-title mb-20">Total de documentos requeridos</p>
 
-    <div class="col-sm-6 col-xs-12 col-md-2  padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Documentos  (Total)", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.TotalDocumentRequired, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label(Model.TitleDoc1, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsRequired, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentRequired, defaultHtmlAttr)
@@ -143,22 +133,21 @@
 </div>
 
 <div class="row">
-    <h4 class="panel-title-radian padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
-    <hr class="margin-5 margin-bottom-20" />
+    <p class="sub-title mb-20">Total de documentos aceptados requeridos</p>
 
-    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label("Documentos  (Total)", new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.TotalDocumentAcceptedRequired, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label(Model.TitleDoc1, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.OthersDocumentsAcceptedRequired, defaultHtmlAttr)
         </div>
     </div>
-    <div class="col-sm-6 col-xs-12 col-md-2 padding-xs-0">
+    <div class="col-sm-6 col-md-4 col-lg-3">
         <div class="form-group">
             @Html.Label(Model.TitleDoc2, new { @class = "control-label" })
             @Html.TextBoxFor(m => m.GTestSetOthersDocumentsResult.ElectronicPayrollAjustmentAcceptedRequired, defaultHtmlAttr)

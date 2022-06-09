@@ -239,6 +239,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var DocumentType = await cosmos.getDocumentType();
 			var tipoOper = await cosmos.getTipoOperacion();
 			var TipoOperacion = model.Elements(cbc + "CustomizationID");
+			var TipoDoc = model.Elements(cbc + "InvoiceTypeCode");
 			if (TipoOperacion.Any())
 				plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
 
@@ -402,7 +403,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 
 
-			if (TipoOperacion.FirstOrDefault().Value == "55")
+			if (TipoDoc.FirstOrDefault().Value == "55" || TipoDoc.FirstOrDefault().Value == "50") 
 			{
 				var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "Country").Elements(cbc + "Name");
 				if (AdquirientePais.Any())
@@ -475,8 +476,12 @@ namespace Gosocket.Dian.Functions.Pdf
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 			var cosmos = new CosmosDbManagerPayroll();
 			decimal subTotal = 0;
+			double subTotall = 0.0;
 			decimal DescDet = 0;
 			decimal RecDet = 0;
+			var subTotalTotal = "";
+			var descunetoTotal = "";
+			var recargoTotal = "";
 			foreach (var detalle in model)
 			{
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
@@ -487,11 +492,11 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
-                if (tipoD =="55")
+                if (tipoD =="55" || tipoD == "50")
                 {
 
 					ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");
-					IvaVal = decimal.Parse(ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value.ToString()).ToString("N0");
+					IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value.ToString();
 
 				}
 				var Desc = "";
@@ -509,16 +514,10 @@ namespace Gosocket.Dian.Functions.Pdf
 					else
 					{
 						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
-						if (tipoD == "55")
-                        {
-							
-							DescDet = decimal.Parse(item.Elements(cbc + "Amount").FirstOrDefault().Value.ToString());
-						}
-                        else
-                        {
 
-							DescDet = DescDet + decimal.Parse(Desc);
-                        }
+						descunetoTotal = Desc;
+						DescDet = DescDet + decimal.Parse(Desc);
+                        
 					}
 				}
 				var fechaPeriodo = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "StartDate");
@@ -532,7 +531,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
 
 				
-				if (tipoD == "50" || tipoD == "Nota" || tipoD == "27"|| tipoD == "32")
+				if ( tipoD == "Nota" || tipoD == "27"|| tipoD == "32")
 				{
 					rowDetalleProductosBuilder.Append($@"
                 <tr>
@@ -551,8 +550,9 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
 
 	            </tr>");
-				}else if(tipoD == "55")
+				}else if(tipoD == "55" || tipoD == "50")
 				{
+
 					rowDetalleProductosBuilder.Append($@"
 					 <tr>
 		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
@@ -560,14 +560,14 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{des2}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
-					<td class='text-right'>{decimal.Parse(Desc).ToString("N0"):n2}</td>
+                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()}</td>
+					<td class='text-right'>{Desc:n2}</td>
                     <td class='text-right'>{Reca:n2}</td>
 		            <td class='text-right'>{IvaVal:n2}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
+		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()}</td>
 
 					 </tr>");
 				}
@@ -592,25 +592,32 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 	            </tr>");
 				}
-				if(tipoD=="Nota")
+				string v1 = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString();
+				string v2 = detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value;
+				if (tipoD == "Nota")
 					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
 										decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value);
 				else
-					if (tipoD =="55")
-					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()) *
-										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString().Split('.')[0]);
+					if (tipoD == "55")
+					subTotalTotal = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount").FirstOrDefault().Value.ToString();
+
+
 				else
-						subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
-										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString());
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
+									decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString());
+					subTotall = subTotall + (Convert.ToDouble(v1) * Convert.ToDouble(v2));
+
 
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
             //var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
+			
 
-            if (tipoD =="55")
+			if (tipoD =="55" || tipoD == "50")
             {
-				plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString()).ToString("N0"));
-				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", decimal.Parse(DescDet.ToString()).ToString("N0"));
+				
+				plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotalTotal.ToString());
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", descunetoTotal.ToString());
 			}
             else
             {
@@ -898,14 +905,14 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TotalIVA = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");
 			var TotalNetoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxInclusiveAmount");//resta subtotal ? 
 			var TotalFactura = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "PayableAmount");//resta subtotal ? 
-			if (typeDocument.FirstOrDefault().Value =="55")
+			if (typeDocument.FirstOrDefault().Value =="55" || typeDocument.FirstOrDefault().Value == "50")
             {
 				TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
 				TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 																							
-				Html = Html.Replace("{TotalIVA}", (decimal.Parse(TotalIVA.FirstOrDefault().Value)).ToString("N0"));
-				Html = Html.Replace("{TotalBrutoDocumento}", decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value.ToString()).ToString("N0"));
-				Html = Html.Replace("{TotalNetoDocumento}", decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value.ToString()).ToString("N0"));
-				Html = Html.Replace("{TotalFactura}", decimal.Parse(TotalFactura.FirstOrDefault().Value.ToString()).ToString("N0"));
+				Html = Html.Replace("{TotalIVA}", TotalIVA.FirstOrDefault().Value.ToString());
+				Html = Html.Replace("{TotalBrutoDocumento}",TotalBrutoDocumento.FirstOrDefault().Value.ToString());
+				Html = Html.Replace("{TotalNetoDocumento}", TotalNetoDocumento.FirstOrDefault().Value.ToString());
+				Html = Html.Replace("{TotalFactura}", TotalFactura.FirstOrDefault().Value.ToString());
 			}
             else
             {

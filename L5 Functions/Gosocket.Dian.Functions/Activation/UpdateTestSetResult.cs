@@ -629,6 +629,7 @@ namespace Gosocket.Dian.Functions.Activation
                 }
                 else // Factura Electronica
                 {
+                    var notificationBell = new Utils.NotificationBell();
                     start = DateTime.UtcNow;
                     var validateFE = new GlobalLogger(globalTestSetTracking.TestSetId, "5 FacturaElectronica")
                     {
@@ -687,6 +688,9 @@ namespace Gosocket.Dian.Functions.Activation
                                 contributorService.SetToEnabled(contributor);
                                 var globalContributor = new GlobalContributor(contributor.Code, contributor.Code) { Code = contributor.Code, StatusId = contributor.AcceptanceStatusId, TypeId = contributor.ContributorTypeId };
                                 await contributorTableManager.InsertOrUpdateAsync(globalContributor);
+
+                                log.Info($"Se envia notificacion de usuario Habilitado... "+ contributor.Code);
+                                notificationBell.EventNotificationsAsync("03", contributor.Code);
                             }
 
                             var software = softwareService.Get(Guid.Parse(globalTesSetResult.SoftwareId));
@@ -736,6 +740,11 @@ namespace Gosocket.Dian.Functions.Activation
                                     throw;
                                 }
                             }
+                        }
+                        else if(globalTesSetResult.Status == (int)TestSetStatus.Rejected)
+                        {
+                            log.Info($"Se envia notificacion de rechazo set de pruebas... " + globalTestSetTracking.SenderCode);
+                            notificationBell.EventNotificationsAsync("02", globalTestSetTracking.SenderCode);
                         }
                     }
                 }              

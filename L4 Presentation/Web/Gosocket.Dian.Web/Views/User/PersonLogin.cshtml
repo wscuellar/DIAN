@@ -6,64 +6,57 @@
     ViewBag.Title = "Acceder";
     Layout = "~/Views/Shared/_LayoutNewLogin.cshtml";
 }
-<style>
-    .bhoechie-tab-menu {
-        padding: 0px !important;
-    }
-</style>
-<div class="row">
-    <div class="col-lg-6 col-md-6 col-sm-8 col-xs-9 bhoechie-tab-container">
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
-            <div class="list-group">
-                <!-- admin -->
-                <a href="@Url.Action("Login", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-globe"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Administrator)
-                </a>
 
-                <!-- company -->
-                <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-briefcase"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
-                </a>
+<div class="login-wrapper">
+    <div class="bhoechie-tab-menu">
+        <div class="list-group">
+            <!-- admin -->
+            <a href="@Url.Action("Login", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/Administrator.svg" /> <br> @Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Administrator)
+            </a>
 
-                <!-- external user -->
-                @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
-            <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
-        </a>*@
+            <!-- company -->
+            <a href="@Url.Action("CompanyLogin", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/Company.svg" /> <br> @Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Company)
+            </a>
 
-                <!-- person -->
-                <a href="#" class="list-group-item text-center active">
-                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
-                </a>
+            <!-- external user -->
+            @*<a href="@Url.Action("ExternalUserLogin", "User")" class="list-group-item text-center">
+                    <h4 class="glyphicon glyphicon-user"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.ExternalUser)
+                </a>*@
+
+            <!-- person -->
+            <a href="#" class="list-group-item text-center active">
+                <img src="~/Content/img/login-icons/Person.svg" /> <br> @Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Person)
+            </a>
 
 
-                <!-- Not obliged to invoice -->
-                <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-file"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
-                </a> 
+            <!-- Not obliged to invoice -->
+            <a href="@Url.Action("NotObligedInvoice","User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/NotObligued.svg" /> <br> @Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.NotObligedInvoice)
+            </a>
 
-                <!-- certificate -->
-                <a href="#" class="list-group-item text-center certificate-login-link">
-                    <h4 class="glyphicon glyphicon-star"></h4><br />@Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)
-                </a>
+            <!-- certificate -->
+            <a href="#" class="list-group-item text-center certificate-login-link">
+                <img src="~/Content/img/login-icons/Certificate.svg" /> <br> @Gosocket.Dian.Domain.Common.EnumHelper.GetEnumDescription(LoginType.Certificate)
+            </a>
 
-                <a href="@Url.Action("SearchDocument", "User")" class="list-group-item text-center">
-                    <h4 class="glyphicon glyphicon-search"></h4><br />Documento
-                </a>
-            </div>
-                </div>
-                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
-                    <!-- person section -->
-                    @Html.Partial("_personLogin")
-                </div>
-            </div>
+            <a href="@Url.Action("SearchDocument", "User")" class="list-group-item text-center">
+                <img src="~/Content/img/login-icons/SearchDocument.svg" /> <br> Buscar Documento
+            </a>
         </div>
+    </div>
+    <div class="bhoechie-tab">
+        <!-- person section -->
+        @Html.Partial("_personLogin")
+    </div>
+</div>
 
-
-        @section Scripts
+@section Scripts
         {
-            <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@ConfigurationManager.GetValue("Recaptcha")"></script>
 
-            <script>
+    <script>
 
                 $(document).ready(function () {
 
@@ -89,5 +82,5 @@
                     });
                 });
 
-            </script>
-        }
+    </script>
+}
