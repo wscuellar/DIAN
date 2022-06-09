@@ -8265,7 +8265,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             GlobalRadianOperations softwareProviderRadian = null;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateRequiredDocRadian"), out bool ValidateRequiredDocRadian);
+
             string rowKey = string.Empty;
             responses.Add(new ValidateListResponse
             {
@@ -8310,7 +8311,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         responses.Add(new ValidateListResponse
                                         {
                                             IsValid = false,
-                                            Mandatory = true,
+                                            Mandatory = ValidateRequiredDocRadian,
                                             ErrorCode = "LGC94",
                                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC94"),
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
