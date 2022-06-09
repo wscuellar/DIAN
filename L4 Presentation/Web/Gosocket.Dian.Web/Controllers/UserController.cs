@@ -1636,7 +1636,7 @@ namespace Gosocket.Dian.Web.Controllers
                     </p>    
                 </div>
                 ",
-                "PersonLoginFailed", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
 
         }
 
@@ -1801,7 +1801,7 @@ namespace Gosocket.Dian.Web.Controllers
                     </p>    
                 </div>
                 ", 
-                "PersonLoginFailed", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
 
         }
 
