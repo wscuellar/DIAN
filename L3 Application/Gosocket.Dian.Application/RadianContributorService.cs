@@ -322,26 +322,29 @@ namespace Gosocket.Dian.Application
 
                 }
 
-            List<RadianSoftware> softwares = _radianCallSoftwareService.List(competitor.ContributorId);
-            foreach (RadianSoftware software in softwares)
-            {
+            foreach(var radianContributorOperations in competitor.RadianContributorOperations)
+            {               
+
                 //Quita los software
-                _radianCallSoftwareService.DeleteSoftware(software.Id);
+                _radianCallSoftwareService.DeleteSoftwareCancelaRegistro(radianContributorOperations.SoftwareId);
 
                 //Quitar la operacion.
-                List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.SoftwareId == software.Id && !t.Deleted);
+                List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.SoftwareId == radianContributorOperations.SoftwareId 
+                && t.Id == radianContributorOperations.Id && t.RadianContributorId == competitor.Id);
                 foreach (RadianContributorOperation operation in operations)
                 {
                     operation.OperationStatusId = (int)RadianState.Cancelado;
                     operation.Deleted = true;
                     _radianContributorOperationRepository.Update(operation);
                 }
-            }
+
+            }           
         }
 
         public void UpdateRadianOperation(int radiancontributorId, int softwareType)
         {
-            List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
+            List<RadianContributorOperation> operations = _radianContributorOperationRepository.List(t => t.RadianContributorId == radiancontributorId 
+            && !t.Deleted && t.SoftwareType == softwareType && t.OperationStatusId == 1);
             foreach (RadianContributorOperation operation in operations)
             {
                 operation.OperationStatusId = (int)RadianState.Test;
