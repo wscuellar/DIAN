@@ -227,13 +227,7 @@
     </style>
 }
 <div class="page-content radian-view margin-20 margin-page-content">
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
-        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
-    </div>
+    
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
             <div class="padding-top-20">
@@ -242,49 +236,47 @@
                     {
                         <div class="form-group col-sm-4">
                             <label for="equivalentElectronicDocumentId" class="control-label">Tipo de documento</label>
-                            @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange="equivalentDocumentSelected(this)" })
+                            @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange = "equivalentDocumentSelected(this)" })
                         </div>
                     }
-                    <div id="steps-otherdocELectAssociate">
+                    <div>
                         <div class="radian-personal-info">
                             @Html.Partial("_personalInfo")
                         </div>
                         @if (Model.Step > 0)
                         {
                             <div class="panel-footer">
-                                <div class="row">
-                                    <div class="text-right">
+                                <button name="SubmitPrueba" id="btnDetalleSetPruebas"
+                                        class="btn btn-primary Set-Prueba mr-9">
+                                    Set de pruebas
+                                </button>
 
-                                        <button name="SubmitPrueba" id="btnDetalleSetPruebas"
-                                                class="margin-right-20 btn btn-radian-success Set-Prueba">
-                                            Set de pruebas
-                                        </button>
+                                <button type="button"
+                                        class="btn btn-secondary mr-9 @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
+                                        id="btnReiniciarSerPruebas">
+                                    Reiniciar SET de pruebas
+                                </button>
 
-                                        <button type="button"
-                                                class="btn btn-default btn-radian-default @(Model.Software.OtherDocElecSoftwareStatusName != "Rechazado" ? "disabled" : "")"
-                                                id="btnReiniciarSerPruebas">
-                                            Reiniciar SET de pruebas
-                                        </button>
-
-                                        <button type="button"
-                                                class="btn btn-default btn-radian-default btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
-                                                id="btnSincronizarAProduccion">
-                                            Sincronizar a Producción
-                                        </button>
-                                    </div>
-                                </div>
+                                <button type="button"
+                                        class="btn btn-secondary btn-sync-to-production @(((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.State == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true") ? "" : "disabled")"
+                                        id="btnSincronizarAProduccion">
+                                    Sincronizar a Producción
+                                </button>
                             </div>
                         }
+                        <!--
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Ingreso de solicitud</span></h3>
-                        <section>
-                        </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section>
-                        </section>
+                                    <h3></h3>
+                                        -->
 
-                        <h3></h3>
+
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
@@ -304,7 +296,9 @@
             </div>
 
         </div>
-
+        <div class="title-container" style="float: right;">
+            <div class="back-button btn btn-secondary"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })">Volver</a></div>
+        </div>
         @*Modal*@
 
 

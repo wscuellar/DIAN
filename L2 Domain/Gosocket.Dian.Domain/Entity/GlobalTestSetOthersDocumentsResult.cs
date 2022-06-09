@@ -5,18 +5,18 @@ namespace Gosocket.Dian.Domain.Entity
 {
     public class GlobalTestSetOthersDocumentsResult : TableEntity
     {
-        public GlobalTestSetOthersDocumentsResult(){   }
+        public GlobalTestSetOthersDocumentsResult() { }
 
-        public GlobalTestSetOthersDocumentsResult(string pk, string rk) : base(pk, rk)  { }
+        public GlobalTestSetOthersDocumentsResult(string pk, string rk) : base(pk, rk) { }
 
         public int OtherDocElecContributorId { get; set; }
         public string SenderCode { get; set; }
         public string SoftwareId { get; set; }
         public string ContributorTypeId { get; set; }
-        public string OperationModeId { get; set; } 
+        public string OperationModeId { get; set; }
         public string OperationModeName { get; set; }
         public int ElectronicDocumentId { get; set; }
-        public int ProviderId { get; set; } 
+        public int ProviderId { get; set; }
 
         //OthersDocuments
         public int OthersDocumentsRequired { get; set; }
@@ -42,7 +42,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         //TotalDocument
         public int TotalDocumentAcceptedRequired { get; set; }
-        public int TotalDocumentRequired { get; set; } 
+        public int TotalDocumentRequired { get; set; }
         public int TotalDocumentSent { get; set; }
         public int TotalDocumentAccepted { get; set; }
         public int TotalDocumentsRejected { get; set; }
@@ -57,6 +57,7 @@ namespace Gosocket.Dian.Domain.Entity
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string RangeDate => (StartDate.HasValue && EndDate.HasValue) ? $"{StartDate:dd/MM/yyyy hh:mm:ss tt} - {EndDate:dd/MM/yyyy hh:mm:ss tt}" : "";
 
         public int? EquivalentElectronicDocumentId { get; set; }
     }

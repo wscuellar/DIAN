@@ -55,6 +55,10 @@
     <Reference Include="ExpressiveAnnotations.MvcUnobtrusive, Version=2.5.4.0, Culture=neutral, PublicKeyToken=d3e372f3c1e83cec, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\ExpressiveAnnotations.2.9.6\lib\net45\ExpressiveAnnotations.MvcUnobtrusive.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\packages\Ionic.Zip.1.9.1.8\lib\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AI.DependencyCollector, Version=2.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.9.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
     </Reference>
@@ -462,6 +466,8 @@
     <Content Include="Content\crush-page\img\city-img.png" />
     <Content Include="Content\crush-page\img\crush-bg.png" />
     <Content Include="Content\crush-page\img\gosign-img.png" />
+    <Content Include="Content\css\navbar-new-style.css" />
+    <Content Include="Content\css\app-new-style.css" />
     <Content Include="Content\css\bootstrap-grid.css" />
     <Content Include="Content\css\bootstrap-grid.min.css" />
     <Content Include="Content\css\bootstrap-reboot.css" />
@@ -477,6 +483,7 @@
     <Content Include="Content\css\gosocket\gosocket.css" />
     <Content Include="Content\css\gosocket\typeahead.css" />
     <Content Include="Content\css\loaders.css" />
+    <Content Include="Content\css\login-new-styles.css" />
     <Content Include="Content\css\login.css" />
     <Content Include="Content\css\nifty.css" />
     <Content Include="Content\css\nifty.min.css" />
@@ -568,6 +575,15 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\fonts\glyphicons.css" />
     <Content Include="Content\fonts\glyphicons.min.css" />
+    <Content Include="Content\font\custom\fa-arrow-left.svg" />
+    <Content Include="Content\font\custom\fa-edit.svg" />
+    <Content Include="Content\font\custom\fa-eye.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-danger.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-success.svg" />
+    <Content Include="Content\font\custom\fa-info-circle-warn.svg" />
+    <Content Include="Content\font\custom\fa-info-circle.svg" />
+    <Content Include="Content\font\custom\fa-toggle-off.svg" />
+    <Content Include="Content\font\custom\fa-toggle-on.svg" />
     <Content Include="Content\images\aproved.png" />
     <Content Include="Content\images\bandera-1.png" />
     <Content Include="Content\images\Bandera-2.png" />
@@ -576,6 +592,9 @@
     <Content Include="Content\images\download.png" />
     <Content Include="Content\images\edit.png" />
     <Content Include="Content\images\exclamation-circle.png" />
+    <Content Include="Content\images\icon-check-confirmation.svg" />
+    <Content Include="Content\images\icon-warning-warn.svg" />
+    <Content Include="Content\images\icon-warning.svg" />
     <Content Include="Content\images\ingreso-1.png" />
     <Content Include="Content\images\ingreso-2.png" />
     <Content Include="Content\images\ingreso-3.png" />
@@ -659,12 +678,41 @@
     <Content Include="Content\img\bg-img\thumbs\bg-img-7.jpg" />
     <Content Include="Content\img\bg-img\thumbs\bg-trns.jpg" />
     <Content Include="Content\img\caracol-television.png" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Documento electrónico para no obligado a facturar-68.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Documento electrónico para no obligado a facturar-white-73.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Documentos equivalentes-70.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Documentos equivalentes-white-75.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Eventos RADIAN-69.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Eventos RADIAN-white-74.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Factura electrónica-66.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Factura electrónica-white-71.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina electrónica-67.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina electrónica-white-72.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina Participantes\Emisor-76.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina Participantes\Emisor-white-83.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina Participantes\Proveedor de servicios-78.svg" />
+    <Content Include="Content\img\Catálogo\Documentos electrónicos\Nómina Participantes\Proveedor de servicios-WHITE-79.svg" />
+    <Content Include="Content\img\Catálogo\User ícon-62.svg" />
+    <Content Include="Content\img\Catálogo\Ventanas emergentes\Habilitar transmisión-82.svg" />
+    <Content Include="Content\img\Catálogo\Ventanas emergentes\Proceso como Emisor-81.svg" />
+    <Content Include="Content\img\Catálogo\Ventanas emergentes\Proceso de habilitación-80.svg" />
     <Content Include="Content\img\Clariant - Copy.png" />
     <Content Include="Content\img\Clariant.png" />
     <Content Include="Content\img\clariant2.png" />
+    <Content Include="Content\img\colombia_marca.png" />
     <Content Include="Content\img\customer-service-icon-png-9.png" />
     <Content Include="Content\img\DHL_logo.png" />
+    <Content Include="Content\img\Documento soporte para NO OFE icono principal_Mesa de trabajo 1 copia 2.svg" />
     <Content Include="Content\img\edelpa.png" />
+    <Content Include="Content\img\electronic-document-icons\documento-soporte-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\documentos-equivalentes-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\eventos-radian-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\factura-electronica-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-electronica-icon.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-participante-emisor.svg" />
+    <Content Include="Content\img\electronic-document-icons\nomina-proveedor-servicios-tecnologicos.svg" />
+    <Content Include="Content\img\Facebook.svg" />
+    <Content Include="Content\img\Factura electrónica ícono principal_Mesa de trabajo 1.svg" />
     <Content Include="Content\img\favicon.ico" />
     <Content Include="Content\img\favicon_dian.ico" />
     <Content Include="Content\img\favicon_dian_old.ico" />
@@ -676,21 +724,80 @@
     <Content Include="Content\img\gadgetsbanner.png" />
     <Content Include="Content\img\Gadloading.png" />
     <Content Include="Content\img\Gosocket-logo.png" />
+    <Content Include="Content\img\Gov.co.png" />
+    <Content Include="Content\img\Instagram.svg" />
+    <Content Include="Content\img\LinkedIn.svg" />
+    <Content Include="Content\img\lateral-menu-icons\createUser.svg" />
+    <Content Include="Content\img\lateral-menu-icons\freeSolution.svg" />
+    <Content Include="Content\img\lateral-menu-icons\hamburguerMenu.svg" />
+    <Content Include="Content\img\lateral-menu-icons\history.svg" />
+    <Content Include="Content\img\lateral-menu-icons\home.svg" />
+    <Content Include="Content\img\lateral-menu-icons\participants.svg" />
+    <Content Include="Content\img\lateral-menu-icons\registrationAndAuthorization.svg" />
+    <Content Include="Content\img\lateral-menu-icons\settings.svg" />
     <Content Include="Content\img\loader.gif" />
+    <Content Include="Content\img\login-icons\Administrator.svg" />
+    <Content Include="Content\img\login-icons\AuthorizedUser.svg" />
+    <Content Include="Content\img\login-icons\Company.svg" />
+    <Content Include="Content\img\login-icons\Certificate.svg" />
+    <Content Include="Content\img\login-icons\LegalRepresentative.svg" />
+    <Content Include="Content\img\login-icons\NotObligued.svg" />
+    <Content Include="Content\img\login-icons\Person.svg" />
+    <Content Include="Content\img\login-icons\SearchDocument.svg" />
+    <Content Include="Content\img\Login\Administrator Color-19.svg" />
+    <Content Include="Content\img\Login\Administrator White-25.svg" />
+    <Content Include="Content\img\Login\Buscar documento Color-24.svg" />
+    <Content Include="Content\img\Login\Buscar documento White-30.svg" />
+    <Content Include="Content\img\Login\Certificado Color-23.svg" />
+    <Content Include="Content\img\Login\Certificado White-29.svg" />
+    <Content Include="Content\img\Login\Empresa Color-20.svg" />
+    <Content Include="Content\img\Login\Empresa White-26.svg" />
+    <Content Include="Content\img\Login\No Obligatorio Color-22.svg" />
+    <Content Include="Content\img\Login\No Obligatorio White-28.svg" />
+    <Content Include="Content\img\Login\Persona Color-21.svg" />
+    <Content Include="Content\img\Login\Persona White-27.svg" />
+    <Content Include="Content\img\Login\Subopciones\Representante Legal Color-31.svg" />
+    <Content Include="Content\img\Login\Subopciones\Representante Legal White-33.svg" />
+    <Content Include="Content\img\Login\Subopciones\Usuario Autorizado Color-32.svg" />
+    <Content Include="Content\img\Login\Subopciones\Usuario Autorizado White-34.svg" />
     <Content Include="Content\img\logo.png" />
     <Content Include="Content\img\LogoDian.png" />
     <Content Include="Content\img\LogoDian_Old.png" />
     <Content Include="Content\img\logoejemplogadget.png" />
     <Content Include="Content\img\logoNoSlogan.png" />
     <Content Include="Content\img\logo_slogan.png" />
+    <Content Include="Content\img\Menu\Configuración-58.svg" />
+    <Content Include="Content\img\Menu\Configuración-white-61.svg" />
+    <Content Include="Content\img\Menu\Crear usuario-56.svg" />
+    <Content Include="Content\img\Menu\Crear usuario-White-57.svg" />
+    <Content Include="Content\img\Menu\Hamburguer icon-63.svg" />
+    <Content Include="Content\img\Menu\Histórico-64.svg" />
+    <Content Include="Content\img\Menu\Histórico-White-53.svg" />
+    <Content Include="Content\img\Menu\Inicio-49.svg" />
+    <Content Include="Content\img\Menu\Inicio-White-48.svg" />
+    <Content Include="Content\img\Menu\participantes-54.svg" />
+    <Content Include="Content\img\Menu\participantes-White-55.svg" />
+    <Content Include="Content\img\Menu\Registro y habilitación-50.svg" />
+    <Content Include="Content\img\Menu\Registro y habilitación-White-52.svg" />
+    <Content Include="Content\img\Menu\Solución Gratuita-61.svg" />
+    <Content Include="Content\img\Menu\Solución Gratuita-white-65.svg" />
+    <Content Include="Content\img\Minhacienda_Logo.png" />
     <Content Include="Content\img\mrgo.png" />
     <Content Include="Content\img\mrgodiamond.png" />
     <Content Include="Content\img\no_logo.png" />
+    <Content Include="Content\img\Nómina electrónica ícono principal_Mesa de trabajo 1 copia.svg" />
     <Content Include="Content\img\payme-logo.png" />
+    <Content Include="Content\img\Phone 3column.svg" />
     <Content Include="Content\img\photo_01.jpg" />
     <Content Include="Content\img\promociones_bolsandwich2015.jpg" />
     <Content Include="Content\img\servipag.jpg" />
     <Content Include="Content\img\sii.png" />
+    <Content Include="Content\img\Sistema_Facturacion_Logo.png" />
+    <Content Include="Content\img\social-icons\Facebook.svg" />
+    <Content Include="Content\img\social-icons\Instagram.svg" />
+    <Content Include="Content\img\social-icons\LinkedIn.svg" />
+    <Content Include="Content\img\social-icons\Twitter.svg" />
+    <Content Include="Content\img\social-icons\YouTube.svg" />
     <Content Include="Content\img\staroff.png" />
     <Content Include="Content\img\staron.png" />
     <Content Include="Content\img\test-offer\aztec.jpg" />
@@ -703,6 +810,8 @@
     <Content Include="Content\img\thumbs\img1.jpg" />
     <Content Include="Content\img\thumbs\img2.jpg" />
     <Content Include="Content\img\thumbs\img3.jpg" />
+    <Content Include="Content\img\Twitter.svg" />
+    <Content Include="Content\img\user-icon.svg" />
     <Content Include="Content\img\valorem.png" />
     <Content Include="Content\img\video-overlay.png" />
     <Content Include="Content\img\video-visa.png" />
@@ -710,6 +819,7 @@
     <Content Include="Content\img\video_advance.png" />
     <Content Include="Content\img\visa.png" />
     <Content Include="Content\img\walmart.png" />
+    <Content Include="Content\img\YouTube.svg" />
     <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\jquery-ui.structure.css" />
     <Content Include="Content\jquery-ui.theme.css" />
@@ -2718,7 +2828,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Layout_v1.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
@@ -2977,6 +3087,11 @@
     <Content Include="Views\Contributor\RegisterNoOfe.cshtml" />
     <Content Include="Views\Contributor\_noOfeObligation.cshtml" />
     <Content Include="Views\Shared\_LoadingPage.cshtml" />
+    <Content Include="Views\Shared\_header.cshtml" />
+    <Content Include="Views\Shared\_footer.cshtml" />
+    <Content Include="Views\Shared\_ConfirmModal.cshtml" />
+    <Content Include="Views\Shared\_LoadingPage.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Contributor\_defaultNoOFE.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

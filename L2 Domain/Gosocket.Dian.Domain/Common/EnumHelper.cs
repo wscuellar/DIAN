@@ -495,7 +495,8 @@ namespace Gosocket.Dian.Domain.Common
         Person = 3,
         [Description("Usuario Registrado")]
         ExternalUser = 4,
-        [Description("No obligados a Facturar")]
+        //[Description("No obligados a Facturar")]
+        [Description("No Obligatorio")]
         NotObligedInvoice = 5,
 
     }

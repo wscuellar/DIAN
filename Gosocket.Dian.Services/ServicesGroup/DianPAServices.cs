@@ -1363,7 +1363,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             try
             {
                 var authEntity = GetAuthorization(accountCode, authCode);
-                if (authEntity != null && authEntity.PartitionKey != accountCodeT)
+                var authCodeNew = authCode?.Trim().Substring(0, authCode.Trim().Length - 1);
+                if (authEntity != null && authEntity.PartitionKey != accountCodeT && authCodeNew != accountCodeT)
                 {
                     verificationResult.OperationCode = "401";
                     verificationResult.OperationDescription = $"NIT: {authCode} del certificado no autorizado para consultar rangos de numeración asociados del NIT: {accountCodeT}";
@@ -1789,6 +1790,15 @@ namespace Gosocket.Dian.Services.ServicesGroup
             timer.Start();
 
             var user = GetGlobalContributor(authCode);
+
+            var authorization = GetAuthorization(nit, authCode);
+
+            if(authorization is null)
+            {
+                dianResponse.StatusCode = "89";
+                dianResponse.StatusDescription = "Usted no está autorizado para realizar esta operación.";
+                return dianResponse;
+            }
 
             var request = new BulkDocumentDownloadRequest(user.Code, email, nit, startDate, endDate, documentGroup);
             var response = ApiHelpers.ExecuteRequest<BulkDocumentDownloadResponse>(ConfigurationManager.GetValue("BulkDocumentsDownloadUrl"), request);

@@ -16,16 +16,12 @@
         <div class="row margin-horizontal-0">
             <div class="tab-base">
                 <!--Tabs Content-->
-                <div class="tab-content padding-0">
+                <div class="tab-content transparency">
                     <div id="tab-current-country" class="tab-pane fade active in">
 
-                        <div class="panel" id="panel-wrapper" data-target="#panel-wrapper">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">@ViewBag.Title</h3>
-                            </div>
-
+                        <div class="panel" id="panel-wrapper" data-target="#panel-wrapper" style="background-color: #ffffff00;">
                             <div class="panel-body padding-top-20">
-                                <div class="pad-btm padding-bottom-0">
+                                <div class="pad-btm">
                                     <div class="row margin-horizontal-0">
                                         @using (Html.BeginForm("Export", "Document", FormMethod.Post, new { id = "export-form" }))
                                         {
@@ -42,7 +38,7 @@
                                                 <div class="col-md-12 padding-horizontal-0">
                                                     <div id="document-list" class="panel panel-bordered-dian">
 
-                                                        <div class="panel-body padding-20 padding-bottom-0">
+                                                        <div class="panel-body padding-20">
                                                             <div class="row">
 
                                                                 @if (User.IsInAnyRole("Administrador", "Super"))
@@ -66,7 +62,7 @@
                                                                     <div class="form-group">
                                                                         <label class="control-label">Rango de fechas</label>
                                                                         <div class="form-group">
-                                                                            <div class="btn btn-default col-sm-12" id="export-range">
+                                                                            <div class="form-control col-sm-12" id="export-range">
                                                                                 <i class="icon-calendar"></i>&nbsp;
                                                                                 <span class="thin uppercase hidden-xs"></span>&nbsp;
                                                                                 <i class="fa fa-angle-down"></i>
@@ -93,17 +89,29 @@
                                                             <br />
                                                             @if (User.IsInAnyRole("Administrador", "Super"))
                                                             {
-                                                                <label class="control-label">*   Se exportarán un  máximo de @Model.AmountAdmin documentos.</label>
+                                                        <div class="dian-alert dian-alert-info" style="width:40%;">
+                                                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                                                            <p>
+                                                                Se exportarán un  máximo de @Model.AmountAdmin documentos.
+                                                            </p>
+                                                        </div>                                                              
+       
                                                             }
                                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                                             {
-                                                                <label class="control-label">*   Se exportarán un  máximo de @Model.AmountContributor1 documentos.</label>
+                                                        <div class="dian-alert dian-alert-info" style="width:40%;">
+                                                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                                                            <p>
+                                                                Se exportarán un  máximo de @Model.AmountAdmin documentos.
+                                                            </p>
+                                                        </div>
+                                                                                                                                
                                                             }
 
                                                         </div>
 
-                                                        <div class="panel-footer-grey text-right">
-                                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-export-excel"><i class="fa fa-file-excel-o"></i>&nbsp;&nbsp;Exportar Excel</button>
+                                                        <div class="panel-footer-grey text-center">
+                                                            <button type="button" class="btn btn-success btn-radian-success btn-export-excel">Exportar Excel</button>
                                                         </div>
 
                                                     </div>

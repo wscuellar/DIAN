@@ -8,7 +8,7 @@
 
 <style>
 
-    .form-control {
+    /*.form-control {
         border-radius: 4px;
         height: 43px !important;
         border: 1px solid #CCCCCC;
@@ -17,23 +17,21 @@
     .title-container {
         margin-bottom: 50px !important;
         margin-top: 30px !important;
-    }
+    }*/ 
 </style>
 
 <div class="page-content margin-15">
 
     <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-        <div class="underline-title"></div>
+      
     </div>
+
 
     <div class="row margin-horizontal-0">
         <div class="tab-base">
-            <div class="tab-content padding-0">
+            <div class="tab-content padding-0" style="border-radius: 20px !important; background-color: #ffffff00 !important; ">
                 <div id="tab-current-country" class="tab-pane fade active in">
-                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" >
+                    <div id="divMain" class="panel" data-target="#divMain" data-toggle="panel-overlay" style="background: transparent;">
                         <div class="panel-body padding-top-20">
                             <div class="pad-btm padding-bottom-0">
                                 <div class="row margin-horizontal-0">
@@ -76,7 +74,7 @@
 
                                                     </div>
 
-                                                    <div class="panel-footer-grey text-right submit-container">
+                                                    <div class="text-center submit-container" style="padding:20px;">
                                                         <button type="submit" class="btn btn-success btn-radian-success">Buscar</button>
                                                     </div>
 
@@ -92,9 +90,9 @@
 
                         </div>
 
-                        <div class="row margin-horizontal-0 text-right buttons-freebiller">
+                        <div class="row margin-horizontal-0 text-left buttons-freebiller">
                             <button id="btnProfile" type="button" class="btn btn-success btn-radian-success">Crear Perfil</button>
-                            <button id="btnUser" type="button" class="btn btn-success btn-radian-success">Crear Usuario</button>
+                            <button id="btnUser" type="button" class="btn btn-success" style="border: 2px solid #41D78C; ">Crear Usuario</button>
                         </div>
 
                     </div>

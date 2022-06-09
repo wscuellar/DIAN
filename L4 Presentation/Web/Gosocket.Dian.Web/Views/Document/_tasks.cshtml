@@ -3,7 +3,7 @@
 @model Gosocket.Dian.Web.Models.ExportDocumentTableViewModel
 
 <div class="table-responsive padding-bottom-15">
-    <table colspan="12" class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table colspan="12" class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th>Fecha</th>
@@ -14,9 +14,9 @@
                     <th>Grupo</th>
                 }
                 <th>Tipo</th>
-                <th class="text-right">Total</th>
-                <th class="text-center">Estado</th>
-                <th class="text-right">Acciones</th>
+                <th class="text-left">Total</th>
+                <th class="text-left">Estado</th>
+                <th class="text-left">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@
             {
                 <tr style="background-color: transparent !important;">
                     <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
-                        <div class="alert panel-footer-grey">
+                        <div class="alert dataTables_empty">
                             Ninguna tarea de exportación disponible para mostrar.
                         </div>
                     </td>
@@ -80,29 +80,29 @@
                         <td>@t.FilterGroup</td>
                     }
                     <td><i class="fa fa-@iconTypeClass"></i> @t.TypeDescription</td>
-                    <td class="text-right">@t.TotalResult</td>
-                    <td class="text-center">
+                    <td class="text-left">@t.TotalResult</td>
+                    <td class="text-left">
                         <i class="fa fa-@statusIcon fa-lg text-@textClass add-tooltip"
                            title="@t.StatusDescription" data-html="true" data-original-title="@t.StatusDescription"></i>
                     </td>
-                    <td class="text-right">
+                    <td class="text-left">
                         @if (t.Status == (int)ExportStatus.InProcess)
                         {
-                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="#"
+                            <a class="btn btn-xs btn-hover-gosocket add-tooltip" href="#"
                                title="Cancelar" data-html="true" data-original-title="Cancelar">
                                 <i class="fa fa-remove"></i>
                             </a>
                         }
                         @if (t.Status == (int)ExportStatus.OK)
                         {
-                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="@Url.Action("DownloadExportedZipFile", new { pk = t.PartitionKey, rk = t.RowKey })"
+                            <a class="btn btn-xs btn-hover-gosocket add-tooltip" href="@Url.Action("DownloadExportedZipFile", new { pk = t.PartitionKey, rk = t.RowKey })"
                                title="Descargar" data-html="true" data-original-title="Descargar">
                                 <i class="fa fa-download"></i>
                             </a>
                         }
                         @if (t.Status == (int)ExportStatus.Cancelled || t.Status == (int)ExportStatus.Error)
                         {
-                            <a class="btn btn-default btn-hover-gosocket add-tooltip" href="#"
+                            <a class="btn btn-xs btn-hover-gosocket add-tooltip" href="#"
                                title="Eliminar" data-html="true" data-original-title="Eliminar">
                                 <i class="fa fa-trash"></i>
                             </a>

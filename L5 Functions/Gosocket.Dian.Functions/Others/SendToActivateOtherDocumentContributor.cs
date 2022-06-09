@@ -101,6 +101,10 @@ namespace Gosocket.Dian.Functions.Others
 
                     SetLogger(results, "Step STA-5.1", " -- OtherDocumentActivationRequest -- ", "SEND-09");
 
+                    SetLogger(results, "Step STA-5.1.1", $" -- Activate Contributor Entity {{contributorId:{contributor.Id}, Status:{contributor.AcceptanceStatusId}, ContributorTypeId:{contributor.ContributorTypeId}}}-- ", "SEND-09.1");
+
+                    contributorService.SetToEnabled(contributor);
+
                     SetLogger(null, "Step STA-6", " -- OtherDocElecContributor -- " +
                                             otherDocElecContributor.ContributorId + " "
                                             + otherDocElecContributor.OtherDocElecContributorTypeId + " "

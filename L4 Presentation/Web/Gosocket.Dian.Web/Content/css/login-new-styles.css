@@ -1,0 +1,89 @@
+﻿.list-group {
+    width: 155px;
+}
+
+.list-group-item {
+    height: 95px;
+    border-color: #DCDCDC;
+}
+
+.list-group-item:hover,
+.list-group-item.active {
+    font-weight: bold;
+    color: #fff !important;
+    border: 0 !important;
+    background: linear-gradient(90deg, rgba(32,203,169,1) 0%, rgba(29,181,217,1) 100%) !important;
+}
+
+.list-group-item.active::after {
+    border-left-color: rgba(29,181,217,1) !important;
+}
+
+.list-group-item:hover img,
+.list-group-item.active img {
+    filter: invert(1) brightness(10);
+}
+
+.list-group-item img {
+    height: 40px;
+}
+
+.bhoechie-tab-menu {
+    /****/
+}
+.bhoechie-tab {
+    width: 588px;
+}
+.bhoechie-tab-content {
+    padding: 57px 73px 50px 66px!important;
+    background: #f6f7f9 !important;
+}
+.login-wrapper {
+    width: 743px;
+    margin: 40px auto 0;
+    background: #f6f7f9 !important;
+    display: flex;
+}
+.login-wrapper p {
+    font-family: 'Ubuntu';
+}
+
+button.menu-button {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    /*box-shadow: 0px 3px 6px rgb(0 0 0 / 16%);*/
+    width: 205px;
+    height: 205px;
+    padding: 30px;
+    font-family: 'Ubuntu';
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 26px;
+    text-align: center;
+    color: #2B323D;
+}
+
+    button.menu-button img {
+        display: block;
+        margin: 0 auto 12px;
+    }
+
+    button.menu-button:hover {
+        background: linear-gradient(90deg, #41D78C, #00B4DC);
+        color: #fff;
+    }
+
+    button.menu-button:hover img {
+        filter: invert(1) brightness(10);
+    }
+
+#menu-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.no-flex {
+    display: block;
+}

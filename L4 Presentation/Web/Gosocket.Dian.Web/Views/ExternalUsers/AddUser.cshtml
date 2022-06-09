@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
 
 @{
-    ViewBag.Title = "Crear usuario";
+    ViewBag.Title = ViewBag.txtAccion;
 }
 
 @section css
@@ -128,19 +128,62 @@
     </style>
 }
 
+
+<style>
+    input[type="checkbox"] {
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* For iOS < 15 to remove gradient background */
+        background-color: #fff !important;
+        /* Not removed via appearance */
+        margin: 0 !important;
+        appearance: none !important;
+        background-color: #fff !important;
+        margin: 0 !important;
+        font: inherit !important;
+        color: currentColor !important;
+        width: 2em !important;
+        height: 2em !important;
+        border: 0.15em solid #41D78C !important;
+        border-radius: 0.15em !important;
+        transform: translateY(-0.075em) !important;
+        margin: 10px !important;
+        display: grid !important;
+        place-content: center !important;
+        outline: none !important;
+        border-radius: 5px !important;
+    }
+
+
+        input[type="checkbox"]:checked {
+            border: 1px solid white !important;
+            background: #41D78C !important;
+            border-radius: 5px !important;
+        }
+
+            input[type="checkbox"]:checked::after {
+                font-family: 'FontAwesome' !important;
+                /*  content:'';*/
+                font-weight: 400 !important;
+                content: "\F00C" !important;
+                color: white !important;
+                /*
+    width:5px;
+    height:4px;
+    display:block;
+    background:black;*/
+            }
+</style>
+
+
 <div class="page-content margin-15">
-    <div class="row title-container" style="margin-left: 1px;">
-        <p class="title-view">
-            @ViewBag.txtAccion
-        </p>
-        <div class="underline-title"></div>
-    </div>
     <div class="row margin-horizontal-0 margin-top-35">
-        <div class="panel">
+        <div class="panel" style="border-radius: 5px;">
 
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel margin-bottom-0" style="box-shadow: none;">
                         @using (Html.BeginForm("AddUser", "ExternalUsers", FormMethod.Post, new { id = "add-user-form" }))
                         {
                             @Html.HiddenFor(m => m.Id)
@@ -151,35 +194,43 @@
                             <input type="hidden" id="hddPermissionsAsigned" name="hddPermissionsAsigned"
                                    value="@(ViewBag.PermissionList != null ? Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.PermissionList) : null)" />
 
+                            <div class="row margin-left-20 margin-right-20">
+                                <h4 class="panel-title-radian padding-0">
+                                    <strong> Datos de usuario </strong>
+                                </h4>
+                                @*<hr class="margin-5 margin-bottom-20" />*@
+                            </div>
+
                             @Html.Partial("_userForm")
 
+
+                            <div class="row margin-left-20 margin-right-20">
+                                <hr class="margin-5 margin-bottom-20" />
+                            </div>
                             <div id="IdSinPermisos" class="text-center text-danger"></div>
 
 
                             <div class="row margin-left-20 margin-right-20">
-                                <h4 class="panel-title-radian padding-0">Permisos</h4>
-                                <hr class="margin-5 margin-bottom-20" />
+                                <h4 class="panel-title-radian padding-0"><strong>Permisos</strong></h4>
+                                @*<hr class="margin-5 margin-bottom-20" />*@
                             </div>
                             <div class="panel-body padding-top-0">
                                 @foreach (Gosocket.Dian.Web.Models.MenuViewModel menu in ((List<Gosocket.Dian.Web.Models.MenuViewModel>)ViewBag.Menu))
                                 {
-                                    <div id="@("divMenu" + menu.Id)" class="col-xs-2 col-md-2">
+                                    <div class="col-md-1" style="width:4%">
+                                        @if (!string.IsNullOrEmpty(menu.Icon))
+                                        {
+                                            <img src="@menu.Icon" />
+                                        }
+                                    </div>
+                                    <div id="@("divMenu" + menu.Id)" class="col-xs-2 col-md-2 form-group">
                                         <div class="form-group form-check" style="margin-bottom: 0px;">
                                             <table>
                                                 <tr>
                                                     <td>
                                                         <input type="checkbox" class="form-check-input" id="@("chkMenu" + menu.Id)" onchange="changeAllMenu(@menu.Id)" title="@menu.Title" />
-                                                    </td>
-                                                    @if (!string.IsNullOrEmpty(menu.Icon))
-                                                    {
-                                                        <td class="menuIcon">
-
-                                                            <i class="@menu.Icon"></i>
-
-                                                        </td>
-                                                    }
                                                     <td>
-                                                        <label class="form-check-label lblOptions" for="@("chkMenu" + menu.Id)" title="@menu.Title">@menu.Name</label>
+                                                        <label class="form-check-label lblOptions" for="@("chkMenu" + menu.Id)" title="@menu.Title"><strong> @menu.Name</strong></label>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -202,18 +253,6 @@
                                         }
                                     </div>
                                 }
-                            </div>
-                            <div class="panel-footer footerRectangle text-right">
-                                @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-                                    <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-                                    <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
-                                <div class="footerRectangle">
-                                    <a href="/ExternalUsers/AddUser" class="btn btn-default btn-radian-default cancel-register">Cancelar</a>
-                                    <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-success btn-hover-gosocket btn-radian-success">
-                                        @ViewBag.txtAccion
-                                    </button>
-
-                                </div>
                             </div>
 
 
@@ -244,10 +283,10 @@
                                                     <br />
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="submit" class="btn btn-hover-gosocket btn-default-gosocket pull-right btn-save" style="margin-right:10px">Aceptar</button>
+                                                    <button type="submit" class="btn btn btn-primary btn-hover-gosocket btn-default-gosocket pull-right btn-save" style="margin-right:10px">Aceptar</button>
                                                 </div>
                                                 <div class="col-md-6 col-lg-6 col-xs-6">
-                                                    <button type="button" class="btn btn-success btn-hover-gosocket btn-radian-success" style="margin-left:10px" data-dismiss="modal" aria-label="Close">
+                                                    <button type="button" class="btn btn-secondary btn-hover-gosocket btn-radian-success" style="margin-left:10px" data-dismiss="modal" aria-label="Close">
                                                         Cancelar
                                                     </button>
                                                 </div>
@@ -299,28 +338,43 @@
                 </div>
 
             </div>
+        </div>
+        <div class="footerRectangle" style="background-color: none !important;">
+            @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
+                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+            <div class="footerRectangle">
+                <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-primary ">
+                    @ViewBag.txtAccion
+                </button>
+                @Html.ActionLink("Salir", "AddUser", new { id = "" }, new { @class = "btn btn-secondary" })
+                @*<a href="/ExternalUsers/AddUser" class="btn btn-default btn-radian-default cancel-register">Cancelar</a>*@
+            </div>
+        </div>
+        <div class="panel" style="border-radius: 5px; background-color: initial;">
             @if (Model.Id == null || Model.Id == "")
             {
 
-                <div class="panel-body padding-top-20">
+                <div class="panel-body" style="background-color: initial; padding: 0px; margin-top: 10px;">
                     <div class="row">
                         <div class="col-lg-12  col-md-12  col-xs-12">
-                            <h4> Usuarios Configurados</h4>
+                            <h4 class="subtitle-view" style="margin-bottom:20px;"><strong> Usuarios Configurados</strong></h4>
+
                         </div>
-                        <div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-                        </div>
-                        <div class="col-lg-offset-1 col-md-offset-1  col-lg-10 col-md-10  col-xs-12">
+                        @*<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
+                            </div>*@
+                        <div class="col-lg-12 col-md-12  col-xs-12">
                             <div class="table-responsive">
 
-                                <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
                                     <thead>
                                         <tr>
                                             <th class="text-left">Nombre</th>
-                                            <th class="text-center">Número de documento</th>
-                                            <th class="text-center">Fecha de creación</th>
-                                            <th class="text-center">Fecha última modificación</th>
-                                            <th class="text-center">Estado</th>
-                                            <th class="text-center">Acciones</th>
+                                            <th class="text-left">Número de documento</th>
+                                            <th class="text-left">Fecha de creación</th>
+                                            <th class="text-left">Fecha última modificación</th>
+                                            <th class="text-left">Estado</th>
+                                            <th class="text-left">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -345,18 +399,18 @@
                                                     <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
                                                     <td class="text-center">
 
-                                                        @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })
+                                                        <button class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Editar usuario">    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })</button>
                                                         &nbsp;
-
-                                                        @if (item.Active == 1)
-                                                        {
-                                                            <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
-                                                        }
-                                                        else
-                                                        {
-                                                            <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
-                                                        }
-
+                                                        <button class="btn add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Activar / Desactivar usuario" style="background:white;">
+                                                            @if (item.Active == 1)
+                                                            {
+                                                                <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
+                                                            }
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             }
@@ -765,8 +819,6 @@
         function HideModalAfilmacion() {
             $("#ModalGenerico").modal('hide');
         }
-
-
 
     </script>
 }

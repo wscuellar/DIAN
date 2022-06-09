@@ -7,49 +7,69 @@
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel">
-            <div class="panel-heading">
-                <h3 class="panel-title">@ViewBag.Title</h3>
-            </div>
+        
+        <div class="panel" style="background: transparent;">
+
 
             <div class="panel-body padding-top-20">
-                <div class="row margin-horizontal-0">
+                <div class="row margin-horizontal-0" style="margin-bottom: 30px;">
 
-                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Pending)
-                    {
-                        <div class="alert custom-alert-primary margin-bottom-5">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, su estado de solicitud se encuentra pendiente de autorización.<br />
-                        </div>
-                    }
+                  
 
-                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Authorized)
-                    {
-                        <div class="alert custom-alert-success margin-bottom-5">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, su estado de solicitud se encuentra autorizado.<br />
-                        </div>
-                    }
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0" style="box-shadow: none; padding: 20px;">
+                        @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Pending)
+                        {
+                            <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;">
+                                <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                                <p style="margin: 0px 40px;">Estimado contribuyente, su estado de solicitud se encuentra pendiente de autorización.</p>
+                            </div>
 
-                    @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Rejected)
-                    {
-                        <div class="alert custom-alert-danger margin-bottom-5">
-                            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                            Estimado contribuyente, su estado de solicitud se encuentra rechazado.<br />
-                            Observación: <strong>@Model.Observations</strong>
-                        </div>
-                    }
+                            <!-- <div class="alert custom-alert-primary margin-bottom-5">
+            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+            Estimado contribuyente, su estado de solicitud se encuentra pendiente de autorización.<br />
+        </div>-->
+                        }
 
-                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                            @using (Html.BeginForm("RequestAuthorization", "BigContributor", FormMethod.Post, new { id = "request-authorization-form" }))
-                            {
-                                @Html.AntiForgeryToken()
-                                @Html.Partial("_form")
-                                <div class="panel-footer text-right">
-                                    <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Enviar</button>
-                                </div>
-                            }
-                        </div>
+                        @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Authorized)
+                        {
+                            <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;">
+                                <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                                <p style="margin: 0px 40px;">Estimado contribuyente, su estado de solicitud se encuentra autorizado.</p>
+                            </div>
+
+                            <!-- <div class="alert custom-alert-success margin-bottom-5">
+            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+            Estimado contribuyente, su estado de solicitud se encuentra autorizado.<br />
+        </div>-->
+                        }
+
+                        @if (Model.AuthorizationRequestAlreadyExist && Model.StatusCode == (int)BigContributorAuthorizationStatus.Rejected)
+                        {
+                            <div class="dian-alert dian-alert-info" style="width: 50%; display: inline-block; margin: 20px;">
+                                <h4 style="display: flex;align-content: center;flex-direction: row;align-items: center;"><i class="fa fa-info-circle" style="margin-right: 15px;"></i><b>Importante!</b></h4>
+                                <p style="margin: 0px 40px;">
+                                    Estimado contribuyente, su estado de solicitud se encuentra rechazado.<br />
+                                    Observación: <strong>@Model.Observations</strong>
+                                </p>
+                            </div>
+
+                            <!--<div class="alert custom-alert-danger margin-bottom-5">
+            <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
+            Estimado contribuyente, su estado de solicitud se encuentra rechazado.<br />
+            Observación: <strong>@Model.Observations</strong>
+        </div>
+            -->
+                        }
+
+                        @using (Html.BeginForm("RequestAuthorization", "BigContributor", FormMethod.Post, new { id = "request-authorization-form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Partial("_form")
+                            <div class="panel-footer text-left">
+                                <button type="button" class="btn btn-primary btn-hover-gosocket btn-save">Enviar</button>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 @if (Model.Trackings.Any())

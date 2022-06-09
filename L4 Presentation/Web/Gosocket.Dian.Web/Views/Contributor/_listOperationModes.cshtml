@@ -2,23 +2,22 @@
 @using Gosocket.Dian.Web.Utils
 @using Gosocket.Dian.Infrastructure
 <div class="panel-heading">
-    <h3 class="panel-title padding-0">Listado de modos de operación asociados</h3>
-    <hr class="margin-0" />
+    <h3 class="panel-title padding-0" style="margin-top:20px;">Listado de modos de operación asociados</h3>
 </div>
 
 <div class="table-responsive padding-top-15">
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th>Modo de operación</th>
-                <th class="text-center">Registro</th>
+                <th class="text-left">Registro</th>
                 <th>Estado</th>
                 <th>Software</th>
                 <th>Id</th>
                 <th>Pin</th>
                 <th>URL</th>
-                <th class="text-center">Rangos de prueba</th>
-                <th class="text-center">Acciones</th>
+                <th class="text-left">Rangos de prueba</th>
+                <th class="text-left">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -65,16 +64,16 @@
                     <td>
                         <a>@ConfigurationManager.GetValue("WebServiceUrl")</a>
                     </td>
-                    <td class="text-center">
-                        <a href="@Url.Action("ListTests", "NumberRange", new { contributorId = Model.Id, operationModeId = contributorOperation.OperationModeId })" class="text-center" data-index-contributorOperations="@contributorOperation.Id" data-index-operationModeId="@contributorOperation.OperationModeId" onclick="redirectToTestNumberRange(this);"> <i class="fa fa-list add-tooltip" data-original-title="Rangos de numeración de pruebas"></i></a>
+                    <td class="text-left">
+                        <a href="@Url.Action("ListTests", "NumberRange", new { contributorId = Model.Id, operationModeId = contributorOperation.OperationModeId })" class="btn btn-xs" data-index-contributorOperations="@contributorOperation.Id" data-index-operationModeId="@contributorOperation.OperationModeId" onclick="redirectToTestNumberRange(this);"> <i class="fa fa-tasks add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Rangos de numeración de pruebas"></i></a>
                     </td>
-                    <td class="text-center">
+                    <td class="text-left">
                         @{var softwareId = contributorOperation.SoftwareId != null ? contributorOperation.SoftwareId.ToString() : ConfigurationManager.GetValue("BillerSoftwareId");}
                         @if (contributorOperation.StatusId != 1)
                         {
                             <a href="javascript:void(0)" class="text-center" data-index-contributorOperations="@contributorOperation.Id" onclick="removeLine(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar modo de operación"></i></a>
                         }
-                        <a href="@Url.Action("View", "TestSet", new { operationModeId = contributorOperation.OperationModeId, contributorId = Model.Id, contributorCode = Model.Code, softwareId = @softwareId})" class="text-center"> <i class="fa fa-tasks  add-tooltip" data-original-title="Detalles de set de pruebas"></i></a>
+                        <a href="@Url.Action("View", "TestSet", new { operationModeId = contributorOperation.OperationModeId, contributorId = Model.Id, contributorCode = Model.Code, softwareId = @softwareId})" class="btn btn-xs"> <i class="fa fa-eye add-tooltip" style="color:#262944 !important" data-tooltip="tooltip" data-placement="top" title="Detalles de set de pruebas"></i></a>
                     </td>
                 </tr>
             }
