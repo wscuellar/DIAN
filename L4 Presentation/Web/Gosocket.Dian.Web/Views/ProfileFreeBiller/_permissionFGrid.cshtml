@@ -16,9 +16,56 @@
         electronicDocumentId = ViewBag.DocElectronicDocument;
     }
 }
+
+<style>
+    input[type="checkbox"] {
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* For iOS < 15 to remove gradient background */
+        background-color: #fff !important;
+        /* Not removed via appearance */
+        margin: 0 !important;
+        appearance: none !important;
+        background-color: #fff !important;
+        margin: 0 !important;
+        font: inherit !important;
+        color: currentColor !important;
+        width: 2em !important;
+        height: 2em !important;
+        border: 0.15em solid #41D78C !important;
+        border-radius: 0.15em !important;
+        transform: translateY(-0.075em) !important;
+        margin: 10px !important;
+        display: grid !important;
+        place-content: center !important;
+        outline: none !important;
+        border-radius: 5px !important;
+    }
+
+
+        input[type="checkbox"]:checked {
+            border: 1px solid white !important;
+            background: #41D78C !important;
+            border-radius: 5px !important;
+        }
+
+            input[type="checkbox"]:checked::after {
+                font-family: 'FontAwesome' !important;
+                /*  content:'';*/
+                font-weight: 400 !important;
+                content: "\F00C" !important;
+                color: white !important;
+                /* 
+    width:5px;
+    height:4px;
+    display:block;
+    background:black;*/
+            }
+</style>
+
 <div>
-    <h3 class="panel-title-radian padding-0">Permisos</h3>
-    <hr class="margin-0 margin-bottom-10" />
+    <h3 class="panel-title-radian padding-0">Permisos</h3>    
 </div>
 @if (User.ContributorTypeId() != 4)
 {
@@ -27,16 +74,16 @@
         if (@operationMode == 1)
         {
             <div>
-                <div>
-                    <em class="fa fa-file-text-o fa-5x" aria-hidden="true"></em>                 
-                    <h5>Factura Electrónica</h5>
+                <div class="col-sm-3" style="display: inline-flex; justify-content: flex-start; flex-direction: row; align-items: center; border: 2px solid #E2E7EB; padding: 15px; margin: 0px 20px 0px 0px;">
+                    <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" width="60" />
+                    <h5 style="margin-left:20px;">Factura Electrónica</h5> <i class="fa fa-chevron-right" style="margin: 0px 0px 0px auto; color: #41D78C;"></i>
                 </div>
                 <div class="row checks-group">
                     @foreach (var menuMain in Model.MenuOptionsByProfile)
                     {
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -79,7 +126,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -116,7 +163,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -154,92 +201,93 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
-                                <div class="level-1">
+                <div class="col-sm-2">
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Nueva Plantilla" && subMenuItems.SeccionOptions == "PermisosPerfil")
+                            {
+                                <div class="level-2">
                                     <div>
-
+                                        <span class="subTitleMenu">@subMenuItems.Name</span>
                                     </div>
-                                    @foreach (var subMenuItems in menuMain.Children)
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
                                     {
-                                        if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Nueva Plantilla" && subMenuItems.SeccionOptions == "PermisosPerfil")
+                                        if (subSubMenuItems.ParentId == 11 && subSubMenuItems.SeccionOptions == "PermisosFactura")
                                         {
-                                            <div class="level-2">
-                                                <div>
-                                                    <span class="subTitleMenu">@subMenuItems.Name</span>
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
                                                 </div>
-                                                @foreach (var subSubMenuItems in subMenuItems.Children)
-                                                {
-                                                    if (subSubMenuItems.ParentId == 11 && subSubMenuItems.SeccionOptions == "PermisosFactura")
-                                                    {
-                                                        <div class="level-3">
-                                                            <div class="row-cols-1">
-                                                                <div class="form-group d-flex margin-0">
-                                                                    <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
-                                                                    <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    }
-
-                                                }
                                             </div>
                                         }
+
                                     }
                                 </div>
-                            </div>
+                            }
+                        }
+                    </div>
+                    <div class="level-1">
+                        <div>
+
+                        </div>
+                        @foreach (var subMenuItems in menuMain.Children)
+                        {
+                            if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Operaciones" && subMenuItems.SeccionOptions == "PermisosPerfil")
+                            {
+                                <div class="level-2">
+                                    <div>
+                                        <span class="subTitleMenu" style="margin-top: 15px; margin-bottom: 15px;">@subMenuItems.Name</span>
+                                    </div>
+                                    @foreach (var subSubMenuItems in subMenuItems.Children)
+                                    {
+                                        if (subSubMenuItems.ParentId == 12 && subSubMenuItems.SeccionOptions == "PermisosFactura")
+                                        {
+                                            <div class="level-3">
+                                                <div class="row-cols-1">
+                                                    <div class="form-group d-flex margin-0">
+                                                        <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
+                                                        <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Plantillas" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
-                                <div class="level-1">
-                                    <div>
+                            <div class="col-sm-2">
 
-                                    </div>
-                                    @foreach (var subMenuItems in menuMain.Children)
-                                    {
-                                        if (subMenuItems.MenuLevel == 2 && subMenuItems.Name == "Operaciones" && subMenuItems.SeccionOptions == "PermisosPerfil")
-                                        {
-                                            <div class="level-2">
-                                                <div>
-                                                    <span class="subTitleMenu">@subMenuItems.Name</span>
-                                                </div>
-                                                @foreach (var subSubMenuItems in subMenuItems.Children)
-                                                {
-                                                    if (subSubMenuItems.ParentId == 12 && subSubMenuItems.SeccionOptions == "PermisosFactura")
-                                                    {
-                                                        <div class="level-3">
-                                                            <div class="row-cols-1">
-                                                                <div class="form-group d-flex margin-0">
-                                                                    <input type="checkbox" id="@subSubMenuItems.Id" name="ValuesSelected" value="@menuMain.Id,@subMenuItems.Id,@subSubMenuItems.Id" />
-                                                                    <label for="@subSubMenuItems.Id" class="label-check">@subSubMenuItems.Name</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    }
-
-                                                }
-                                            </div>
-                                        }
-                                    }
-                                </div>
                             </div>
                         }
                     }
                 </div>
             </div>
             <br />
-            <hr />
+            
             <div>
-                <div>
-                    <em class="fa fa-calculator fa-4x" aria-hidden="true"></em>
-                    <h5>Nómina Electrónica</h5>
+                <div class="col-sm-3" style="display: inline-flex; justify-content: flex-start; flex-direction: row; align-items: center; border: 2px solid #E2E7EB; padding: 15px; margin: 0px 20px 0px 0px;">
+                    <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" width="60" />
+                    <h5 style="margin-left:20px;">Nómina Electrónica</h5> <i class="fa fa-chevron-right" style="margin: 0px 0px 0px auto; color: #41D78C;"></i>
                 </div>
                 <div class="row checks-group">
                     @foreach (var menuMain in Model.MenuOptionsByProfile)
                     {
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -278,7 +326,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -314,7 +362,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -353,20 +401,18 @@
                 </div>
             </div>
             <br />
-            <hr />
+            
             <div>
-                <div>
-                    <em class="fa fa-pencil-square-o fa-4x" aria-hidden="true"></em>
-                    <h5>Documento soporte en adquisiciones</h5>
-                    <h5>efectuadas a sujetos no obligados a </h5>
-                    <h5>expedir factura</h5>
+                <div class="col-sm-3" style="display: inline-flex; justify-content: flex-start; flex-direction: row; align-items: center; border: 2px solid #E2E7EB; padding: 15px; margin: 0px 20px 0px 0px;">
+                    <img src="~/Content/img/electronic-document-icons/documento-soporte-icon.svg" width="60" />
+                    <h5 style="margin-left:20px;">Documento soporte en adquisiciones efectuadas a sujetos no obligados a expedir factura</h5><i class="fa fa-chevron-right" style="margin: 0px 0px 0px auto; color: #41D78C;"></i>
                 </div>
                 <div class="row checks-group">
                     @foreach (var menuMain in Model.MenuOptionsByProfile)
                     {
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Facturación" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -404,7 +450,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Documentos" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
@@ -440,7 +486,7 @@
                         }
                         if (menuMain.MenuLevel == 1 && menuMain.Children.Count > 0 && menuMain.Name == "Configuración" && menuMain.SeccionOptions == "PermisosPerfil")
                         {
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="level-1">
                                     <div>
 
