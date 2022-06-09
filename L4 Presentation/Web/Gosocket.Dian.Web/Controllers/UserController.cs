@@ -1517,7 +1517,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if ((contributorInvoice.ContributorTypeId != '1' || contributorInvoice.ContributorTypeId != 1) && contributorInvoice.AcceptanceStatusId == 4)
+            if ((/*contributorInvoice.ContributorTypeId != '4' || */ contributorInvoice.ContributorTypeId != 4) && contributorInvoice.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
