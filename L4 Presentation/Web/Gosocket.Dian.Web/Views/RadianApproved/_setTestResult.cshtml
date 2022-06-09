@@ -32,7 +32,6 @@
         <p class="title-view">
             @ViewBag.title
         </p>
-        <div class="underline-title"></div>
         @if (Model.RadianState == "Habilitado")
         {
             using (Html.BeginForm("GetFactorOperationMode", "RadianApproved", FormMethod.Post))
@@ -60,13 +59,11 @@
     <div class="row margin-horizontal-0">
         <div class="panel">
             <div class="panel-body padding-top-20">
-                <div class="row warning-wrapper">
-                    <div class="col-sm-1 icon-warning">
-                        <i class="fa fa-exclamation-circle"></i>
-                    </div>
-                    <div class="col-sm-11">
-                        <span class="warning-title">¡Importante!</span>
+                <div class="row">
+                    <div class="dian-alert dian-alert-warning">
+                        <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
                         <p>
+                            <strong>¡Importante!</strong> <br>
                             Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuenta <b>@status</b>.<br>
                             Usted debe proporcinar el identificador del set de pruebas (TestSetld) <b>@Model.RadianTestSetResult.Id</b> en el web service  para el envío de su set de pruebas.
                         </p>
@@ -80,7 +77,7 @@
                 }
 
             <div class="row margin-horizontal-0">
-                @using (Html.BeginForm("SetTestDetails", "RadianApproved", FormMethod.Post, new { @class = "setTestForm" }))
+                @using (Html.BeginForm("SetTestDetails", "RadianApproved", FormMethod.Post, new { @class = "" }))
                 {
                     @Html.HiddenFor(m => m.Nit);
                     @Html.HiddenFor(m => m.RadianState);
@@ -91,17 +88,16 @@
                     @Html.HiddenFor(m => m.RadianContributorTypeId);
                     @Html.Hidden("SoftwareT", Model.SoftwareType);
 
-                    <div class="row">
-                        <h4 class="panel-title-radian padding-0"><strong>Datos del modo operación</strong></h4>
-                        <hr class="margin-5" />
-
+                    <div class="row" style="padding: 20px 20px 0px 20px;">
+                        <h4 class="sub-title padding-0"><strong>Datos del modo operación</strong></h4>
+                        
                         <div class="col-sm-3 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Seleccione el modo de operación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.OperationModeName, defaultHtmlAttr)
                             </div>
                         </div>
-                        <div class="col-sm-9 padding-xs-0">
+                        <div class="col-sm-3 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Descripción", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.RadianTestSetResult.StatusDescription, defaultHtmlAttr)
@@ -109,23 +105,22 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <h4 class="panel-title-radian padding-0"><strong>Información del software</strong></h4>
-                        <hr class="margin-5" />
-
-                        <div class="col-sm-2 padding-xs-0">
+                    <div class="row" style="padding: 20px 20px 0px 20px;">
+                        <h4 class="sub-title padding-0"><strong>Información del software</strong></h4>
+                        
+                        <div class="col-sm-3 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Identificación", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.Software.Id, defaultHtmlAttr)
                             </div>
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
+                        <div class="col-sm-3 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("Nombre", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.Software.Name, defaultHtmlAttr)
                             </div>
                         </div>
-                        <div class="col-sm-8 padding-xs-0">
+                        <div class="col-sm-3 padding-xs-0">
                             <div class="form-group">
                                 @Html.Label("PIN", new { @class = "control-label" })
                                 @Html.TextBoxFor(m => m.Software.Pin, defaultHtmlAttr)
@@ -134,298 +129,287 @@
                     </div>
 
                     @* Required *@
-                    <div class="row">
-                        <h4 class="panel-title-radian padding-0"><strong>Total de documentos requeridos</strong></h4>
-                        <hr class="margin-5" />
+            <div class="row" style="padding: 20px 20px 0px 20px;">
+                <h4 class="sub-title padding-0"><strong>Total de documentos requeridos</strong></h4>
 
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.TotalDocumentRequired, new { @class = "control-label claseLabel" })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.TotalDocumentRequired, "", new { @class = "text-danger" })
-                            </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.TotalDocumentRequired, new { @class = "control-label claseLabel" })
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired).ToString()) })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, "", new { @class = "text-danger" })
-                            </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.TotalDocumentRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired).ToString()) })
                         </div>
-                        <div class="col-sm-2 padding-xs-0 ">
-                            <div class="form-group">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired).ToString()) })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, "", new { @class = "text-danger" })
-                            </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptNoticeTotalRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0 ">
+                    <div class="form-group">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired).ToString()) })
+                        </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptServiceTotalRequired, "", new { @class = "text-danger" })
+                    </div>
 
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired).ToString()) })
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired).ToString()) })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, "", new { @class = "control-label" })
-                            </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group ">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired).ToString()) })
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group ">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired).ToString()) })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, "", new { @class = "control-label" })
-                            </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        <div class="">
+                            @Html.LabelFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired).ToString()) })
                         </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                <div class="">
-                                    @Html.LabelFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired).ToString()) })
-                                </div>
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, "", new { @class = "control-label" })
-                            </div>
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.RejectInvoiceTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.GuaranteeTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndMandateTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndMandateTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndMandateTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        <div>
+                            @Html.LabelFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired).ToString()) })
+                            @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, defaultHtmlAttr)
+                            @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, "", new { @class = "control-label" })
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.GuaranteeTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.GuaranteeTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ElectronicMandateTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndMandateTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndMandateTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndMandateTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementPropertyTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                <div>
-                                    @Html.LabelFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired).ToString()) })
-                                    @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, defaultHtmlAttr)
-                                    @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementCancellationTotalRequired, "", new { @class = "control-label" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.PaymentNotificationTotalRequired, "", new { @class = "control-label" })
                     </div>
-                    <div class="row">
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.CirculationLimitationTotalRequired, "", new { @class = "control-label" })
                     </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementProcurementTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ApplicationAvailableTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReportForPaymentTotalRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+            </div>
+
 
                     @* Accept *@
-                    <div class="row">
-                        <h4 class="panel-title-radian padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
-                        <hr class="margin-5" />
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, "", new { @class = "text-danger" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, "", new { @class = "control-label" })
+            <div class="row" style="padding: 20px 20px 0px 20px;">
+                <h4 class="sub-title padding-0"><strong>Total de documentos aceptados requeridos</strong></h4>
 
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.TotalDocumentAcceptedRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptNoticeTotalAcceptedRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReceiptServiceTotalAcceptedRequired, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ExpressAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.AutomaticAcceptanceTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.RejectInvoiceTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.GuaranteeTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ElectronicMandateTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndMandateTotalAcceptedRequired, "", new { @class = "control-label" })
 
                     </div>
-                    <div class="row">
-
-
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
-                        <div class="col-sm-2 padding-xs-0">
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired).ToString()) })
-                                @Html.TextBoxFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, defaultHtmlAttr)
-                                @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, "", new { @class = "control-label" })
-                            </div>
-                        </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementPropertyTotalAcceptedRequired, "", new { @class = "control-label" })
                     </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementCancellationTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.PaymentNotificationTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.CirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementGuaranteeTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndorsementProcurementTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.EndCirculationLimitationTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ApplicationAvailableTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-sm-3 padding-xs-0">
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired).ToString()) })
+                        @Html.TextBoxFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, defaultHtmlAttr)
+                        @Html.ValidationMessageFor(m => m.RadianTestSetResult.ReportForPaymentTotalAcceptedRequired, "", new { @class = "control-label" })
+                    </div>
+                </div>
+            </div>
 
-                    <div class="panel-footer text-right">
+                    <div class="panel-footer text-left">
                         <button type="submit" class="btn btn-success btn-radian-success">Detalles</button>
                     </div>
                 }

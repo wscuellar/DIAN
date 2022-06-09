@@ -6,7 +6,17 @@
 @{
     ViewBag.Title = "Inicio";
 }
-
+<style>
+    .modal-header:after {
+    border:none !important;
+    }
+    .modal-content {
+    padding:0px 20px;
+    }
+    .modal-body {
+    padding:0px 0px 0px 10px;
+    }
+</style>
 <div id="page-content" data-target="#page-content" data-toggle="panel-overlay" style="padding:0;">
     <div class="row margin-horizontal-0">
 
@@ -363,20 +373,20 @@
 
         function showRegisterProductionDateModal() {
             bootbox.dialog({
-                title: "Registrar fecha de inicio salida a producción",
+                title: "<h4 class='sub-title padding-0'><strong>Registrar fecha de inicio salida a producción</strong></h4>",
                 message: "<div class='row'>" +
                             "<div class= 'col-md-12'>" +
                                 "<form class= 'form-horizontal' >" +
-                                    "<div class='form-group'>" +
-                                        "<label class='col-md-4 control-label' for='name'>Habilitación</label>" +
-                                        "<div class='col-md-4'>" +
+                                    "<div>" + 
+                    "<div class='col-md-11' style='padding: 0px 0px 0px 10px;'>" +
+                    "<label class='col-md-4 control-label' for='name'>Habilitación</label>" +
                                             "<input id='habilitationDate' name='habilitationDate' type='text' value='@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")' class='form-control input-md' readonly>" +
                                                 "<span class='help-block'><small>Fecha de habilitación</small></span>" +
                                         "</div>" +
                                     "</div>" +
-                                    "<div class='form-group'>" +
-                                        "<label class='col-md-4 control-label' for='name'>Producción</label>" +
-                                        "<div class='col-md-4'>" +
+                                    "<div>" +                                        
+                    "<div class='col-md-11' style='padding: 0px 0px 0px 10px;'>" +
+                    "<label class='col-md-4 control-label' for='name'>Producción</label>" +
                                             "<input id='productionDate' name='productionDate' type='text' value='@DateTime.UtcNow.ToString("dd-MM-yyyy")' class='form-control input-md'>" +
                                             "<span class='help-block'><small>Fecha inicio real producción</small></span>" +
                                         "</div>" +
@@ -387,7 +397,7 @@
                 buttons: {
                     del: {
                         label: "Aceptar",
-                        className: "btn-gosocket",
+                        className: "btn btn-success btn-radian-success",
                         callback: function () {
                             showConfirmSetProductionDate();
                         }
@@ -400,15 +410,16 @@
             var habilitationDate = $("#habilitationDate").val();
             var productionDate = $("#productionDate").val();
             bootbox.dialog({
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'><strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong></h4>" +
+                message: "<div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div>" +
+                    "<div class='media'><div style='padding: 10px 80px 20px 80px;'>" +
+                    "<h4 class='title' style='font-size:21px !important;line-height:24px !important;text-align:center !important;margin-bottom: 20px !important;'><strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong></h4>" +
                     "Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<br>" +
                     "</div></div>",
-                title: "Advertencia",
+                title: "<h4 class='sub-title padding-0'><strong>Advertencia</strong></h4>",
                 buttons: {
                     del: {
                         label: "Aceptar",
-                        className: "btn-gosocket",
+                        className: "btn btn-success btn-radian-success",
                         callback: function () {
                             setProductionDate(habilitationDate, productionDate);
                         }

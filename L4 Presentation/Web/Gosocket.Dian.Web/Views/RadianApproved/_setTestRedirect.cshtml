@@ -1,5 +1,5 @@
 ﻿@model Gosocket.Dian.Web.Models.RadianApproved.RadianApprovedViewModel
-<div class="panel-body">
+<div class="panel-body" style="background: white;">
     <div class="row">
         @using (Html.BeginForm("GetSetTestResult", "RadianApproved", FormMethod.Post))
         {
@@ -17,7 +17,7 @@
             @Html.HiddenFor(m => m.ContributorId);
             @Html.HiddenFor(m => m.SoftwareType);
 
-            <div class="text-right">
+            <div class="text-left">
                 <button type="submit" class="btn btn-success btn-radian-success">Set de pruebas</button>
             </div>
         }

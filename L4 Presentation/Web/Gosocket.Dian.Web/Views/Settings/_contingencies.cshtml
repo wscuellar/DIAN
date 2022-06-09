@@ -2,7 +2,7 @@
 @model Gosocket.Dian.Web.Models.ContingencyTableViewModel
 
 <div id="table-contingencies" class="table-responsive" data-target="#table-contingencies" data-toggle="panel-overlay">
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         <thead>
             <tr>
                 <th class="text-center" nowrap>Estado</th>
@@ -24,9 +24,9 @@
                     <td class="text-left text-nowrap"><a>@c.EndDateString</a></td>
                     <td class="text-nowrap"><a>@c.Reason</a></td>
                     <td class="text-center">
-                        <a href="@Url.Action("ChangeStatusContingency","Settings", new {pk = c.PartitionKey, rk = c.RowKey })" class="btn btn-default btn-hover-gosocket btn-sm add-tooltip" data-toggle="tooltip" data-original-title="@(c.Active ? "Desactivar" : "Activar")"><i class="fa @(c.Active ? "fa-pause" : "fa-play") fa-1"></i> @(c.Active ? "Desactivar" : "Activar")</a>
-                        <a href="@Url.Action("EditContingency","Settings", new {pk = c.PartitionKey, rk = c.RowKey })" class="btn btn-default btn-hover-gosocket btn-sm  add-tooltip" data-toggle="tooltip" data-original-title="Editar"><i class="fa fa-edit fa-1"></i> Editar</a>
-                        <button class="delete-btn btn btn-default btn-hover-gosocket btn-sm add-tooltip" data-pk="@c.PartitionKey" data-rk="@c.RowKey" data-toggle="tooltip" data-original-title="Eliminar"> <i class="fa fa-trash fa-1"></i> Eliminar</button>
+                        <a href="@Url.Action("ChangeStatusContingency","Settings", new {pk = c.PartitionKey, rk = c.RowKey })" class="btn btn-xs add-tooltip" data-toggle="tooltip" data-original-title="@(c.Active ? "Desactivar" : "Activar")"><i class="fa @(c.Active ? "fa-pause" : "fa-play") fa-1"></i></a>
+                        <a href="@Url.Action("EditContingency","Settings", new {pk = c.PartitionKey, rk = c.RowKey })" class="btn btn-xs add-tooltip" data-toggle="tooltip" data-original-title="Editar"><i class="fa fa-pencil"></i></a>
+                        <button class="btn btn-xs add-tooltip" data-pk="@c.PartitionKey" data-rk="@c.RowKey" data-toggle="tooltip" data-original-title="Eliminar"> <i class="fa fa-trash fa-1"></i></button>
                     </td>
                 </tr>
             }
