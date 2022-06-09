@@ -19,6 +19,15 @@
             break;
     }
 }
+<style>
+    .steps.clearfix {
+        display: none;
+        
+    }
+    #steps-approved .content {
+        min-height: 20em !important;
+    }
+</style>
 <div class="page-content radian-view margin-20">
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
@@ -43,7 +52,7 @@
                                     @Html.Partial("_personalInfo")
                                 </div>
                             </div>
-                            <div class="panel-footer text-right">
+                            <div class="panel-footer text-left">
                                 <button type="submit" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
                             </div>
                         }
@@ -51,7 +60,7 @@
                 }
                 else
                 {
-                    <div id="steps-approved">
+                        <div id="steps-approved">
                         <div class="radian-personal-info">
                             @Html.Partial("_personalInfo")
                         </div>
