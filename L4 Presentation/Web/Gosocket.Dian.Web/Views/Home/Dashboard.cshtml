@@ -7,25 +7,23 @@
     ViewBag.Title = "Inicio";
 }
 
-<div id="page-content" data-target="#page-content" data-toggle="panel-overlay" class="page-content margin-15">
+<div id="page-content" data-target="#page-content" data-toggle="panel-overlay" style="padding:0;">
     <div class="row margin-horizontal-0">
 
         <div class="">
-            <div class="panel-body">
+            <div class="">
                 <div class="row margin-horizontal-0">
                     @if (User.IsInAnyRole("Administrador", "Super"))
                     {
-                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dia margin-bottom-0  ">
+                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel RadianContainerBegin">
                             <div class="panel-body padding-0 padding-bottom-0">
                                 <div class="row">
-                                    <div id="contributor-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-                                    <div id="global-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-                                    <div id="global-monthly-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-
+                                    <div id="contributor-stats-chart" class="col-sm-6 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <div id="global-stats-chart" class="col-sm-6 padding-xs-0" style="height:320px; margin: 0 auto"></div>
                                 </div>
-                                <div class="row padding-top-30">
-                                    <div id="global-daily-stats-chart" class="col-sm-12 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-
+                                <div class="row mt-28">
+                                    <div id="global-daily-stats-chart" class="col-sm-6 padding-xs-0" style="height:320px; margin: 0 auto"></div>
+                                    <div id="global-monthly-stats-chart" class="col-sm-6 padding-xs-0" style="height:320px; margin: 0 auto"></div>
                                 </div>
                             </div>
                         </div>
