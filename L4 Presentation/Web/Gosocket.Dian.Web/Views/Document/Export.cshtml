@@ -61,13 +61,22 @@
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
                                                                         <label class="control-label">Rango de fechas</label>
-                                                                        <div class="form-group">
+                                                                        <div class="input-group double-calendar">
+                                                                            <span id="action-left" class="input-group-addon">
+                                                                                <i class="fa fa-chevron-left"></i>
+                                                                            </span>
+                                                                            <input type="text" class="form-control" id="export-range" placeholder="Ejm: 01-01-2020 - 01-03-2021">
+                                                                            <span id="action-right" class="input-group-addon">
+                                                                                <i class="fa fa-chevron-right"></i>
+                                                                            </span>
+                                                                        </div>
+                                                                        @*<div class="form-group">
                                                                             <div class="form-control col-sm-12" id="export-range">
                                                                                 <i class="icon-calendar"></i>&nbsp;
                                                                                 <span class="thin uppercase hidden-xs"></span>&nbsp;
                                                                                 <i class="fa fa-angle-down"></i>
                                                                             </div>
-                                                                        </div>
+                                                                        </div>*@
                                                                     </div>
                                                                 </div>
 
@@ -220,33 +229,36 @@
         endDate.locale('es');
 
         $('#export-range').daterangepicker({
-            "buttonClasses": "btn btn-block btn-default",
+            /*"buttonClasses": "btn btn-block btn-default",*/
             "startDate": startDate,
             "endDate": endDate,
-            "applyClass": "btn-hover-gosocket",
-            "cancelClass": "btn-hover-gosocket",
-            "ranges": {
-                'Últimos 7 Días': [moment().subtract('days', 6), moment()],
-                'Mes actual': [moment().startOf('month'), moment().endOf('month')],
-                'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
-            },
+            //"applyClass": "btn-hover-gosocket",
+            //"cancelClass": "btn-hover-gosocket",
+            //"ranges": {
+            //    'Últimos 7 Días': [moment().subtract('days', 6), moment()],
+            //    'Mes actual': [moment().startOf('month'), moment().endOf('month')],
+            //    'Mes Anterior': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+            //    'Últimos 3 Meses': [moment().subtract('month', 3).startOf('month'), moment().endOf('month')]
+            //
+            //},
+            "autoApply": false,
             "locale": {
-                "format": "DD-MM-YY",
+                "format": "YYYY-MM-DD",
                 "separator": " - ",
-                "applyLabel": "Aceptar",
+                "applyLabel": "Aplicar",
                 "cancelLabel": "Cancelar",
                 "fromLabel": "Desde",
                 "toLabel": "Hasta",
-                "customRangeLabel": "Rango de Fechas",
+                "customRangeLabel": "Personalizar",
+                "weekLabel": "S",
                 "daysOfWeek": [
-                    "Do",
-                    "Lu",
-                    "Ma",
-                    "Mi",
-                    "Ju",
-                    "Vi",
-                    "Sa"
+                    "DO",
+                    "LU",
+                    "MA",
+                    "MI",
+                    "JU",
+                    "VI",
+                    "SÁ"
                 ],
                 "monthNames": [
                     "Enero",
@@ -262,17 +274,41 @@
                     "Noviembre",
                     "Diciembre"
                 ],
-                "firstDay": 1
+                "firstDay": 0
             },
             opens: ('left'),
         }, function (start, end, label) {
-            $('#export-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
+            //$('#export-range span').html(capitalizeMonth(start.format('DD-MMMM-YYYY')) + ' al ' + capitalizeMonth(end.format('DD-MMMM-YYYY')));
             startDate = start;
             endDate = end;
             $('#StartDate').val(startDate.format('MM/DD/YYYY'));
             $('#EndDate').val(endDate.format('MM/DD/YYYY'));
         });
 
+        $(".daterangepicker").find(".cancelBtn ").addClass("btn-secondary");
+
+        $(".double-calendar").find("#action-left").click(function () {
+            const actualStartDate = moment($("#StartDate").val()),
+                actualEndDate = moment($("#EndDate").val()),
+                prevStartDate = actualStartDate.add(-1, "days"),
+                nextEndDate = actualEndDate.add(-1, "days");
+
+            $("#export-range").data('daterangepicker').setStartDate(prevStartDate);
+            $("#export-range").data('daterangepicker').setEndDate(nextEndDate);
+            $("#StartDate").val(prevStartDate.format('MM/DD/YYYY'));
+            $("#EndDate").val(nextEndDate.format('MM/DD/YYYY'));
+        })
+        $(".double-calendar").find("#action-right").click(function () {
+            const actualStartDate = moment($("#StartDate").val()),
+                actualEndDate = moment($("#EndDate").val()),
+                prevStartDate = actualStartDate.add(1, "days"),
+                nextEndDate = actualEndDate.add(1, "days");
+
+            $("#export-range").data('daterangepicker').setStartDate(prevStartDate);
+            $("#export-range").data('daterangepicker').setEndDate(nextEndDate);
+            $("#StartDate").val(prevStartDate.format('MM/DD/YYYY'));
+            $("#EndDate").val(nextEndDate.format('MM/DD/YYYY'));
+        })
 
         function capitalizeMonth(date) {
             return date.substring(0,3) + date.charAt(3).toUpperCase() + date.slice(4);

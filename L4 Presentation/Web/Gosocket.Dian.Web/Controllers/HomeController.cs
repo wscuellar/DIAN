@@ -158,7 +158,7 @@ namespace Gosocket.Dian.Web.Controllers
                         <div class='dian-alert dian-alert-info mb-20'>
                             <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
                             <p>
-                                Estimado contribuyente: <br>
+                                <strong>Estimado contribuyente:</strong> <br>
                                 Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)}</strong> <br>
                                 Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
                                 Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
@@ -173,7 +173,7 @@ namespace Gosocket.Dian.Web.Controllers
                         <div class='dian-alert dian-alert-danger mb-20'>
                             <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
                             <p>
-                                Estimado contribuyente <br>
+                                <strong>Estimado contribuyente:</strong> <br>
                                 Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}</strong> <br>
                                 Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
                                 Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
