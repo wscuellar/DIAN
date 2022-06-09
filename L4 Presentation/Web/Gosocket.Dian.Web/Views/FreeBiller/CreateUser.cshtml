@@ -47,15 +47,60 @@
     .bootstrap-select button {
         padding-left: 10px !important;
     }
+
+    input[type="checkbox"] {
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* For iOS < 15 to remove gradient background */
+        background-color: #fff !important;
+        /* Not removed via appearance */
+        margin: 0 !important;
+        appearance: none !important;
+        background-color: #fff !important;
+        margin: 0 !important;
+        font: inherit !important;
+        color: currentColor !important;
+        width: 2em !important;
+        height: 2em !important;
+        border: 0.15em solid #41D78C !important;
+        border-radius: 0.15em !important;
+        transform: translateY(-0.075em) !important;
+        margin: 10px !important;
+        display: grid !important;
+        place-content: center !important;
+        outline: none !important;
+        border-radius: 5px !important;
+    }
+
+
+        input[type="checkbox"]:checked {
+            border: 1px solid white !important;
+            background: #41D78C !important;
+            border-radius: 5px !important;
+        }
+
+            input[type="checkbox"]:checked::after {
+                font-family: 'FontAwesome' !important;
+                /*  content:'';*/
+                font-weight: 400 !important;
+                content: "\F00C" !important;
+                color: white !important;
+                /* 
+    width:5px;
+    height:4px;
+    display:block;
+    background:black;*/
+            }
+    input[type=checkbox][disabled] {
+        background: #CCCCCC !important;
+        border: none !important;
+    }
 </style>
 
 <div class="page-content margin-15">
 
-    <div class="title-container">
-        <p class="title-view">
-            @ViewBag.title
-        </p>
-    </div>
+   
 
     <div class="row margin-horizontal-0">
         <div class="tab-base">
