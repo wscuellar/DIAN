@@ -645,7 +645,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			if (tipoD =="55" || tipoD == "50")
             {				
-				var totalRevert = Reverse(Convert.ToString(subTotal));
+				var totalRevert = Reverse(Convert.ToString(subTotal / 100));
 				var decimales = totalRevert.Substring(0, 2);
 				var total = $"{subTotal/100}.{Reverse(decimales)}";
 				var totalRec = "";
