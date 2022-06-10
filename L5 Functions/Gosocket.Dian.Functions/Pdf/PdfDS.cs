@@ -642,7 +642,7 @@ namespace Gosocket.Dian.Functions.Pdf
             //var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
 			
 
-			if (tipoD =="55" || tipoD == "50")
+			if (tipoD =="55" || tipoD == "50" || tipoD == "45")
             {				
 				var totalRevert = Reverse(Convert.ToString(subTotal));
 				var decimales = totalRevert.Substring(0, 2);
@@ -943,7 +943,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TotalFactura = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "PayableAmount");//resta subtotal ? 
             if (typeDocument.Any())
             {
-				if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50")
+				if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45")
 				{
 					TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
 					TotalIVA = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");//resta subtotal ? 																							
