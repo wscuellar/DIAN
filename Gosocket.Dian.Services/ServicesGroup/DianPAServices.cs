@@ -1356,7 +1356,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             try
             {
                 var authEntity = GetAuthorization(accountCode, authCode);
-                if (authEntity != null && authEntity.PartitionKey != accountCodeT)
+                var authCodeNew = authCode?.Trim().Substring(0, authCode.Trim().Length - 1);
+                if (authEntity != null && authEntity.PartitionKey != accountCodeT && authCodeNew != accountCodeT)
                 {
                     verificationResult.OperationCode = "401";
                     verificationResult.OperationDescription = $"NIT: {authCode} del certificado no autorizado para consultar rangos de numeración asociados del NIT: {accountCodeT}";
