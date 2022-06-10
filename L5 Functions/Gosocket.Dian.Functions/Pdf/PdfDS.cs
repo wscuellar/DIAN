@@ -111,8 +111,7 @@ namespace Gosocket.Dian.Functions.Pdf
 					html = FillTransporteT(html, xelement);
 				}
 
-				if (tipo == "60")
-				{
+				if (tipo == "60"){
 
 
 
@@ -517,15 +516,17 @@ namespace Gosocket.Dian.Functions.Pdf
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
 				var ivaValor =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount") : detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount"); 
+				var ivaValorGran =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").ToList() : detalle.Elements(cac + "TaxTotal").ToList(); 
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
                 if (tipoD =="55" || tipoD == "50")
                 {
-
+					
 					ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");
-					IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value.ToString();
+
+					IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				}
 				var Desc = "";
@@ -646,19 +647,51 @@ namespace Gosocket.Dian.Functions.Pdf
             {				
 				var totalRevert = Reverse(Convert.ToString(subTotal));
 				var decimales = totalRevert.Substring(0, 2);
-				var total = $"{subTotal/100}.{Reverse(decimales)}";				
+				var total = $"{subTotal/100}.{Reverse(decimales)}";
+				var totalRec = "";
+				var totalDes = "";
+
+
+
+				if (Convert.ToString(DescDet).Length > 2)
+				{
+					var totalRevertDes = Reverse(Convert.ToString(DescDet));
+					var decimalesDes = totalRevertDes.Substring(0, 2);
+				    totalDes = $"{Convert.ToString(DescDet).Substring(0, Convert.ToString(DescDet).Length - 2)}.{Reverse(decimalesDes)}";
+
+                }
+                else
+                {
+					totalDes = Convert.ToString(DescDet);
+
+				}
 				
+
+				
+				if (Convert.ToString(RecDet).Length > 2) {
+					var totalRevertRec = Reverse(Convert.ToString(RecDet));
+					var decimalesRec = totalRevertRec.Substring(0, 2);
+					totalRec = $"{Convert.ToString(RecDet).Substring(0, Convert.ToString(RecDet).Length - 2)}.{Reverse(decimalesRec)}";
+                }
+                else
+                {
+
+					totalRec = Convert.ToString(RecDet);
+                }
+
 				plantillaHtml = plantillaHtml.Replace("{SubTotal}", total.ToString());
-				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", totalDes.ToString());
+			    plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", totalRec.ToString());
+                
 			}
             else
             {
 
 			  plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString().Split('.')[0]).ToString("N0"));
 			  plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
+			  plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", Decimal.Parse(RecDet.ToString().Split('.')[0]).ToString("N0"));
             }
 
-			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", Decimal.Parse(RecDet.ToString().Split('.')[0]).ToString("N0"));
 			return plantillaHtml;
 		}
 		public static string Reverse(string text) { char[] cArray = text.ToCharArray(); string reverse = String.Empty; for (int i = cArray.Length - 1; i > -1; i--) { reverse += cArray[i]; } return reverse; }
