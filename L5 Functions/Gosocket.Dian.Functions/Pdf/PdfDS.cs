@@ -1596,6 +1596,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			documentTypeNI.Add(new ListDocumentType { Id = "3" , Name= "Rebaja o descuento parcial o total" });
 			documentTypeNI.Add(new ListDocumentType { Id = "4" , Name= "Ajuste de precio" });
 			documentTypeNI.Add(new ListDocumentType { Id = "5" , Name= "Otros" });
+			documentTypeNI.Add(new ListDocumentType { Id = "" , Name= "" });
+
 			var rowReferencias = new StringBuilder();
 			
 			
