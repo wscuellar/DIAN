@@ -74,7 +74,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                             
+
                                             <div class="text-left" style="padding-left: 20px;padding-bottom: 30px;">
                                                 <button type="button" class="btn btn-secondary btn-hover-gosocket btn-search text-left">Buscar</button>
                                             </div>
@@ -86,22 +86,22 @@
                                 <div class="row margin-horizontal-0">
                                     <div class="col-md-9 table-toolbar-left padding-left-0">
                                     </div>
-                                    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
-                                        @if (Model.Contributors.Count > 0)
-                                        {
-                                            <span class="text-muted">
-                                                <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Contributors.Count ? (Model.Page) * Model.Length + Model.Contributors.Count : (Model.Page + 1) * Model.Length)</strong>
-                                            </span>
-                                            <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                                <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                                    <span class="fa fa-chevron-left"></span>
-                                                </a>
-                                                <a class="btn btn-default paginate-btn next-page" @(Model.Contributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                                                    <span class="fa fa-chevron-right"></span>
-                                                </a>
-                                            </div>
-                                        }
-                                    </div>
+                                    <!-- <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+                         @if (Model.Contributors.Count > 0)
+                         {
+                             <span class="text-muted">
+                                 <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Contributors.Count ? (Model.Page) * Model.Length + Model.Contributors.Count : (Model.Page + 1) * Model.Length)</strong>
+                             </span>
+                             <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                                 <a class="btn btn-default paginate-btn prev-page" @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                                     <span class="fa fa-chevron-left"></span>
+                                 </a>
+                                 <a class="btn btn-default paginate-btn next-page" @(Model.Contributors.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                                     <span class="fa fa-chevron-right"></span>
+                                 </a>
+                             </div>
+                         }
+                     </div>-->
                                 </div>
                             }
                         </div>
@@ -116,7 +116,7 @@
                         </div>
                     }
 
-                    <div class="pull-right table-pagination padding-top-10">
+                    <!--<div class="pull-right table-pagination padding-top-10">
                         @if (Model.Contributors.Count > 0)
                         {
                             <span class="text-muted">
@@ -131,7 +131,7 @@
                                 </a>
                             </div>
                         }
-                    </div>
+                    </div>-->
 
                 </div>
             </div>
