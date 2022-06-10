@@ -1595,7 +1595,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			documentTypeNI.Add(new ListDocumentType { Id = "2" , Name= "Anulación del documento equivalente POS" });
 			documentTypeNI.Add(new ListDocumentType { Id = "3" , Name= "Rebaja o descuento parcial o total" });
 			documentTypeNI.Add(new ListDocumentType { Id = "4" , Name= "Ajuste de precio" });
-			documentTypeNI.Add(new ListDocumentType { Id = "5" , Name= "Ajuste de precio" });
+			documentTypeNI.Add(new ListDocumentType { Id = "5" , Name= "Otros" });
 			var rowReferencias = new StringBuilder();
 			
 			
