@@ -1597,8 +1597,8 @@ namespace Gosocket.Dian.Functions.Pdf
 			documentTypeNI.Add(new ListDocumentType { Id = "4" , Name= "Ajuste de precio" });
 			documentTypeNI.Add(new ListDocumentType { Id = "5" , Name= "Ajuste de precio" });
 			var rowReferencias = new StringBuilder();
-			var cosmos = new CosmosDbManagerPayroll();
-			var DocumentType = await cosmos.getTipoOperacion();
+			
+			
 			var model = obj.Elements(cac + "BillingReference").ToList();
 			if (!model.Any())
 			{
