@@ -152,11 +152,16 @@
                                     {
                                         if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
                                         {
-                                            <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                            <button class="btn btn-xs add-tooltip download-document" data-id="@document.Id" id="@document.Id">
+                                                <i style="color:#2B323D" class="fa fa fa-download" data-tooltip="tooltip" data-placement="bottom" title="Descargar elementos"></i>
+                                            </button>
+                                            
                                         }
                                         else
                                         {
-                                            <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                            <button class="btn btn-xs disabled">
+                                                <i class="fa fa fa-close add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Descarga desahabilitada"></i>
+                                            </button>
                                         }
                                     }
                                 }
