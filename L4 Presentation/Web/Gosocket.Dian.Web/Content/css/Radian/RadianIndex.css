@@ -1258,7 +1258,7 @@ button.selectpicker {
 }
 
 .prompt-comment .bootbox-close-button.close {
-    background: url(/Content/images/png/closeButton.png);
+    background: url(/Content/images/Svg/CloseButton.svg);
     background-repeat: no-repeat;
     text-indent: -9000px;
     right: -30px;
@@ -1266,7 +1266,7 @@ button.selectpicker {
 }
 
 .bootbox-close-button.close {
-    background: url(/Content/images/png/closeButton.png);
+    background: url(/Content/images/Svg/CloseButton.svg);
     background-repeat: no-repeat;
     text-indent: -9000px;
     top: 28px;

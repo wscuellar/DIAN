@@ -1463,13 +1463,13 @@ Bootstrap Daterangepicker
         margin-bottom: 0 !important;
     }
 
-    .daterangepicker .fa-angle-right:before {
-        content: "" /*rtl:""*/;
+    /*.daterangepicker .fa-angle-right:before {
+        content: ""*/ /*rtl:""*//*;
     }
 
     .daterangepicker .fa-angle-left:before {
-        content: "" /*rtl:""*/;
-    }
+        content: ""*/ /*rtl:""*//*;
+    }*/
 
     .daterangepicker .ranges li {
         background: #f5f5f5 none repeat scroll 0 0;
