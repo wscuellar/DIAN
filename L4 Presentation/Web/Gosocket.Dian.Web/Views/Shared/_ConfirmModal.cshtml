@@ -118,7 +118,7 @@
     function ConfirmDialogV2(title, message, buttons, confirmCallback, cancelCallback = null) {
         $("#confirmModal-title").text(title || "Confirmación");
         $("#confirmModal-message").html(message || "¿Está seguro que desea realizar esta operación?");
-        $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Confimar");
+        $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Aceptar");
         $("#confirmModal-cancel-button").text(buttons?.cancel ?? "Cancelar");
 
         $("#confirmModal").modal("show");
