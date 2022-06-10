@@ -85,7 +85,7 @@
         }
 
         .modal-body .close, .modal-header .close {
-            background-color: #348441 !important;
+            background-color: none !important;
             /*top: 20px !important;
             right: -25px !important;*/
         }
@@ -319,7 +319,7 @@
         {
             <text>
             bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
+                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + '@message' + "</h4></div></div>",
                 onEscape: () => { }
             });
             </text>
@@ -329,7 +329,7 @@
 			return {
 				del: {
 					label: "Aceptar",
-					className: "btn-radian-default",
+                    className: "btn-radian-default btn-radian-success",
 					callback: function () {
 						param ? operation(param) : operation();
 						operationClick = false;
@@ -337,7 +337,7 @@
 				},
 				del1: {
 					label: "Cancelar",
-					className: "btn-radian-default btn-radian-success",
+					className: "btn-secundary btn-radian-success",
 					callback: function () {
 						$(' .close').click()
 					}
@@ -351,7 +351,7 @@
             if ('@ViewBag.softwareActive' == 'True') {
                 var sms = 'No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
                 bootbox.dialog({
-                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
+                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + sms + "</h4></div></div>",
                     onEscape: () => { }
                 });
             }
@@ -376,7 +376,7 @@
                 /*Esta validación aplica cuando el modo de operacion es SP o PT*/
                 if ((SoftwaresIds.find(s => s == $('#SoftwareId').val()) || SoftwaresIds.find(s => s == $('#SoftwareIdPr').val()))
                     && $('#OperationModeSelectedId').val() != 3 ) {
-                    showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
+                    showConfirmation("<div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><br>El participante ya tiene asociado el software asignado!!!", AlertExec(null));
                     return;
                 }
                 
@@ -546,7 +546,7 @@
 
 							$('.close').click()
 							bootbox.dialog({
-								message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
+                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + result.Message + "</h4></div></div>",
 								onEscape: () => {
 									var url = window.location.href.split('&');
 									var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
@@ -558,7 +558,7 @@
                         }
 
                         bootbox.dialog({
-                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
+                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'></div><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
                             onEscape: () => {
                                 var url = "@Url.Action("Index", "OthersElectronicDocuments")";
                                 if (@Model.ElectronicDocumentId == 14) {
