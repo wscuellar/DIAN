@@ -95,7 +95,7 @@ namespace Gosocket.Dian.Functions.Pdf
 					var CreditLineNodes = xelement.Elements(cac + "CreditNoteLine");
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosComplete(html, CreditLineNodes.ToList(), tipo);
-					html = CruzarReferenciasNota(html, xelement);
+					html =  CruzarReferenciasNota(html, xelement);
 				}
 
 				if (tipo == "50" || tipo == "55" || tipo == "45" || tipo == "32" ||tipo == "27" || tipo == "30" )
@@ -1590,7 +1590,15 @@ namespace Gosocket.Dian.Functions.Pdf
 		{
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+			List<ListDocumentType>  documentTypeNI = new List<ListDocumentType>();
+			documentTypeNI.Add(new ListDocumentType { Id = "1" , Name="Devolución parcial de los bienes y/o no aceptación parcial del servicio" });
+			documentTypeNI.Add(new ListDocumentType { Id = "2" , Name= "Anulación del documento equivalente POS" });
+			documentTypeNI.Add(new ListDocumentType { Id = "3" , Name= "Rebaja o descuento parcial o total" });
+			documentTypeNI.Add(new ListDocumentType { Id = "4" , Name= "Ajuste de precio" });
+			documentTypeNI.Add(new ListDocumentType { Id = "5" , Name= "Ajuste de precio" });
 			var rowReferencias = new StringBuilder();
+			var cosmos = new CosmosDbManagerPayroll();
+			var DocumentType = await cosmos.getTipoOperacion();
 			var model = obj.Elements(cac + "BillingReference").ToList();
 			if (!model.Any())
 			{
@@ -1605,14 +1613,14 @@ namespace Gosocket.Dian.Functions.Pdf
 			}
 			foreach (var detalle in model)
 			{
-				var tip = detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "DocumentType");
+				var tip = obj.Elements(cac + "DiscrepancyResponse").Elements(cbc + "ResponseCode");
 				var tipo = tip.Any() ? tip.FirstOrDefault().Value : "";
 
 				var desc = obj.Elements(cac + "DiscrepancyResponse").Elements(cbc + "Description");
 				var des = desc.Any() ? desc.FirstOrDefault().Value : "";
 				rowReferencias.Append($@"
                 <tr>
-		            <td colspan='1'>{tipo}</td>
+		            <td colspan='1'>{documentTypeNI.Where(x=> x.Id == tipo).FirstOrDefault().Name}</td>
 					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "ID").FirstOrDefault().Value}</td>
 					<td colspan='1'>{detalle.Elements(cac + "InvoiceDocumentReference").Elements(cbc + "IssueDate").FirstOrDefault().Value}</td>
 					<td colspan='1'>{des}</td>
@@ -1653,7 +1661,13 @@ namespace Gosocket.Dian.Functions.Pdf
 
 	}
 
-	partial class param
+	partial class ListDocumentType
+    {
+		public string Id { get; set; }
+		public string Name { get; set; }
+	}
+
+    partial class param
 	{
 		public string base64Xml { get; set; }
 		public string FechaValidacionDIAN { get; set; }
