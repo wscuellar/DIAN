@@ -754,7 +754,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                    return View("CompanyLogin", model);
+                    return View("PersonLogin", model);
                 }
             }
 
@@ -2233,11 +2233,12 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         private bool VerifyContributorEnabledInElectronicBiller(Contributor contributor)
         {
-            var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
-            var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
-            var hasTestSetResultsAccepted = testSetResults.Any(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted);
+            return true;
+            //var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
+            //var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
+            //var hasTestSetResultsAccepted = testSetResults.Any(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted);
             
-            return hasTestSetResultsAccepted;
+            //return hasTestSetResultsAccepted;
         }
     }
 }
