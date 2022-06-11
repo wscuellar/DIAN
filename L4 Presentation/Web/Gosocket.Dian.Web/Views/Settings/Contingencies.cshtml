@@ -166,22 +166,33 @@
             $('.delete-btn').click('onClick', function () {
                 var pk = $(this).attr("data-pk");
                 var rk = $(this).attr("data-rk");
-                bootbox.dialog({
-                    message: "Está seguro que desea eliminar contingencia?",
-                    title: "Eliminar contingencia",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                showLoading('#table-contingencies', 'Eliminando', 'Procesando datos, por favor espere.');
-                                $("#pk").val(pk);
-                                $("#rk").val(rk);
-                                $("#delete-contingency").submit();
-                            }
-                        },
-                    }
-                });
+
+                ConfirmDialogV2("Eliminar contingencia",
+                    "¿Está seguro que desea eliminar contingencia?",
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => {
+                        showLoading('#table-contingencies', 'Eliminando', 'Procesando datos, por favor espere.');
+                        $("#pk").val(pk);
+                        $("#rk").val(rk);
+                        $("#delete-contingency").submit();
+                    });
+
+                //bootbox.dialog({
+                //    message: "Está seguro que desea eliminar contingencia?",
+                //    title: "Eliminar contingencia",
+                //    buttons: {
+                //        del: {
+                //            label: "Aceptar",
+                //            className: "btn-gosocket",
+                //            callback: function () {
+                //                showLoading('#table-contingencies', 'Eliminando', 'Procesando datos, por favor espere.');
+                //                $("#pk").val(pk);
+                //                $("#rk").val(rk);
+                //                $("#delete-contingency").submit();
+                //            }
+                //        },
+                //    }
+                //});
             });
 
             // Pagination

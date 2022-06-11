@@ -118,7 +118,7 @@
     function ConfirmDialogV2(title, message, buttons, confirmCallback, cancelCallback = null) {
         $("#confirmModal-title").text(title || "Confirmación");
         $("#confirmModal-message").html(message || "¿Está seguro que desea realizar esta operación?");
-        $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Aceptar");
+        $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Confimar");
         $("#confirmModal-cancel-button").text(buttons?.cancel ?? "Cancelar");
 
         $("#confirmModal").modal("show");
@@ -183,5 +183,13 @@
 
         if (!autoClosed) return;
         window.setTimeout(() => { $("#successModal").modal("hide"); }, 5000);
+    }
+
+    function SuccessDialogV2Callback(title, message = null, callback = null) {
+        SuccessDialogV2(title, message);
+        $('#successModal').on('hidden.bs.modal', () => {
+            if (!callback) return;
+            callback();
+        });
     }
 </script>

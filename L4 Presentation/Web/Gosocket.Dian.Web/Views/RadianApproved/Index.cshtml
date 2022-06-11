@@ -158,7 +158,7 @@
                 })
             });
 
-        $('.submit-button').click(function (e) {           
+        $('.submit-button').click(function (e) {
             validator && validator.destroy();
             showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
             var form = $(this).parents("form");
@@ -303,21 +303,24 @@
         });
 
         $('.btn-sync-to-production').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId)
-                            }
-                        },
-                    }
-                });
-            });
+            ConfirmDialogV2("Advertencia",
+                "¿Está seguro que desea sincronizar contribuyente a producción?",
+                { confirm: "Aceptar", cancel: "Cancelar" }, () => { syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId); });
 
+            @*bootbox.dialog({
+                title: "Advertencia",
+                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId)
+                        }
+                    },
+                }
+            });*@
+        });
      });
 
      syncToProduction = (code, contributorTypeId, contributorId) => {

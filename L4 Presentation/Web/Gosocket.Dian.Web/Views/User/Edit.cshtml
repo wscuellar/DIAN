@@ -97,19 +97,23 @@
 
             var code = $(button).parent().parent().attr("data-code")
 
-            bootbox.dialog({
-                    message: "Está seguro que desea eliminar la relación con la empresa?",
-                    title: "Advertencia",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                removeLineAjax(code);
-                            }
-                        },
-                    }
-                });
+            ConfirmDialogV2("Advertencia",
+                "¿Está seguro que desea eliminar la relación con la empresa?",
+                { confirm: "Aceptar", cancel: "Cancelar" }, () => { removeLineAjax(code); });
+
+            //bootbox.dialog({
+            //        message: "Está seguro que desea eliminar la relación con la empresa?",
+            //        title: "Advertencia",
+            //        buttons: {
+            //            del: {
+            //                label: "Aceptar",
+            //                className: "btn-gosocket",
+            //                callback: function () {
+            //                    removeLineAjax(code);
+            //                }
+            //            },
+            //        }
+            //    });
             
         }
 

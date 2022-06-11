@@ -205,10 +205,7 @@
 
             if ('@ViewBag.ErrorExistsTestSet' == 'True') {
                 var sms = 'Ya se encuentra registrado un set de pruebas para este Documento electrónico y modo de operación';
-                bootbox.dialog({
-                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                    onEscape: () => { }
-                });
+                ErrorDialogV2("¡Notificación!", sms);
             }
 
             $('.btn-save').click(function () {
