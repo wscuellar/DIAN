@@ -2233,12 +2233,15 @@ namespace Gosocket.Dian.Web.Controllers
         /// <returns></returns>
         private bool VerifyContributorEnabledInElectronicBiller(Contributor contributor)
         {
-            return true;
-            //var tableManagerTestSetResult = new TableManager("GlobalTestSetResult");
-            //var testSetResults = tableManagerTestSetResult.FindByPartition<GlobalTestSetResult>(contributor.Code);
-            //var hasTestSetResultsAccepted = testSetResults.Any(t => !t.Deleted && t.Status == (int)TestSetStatus.Accepted);
-            
-            //return hasTestSetResultsAccepted;
+            var service = new ContributorOperationsService();
+
+            var operations = service.GetContributorOperations(contributor.Id);
+            var hasOperationModesEnabledInElectronicBiller = operations
+                .Any(t => !t.Deleted
+                    && !t.Software.Deleted
+                    && t.Software.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
+
+            return hasOperationModesEnabledInElectronicBiller;
         }
     }
 }
