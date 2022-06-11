@@ -1018,8 +1018,27 @@ text-align:left !important;
     border-radius: 5px;
     width: 100px;
 }
+
+.custom-label-warning {
+    background-color: #FBF0D7;
+    color: #C98802;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+
+.custom-label-danger {
+    background-color: #FCD5D3;
+    color: #F54E41;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+
 a.label-table:hover {
-   color: #00AC57;
+    color: #00AC57;
 }
 
 .subTitleMenu {
