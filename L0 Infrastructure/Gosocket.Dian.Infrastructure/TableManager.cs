@@ -495,6 +495,19 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+        public T FindPartitionKey<T>(string partitionKey) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey);
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.FirstOrDefault();
+        }
+
         public IEnumerable<T> FindBy<T>(string partitionKey, string rowKey) where T : ITableEntity, new()
         {
             var query = new TableQuery<T>();
