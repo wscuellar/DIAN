@@ -1043,7 +1043,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 if (typeDocument.Any())
                 {
-					if (typeDocument.FirstOrDefault().Value == "55")
+					if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "45")
 					{
 						var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
 						var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
