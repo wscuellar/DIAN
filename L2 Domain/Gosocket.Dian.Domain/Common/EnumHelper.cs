@@ -772,8 +772,16 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Notificación de pago parcial")]
         PartialPaymentNotification = 451,
         [Description("Pago de la factura electrónica de venta como título valor")]
-        PaymentBillFTV = 452
-        
+        PaymentBillFTV = 452,
+        [Description("Protesto por falta de aceptación")]
+        ObjectionNonAcceptance = 481,
+        [Description("Protesto por falta de pago")]
+        ObjectionNonPayment = 482,
+        [Description("Pago parcial de la transferencia de los derechos económicos")]
+        PartialPaymentTransferEconomicRights = 511,
+        [Description("Pago total de la transferencia de los derechos económicos")]
+        TotalPaymentTransferEconomicRights = 512
+
     }
 
     public enum PaymentMethods
