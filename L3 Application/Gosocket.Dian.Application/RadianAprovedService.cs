@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Gosocket.Dian.Services.Utils.Helpers;
 
 namespace Gosocket.Dian.Application
 {
@@ -229,6 +232,8 @@ namespace Gosocket.Dian.Application
 
             ApplyTestSet(radianContributorOperation, testSet, radianContributor, existingOperation);
 
+            _ = SyncToProductionAsync(radianContributorOperation, radianContributor);
+
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
@@ -404,5 +409,71 @@ namespace Gosocket.Dian.Application
             operation.OperationStatusId = (int)RadianState.Test; //=en proceso
             return _radianContributorOperationRepository.Update(operation);
         }
+
+
+        private async Task SyncToProductionAsync(RadianContributorOperation radianContributorOperation, RadianContributor radianContributor)
+        {
+            var pk = radianContributor.Contributor.Code.ToString();
+            var rk = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+            RadianTestSetResult testSetResult = _radianTestSetResultService.GetTestSetResult(pk, rk);
+            if (testSetResult != null)
+            {
+                var data = new RadianActivationRequest();
+                data.Code = radianContributor.Contributor.Code; 
+                data.ContributorId = radianContributor.ContributorId; 
+                data.ContributorTypeId = radianContributor.RadianContributorTypeId;  
+                data.Pin = radianContributorOperation.Software.Pin;
+                data.SoftwareId = radianContributorOperation.SoftwareId.ToString();
+                data.SoftwareName = radianContributorOperation.Software.Name; 
+                data.SoftwarePassword = radianContributorOperation.Software.SoftwarePassword; 
+                data.SoftwareType = radianContributorOperation.SoftwareType.ToString();
+                data.SoftwareUser = radianContributorOperation.Software.SoftwareUser; 
+                data.TestSetId = testSetResult.Id;
+                data.Url = radianContributorOperation.Software.Url;
+                data.Enabled = true;
+
+                var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
+            }
+        }
+    }
+
+    class RadianActivationRequest
+    {
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "contributorId")]
+        public int ContributorId { get; set; }
+
+        [JsonProperty(PropertyName = "contributorTypeId")]
+        public int ContributorTypeId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareId")]
+        public string SoftwareId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareType")]
+        public string SoftwareType { get; set; }
+
+        [JsonProperty(PropertyName = "softwareUser")]
+        public string SoftwareUser { get; set; }
+
+        [JsonProperty(PropertyName = "softwarePassword")]
+        public string SoftwarePassword { get; set; }
+
+        [JsonProperty(PropertyName = "pin")]
+        public string Pin { get; set; }
+
+        [JsonProperty(PropertyName = "softwareName")]
+        public string SoftwareName { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "testSetId")]
+        public string TestSetId { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
     }
 }
