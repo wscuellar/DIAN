@@ -260,6 +260,10 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        #btn-back {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body bgcolor="F6F7F9">
@@ -289,7 +293,7 @@
         var contributorType = User.ContributorTypeId();
         var contributorName = User.ContributorName();
         var userFullName = User.UserFullName();
-        string sesion = ViewBag.LoginMenu;
+        string sesion = Session["loginMenu"].ToString();
     }
 
     @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
@@ -308,7 +312,13 @@
                 <div id="page-alert"></div>
 
                 <div id="user-info-wrapper">
-                    <p class="title">@ViewBag.Title</p>
+                    <p class="title">
+                        @if(ViewBag.Title != "Inicio")
+                        {
+                            <i id="btn-back" class="fa fa-arrow-left mr-9" data-tooltip="tooltip" data-placement="bottom" title="Volver"></i> 
+                        }
+                        @ViewBag.Title
+                    </p>
                     <ul id="right-nav" class="nav navbar-top-links pull-right">
                         @*@if (!User.IsInAnyRole("Administrador", "Super") && contributorName.ToLower() != User.UserFullName().ToLower())
                             {
@@ -408,7 +418,7 @@
                                         <a href="@Url.Action("Dashboard", "Home")">
                                             <img src="~/Content/img/lateral-menu-icons/home.svg" />
                                             <span class="menu-title">
-                                                Tablero
+                                                Inicio
                                             </span>
                                         </a>
                                     </li>
@@ -447,12 +457,12 @@
                                         <!--Rol Administrador-->
                                         @if (User.IsInAnyRole("Administrador", "Super"))
                                         {
-                                            <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
-                                                <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
-                                                <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
-                                                <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
-                                            </ul>
+                                    <ul class="collapse">
+                                        <li id="@Navigation.NavigationEnum.DocumentList"><a href="@Url.Action("Index", "Document")">Factura Electrónica</a></li>
+                                        <li id="@Navigation.NavigationEnum.Payroll"><a href="@Url.Action("Payroll", "Document")">Nómina Electrónica</a></li>
+                                        <li id="@Navigation.NavigationEnum.NumberRange"><a href="@Url.Action("List", "NumberRange")">Rangos de Numeración</a></li>
+                                        <li id="@Navigation.NavigationEnum.DocumentExport"><a href="@Url.Action("Export", "Document")">Descargar listados</a></li>
+                                    </ul>
                                         }
                                         <!--Rol Administrador-->
                                         <!--Rol Facturador and Proveedor-->
@@ -486,8 +496,6 @@
                                         <!--Submenu-->
                                         <ul class="collapse">
                                             <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
-                                        </ul>
-                                        <ul class="collapse">
                                             <!--Rol Administrador-->
                                             @if (User.IsInAnyRole("Administrador", "Super"))
                                             {
@@ -561,35 +569,36 @@
 
                                     @if (!User.IsInAnyRole("Administrador", "Super"))
                                     {
-                                        <li>
-                                            <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
-                                                <img src="~/Content/img/lateral-menu-icons/settings.svg" />
-                                                <span class="menu-title">
-                                                    Configuración
-                                                </span>
-                                                <i class="arrow"></i>
-                                            </a>
-                                            <!--Submenu-->
-                                            <ul class="collapse">
-                                                <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
-                                            </ul>
-                                            <ul>
-                                                @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
-                                                {
-                                                    <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
-                                                }
-                                            </ul>
-                                            <ul>
-                                                @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
-                                                {
-                                                    //if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
-                                                    if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Cancelled)
-                                                    {
-                                                        <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
-                                                    }
-                                                }
-                                            </ul>
-                                        </li>
+                                <li>
+                                    <a id="@Navigation.NavigationEnum.ExternalUsersCreate" class="parent-link" href="#">
+                                        <img src="~/Content/img/lateral-menu-icons/settings.svg" />
+                                        <span class="menu-title">
+                                            Configuración
+                                        </span>
+                                        <i class="arrow"></i>
+                                    </a>
+                                    <!--Submenu-->
+                                    <ul class="collapse">
+                                        <li id="@Navigation.NavigationEnum.ExternalUsersCreate"><a href="@Url.Action("AddUser", "ExternalUsers")">Crear usuario Cátalogo</a></li>
+                                    </ul>
+                                    <ul>
+                                        @if (new string[] { "Dev", "Local", "Prod", "Test" }.Contains(ConfigurationManager.GetValue("Environment")))
+                                        {
+                                            //if ((User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled) || (User.ContributorTypeId() == (int)ContributorType.Provider && (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled || User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Registered)))
+                                            if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Cancelled)
+                                            {
+                                                <li id="@Navigation.NavigationEnum.AddNumberRange"><a href="@Url.Action("AddNumberRange", "Software")">Asociar Rangos de numeración</a></li>
+                                            }
+                                        }
+                                    </ul>
+                                    <ul>
+                                        @if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.Provider || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
+                                        {
+                                            <li id="@Navigation.NavigationEnum.BigContributors"><a href="@Url.Action("Index", "BigContributor")">Solicitar Autorización Envios por Lote - Asíncrono</a></li>
+                                        }
+                                    </ul>
+
+                                </li>
                                         <li class="list-divider"></li>
                                     }
 
@@ -648,16 +657,27 @@
                                                 @if (ConfigurationManager.GetValue("Environment") != "Prod")
                                                 {
                                                     <li id="@Navigation.NavigationEnum.ContributorFileType"><a href="@Url.Action("List", "ContributorFileType")">Tipos de Ficheros</a></li>
+                                                }
+                                                <!-- Perteneciente a Configuracion RADIAN -->
+                                                @if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros RADIAN</a></li>
+                                                }
+                                                @if (ConfigurationManager.GetValue("Environment") != "Prod")
+                                                {
                                                     <li id="@Navigation.NavigationEnum.TestSet"><a href="@Url.Action("List", "TestSet")">Set de Pruebas</a></li>
                                                     <li id="@Navigation.NavigationEnum.TestSetOtherDocuments"><a href="@Url.Action("List", "TestSetOthersDocuments")">Set de Pruebas - Otros Documentos</a></li>
+                                                }
+                                                <!-- Perteneciente a Configuracion RADIAN -->
+                                                @if (User.IsInAnyRole("Administrador", "Super"))
+                                                {
+                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
                                                 }
                                                 <!-- Configuracion RADIAN -->
                                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                                 {
-                                                    <li id="@Navigation.NavigationEnum.RadianContributorFileType"><a href="@Url.Action("List", "RadianContributorFileType")">Tipos de Ficheros RADIAN</a></li>
-                                                    <li id="@Navigation.NavigationEnum.RadianSetPruebas"><a href="@Url.Action("Index", "RadianTestSet")">Set de Pruebas RADIAN</a></li>
                                                     <li id="@Navigation.NavigationEnum.Contingencies"><a href="@Url.Action("Contingencies", "Settings")">Administrar Contingencias</a></li>
-                                                    <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios</a></li>
+                                                    <li id="@Navigation.NavigationEnum.Users"><a href="@Url.Action("Users", "Settings")">Usuarios con roles asignados</a></li>
                                                 }
                                             </ul>
                                         </li>
@@ -972,6 +992,12 @@
                 window.location = $(this).data("href");
             });
             $('.select2').select2();
+
+            $("#btn-back").click(function () {
+                window.history.back();
+            });
+
+            $("[data-tooltip='tooltip']").tooltip();
         });
 
     </script>

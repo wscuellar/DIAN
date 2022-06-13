@@ -4,11 +4,11 @@ function OnBeginAjax(response) {
 }
 
 function OnSuccessAjax(response) {
+    hideLoading("#panel-forma");
     if (response.Code == 200) {
         window.location.href = response.Message;
     } else {
-        hideLoading("#panel-forma");
-        if (!response.Message) {
+        if (response.Code == 400) {
             ErrorDialogV2("", response.Message || "Ocurrió un error por favor intente nuevamente.");
             return;
         }
@@ -21,6 +21,7 @@ function OnSuccessAjax(response) {
 }
 
 function OnFailureAjax(response) {
+    hideLoading("#panel-forma");
     var confirmMessage = response.responseJSON.message;
     ErrorDialogV2("Notificación", confirmMessage);
     //var buttons = AlertExec();

@@ -19,6 +19,15 @@
             break;
     }
 }
+<style>
+    .steps.clearfix {
+        display: none;
+        
+    }
+    #steps-approved .content {
+        min-height: 20em !important;
+    }
+</style>
 <div class="page-content radian-view margin-20">
     <div class="row margin-horizontal-0 margin-top-50">
         <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
@@ -43,7 +52,7 @@
                                     @Html.Partial("_personalInfo")
                                 </div>
                             </div>
-                            <div class="panel-footer text-right">
+                            <div class="panel-footer text-left">
                                 <button type="submit" class="btn btn-success btn-radian-success button-change-state">Configurar modo de operación</button>
                             </div>
                         }
@@ -51,7 +60,7 @@
                 }
                 else
                 {
-                    <div id="steps-approved">
+                        <div id="steps-approved">
                         <div class="radian-personal-info">
                             @Html.Partial("_personalInfo")
                         </div>
@@ -149,7 +158,7 @@
                 })
             });
 
-        $('.submit-button').click(function (e) {           
+        $('.submit-button').click(function (e) {
             validator && validator.destroy();
             showLoading('#panel-form', 'Cargando', 'Cargando archivos, por favor espere.');
             var form = $(this).parents("form");
@@ -294,21 +303,24 @@
         });
 
         $('.btn-sync-to-production').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId)
-                            }
-                        },
-                    }
-                });
-            });
+            ConfirmDialogV2("Advertencia",
+                "¿Está seguro que desea sincronizar contribuyente a producción?",
+                { confirm: "Aceptar", cancel: "Cancelar" }, () => { syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId); });
 
+            @*bootbox.dialog({
+                title: "Advertencia",
+                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
+                buttons: {
+                    del: {
+                        label: "Aceptar",
+                        className: "btn-gosocket",
+                        callback: function () {
+                            syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId)
+                        }
+                    },
+                }
+            });*@
+        });
      });
 
      syncToProduction = (code, contributorTypeId, contributorId) => {

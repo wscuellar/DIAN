@@ -12,7 +12,7 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
         .modal-body .close, .modal-header .close {
-            background-color: #348441 !important;
+            background-color: none !important;
         }
 
         .btnCloseOtherDocument {
@@ -112,7 +112,7 @@
         {
             <text>
             bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
+                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + '@message' + "</h4></div></div>",
                         onEscape: () => {  }});
             </text>
         }

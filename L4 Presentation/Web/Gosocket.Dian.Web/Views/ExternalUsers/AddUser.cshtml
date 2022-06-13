@@ -125,9 +125,57 @@
             border-radius: 4px;
             margin-top: 8px;
         }
-        
     </style>
 }
+
+
+<style>
+    input[type="checkbox"] {
+        /* Add if not using autoprefixer */
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* For iOS < 15 to remove gradient background */
+        background-color: #fff !important;
+        /* Not removed via appearance */
+        margin: 0 !important;
+        appearance: none !important;
+        background-color: #fff !important;
+        margin: 0 !important;
+        font: inherit !important;
+        color: currentColor !important;
+        width: 2em !important;
+        height: 2em !important;
+        border: 0.15em solid #41D78C !important;
+        border-radius: 0.15em !important;
+        transform: translateY(-0.075em) !important;
+        margin: 10px !important;
+        display: grid !important;
+        place-content: center !important;
+        outline: none !important;
+        border-radius: 5px !important;
+    }
+
+
+        input[type="checkbox"]:checked {
+            border: 1px solid white !important;
+            background: #41D78C !important;
+            border-radius: 5px !important;
+        }
+
+            input[type="checkbox"]:checked::after {
+                font-family: 'FontAwesome' !important;
+                /*  content:'';*/
+                font-weight: 400 !important;
+                content: "\F00C" !important;
+                color: white !important;
+                /*
+    width:5px;
+    height:4px;
+    display:block;
+    background:black;*/
+            }
+</style>
+
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0 margin-top-35">
@@ -293,8 +341,8 @@
         </div>
         <div class="footerRectangle" style="background-color: none !important;">
             @*@Html.ActionLink("Nuevo", "Add@*User", "ExternalUsers", null, new { @class = "btn btn-default" })
-            <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
-            <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
+                <button type="button" class="btn btn-danger btn-hover-gosocket btn-active" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive()">@ViewBag.txtActive</button>
+                <button type="submit" class="btn btn-success btn-hover-gosocket btn-save">@ViewBag.txtAccion</button>*@
             <div class="footerRectangle">
                 <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-primary ">
                     @ViewBag.txtAccion
@@ -311,89 +359,89 @@
                     <div class="row">
                         <div class="col-lg-12  col-md-12  col-xs-12">
                             <h4 class="subtitle-view" style="margin-bottom:20px;"><strong> Usuarios Configurados</strong></h4>
-                            
+
                         </div>
                         @*<div class="col-lg-12  col-md-12  col-xs-12 radian-subtitle-line">
-                        </div>*@
-                        <div class="col-lg-12 col-md-12  col-xs-12">
-                            <div class="table-responsive">
+                            </div>*@
+                    <div class="col-lg-12 col-md-12  col-xs-12">
+                        <div class="table-responsive">
 
-                                <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-left">Nombre</th>
-                                            <th class="text-center">Número de documento</th>
-                                            <th class="text-center">Fecha de creación</th>
-                                            <th class="text-center">Fecha última modificación</th>
-                                            <th class="text-center">Estado</th>
-                                            <th class="text-center">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @if (ViewBag.ExternalUsersList != null)
+                            <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Nombre</th>
+                                        <th class="text-left">Número de documento</th>
+                                        <th class="text-left">Fecha de creación</th>
+                                        <th class="text-left">Fecha última modificación</th>
+                                        <th class="text-left">Estado</th>
+                                        <th class="text-left">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.ExternalUsersList != null)
+                                    {
+                                        //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
+                                        foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
                                         {
-                                            //List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel> listDocsTypesLis = (List<Gosocket.Dian.Web.Models.IdentificationTypeListViewModel>)ViewBag.IdentificationTypesList;
-                                            foreach (var item in (List<Gosocket.Dian.Web.Models.ExternalUserViewModel>)ViewBag.ExternalUsersList)
-                                            {
-                                                <tr>
-                                                    <td class="text-left">@item.Names</td>
-                                                    @*<td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>*@
-                                                    <td class="text-center">@item.IdentificationId</td>
-                                                    @if (item.CreationDate.HasValue)
-                                                    {
-                                                        <td class="text-center">@item.CreationDate.Value.ToString("dd-MM-yyyy")</td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td> </td>
-                                                    }
-                                                    <td class="text-center">@item.LastUpdated.ToString("dd-MM-yyyy")</td>
-                                                    <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
-                                                    <td class="text-center">
+                                            <tr>
+                                                <td class="text-left">@item.Names</td>
+                                                @*<td>@listDocsTypesLis.FirstOrDefault(i => i.Id == item.IdentificationTypeId).Description</td>*@
+                                                <td class="text-center">@item.IdentificationId</td>
+                                                @if (item.CreationDate.HasValue)
+                                                {
+                                                    <td class="text-center">@item.CreationDate.Value.ToString("dd-MM-yyyy")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td> </td>
+                                                }
+                                                <td class="text-center">@item.LastUpdated.ToString("dd-MM-yyyy")</td>
+                                                <td class="text-center">@(item.Active == 1 ? "Activo" : "Inactivo")</td>
+                                                <td class="text-center">
 
-                                                        <button class="btn btn-xs">    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })</button>
-                                                        &nbsp;
-                                                        <button class="btn btn-xs">
-                                                            @if (item.Active == 1)
-                                                            {
-                                                                <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
-                                                            }
-                                                            else
-                                                            {
-                                                                <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
-                                                            }
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            }
+                                                    <button class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Editar usuario">    @Html.ActionLink(" ", "AddUser", new { id = item.Id }, new { @class = "fa fa-pencil" })</button>
+                                                    &nbsp;
+                                                    <button class="btn add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Activar / Desactivar usuario" style="background:white;">
+                                                        @if (item.Active == 1)
+                                                        {
+                                                            <a class="fa fa-toggle-on" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"></a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a class="fa fa-toggle-off" data-toggle="modal" data-target="#dialogConfirmActive" onclick="confirmActive('@item.Id', @item.Active, '@item.Email')"> </a>
+                                                        }
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         }
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!--Paginacón de la tabla-->
-                            <div class="pull-right table-pagination padding-top-10">
-                                @if (Model.Users.Count > 0)
-                                {
-                                    <span class="text-muted">
-                                        <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Users.Count ? (Model.Page) * Model.Length + Model.Users.Count : (Model.Page + 1) * Model.Length)</strong>
-                                    </span>
-                                    <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
-                                        <a class="btn btn-default paginate-btn prev-page"
-                                           href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page - 1 })"
-                                           @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
-                                            <span class="fa fa-chevron-left"></span>
-                                        </a>
-                                        <a class="btn btn-default paginate-btn next-page"
-                                           href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page + 1 })"
-                                           @(Model.Users.Count < Model.Length ? "disabled=\"disabled\"" : "")>
-                                            <span class="fa fa-chevron-right"></span>
-                                        </a>
-                                    </div>
-                                }
-                            </div>
-
+                                    }
+                                </tbody>
+                            </table>
                         </div>
+
+                        <!--Paginacón de la tabla-->
+                        <!-- <div class="pull-right table-pagination padding-top-10">
+         @if (Model.Users.Count > 0)
+         {
+             <span class="text-muted">
+                 <strong>@(Model.Page * Model.Length + 1)-@(Model.Length > Model.Users.Count ? (Model.Page) * Model.Length + Model.Users.Count : (Model.Page + 1) * Model.Length)</strong>
+             </span>
+             <div class="btn-group btn-group margin-left-5" style="padding-right: 20px;">
+                 <a class="btn btn-default paginate-btn prev-page"
+                    href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page - 1 })"
+                    @(Model.Page == 0 ? "disabled=\"disabled\"" : "")>
+                     <span class="fa fa-chevron-left"></span>
+                 </a>
+                 <a class="btn btn-default paginate-btn next-page"
+                    href="@Url.Action("AddUser", "ExternalUsers", new { id = Model.Id, Page = Model.Page + 1 })"
+                    @(Model.Users.Count < Model.Length ? "disabled=\"disabled\"" : "")>
+                     <span class="fa fa-chevron-right"></span>
+                 </a>
+             </div>
+         }
+     </div>-->
+
+                    </div>
                     </div>
                 </div>}
         </div>
@@ -442,7 +490,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-<script>
+    <script>
         var listMenu;
         var userId = "";
         var reloadView = false;
@@ -772,5 +820,5 @@
             $("#ModalGenerico").modal('hide');
         }
 
-</script>
+    </script>
 }

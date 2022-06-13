@@ -2,7 +2,7 @@
 @using Gosocket.Dian.Web.Utils
 <div class="table-responsive table-set-files margin-bottom-40">
 
-    <table class="documents-table table table-striped table-hover align-middle margin-bottom-0 custom-styles-files" data-int="0">
+    <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0 custom-styles-files" data-int="0">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -30,7 +30,7 @@
                     </td>
                     <td class="text-nowrap"><a>@fileType.RadianContributorType.Name</a></td>
                     <td class="text-nowrap" style="">
-                        <a onclick="editRadianContributorFileType(@fileType.Id)"><i class="fa fa-pencil" style="color: #348441; margin:1vh"></i></a>
+                        <a class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Editar" onclick="editRadianContributorFileType(@fileType.Id)"><i class="fa fa-pencil" style="color: #348441;"></i></a>
                         @if (!fileType.HideDelete)
                         {
                             <a onclick="deleteRadianContributorFileType(@fileType.Id)"><i class="fa fa-trash" style="color: #348441; margin:1vh"></i></a>

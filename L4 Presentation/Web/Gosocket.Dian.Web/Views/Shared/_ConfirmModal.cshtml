@@ -184,4 +184,12 @@
         if (!autoClosed) return;
         window.setTimeout(() => { $("#successModal").modal("hide"); }, 5000);
     }
+
+    function SuccessDialogV2Callback(title, message = null, callback = null) {
+        SuccessDialogV2(title, message);
+        $('#successModal').on('hidden.bs.modal', () => {
+            if (!callback) return;
+            callback();
+        });
+    }
 </script>

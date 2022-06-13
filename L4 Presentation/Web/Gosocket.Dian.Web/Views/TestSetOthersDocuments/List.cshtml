@@ -46,13 +46,13 @@
                     <div class="panel">
 
                         <div class="panel-body padding-top-20">
-                            <div class="padding-0 padding-bottom-30" style="border: 1px solid #348441">
+                            <div class="padding-0 padding-bottom-30">
                                 @if (User.IsInAnyRole("Administrador", "Super"))
                                 {
                                     <div class="form-inline padding-bottom-0">
                                         <div class="row margin-horizontal-0">
                                             <div class="col-md-12 table-toolbar-left padding-left-0 button-top-left-radian">
-                                                <a href="@Url.Action("Add", "TestSetOthersDocuments")" class="btn btn-success btn-radian-success pull-right">Configurar Nuevo Set de Pruebas</a>
+                                                <a href="@Url.Action("Add", "TestSetOthersDocuments")" class="btn btn-success btn-radian-success pull-left">Configurar Nuevo Set de Pruebas</a>
                                             </div>
 
                                             <div class="col-md-2 table-toolbar-right padding-right-0">

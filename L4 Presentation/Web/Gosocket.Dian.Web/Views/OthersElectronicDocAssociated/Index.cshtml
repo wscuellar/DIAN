@@ -227,27 +227,27 @@
     </style>
 }
 <div class="page-content radian-view margin-20 margin-page-content">
-    <div class="title-container">
-        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
-    </div>
-    <div class="row margin-horizontal-0 margin-top-50">
-        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
-            <div class="padding-top-20">
+    
+    <div class="row margin-horizontal-0 margin-top-20">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" style="background:none;">
+            <div>
                 <div class="margin-20 padding-bottom-25">
-                    @if (Model.EsEquivalentDocument)
-                    {
-                        <div class="form-group col-sm-4">
-                            <label for="equivalentElectronicDocumentId" class="control-label">Tipo de documento</label>
-                            @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange="equivalentDocumentSelected(this)" })
-                        </div>
-                    }
-                    <div id="steps-otherdocELectAssociate">
-                        <div class="radian-personal-info">
+                    <div class="row">
+                        @if (Model.EsEquivalentDocument)
+                        {
+                            <div class="form-group col-sm-4" style="padding: 0px 0px 20px 40px;">
+                                <label for="equivalentElectronicDocumentId" class="control-label">Tipo de documento</label>
+                                @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange = "equivalentDocumentSelected(this)" })
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <div class="radian-personal-info" style="background:white;border-radius:25px 25px 0px 0px;">
                             @Html.Partial("_personalInfo")
                         </div>
                         @if (Model.Step > 0)
                         {
-                            <div class="panel-footer">
+                            <div class="panel-footer" style="border-radius: 0px 0px 25px 25px;padding: 0px 30px 30px 30px !important;">
                                 <button name="SubmitPrueba" id="btnDetalleSetPruebas"
                                         class="btn btn-primary Set-Prueba mr-9">
                                     Set de pruebas
@@ -266,16 +266,19 @@
                                 </button>
                             </div>
                         }
+                        <!--
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Ingreso de solicitud</span></h3>
-                        <section>
-                        </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section>
-                        </section>
+                                    <h3></h3>
+                                        -->
 
-                        <h3></h3>
+
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
@@ -295,7 +298,9 @@
             </div>
 
         </div>
-
+        <div class="title-container" style="float: right;">
+            <div class="back-button btn btn-secondary"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })">Volver</a></div>
+        </div>
         @*Modal*@
 
 

@@ -473,10 +473,10 @@ namespace Gosocket.Dian.Web.Controllers
             if (!recaptchaValidation.Item1)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", recaptchaValidation.Item2);
-                return Json(new ResponseMessage("Captcha invalido", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage("Captcha inválido", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
             if (!ModelState.IsValid)
-                return Json(new ResponseMessage("informacion invalida", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage("Información inválida", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
 
             var pk = $"{model.IdentificationType}|{model.UserCode}";
             var rk = $"{model.CompanyCode}";
@@ -501,10 +501,25 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Contribuyente tiene RUT en estado cancelado.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)Domain.Common.ContributorStatus.Enabled)
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
-                return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                if(contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
+                {
+                    ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada.");
+                    return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                }
+
+                /*2022-06-10 => Solucion a Bug 15525
+                 * Dado que el contribuyente (Empresa) es NO OFE y se encuentra habilitado en Nomina Electrónica (o en cualquiera de los otros documentos electrónicos No Ofe)
+                 * Cuando el ingrese por la opción Empresa OFE
+                 * Entonces el sistema debe validar que el contribuyente esté habilitado en factura electronica (en cualquiera de sus modos de operación)
+                 */
+                bool contributorIsBillerEnabled = VerifyContributorEnabledInElectronicBiller(contributor);
+                if (!contributorIsBillerEnabled)
+                {
+                    ModelState.AddModelError($"CompanyLoginFailed", "Empresa no se encuentra habilitada como facturador electrónico.");
+                    return Json(new ResponseMessage("Empresa no se encuentra habilitada como facturador electrónico.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                }
             }
 
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
@@ -593,7 +608,6 @@ namespace Gosocket.Dian.Web.Controllers
             return Json(new ResponseMessage("LoginConfirmed", "OK", (int)System.Net.HttpStatusCode.OK), JsonRequestBehavior.AllowGet);
         }
 
-
         [ExcludeFilter(typeof(Authorization))]
         public ActionResult LoginConfirmed(UserLoginViewModel model, string returnUrl)
         {
@@ -653,10 +667,25 @@ namespace Gosocket.Dian.Web.Controllers
                 return View("PersonLogin", model);
             }
 
-            if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
+            if (ConfigurationManager.GetValue("Environment") == "Prod")
             {
-                ModelState.AddModelError($"PersonLoginFailed", "Usted no se ecuentra habilitado.");
-                return View("PersonLogin", model);
+                if(contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
+                {
+                    ModelState.AddModelError($"PersonLoginFailed", "Usted no se ecuentra habilitado.");
+                    return View("PersonLogin", model);
+                }
+
+                /*2022-06-10 => Solucion a Bug 15525
+                 * Dado que el contribuyente (Empresa) es NO OFE y se encuentra habilitado en Nomina Electrónica (o en cualquiera de los otros documentos electrónicos No Ofe)
+                 * Cuando el ingrese por la opción Empresa OFE
+                 * Entonces el sistema debe validar que el contribuyente esté habilitado en factura electronica (en cualquiera de sus modos de operación)
+                 */
+                bool contributorIsBillerEnabled = VerifyContributorEnabledInElectronicBiller(contributor);
+                if (!contributorIsBillerEnabled)
+                {
+                    ModelState.AddModelError($"PersonLoginFailed", "Usted no se encuentra habilitado como facturador electrónico.");
+                    return View("PersonLogin", model);
+                }
             }
 
             var pk = $"{model.IdentificationType}|{model.PersonCode}";
@@ -725,7 +754,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                     tableManager.InsertOrUpdate(logger);
                     ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                    return View("CompanyLogin", model);
+                    return View("PersonLogin", model);
                 }
             }
 
@@ -1517,7 +1546,7 @@ namespace Gosocket.Dian.Web.Controllers
                 return Json(new ResponseMessage("Empresa no se encuentra habilitada.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if ((contributorInvoice.ContributorTypeId != '1' || contributorInvoice.ContributorTypeId != 1) && contributorInvoice.AcceptanceStatusId == 4)
+            if ((/*contributorInvoice.ContributorTypeId != '4' || */ contributorInvoice.ContributorTypeId != 4) && contributorInvoice.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1636,7 +1665,7 @@ namespace Gosocket.Dian.Web.Controllers
                     </p>    
                 </div>
                 ",
-                "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
 
         }
 
@@ -1669,16 +1698,16 @@ namespace Gosocket.Dian.Web.Controllers
             if (contributor == null)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Persona natural sin permisos asociados.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Persona natural sin permisos asociados.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (contributor.StatusRut == (int)StatusRut.Cancelled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Contribuyente tiene RUT en estado cancelado.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Contribuyente tiene RUT en estado cancelado.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            if ((contributor.ContributorTypeId != '4' || contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
+            if ((/*contributor.ContributorTypeId != '4' ||*/ contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
                 return Json(new ResponseMessage("No es posible el ingreso de la persona, ya que se encuentra habilitada.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
@@ -1687,7 +1716,7 @@ namespace Gosocket.Dian.Web.Controllers
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "Usted no se ecuentra habilitado.");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage("Usted no se ecuentra habilitado.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             var pk = $"{model.IdentificationType}|{model.PersonCode}";
@@ -1776,7 +1805,7 @@ namespace Gosocket.Dian.Web.Controllers
 
                 tableManager.InsertOrUpdate(logger);
                 ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                return View("NotObligedInvoice", model);
+                return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
@@ -1801,7 +1830,7 @@ namespace Gosocket.Dian.Web.Controllers
                     </p>    
                 </div>
                 ", 
-                "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                "PersonLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
 
         }
 
@@ -2196,5 +2225,23 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         #endregion
+
+        /// <summary>
+        /// Verifica si el usuario ya tiene un proceso de habilitación de facturación electrónica habilitado
+        /// </summary>
+        /// <param name="contributor"></param>
+        /// <returns></returns>
+        private bool VerifyContributorEnabledInElectronicBiller(Contributor contributor)
+        {
+            var service = new ContributorOperationsService();
+
+            var operations = service.GetContributorOperations(contributor.Id);
+            var hasOperationModesEnabledInElectronicBiller = operations
+                .Any(t => !t.Deleted
+                    && !t.Software.Deleted
+                    && t.Software.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
+
+            return hasOperationModesEnabledInElectronicBiller;
+        }
     }
 }

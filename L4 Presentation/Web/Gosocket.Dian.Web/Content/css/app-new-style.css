@@ -22,7 +22,9 @@
     }
 
 .form-control,
-button.btn.dropdown-toggle.btn-default {
+button.btn.dropdown-toggle.btn-default,
+[name="daterangepicker_start"],
+[name="daterangepicker_end"] {
     min-height: 40px !important;
     border: 1px solid #ccc !important;
     background: #fff !important;
@@ -36,7 +38,9 @@ button.btn.dropdown-toggle.btn-default {
     border-radius: 4px !important;
 }
 
-    .form-control::placeholder {
+    .form-control::placeholder,
+    [name="daterangepicker_start"]::placeholder,
+    [name="daterangepicker_end"]::placeholder {
         text-transform: initial;
         color: #ccc !important;
     }
@@ -112,7 +116,7 @@ table.simple-table tbody tr td:not(.dataTables_empty) {
     font-weight: normal !important;
     /*text-align: left !important;*/
     background: #fff !important;
-    padding: 25px 4px !important;
+    padding: 25px 14px !important;
     border: 0 !important;
     border-bottom: 1px solid #CCCCCC !important;
 }
@@ -427,6 +431,31 @@ label.sub-title-2 {
         content: '' !important;
     }
 
+.fa-toggle-on {
+    background: url(/Content/font/custom/fa-toggle-on.svg);
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+    .fa-toggle-on::before {
+        content: '' !important;
+    }
+
+.fa-toggle-off {
+    background: url(/Content/font/custom/fa-toggle-off.svg);
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+.fa-toggle-off::before {
+    content: '' !important;
+}
+
+
 .fa-eye {
     background: url(/Content/font/custom/fa-eye.svg);
     background-repeat: no-repeat;
@@ -649,36 +678,52 @@ label.sub-title-2 {
     margin-top: 10px !important;
 }
 
-    .daterangepicker .drp-calendar {
+    .daterangepicker .daterangepicker_input {
+        padding: 8px;
+    }
+
+    .daterangepicker .daterangepicker_input i {
+        display: none;
+    }
+
+    .daterangepicker .drp-calendar,
+    .daterangepicker .calendar {
         padding: 0 0 12px !important;
         border: 2px solid #0DB4DC;
         border-radius: 6px;
         max-width: 50% !important;
     }
 
-        .daterangepicker .drp-calendar.left {
+        .daterangepicker .drp-calendar.left,
+        .daterangepicker .calendar.left {
             border-right: 0;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
 
-        .daterangepicker .drp-calendar.right {
+        .daterangepicker .drp-calendar.right,
+        .daterangepicker .calendar.right {
             border-left: 0;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
             width: fit-content !important;
         }
 
-        .daterangepicker .drp-calendar .calendar-table table {
+        .daterangepicker .drp-calendar .calendar-table table,
+        .daterangepicker .calendar .calendar-table table {
             font-family: 'Ubuntu';
             color: #2B323D;
         }
 
             .daterangepicker .drp-calendar .calendar-table table tr th,
-            .daterangepicker .drp-calendar .calendar-table table tr td {
+            .daterangepicker .drp-calendar .calendar-table table tr td,
+            .daterangepicker .calendar .calendar-table table tr th,
+            .daterangepicker .calendar .calendar-table table tr td {
                 border-radius: 0;
                 width: 35px;
+                height: 40px;
                 padding: 9px;
+                font-family: 'Ubuntu';
                 /*font-size: 14px;*/
             }
 
@@ -692,8 +737,14 @@ label.sub-title-2 {
         .daterangepicker tr:first-child th:last-child span {
             border-color: #41D78C;
         }
+        .daterangepicker tr:first-child th:first-child,
+        .daterangepicker tr:first-child th:last-child {
+            color: #41D78C;
+            font-size: 18px;
+        }
 
-    .daterangepicker .drp-calendar .calendar-table table thead tr:last-child th {
+    .daterangepicker .drp-calendar .calendar-table table thead tr:last-child th,
+    .daterangepicker .calendar .calendar-table table thead tr:last-child th {
         height: 42px;
         min-width: 43px;
         background: #E2E7EB;
@@ -718,17 +769,19 @@ label.sub-title-2 {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 34px;
+            height: 33.5px;
             margin: 3px !important;
             /*min-width: 30px !important;
             padding: 8px !important;*/
         }
 
-    .daterangepicker .drp-calendar .calendar-table table tr td.off {
+    .daterangepicker .drp-calendar .calendar-table table tr td.off,
+    .daterangepicker .calendar .calendar-table table tr td.off {
         background: #F0F2F4 !important;
     }
 
-.drp-buttons {
+.drp-buttons,
+.ranges {
     display: none !important;
 }
 
@@ -740,13 +793,19 @@ label.sub-title-2 {
     }
 
 @media (min-width: 564px) {
-    .daterangepicker .drp-calendar.left .calendar-table {
+    .daterangepicker .drp-calendar.left .calendar-table,
+    .daterangepicker .calendar.left .calendar-table {
         padding: 0px;
         border-right: 2px solid #220202;
     }
 
+    .daterangepicker .drp-calendar.right .calendar-table,
+    .daterangepicker .calendar.right .calendar-table {
+        padding: 0px;
+    }
+
     .daterangepicker {
-        width: 620px;
+        width: 630px;
     }
 }
 /*Botones del proceso de habilitacion*/
@@ -795,8 +854,7 @@ button.hab-menu-button {
 }
 /*****************************/
 .RadianContainerBegin {
-    margin-top: 40px;
-    margin-bottom: 0px;
+    margin: 0 !important;
     padding: 45px 60px;
 }
 
@@ -887,3 +945,105 @@ table.simple-table {
     background: #fff !important;
     border: 0 !important;
 }
+table.simple-table tbody tr td:not(.dataTables_empty) {
+text-align:left !important;
+}
+
+
+/* tooltips */
+
+.tooltip-inner {
+    background-color: #262944;
+    font-family: 'Ubuntu';
+    font-weight: normal;
+    color: #fff;
+    text-align: left;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 18px;
+    border-radius: 6px;
+    min-width: 117px;
+    min-height: 50px;
+}
+
+.tooltip.top {
+    margin-top: -10px;
+}
+
+    .tooltip.top .tooltip-arrow {
+        border-top-color: #262944 !important;
+        bottom: -3px;
+        margin-left: -10px;
+        border-width: 10px 10px 0;
+    }
+
+.tooltip.right {
+    margin-left: 10px;
+}
+
+    .tooltip.right .tooltip-arrow {
+        border-right-color: #262944 !important;
+        left: -3px !important;
+        margin-top: -10px;
+        border-width: 10px 10px 10px 0;
+    }
+
+.tooltip.left {
+    margin-left: -10px;
+}
+
+    .tooltip.left .tooltip-arrow {
+        border-left-color: #262944 !important;
+        right: -3px !important;
+        margin-top: -10px;
+        border-width: 10px 0 10px 10px;
+    }
+
+.tooltip.bottom {
+    margin-top: 10px;
+}
+
+    .tooltip.bottom .tooltip-arrow {
+        border-bottom-color: #262944 !important;
+        top: -3px !important;
+        margin-left: -10px;
+        border-width: 0 10px 10px;
+    }
+
+.custom-label-success {
+    background-color: #D5F4E6;
+    color: #00AC57;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+
+.custom-label-warning {
+    background-color: #FBF0D7;
+    color: #C98802;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+
+.custom-label-danger {
+    background-color: #FCD5D3;
+    color: #F54E41;
+    padding: 10px 13px;
+    font-family: 'Ubuntu';
+    border-radius: 5px;
+    width: 100px;
+}
+
+a.label-table:hover {
+    color: #00AC57;
+}
+
+.subTitleMenu {
+    margin-top: -37px;
+    margin-bottom: 15px;
+    font-family: 'Ubuntu';
+}
+

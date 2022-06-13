@@ -582,6 +582,8 @@
     <Content Include="Content\font\custom\fa-info-circle-success.svg" />
     <Content Include="Content\font\custom\fa-info-circle-warn.svg" />
     <Content Include="Content\font\custom\fa-info-circle.svg" />
+    <Content Include="Content\font\custom\fa-toggle-off.svg" />
+    <Content Include="Content\font\custom\fa-toggle-on.svg" />
     <Content Include="Content\images\aproved.png" />
     <Content Include="Content\images\bandera-1.png" />
     <Content Include="Content\images\Bandera-2.png" />
@@ -625,6 +627,7 @@
     <Content Include="Content\images\puerbas-2.png" />
     <Content Include="Content\images\reject.png" />
     <Content Include="Content\images\spinner.gif" />
+    <Content Include="Content\images\Svg\CloseButton.svg" />
     <Content Include="Content\images\Svg\documentos_equivalentes_icono_principal_Mesa_de_trabajo.svg" />
     <Content Include="Content\images\Svg\edti.svg" />
     <Content Include="Content\images\Svg\EstadoFacturaElectronica.svg" />
