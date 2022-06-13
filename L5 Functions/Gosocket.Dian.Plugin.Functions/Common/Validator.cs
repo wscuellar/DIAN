@@ -6858,8 +6858,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.TransferEconomicRights:
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
-                    DateTime transferEconomicPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime transferEconomicDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime transferEconomicPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;                    
+                    DateTime transferEconomicDueDateInvoice = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (transferEconomicPaymentDueDate == transferEconomicDueDateInvoice)
                     {
