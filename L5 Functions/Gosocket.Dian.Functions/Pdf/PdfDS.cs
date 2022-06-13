@@ -22,6 +22,7 @@ using QRCoder;
 using System.Drawing;
 using Gosocket.Dian.DataContext;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Gosocket.Dian.Functions.Pdf
 {
@@ -512,6 +513,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			
 			foreach (var detalle in model)
 			{
+				var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
@@ -547,14 +549,14 @@ namespace Gosocket.Dian.Functions.Pdf
 					{
 						Reca = item.Elements(cbc + "Amount").FirstOrDefault().Value;
 
-						RecDet = RecDet + decimal.Parse(Reca);
+						RecDet = RecDet + decimal.Parse(Reca, numinf);
 					}
 					else
 					{
 						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
 
 						descunetoTotal = Desc;
-						DescDet = DescDet + decimal.Parse(Desc);
+						DescDet = DescDet + decimal.Parse(Desc, numinf);
                         
 					}
 				}
@@ -630,18 +632,19 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 	            </tr>");
 				}
-				
+
 				if (tipoD == "Nota")
-					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
-										decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value);
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString(), numinf) *
+										decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value, numinf);
 				else
 					if (tipoD == "")
 					subTotalTotal = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount").FirstOrDefault().Value.ToString();
 
 
 				else
-					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
-									decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString());
+					
+				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString(), numinf) *
+									decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString(), numinf);
 
 					
 
@@ -653,44 +656,10 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			if (tipoD =="55" || tipoD == "50" || tipoD == "45")
             {				
-				var totalRevert = Reverse(Convert.ToString(subTotal / 100));
-				var decimales = totalRevert.Substring(0, 2);
-				var total = $"{subTotal/100}.{Reverse(decimales)}";
-				var totalRec = "";
-				var totalDes = "";
+				plantillaHtml = plantillaHtml.Replace("{SubTotal}", Convert.ToString(subTotal).Replace(",", "."));
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", Convert.ToString(DescDet).Replace(",", "."));
+				plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}",Convert.ToString(RecDet).Replace(",", "."));
 
-
-
-				if (Convert.ToString(DescDet).Length > 2)
-				{
-					var totalRevertDes = Reverse(Convert.ToString(DescDet));
-					var decimalesDes = totalRevertDes.Substring(0, 2);
-				    totalDes = $"{Convert.ToString(DescDet).Substring(0, Convert.ToString(DescDet).Length - 2)}.{Reverse(decimalesDes)}";
-
-                }
-                else
-                {
-					totalDes = Convert.ToString(DescDet);
-
-				}
-				
-
-				
-				if (Convert.ToString(RecDet).Length > 2) {
-					var totalRevertRec = Reverse(Convert.ToString(RecDet));
-					var decimalesRec = totalRevertRec.Substring(0, 2);
-					totalRec = $"{Convert.ToString(RecDet).Substring(0, Convert.ToString(RecDet).Length - 2)}.{Reverse(decimalesRec)}";
-                }
-                else
-                {
-
-					totalRec = Convert.ToString(RecDet);
-                }
-
-				plantillaHtml = plantillaHtml.Replace("{SubTotal}", total.ToString());
-				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", totalDes.ToString());
-			    plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", totalRec.ToString());
-                
 			}
             else
             {
