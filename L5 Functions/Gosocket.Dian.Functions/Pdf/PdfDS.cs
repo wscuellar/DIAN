@@ -656,10 +656,10 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			if (tipoD =="55" || tipoD == "50" || tipoD == "45")
             {				
-				plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString());
-				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
-			    plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
-                
+				plantillaHtml = plantillaHtml.Replace("{SubTotal}", Convert.ToString(subTotal).Replace(",", "."));
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", Convert.ToString(DescDet).Replace(",", "."));
+				plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}",Convert.ToString(RecDet).Replace(",", "."));
+
 			}
             else
             {
