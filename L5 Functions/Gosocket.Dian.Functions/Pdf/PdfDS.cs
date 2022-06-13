@@ -959,9 +959,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{Anticipo}", Anticipo.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{Anticipo}", string.Empty);
+			//ojito ese anticipo esta mal pero es porque en el xpath del excel de anticipos aparece esto asi que se deja
 
-
-			var Retenciones = model.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");
+			var Retenciones = model.Elements(cac + "WithholdingTaxTotal").Elements(cbc + "TaxAmount");
 			if (Retenciones.Any())
 				Html = Html.Replace("{Retenciones}", Retenciones.FirstOrDefault().Value);
 			else
