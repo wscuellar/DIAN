@@ -516,7 +516,7 @@ namespace Gosocket.Dian.Functions.Pdf
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
 				var ivaValor =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cbc + "TaxableAmount") : detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount"); 
-				var ivaValorGran =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").ToList() : detalle.Elements(cac + "TaxTotal").ToList(); 
+				var ivaValorGran =tipoD!="Nota"? detalle.Elements(cac + "TaxTotal").ToList() : detalle.Elements(cac + "TaxTotal").ToList(); 
 				var IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
@@ -524,7 +524,15 @@ namespace Gosocket.Dian.Functions.Pdf
                 if (tipoD =="55" || tipoD == "50")
                 {
 					
-					ivaValor = detalle.Elements(cac + "TaxTotal").Elements(cbc + "TaxAmount");
+                    foreach (var item in ivaValorGran)
+                    {
+						var tipo = item.Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cac + "TaxScheme").Elements(cbc + "ID").FirstOrDefault().Value;
+                        if (tipo =="01")
+                        {
+					      ivaValor = item.Elements(cbc + "TaxAmount");
+                        }
+
+                    }
 
 					IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
 
