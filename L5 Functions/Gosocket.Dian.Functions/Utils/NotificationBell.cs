@@ -19,7 +19,6 @@ namespace Gosocket.Dian.Functions.Utils
         {
             RequestNotification notification = new RequestNotification();
             RequestNotification notificationProd = new RequestNotification();
-            var listaNotificacionProd = new List<RequestNotification>();
             var accountId = await ApiHelpers.ExecuteRequestAsync<string>(ConfigurationManager.GetValue("AccountByNit"), new { Nit = id });
             Contributor contributor = contributorService.GetByCode(id);
             var business = contributor.Name;
@@ -55,32 +54,12 @@ namespace Gosocket.Dian.Functions.Utils
                     notification.NotificationId = 2;
                     notification.NoticationType = 2;
 
-                    notificationProd.Menssage = "Su certificado digital se encuentra cargado correctamente en producción.<br><br>";
-                    notificationProd.Description = "Su certificado digital se encuentra cargado correctamente en producción.";
-                    notificationProd.Subject = "Traslado de certificado digital al ambiente de Producción";
-                    notificationProd.Matters = "Traslado de certificado digital al ambiente de Producción";
-                    notificationProd.NotificationId = 2;
-                    notificationProd.NoticationType = 2;
-                    notificationProd.PetitionName = contributor.Email;
-                    notificationProd.UserName = contributor.Code;
-                    notificationProd.PartitionKey = accountId;
-                    notificationProd.RecipientEmail = contributor.Email;
-                    listaNotificacionProd.Add(notificationProd);
-
-                    notificationProd.Menssage = "Recuerde asociar y/o crear la numeración -Ruta Configuración/Rangos de numeración.<br><br>";
-                    notificationProd.Description = "Recuerde asociar y/o crear la numeración -Ruta Configuración/Rangos de numeración.";
-                    notificationProd.Subject = "Solicitud de Numeración";
-                    notificationProd.Matters = "Solicitud de Numeración";
-                    notificationProd.NotificationId = 2;
-                    notificationProd.NoticationType = 2;
-                    notificationProd.PetitionName = contributor.Email;
-                    notificationProd.UserName = contributor.Code;
-                    notificationProd.PartitionKey = accountId;
-                    notificationProd.RecipientEmail = contributor.Email;
-                    listaNotificacionProd.Add(notificationProd);
-
-                    notificationProd.Menssage = "Por favor crear sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). - Ruta Configuración.<br><br>";
-                    notificationProd.Description = "Por favor crear sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). - Ruta Configuración.";
+                    notificationProd.Menssage = "1. Su certificado digital se encuentra cargado correctamente en producción.<br><br>" +
+                        "2.  Recuerde asociar y/o crear la numeración -Ruta Configuración/Rangos de numeración.<br><br>" +
+                        "3. Por favor crear sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). - Ruta Configuración.<br><br>";
+                    notificationProd.Description = "1. Su certificado digital se encuentra cargado correctamente en producción.<br><br>" +
+                        "2.  Recuerde asociar y/o crear la numeración -Ruta Configuración/Rangos de numeración.<br><br>" +
+                        "3. Por favor crear sus insumos (Compradores/Vendedores/Trabajadores/Productos y Servicios). - Ruta Configuración.<br><br>";
                     notificationProd.Subject = "Creación de Insumos";
                     notificationProd.Matters = "Creación de Insumos";
                     notificationProd.NotificationId = 2;
@@ -88,8 +67,7 @@ namespace Gosocket.Dian.Functions.Utils
                     notificationProd.PetitionName = contributor.Email;
                     notificationProd.UserName = contributor.Code;
                     notificationProd.PartitionKey = accountId;
-                    notificationProd.RecipientEmail = contributor.Email;
-                    listaNotificacionProd.Add(notificationProd);
+                    notificationProd.RecipientEmail = contributor.Email;               
                     
                     break;
             }
@@ -100,8 +78,8 @@ namespace Gosocket.Dian.Functions.Utils
 
             SentEvent(notification);
 
-            if (listaNotificacionProd.Count > 0) { 
-                SentEventProd(listaNotificacionProd);
+            if ( type.Equals("03")) { 
+                SentEventProd(notificationProd);
             }
         }
 
@@ -139,29 +117,27 @@ namespace Gosocket.Dian.Functions.Utils
             Console.WriteLine(responseLog.Content);
         }
 
-        public void SentEventProd(List<RequestNotification> lista)
+        public void SentEventProd(RequestNotification notificacionprod)
         {
-            foreach(var notificacionprod in lista) { 
-                var insertNotification = ConfigurationManager.GetValue("InsertNotificationProd");
-                var clientNot = new RestClient(insertNotification);
-                var requestNot = new RestRequest();
-                requestNot.Method = Method.POST;
-                requestNot.AddHeader("Content-Type", "application/json");
-                requestNot.Parameters.Clear();
-                requestNot.AddParameter("application/json", JsonConvert.SerializeObject(notificacionprod), ParameterType.RequestBody);
-                var responseNot = clientNot.Execute(requestNot);
-                Console.WriteLine(responseNot.Content);
+            var insertNotification = ConfigurationManager.GetValue("InsertNotificationProd");
+            var clientNot = new RestClient(insertNotification);
+            var requestNot = new RestRequest();
+            requestNot.Method = Method.POST;
+            requestNot.AddHeader("Content-Type", "application/json");
+            requestNot.Parameters.Clear();
+            requestNot.AddParameter("application/json", JsonConvert.SerializeObject(notificacionprod), ParameterType.RequestBody);
+            var responseNot = clientNot.Execute(requestNot);
+            Console.WriteLine(responseNot.Content);
 
-                var logNotification = ConfigurationManager.GetValue("LogNotification");
-                var clientLog = new RestClient(logNotification);
-                var requestLog = new RestRequest();
-                requestLog.Method = Method.POST;
-                requestLog.AddHeader("Content-Type", "application/json");
-                requestLog.Parameters.Clear();
-                requestLog.AddParameter("application/json", JsonConvert.SerializeObject(notificacionprod), ParameterType.RequestBody);
-                var responseLog = clientLog.Execute(requestLog);
-                Console.WriteLine(responseLog.Content);
-            }
+            var logNotification = ConfigurationManager.GetValue("LogNotification");
+            var clientLog = new RestClient(logNotification);
+            var requestLog = new RestRequest();
+            requestLog.Method = Method.POST;
+            requestLog.AddHeader("Content-Type", "application/json");
+            requestLog.Parameters.Clear();
+            requestLog.AddParameter("application/json", JsonConvert.SerializeObject(notificacionprod), ParameterType.RequestBody);
+            var responseLog = clientLog.Execute(requestLog);
+            Console.WriteLine(responseLog.Content);
         }
     }
 
