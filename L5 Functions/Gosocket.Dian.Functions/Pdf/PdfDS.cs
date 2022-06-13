@@ -1028,7 +1028,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			var RecargoGlobal = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "ChargeTotalAmount");//resta subtotal ? 
 			if (RecargoGlobal.Any())
-				Html = Html.Replace("{RecargoGlobal}", Decimal.Parse(RecargoGlobal.FirstOrDefault().Value.ToString().Split('.')[0]).ToString("N0"));
+				Html = Html.Replace("{RecargoGlobal}", RecargoGlobal.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{RecargoGlobal}", string.Empty);
 
