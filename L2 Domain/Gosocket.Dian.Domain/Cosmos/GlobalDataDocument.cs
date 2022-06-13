@@ -45,6 +45,9 @@ namespace Gosocket.Dian.Domain.Cosmos
         public string DocumentTypeName { get; set; }
         public ulong? GlobalNSUCode { get; set; }
         public string SoftwareId { get; set; }
+        public string CustomizationID { get; set; }
+        public string DocumentCurrencyCode { get; set; }
+
 
         public string id { get; set; }
         public string _rid { get; set; }
