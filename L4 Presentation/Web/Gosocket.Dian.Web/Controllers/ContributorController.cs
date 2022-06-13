@@ -265,8 +265,9 @@ namespace Gosocket.Dian.Web.Controllers
             var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
             var contributorTypeId = contributor.ContributorTypeId;
             
-            AuthToken auth = GetAuthData();
-            var contributorLoggedByOfe = auth.LoginMenu == "OFE";
+            var auth = Session["loginMenu"].ToString();
+
+            var contributorLoggedByOfe = (auth == "OFE");
 
             if (contributorAcceptanceStatusId == (int)ContributorStatus.Pending)
             {
