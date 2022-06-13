@@ -8851,7 +8851,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateTransferEconomicRights,
                     ErrorCode = "AAI05a",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a_049"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -8874,7 +8874,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateTransferEconomicRights,
                     ErrorCode = "AAI07b",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b_049"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -8927,7 +8927,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateTransferEconomicRights,
                     ErrorCode = "AAI05a",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a_049"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -8945,7 +8945,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateTransferEconomicRights,
                     ErrorCode = "AAI07b",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b_049"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
