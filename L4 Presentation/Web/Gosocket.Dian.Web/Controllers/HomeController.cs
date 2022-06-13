@@ -144,6 +144,9 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = (int)ContributorStatus.Pending;
                 model.ContributorHabilitationDate = DateTime.UtcNow;
                 model.ContributorProductionDate = DateTime.UtcNow;
+
+                var loginMenu = "OFE";
+                Session["loginMenu"] = loginMenu;
             }
             else
             {
