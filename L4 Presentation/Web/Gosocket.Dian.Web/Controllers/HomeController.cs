@@ -192,9 +192,11 @@ namespace Gosocket.Dian.Web.Controllers
                 var pk = identificatioType + "|" + User.UserCode();
                 var rk = User.UserCode();
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
-                ViewBag.LoginMenu = auth.LoginMenu;
+                var loginMenu = auth.LoginMenu;
 
-                if(auth.LoginMenu == "NO OFE")
+                Session["loginMenu"] = loginMenu;
+
+                if (auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }
