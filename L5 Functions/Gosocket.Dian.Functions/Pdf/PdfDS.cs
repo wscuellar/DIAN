@@ -403,7 +403,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
             if (TipoDoc.Any())
             {
-				if (TipoDoc.FirstOrDefault().Value == "55" || TipoDoc.FirstOrDefault().Value == "50")
+				if (TipoDoc.FirstOrDefault().Value == "55" || TipoDoc.FirstOrDefault().Value == "50" || TipoDoc.FirstOrDefault().Value == "60")
 				{
 					var AdquirientePais = model.Elements(cac + "AccountingCustomerParty").Elements(cac + "Party").Elements(cac + "PhysicalLocation").Elements(cac + "Address").Elements(cac + "Country").Elements(cbc + "Name");
 					if (AdquirientePais.Any())
@@ -1043,7 +1043,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 if (typeDocument.Any())
                 {
-					if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "45")
+					if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "60")
 					{
 						var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
 						var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
