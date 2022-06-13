@@ -262,20 +262,32 @@ namespace Gosocket.Dian.Services.Utils.Common
 
         private string GetXmlParserDefinitions()
         {
+            var fileManager = new FileManager();
             var xmlParserDefinitions = "";
             var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitions");
-            if (cacheItem == null)
+
+            if(ConfigurationManager.GetValue("Environment") == "Test") 
             {
-                var fileManager = new FileManager();
-                xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitions.config");
-                CacheItemPolicy policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
-                };
-                xmlParserDefinitionsInstanceCache.Set(new CacheItem("XmlParserDefinitions", xmlParserDefinitions), policy);
+                xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitions_85.config");
             }
             else
-                xmlParserDefinitions = (string)cacheItem.Value;
+            {
+                if (cacheItem == null)
+                {
+                    //var fileManager = new FileManager();
+                    xmlParserDefinitions = fileManager.GetText("configurations", "XmlParserDefinitions.config");
+
+                    CacheItemPolicy policy = new CacheItemPolicy
+                    {
+                        AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
+                    };
+                    xmlParserDefinitionsInstanceCache.Set(new CacheItem("XmlParserDefinitions", xmlParserDefinitions), policy);
+                }
+                else
+                    xmlParserDefinitions = (string)cacheItem.Value;
+            }
+
+
             return xmlParserDefinitions;
         }
     }
