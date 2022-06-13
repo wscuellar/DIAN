@@ -218,7 +218,8 @@
     "ErrorMessage_DC24zd": "No se puede generar el evento endoso con efectos de cesión ordinaria antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional",
     "ErrorMessage_DC24zf": "No se puede generar el evento Protesto antes de la fecha de generación del evento inscripción en el RADIAN de la factura electrónica de venta como título valor que circula en el territorio nacional",
     "ErrorMessage_DC24zc": "No se puede generar el evento endoso con efectos de cesión ordinaria antes de la fecha de generación del documento referenciado.",
-    "ErrorMessage_DC24ze": "No se puede generar el evento Protesto antes de la fecha de generación del documento referenciado."
+    "ErrorMessage_DC24ze": "No se puede generar el evento Protesto antes de la fecha de generación del documento referenciado.",
+    "ErrorMessage_AAI07a_049": "El valor no es informado"
 
 
 

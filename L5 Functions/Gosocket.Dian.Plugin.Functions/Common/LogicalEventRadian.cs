@@ -2527,21 +2527,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valueTotalElements = string.Empty;
             string valuePriceToPay = string.Empty;
             string valueDiscountRateEndoso = string.Empty;
-            bool validaPago = false;
-
-            switch (Convert.ToInt32(eventCode))
-            {
-                case (int)EventStatus.EndorsementWithEffectOrdinaryAssignment:
-                    valueTotalElements = nitModel.ValorTotalEndoso;
-                    valuePriceToPay = nitModel.PrecioPagarseFEV;
-                    valueDiscountRateEndoso = nitModel.TasaDescuento;
-                    break;
-                case (int)EventStatus.TransferEconomicRights:
-                    valueTotalElements = nitModel.InformacionTransferenciaDerechos;
-                    break;
-                default:
-                    break;
-            }
+            bool validaPago = false;           
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validElements = false;
@@ -2598,6 +2584,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 //Valida informacion ValorTotalEndoso
                 if (String.IsNullOrEmpty(valueTotalElements))
                 {
+                    validaPago = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -2606,12 +2593,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
-                    return responses;
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAI05a",
+                        ErrorMessage = "ErrorMessage_AAI05a",
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });                  
                 }
 
                 //Valida informacion Endoso  PrecioPagarseFEV                         
                 if (String.IsNullOrEmpty(valuePriceToPay))
                 {
+                    validaPago = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -2620,12 +2616,21 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
-                    return responses;
+
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAI07b",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
                 }
 
                 //Valida informacion Endoso TasaDescuento                       
                 if (String.IsNullOrEmpty(valueDiscountRateEndoso))
                 {
+                    validaPago = true;
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -2633,9 +2638,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorCode = "AAI09",
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                    return responses;
+                    });          
                 }
+
+                if (validaPago)
+                    return responses;
+
 
                 if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
                 {

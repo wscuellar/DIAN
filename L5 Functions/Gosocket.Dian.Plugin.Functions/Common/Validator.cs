@@ -5890,24 +5890,6 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             }
                         }
 
-
-                        var eventRadianPaymentInfo = logicalTransferEconomicRights.ValidateElementsSum(xmlParserCude, nitModel, eventPrev.EventCode);
-                        //validateE(documentMeta);
-                        if (eventRadianPaymentInfo != null)
-                        {
-                            foreach (var itemEventRadianPaymentInfo in eventRadianPaymentInfo)
-                            {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = itemEventRadianPaymentInfo.IsValid,
-                                    Mandatory = itemEventRadianPaymentInfo.Mandatory,
-                                    ErrorCode = itemEventRadianPaymentInfo.ErrorCode,
-                                    ErrorMessage = itemEventRadianPaymentInfo.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-
                         var validateTransferEconomicRights = ValidateTransferEconomicRights(xmlParserCude, nitModel);
                         if (validateTransferEconomicRights != null)
                         {
@@ -8863,6 +8845,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = "ErrorMessage_AAI05a",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             //Valida informacion valorPrecioPagarseInfoTransDerechos
@@ -8874,7 +8865,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAI07a",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a_049"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
