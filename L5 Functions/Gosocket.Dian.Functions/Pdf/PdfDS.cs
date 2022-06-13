@@ -521,8 +521,8 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
-                if (tipoD =="55" || tipoD == "50")
-                {
+				if (tipoD == "55" || tipoD == "50" || tipoD == "45" || tipoD == "27")
+				{
 					
                     foreach (var item in ivaValorGran)
                     {
