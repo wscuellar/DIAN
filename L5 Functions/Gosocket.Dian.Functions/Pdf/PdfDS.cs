@@ -651,9 +651,11 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
-            //var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
-			
+			//var dub = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString("0,0", System.Globalization.CultureInfo.InvariantCulture);
 
+			subTotal = decimal.Round(subTotal, 2);
+			DescDet = decimal.Round(DescDet, 2);
+			RecDet = decimal.Round(RecDet, 2);
 			if (tipoD =="55" || tipoD == "50" || tipoD == "45")
             {				
 				plantillaHtml = plantillaHtml.Replace("{SubTotal}", Convert.ToString(subTotal).Replace(",", "."));
