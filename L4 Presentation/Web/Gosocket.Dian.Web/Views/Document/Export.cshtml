@@ -176,28 +176,9 @@
             //});
 
             $('.btn-export-excel').click(function () {
-
-
-                bootbox.dialog({
-                    title: "Atención",
-                    message: "<div class='media'><div class='media-body'>" +
-                        "<h4 class='text-thin'>¿Esta seguro que desea descargar el listado de documentos recibidos?</h4></div></div>",
-                    buttons: {
-                        si: {
-                            label: "SI",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                sendExport();
-                            }
-                        },
-                        no: {
-                            label: "NO",
-                            className: "btn-gosocket",
-                            callback: function () {
-                            }
-                        }
-                    }
-                });
+                ConfirmDialogV2("Atención", `¿Esta seguro que desea descargar el listado de documentos recibidos?`,
+                    { confirm: "SI", cancel: "NO" },
+                    sendExport);
 
 
                 //$(this).attr('disabled', 'disabled');
@@ -351,7 +332,7 @@
 
                     }
                     else {
-                        bootbox.alert("No se pudo realizar el exporte de la información");
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar el exporte de la información");
                     }
                 },
                 complete: function () {
@@ -359,7 +340,7 @@
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }
