@@ -7289,6 +7289,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.errorCode = "AAF01";
                 response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_045");
             }
+            else if (eventCode == "049")
+            {                
+                response.errorCodeNoteA = "AAD11a";
+                response.errorMessageNoteA = ConfigurationManager.GetValue("ErrorMessage_AAD11a");
+            }
             return response;
         }
         #endregion
@@ -8854,6 +8859,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a_049"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Transferencia"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Transferencia"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
 
             //Valida informacion valorPrecioPagarseInfoTransDerechos
@@ -8919,6 +8942,14 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
+            XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueReceiver = 0;
+            for (int i = 0; i < valueListReceiver.Count; i++)
+            {
+                string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            }
+
             if (double.Parse(valorInformacionTransferenciaDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
             {
                 validElements = true;
@@ -8928,6 +8959,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     Mandatory = ValidateTransferEconomicRights,
                     ErrorCode = "AAI05a",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a_049"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Transferencia"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+            }
+
+            if (double.Parse(valorInformacionTransferenciaDerechos, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateTransferEconomicRights,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Transferencia"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
