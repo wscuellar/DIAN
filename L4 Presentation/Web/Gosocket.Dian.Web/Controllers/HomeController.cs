@@ -84,6 +84,7 @@ namespace Gosocket.Dian.Web.Controllers
                     totalMonthAll += (int)total;
                 }
                 model.JsonMonthSumAll += String.Format(CultureInfo.InvariantCulture, "{0:#,#}", totalMonthAll).Replace(",", ".");
+                model.JsonMonthSumAll = !string.IsNullOrWhiteSpace(model.JsonMonthSumAll) ? model.JsonMonthSumAll : "0";
 
                 model.JsonMonthDate = JsonConvert.SerializeObject(arrayMonthDate);
                 model.JsonMonthAll = JsonConvert.SerializeObject(arrayMonthAll);
@@ -128,6 +129,7 @@ namespace Gosocket.Dian.Web.Controllers
                     totalAll += (int)total;
                 }
                 model.JsonSumAll += string.Format(CultureInfo.InvariantCulture, "{0:#,#}", totalAll).Replace(",", ".");
+                model.JsonSumAll = !string.IsNullOrWhiteSpace(model.JsonSumAll) ? model.JsonSumAll : "0";
 
                 model.JsonDate = JsonConvert.SerializeObject(arrayDate);
                 model.JsonAll = JsonConvert.SerializeObject(arrayAll);
