@@ -1051,3 +1051,13 @@ a.label-table:hover {
 ul#mainnav-menu li.active ul.collapse {
     background: #F6F7F9 !important;
 }
+
+
+ul.collapse li {
+    max-height: 70px !important;
+}
+
+
+ul#mainnav-menu li:not(li.list-divider) {
+    min-height: 50px !important;
+}
