@@ -2524,14 +2524,98 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateElementsSum(XmlParser xmlParserCude, NitModel nitModel, string eventCode)
         {
             DateTime startDate = DateTime.UtcNow;
-            string valueTotalElements = string.Empty;
-            string valuePriceToPay = string.Empty;
-            string valueDiscountRateEndoso = string.Empty;
-            bool validaPago = false;           
+            string valueTotalElements = nitModel.ValorTotalEndoso;
+            string valuePriceToPay = nitModel.PrecioPagarseFEV;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;
+            bool validaPago = false;  
+           
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validElements = false;
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateElementsSum"), out bool ValidateElementsSum);
+
+            //Valida informacion ValorTotalEndoso
+            if (String.IsNullOrEmpty(valueTotalElements))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI05",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = "ErrorMessage_AAI05a",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion Endoso  PrecioPagarseFEV                         
+            if (String.IsNullOrEmpty(valuePriceToPay))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI07a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion Endoso TasaDescuento                       
+            if (String.IsNullOrEmpty(valueDiscountRateEndoso))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI09",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (validaPago)
+                return responses;
+
 
             XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
             double totalValueSender = 0;
@@ -2557,8 +2641,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateElementsSum,
                     ErrorCode = "AAF19",
-                    ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
-                        ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAF19_Transferencia"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2572,110 +2655,42 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateElementsSum,
                     ErrorCode = "AAG20",
-                    ErrorMessage = (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment) ?
-                        ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso") : ConfigurationManager.GetValue("ErrorMessage_AAG20_Transferencia"),
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
 
-            //Valida informacion Endoso con efectos de cesión ordinaria               
-            if (Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
             {
-                //Valida informacion ValorTotalEndoso
-                if (String.IsNullOrEmpty(valueTotalElements))
+                validElements = true;
+                responses.Add(new ValidateListResponse
                 {
-                    validaPago = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAI05",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAI05a",
-                        ErrorMessage = "ErrorMessage_AAI05a",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });                  
-                }
-
-                //Valida informacion Endoso  PrecioPagarseFEV                         
-                if (String.IsNullOrEmpty(valuePriceToPay))
-                {
-                    validaPago = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAI07a",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAI07b",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                //Valida informacion Endoso TasaDescuento                       
-                if (String.IsNullOrEmpty(valueDiscountRateEndoso))
-                {
-                    validaPago = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = true,
-                        ErrorCode = "AAI09",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });          
-                }
-
-                if (validaPago)
-                    return responses;
-
-
-                if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
-                {
-                    validElements = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAI05a",
-                        ErrorMessage = "ErrorMessage_AAI05a",
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
-
-                //Calculo valor de la negociación
-                double resultNegotiationValue = (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - double.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
-                resultNegotiationValue = resultNegotiationValue / 100;
-
-                //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-                if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
-                {
-                    validElements = true;
-                    responses.Add(new ValidateListResponse
-                    {
-                        IsValid = false,
-                        Mandatory = ValidateElementsSum,
-                        ErrorCode = "AAI07b",
-                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
-                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                    });
-                }
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = "ErrorMessage_AAI05a",
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
             }
+
+            //Calculo valor de la negociación
+            double resultNegotiationValue = (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - double.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+            resultNegotiationValue = resultNegotiationValue / 100;
+
+            //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
+            if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            
 
             if (validElements)
                 return responses;

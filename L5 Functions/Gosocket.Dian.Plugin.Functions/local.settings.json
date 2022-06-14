@@ -220,7 +220,8 @@
     "ErrorMessage_DC24zc": "No se puede generar el evento endoso con efectos de cesión ordinaria antes de la fecha de generación del documento referenciado.",
     "ErrorMessage_DC24ze": "No se puede generar el evento Protesto antes de la fecha de generación del documento referenciado.",
     "ErrorMessage_AAI07a_049": "El valor no es informado",
-    "ErrorMessage_AAI05a_049": "El valor informado es diferente a la sumatoria de los elementos cbc:CorporateStockAmount de quien genera el evento"
+    "ErrorMessage_AAI05a_049": "El valor informado es diferente a la sumatoria de los elementos cbc:CorporateStockAmount de quien genera el evento",
+    "ErrorMessage_AAD11a": "No se informo la nota cuando el evento fue generado por un mandato"
 
 
 
