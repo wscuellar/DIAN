@@ -144,6 +144,9 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = (int)ContributorStatus.Pending;
                 model.ContributorHabilitationDate = DateTime.UtcNow;
                 model.ContributorProductionDate = DateTime.UtcNow;
+
+                var loginMenu = "OFE";
+                Session["loginMenu"] = loginMenu;
             }
             else
             {
@@ -192,9 +195,20 @@ namespace Gosocket.Dian.Web.Controllers
                 var pk = identificatioType + "|" + User.UserCode();
                 var rk = User.UserCode();
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
-                ViewBag.LoginMenu = auth.LoginMenu;
+                var loginMenu = "";
+                if (auth != null)
+                {
+                    loginMenu = auth.LoginMenu;
+                }
+                else
+                {
+                    auth = dianAuthTableManager.FindPartitionKey<AuthToken>(pk);
+                    loginMenu = auth.LoginMenu;
+                }
 
-                if(auth.LoginMenu == "NO OFE")
+                Session["loginMenu"] = loginMenu;
+
+                if (auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }

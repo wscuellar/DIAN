@@ -379,7 +379,7 @@
                     showConfirmation("<div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><br>El participante ya tiene asociado el software asignado!!!", AlertExec(null));
                     return;
                 }
-                
+
                 if ($('#OperationModeSelectedId').val() == 1) {
                     $('#ErrorSoftwareName').hide()
                     $('#ErrorPinSW').hide()
@@ -542,7 +542,7 @@
                     hideLoading("#panel-wrapper");
                     if (result != null) {
 
-						if (result.Code != 200) {
+                        if (result.Code != 200) {
 
 							$('.close').click()
 							bootbox.dialog({
@@ -557,39 +557,37 @@
                             return;
                         }
 
-                        bootbox.dialog({
-                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'></div><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
-                            onEscape: () => {
-                                var url = "@Url.Action("Index", "OthersElectronicDocuments")";
-                                if (@Model.ElectronicDocumentId == 14) {
-                                    window.location.reload();
-                                    return;
-                                }
-                                if (@Model.ElectronicDocumentId == 3) {
-                                    window.location.reload();
-                                    return;
-                                }
-                                if (@Model.ElectronicDocumentId == 13) {
-                                    if (result.ExistOperationModeAsociated) {
-                                        window.location.reload();
-                                    } else {
-                                        window.location.href = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
-                                    }
-                                    return;
-                                }
-                                window.location.href = url;
+                        SuccessDialogV2Callback("El modo de operación ha sido eliminado exitosamente", "", () => {
+                            var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                            if (@Model.ElectronicDocumentId == 14) {
+                                window.location.reload();
+                                return;
                             }
+                            if (@Model.ElectronicDocumentId == 3) {
+                                window.location.reload();
+                                return;
+                            }
+                            if (@Model.ElectronicDocumentId == 13) {
+                                if (result.ExistOperationModeAsociated) {
+                                    window.location.reload();
+                                } else {
+                                    window.location.href = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
+                                }
+                                return;
+                            }
+                            window.location.href = url;
                         });
                     }
-                    else
-                        bootbox.alert("No se pudo realizar la Cancelación");
+                    else {
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar la Cancelación");
+                    }
                 },
                 complete: function () {
                     hideLoading("#panel-wrapper");
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }

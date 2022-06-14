@@ -94,14 +94,23 @@ function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, 
 
 
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
-    bootbox.dialog({
-        className: className && className,
-        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-        buttons: buttons,
-        onEscape: () => {
-            operationCancel ? operationCancel() : window.location.reload();
-        }
-    });
+    if (Object.keys(buttons).length <= 1) {
+        ErrorDialogV2("", confirmMessage);
+        return;
+    }
+
+    ConfirmDialogV2(confirmMessage, " ",
+        { confirm: buttons.del.label, cancel: buttons.del1.label },
+        buttons.del.callback, buttons.del1.callback);
+
+    //bootbox.dialog({
+    //    className: className && className,
+    //    message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
+    //    buttons: buttons,
+    //    onEscape: () => {
+    //        operationCancel ? operationCancel() : window.location.reload();
+    //    }
+    //});
 
 }
 
