@@ -563,6 +563,11 @@ namespace Gosocket.Dian.Functions.Pdf
 				var fechaPeriodo = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "StartDate");
 
 				var FechaPeriodo = fechaPeriodo.Any() ? fechaPeriodo.FirstOrDefault().Value : "";
+
+				var fechaPeriodofinal = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "EndDate");
+
+				var FechaPeriodofinal = fechaPeriodofinal.Any() ? fechaPeriodofinal.FirstOrDefault().Value : "";
+
 				var Descr = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "Description");
 
 				var Descrip = Descr.Any() ? Descr.FirstOrDefault().Value : "";
@@ -610,6 +615,27 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()}</td>
 
 					 </tr>");
+				}
+				else if (tipoD == "45")
+				{
+					rowDetalleProductosBuilder.Append($@"
+                <tr>
+		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
+		            <td>{unit.CompositeName}</td>
+		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
+                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
+					 <td class='text-right'>{Desc:n2}</td>
+                    <td class='text-right'>{Reca:n2}</td>
+		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td class='text-right'>{IvaPor:n2}</td>
+
+
+		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
+					<td>{FechaPeriodofinal:dd/MM/yyyy}</td>
+	            </tr>");
 				}
 				else
 				{
