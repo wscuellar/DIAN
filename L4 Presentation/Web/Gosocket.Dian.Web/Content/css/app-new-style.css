@@ -699,6 +699,7 @@ label.sub-title-2 {
             border-right: 0;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            width: 50% !important;
         }
 
         .daterangepicker .drp-calendar.right,
@@ -706,7 +707,7 @@ label.sub-title-2 {
             border-left: 0;
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
-            width: fit-content !important;
+            width: 47% !important;
         }
 
         .daterangepicker .drp-calendar .calendar-table table,
@@ -1047,3 +1048,16 @@ a.label-table:hover {
     font-family: 'Ubuntu';
 }
 
+ul#mainnav-menu li.active ul.collapse {
+    background: #F6F7F9 !important;
+}
+
+
+ul.collapse li {
+    max-height: 70px !important;
+}
+
+
+ul#mainnav-menu li:not(li.list-divider) {
+    min-height: 50px !important;
+}

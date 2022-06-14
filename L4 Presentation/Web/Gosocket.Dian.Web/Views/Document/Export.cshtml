@@ -3,6 +3,7 @@
 
 @{
     ViewBag.Title = "Descargar listados";
+
 }
 
 @section css
@@ -11,136 +12,140 @@
     <link href="~/Content/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
 }
+<style>
+    .modal-header:after {
+        display: none;
+    }
+</style>
+<div class="page-content margin-15">
+    <div class="row margin-horizontal-0">
+        <div class="tab-base">
+            <!--Tabs Content-->
+            <div class="tab-content transparency">
+                <div id="tab-current-country" class="tab-pane fade active in">
 
-    <div class="page-content margin-15">
-        <div class="row margin-horizontal-0">
-            <div class="tab-base">
-                <!--Tabs Content-->
-                <div class="tab-content transparency">
-                    <div id="tab-current-country" class="tab-pane fade active in">
+                    <div class="panel" id="panel-wrapper" data-target="#panel-wrapper" style="background-color: #ffffff00;">
+                        <div class="panel-body padding-top-20">
+                            <div class="pad-btm">
+                                <div class="row margin-horizontal-0">
+                                    @using (Html.BeginForm("Export", "Document", FormMethod.Post, new { id = "export-form" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.HiddenFor(m => m.Type)
+                                        @Html.HiddenFor(m => m.StartDate)
+                                        @Html.HiddenFor(m => m.EndDate)
+                                        @Html.HiddenFor(m => m.AmountAdmin)
 
-                        <div class="panel" id="panel-wrapper" data-target="#panel-wrapper" style="background-color: #ffffff00;">
-                            <div class="panel-body padding-top-20">
-                                <div class="pad-btm">
-                                    <div class="row margin-horizontal-0">
-                                        @using (Html.BeginForm("Export", "Document", FormMethod.Post, new { id = "export-form" }))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            @Html.HiddenFor(m => m.Type)
-                                            @Html.HiddenFor(m => m.StartDate)
-                                            @Html.HiddenFor(m => m.EndDate)
-                                            @Html.HiddenFor(m => m.AmountAdmin)
+                                        @*<input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
+                                            <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
 
-                                            @*<input id="startDate" name="StartDate" type="hidden" value="@Model.StartDate" />
-                                        <input id="endDate" name="EndDate" type="hidden" value="@Model.EndDate" />*@
+                                        <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
+                                            <div class="col-md-12 padding-horizontal-0">
+                                                <div id="document-list" class="panel panel-bordered-dian">
 
-                                            <div class="row margin-horizontal-0 margin-bottom-10" style="margin-left:5px; margin-right:5px;">
-                                                <div class="col-md-12 padding-horizontal-0">
-                                                    <div id="document-list" class="panel panel-bordered-dian">
+                                                    <div class="panel-body padding-20">
+                                                        <div class="row">
 
-                                                        <div class="panel-body padding-20">
-                                                            <div class="row">
-
-                                                                @if (User.IsInAnyRole("Administrador", "Super"))
-                                                                {
-                                                                    <div class="col-sm-3 padding-xs-0">
-                                                                        <div class="form-group">
-                                                                            @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
-                                                                            @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
-                                                                        </div>
-                                                                    </div>
-                                                                }
-
+                                                            @if (User.IsInAnyRole("Administrador", "Super"))
+                                                            {
                                                                 <div class="col-sm-3 padding-xs-0">
                                                                     <div class="form-group">
-                                                                        @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
-                                                                        @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                        @Html.LabelFor(m => m.SenderCode, new { @class = "control-label" })
+                                                                        @Html.TextBoxFor(m => m.SenderCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.SenderCode) } })
                                                                     </div>
                                                                 </div>
+                                                            }
 
-                                                                <div class="col-sm-3 padding-xs-0">
-                                                                    <div class="form-group">
-                                                                        <label class="control-label">Rango de fechas</label>
-                                                                        <div class="input-group double-calendar">
-                                                                            <span id="action-left" class="input-group-addon">
-                                                                                <i class="fa fa-chevron-left"></i>
-                                                                            </span>
-                                                                            <input type="text" class="form-control" id="export-range" placeholder="Ejm: 01-01-2020 - 01-03-2021">
-                                                                            <span id="action-right" class="input-group-addon">
-                                                                                <i class="fa fa-chevron-right"></i>
-                                                                            </span>
-                                                                        </div>
-                                                                        @*<div class="form-group">
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    @Html.LabelFor(m => m.ReceiverCode, new { @class = "control-label" })
+                                                                    @Html.TextBoxFor(m => m.ReceiverCode, new Dictionary<string, object> { { "class", "form-control" }, { "placeholder", @Html.DisplayNameFor(model => model.ReceiverCode) } })
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-3 padding-xs-0">
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Rango de fechas</label>
+                                                                    <div class="input-group double-calendar">
+                                                                        <span id="action-left" class="input-group-addon">
+                                                                            <i class="fa fa-chevron-left"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control" id="export-range" placeholder="Ejm: 01-01-2020 - 01-03-2021">
+                                                                        <span id="action-right" class="input-group-addon">
+                                                                            <i class="fa fa-chevron-right"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                    @*<div class="form-group">
                                                                             <div class="form-control col-sm-12" id="export-range">
                                                                                 <i class="icon-calendar"></i>&nbsp;
                                                                                 <span class="thin uppercase hidden-xs"></span>&nbsp;
                                                                                 <i class="fa fa-angle-down"></i>
                                                                             </div>
                                                                         </div>*@
-                                                                    </div>
                                                                 </div>
-
-                                                                @if (!User.IsInAnyRole("Administrador", "Super"))
-                                                                {
-                                                                    <div class="col-sm-3 padding-xs-0">
-                                                                        <div class="form-group margin-bottom-0">
-                                                                            <label class="control-label">Grupos</label>
-                                                                            <select id="filter-groups" class="form-control selectpicker" name="GroupCode">
-                                                                                <option selected="selected" value="0">Todos</option>
-                                                                                <option value="1">Emitidos</option>
-                                                                                <option value="2">Recibidos</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                }
-
                                                             </div>
-                                                            <br />
-                                                            @if (User.IsInAnyRole("Administrador", "Super"))
-                                                            {
-                                                        <div class="dian-alert dian-alert-info" style="width:40%;">
-                                                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
-                                                            <p>
-                                                                Se exportarán un  máximo de @Model.AmountAdmin documentos.
-                                                            </p>
-                                                        </div>                                                              
-       
-                                                            }
+
                                                             @if (!User.IsInAnyRole("Administrador", "Super"))
                                                             {
-                                                        <div class="dian-alert dian-alert-info" style="width:40%;">
-                                                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
-                                                            <p>
-                                                                Se exportarán un  máximo de @Model.AmountAdmin documentos.
-                                                            </p>
-                                                        </div>
-                                                                                                                                
+                                                                <div class="col-sm-3 padding-xs-0">
+                                                                    <div class="form-group margin-bottom-0">
+                                                                        <label class="control-label">Grupos</label>
+                                                                        <select id="filter-groups" class="form-control selectpicker" name="GroupCode">
+                                                                            <option selected="selected" value="0">Todos</option>
+                                                                            <option value="1">Emitidos</option>
+                                                                            <option value="2">Recibidos</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             }
 
                                                         </div>
+                                                        <br />
+                                                        @if (User.IsInAnyRole("Administrador", "Super"))
+                                                        {
+                                                            <div class="dian-alert dian-alert-info" style="width:40%;">
+                                                                <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                                                                <p>
+                                                                    Se exportarán un  máximo de @Model.AmountAdmin documentos.
+                                                                </p>
+                                                            </div>
 
-                                                        <div class="panel-footer-grey text-center">
-                                                            <button type="button" class="btn btn-success btn-radian-success btn-export-excel">Exportar Excel</button>
-                                                        </div>
+                                                        }
+                                                        @if (!User.IsInAnyRole("Administrador", "Super"))
+                                                        {
+                                                            <div class="dian-alert dian-alert-info" style="width:40%;">
+                                                                <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                                                                <p>
+                                                                    Se exportarán un  máximo de @Model.AmountAdmin documentos.
+                                                                </p>
+                                                            </div>
+
+                                                        }
 
                                                     </div>
+
+                                                    <div class="panel-footer-grey text-center">
+                                                        <button type="button" class="btn btn-success btn-radian-success btn-export-excel">Exportar Excel</button>
+                                                    </div>
+
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
+                                    }
 
-                                    </div>
                                 </div>
-
-                                @Html.Partial("_tasks")
-
                             </div>
 
+                            @Html.Partial("_tasks")
+
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 
 @section Scripts {
@@ -148,13 +153,16 @@
 
     <!--Bootstrap Select [ OPTIONAL ]-->
     <script src="~/Content/plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <link href="~/Content/css/app-new-style.css" rel="stylesheet" />
 
     <script src="~/Content/js/bootstrap-filestyle.min.js"></script>
     <script src="~/Content/js/file-validator.js"></script>
 
+
     <script>
         var startDate;
         var endDate;
+               
 
         $(document).ready(function () {
             //$('input.check').on('change', function () {
@@ -322,7 +330,7 @@
                         //            label: "OK",
                         //            className: "btn-gosocket",
                         //            callback: function () {
-                                        
+
                         //            }
                         //        }
                         //    }
