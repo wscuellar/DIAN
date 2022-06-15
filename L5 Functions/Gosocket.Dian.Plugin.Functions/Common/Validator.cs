@@ -6956,8 +6956,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    //Valida fecha mayor a los eventos Expresa o Tacita
-                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
+                    //Valida fecha menor a los eventos Expresa o Tacita
+                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
@@ -7112,7 +7112,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var arrayTasks = new List<Task>();
             if (Convert.ToInt32(eventCode) == (int)EventStatus.EndosoPropiedad
             || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoGarantia
-            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion)
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndosoProcuracion
+            || Convert.ToInt32(eventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment)
             {
                 GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(trackId, trackId);
                 if (validatorDocumentMeta != null)
