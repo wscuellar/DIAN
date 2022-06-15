@@ -238,7 +238,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TipoOperacion = model.Elements(cbc + "CustomizationID");
 			var TipoDoc = model.Elements(cbc + "InvoiceTypeCode");
 			if (TipoOperacion.Any())
-				plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
+                if (TipoDoc.FirstOrDefault().Value != "32")
+                {
+
+				  plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
+                }
 
 			var EmisorRazonSocial = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "RegistrationName");
 			if (EmisorRazonSocial.Any())
@@ -527,7 +531,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
-				if (tipoD == "55" || tipoD == "50" || tipoD == "45" || tipoD == "27")
+				if (tipoD == "55" || tipoD == "50" || tipoD == "45" || tipoD == "27" || tipoD == "32")
 				{
 					
                     foreach (var item in ivaValorGran)
@@ -1042,7 +1046,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var totalIvaString = "";
             if (typeDocument.Any())
             {
-				if (typeDocument.FirstOrDefault().Value == "60" || typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27")
+				if (typeDocument.FirstOrDefault().Value == "60" || typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27" || typeDocument.FirstOrDefault().Value == "32")
 				{
 					foreach (var item in ivaValorGran)
 					{
