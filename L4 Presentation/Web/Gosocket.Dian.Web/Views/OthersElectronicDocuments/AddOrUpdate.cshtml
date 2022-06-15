@@ -514,7 +514,7 @@
                 return;
             }
 
-            let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
+            let confirmMessage = "Desea cancelar el registro del participante @(Html.Raw(contributorName)) de @(Html.Raw(electronicDocumentName))";
             if (@Model.ElectronicDocumentId == 3) {
                 confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
             }
