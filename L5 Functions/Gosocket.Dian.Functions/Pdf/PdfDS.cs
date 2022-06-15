@@ -537,7 +537,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                     }
 
-					IvaVal = ivaValor.Count() == 0 ? "" : ivaValor.FirstOrDefault().Value;
+					IvaVal = ivaValor.Count() == 0 ? "0" : ivaValor.FirstOrDefault().Value;
 
 				}
 				var Desc = "";
