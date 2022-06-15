@@ -6,40 +6,40 @@
             <tr>
                 <th>Prefijo</th>
                 <th>Nº resolución</th>
-                <th class="text-center">Fecha resolución</th>
+                <th class="text-left">Fecha resolución</th>
                 <th>Llave técnica</th>
-                <th class="text-right">Rango desde</th>
-                <th class="text-right">Rango hasta</th>
-                <th class="text-center">Fecha desde</th>
-                <th class="text-center">Fecha hasta</th>
+                <th class="text-left">Rango desde</th>
+                <th class="text-left">Rango hasta</th>
+                <th class="text-left">Fecha desde</th>
+                <th class="text-left">Fecha hasta</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var range in Model.NumberRanges)
             {
                 <tr>
-                    <td class="text-nowrap">
+                    <td class="text-nowrap text-left">
                         <a>@range.Serie</a>
                     </td>
-                    <td class="text-nowrap">
+                    <td class="text-nowrap text-left">
                         <a>@range.ResolutionNumber</a>
                     </td>
-                    <td class="text-nowrap text-center">
+                    <td class="text-nowrap text-left">
                         <a>@range.ResolutionDate.ToString("dd-MM-yyyy")</a>
                     </td>
-                    <td class="text-nowrap">
+                    <td class="text-nowrap text-left">
                         <a>@range.TechnicalKey</a>
                     </td>
-                    <td class="text-nowrap text-right">
+                    <td class="text-nowrap text-left">
                         <a>@range.FromNumber</a>
                     </td>
-                    <td class="text-nowrap text-right">
+                    <td class="text-nowrap text-left">
                         <a>@range.ToNumber</a>
                     </td>
-                    <td class="text-nowrap text-center">
+                    <td class="text-nowrap text-left">
                         <a>@range.ValidDateNumberFrom</a>
                     </td>
-                    <td class="text-nowrap text-center">
+                    <td class="text-nowrap text-left">
                         <a>@range.ValidDateNumberTo</a>
                     </td>
                 </tr>
