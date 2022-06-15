@@ -510,10 +510,13 @@ namespace Gosocket.Dian.Functions.Pdf
 			decimal DescDet = 0;
 			decimal RecDet = 0;
 			var subTotalTotal = "";
-			var descunetoTotal = "";
 			
+
+
 			foreach (var detalle in model)
 			{
+				decimal descunetoTotal = 0;
+				decimal recargototal = 0;
 				var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
@@ -550,13 +553,14 @@ namespace Gosocket.Dian.Functions.Pdf
 					{
 						Reca = item.Elements(cbc + "Amount").FirstOrDefault().Value;
 
+						recargototal = decimal.Parse(Reca, numinf);
 						RecDet = RecDet + decimal.Parse(Reca, numinf);
 					}
 					else
 					{
 						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
 
-						descunetoTotal = Desc;
+						descunetoTotal = decimal.Parse(Desc, numinf);
 						DescDet = DescDet + decimal.Parse(Desc, numinf);
                         
 					}
@@ -595,8 +599,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{Preciounitario.ToString("N", formato)}</td>
-					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
-                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+					<td class='text-right'>{descunetoTotal.ToString("N", formato)}</td>
+                    <td class='text-right'>{recargototal.ToString("N", formato)}</td>
 		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
@@ -616,8 +620,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{Preciounitario.ToString("N", formato)}</td>
-					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
-                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+					<td class='text-right'>{descunetoTotal.ToString("N", formato)}</td>
+                    <td class='text-right'>{recargototal.ToString("N", formato)}</td>
 		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
@@ -636,8 +640,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                     <td>{Preciounitario.ToString("N", formato)}</td>
-					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
-                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+					<td class='text-right'>{descunetoTotal.ToString("N", formato)}</td>
+                    <td class='text-right'>{recargototal.ToString("N", formato)}</td>
 		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
@@ -657,8 +661,8 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
                    <td>{Preciounitario.ToString("N", formato)}</td>
-					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
-                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+					<td class='text-right'>{descunetoTotal.ToString("N", formato)}</td>
+                    <td class='text-right'>{recargototal.ToString("N", formato)}</td>
 		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
