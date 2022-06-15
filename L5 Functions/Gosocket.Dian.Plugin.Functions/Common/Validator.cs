@@ -6125,6 +6125,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC21"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+
+                        if(Convert.ToInt32(data.ResponseCode) == (int)EventStatus.TransferEconomicRights)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC79",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC79"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }
+
                     }
 
                     //Valida si FE es contado no permite realizar la primera incripción
@@ -6174,6 +6187,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             int businessDays = 0;
             int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimit"), out int businessDaysLimit);
+            int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimitObjection"), out int BusinessDaysLimitObjection);
 
             DateTime startDate = DateTime.UtcNow;
             DateTime dateNow = DateTime.UtcNow.Date;
@@ -6739,7 +6753,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
                     DateTime endorsementPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime endorsementDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime endorsementDueDateInvoice = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (endorsementPaymentDueDate == endorsementDueDateInvoice)
                     {
@@ -6793,13 +6807,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
+                    //Valida la fecha de vencimiento del título está vigente
+                    if(endorsementDueDateInvoice > dateNow)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC72",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC72"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
                     break;
 
                 case (int)EventStatus.Objection:
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
                     DateTime objectionPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime objectionDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime objectionDueDateInvoice = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (objectionPaymentDueDate == objectionDueDateInvoice)
                     {
@@ -6851,6 +6878,51 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_DC24zf"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
+                    }
+
+                    //Valida la fecha del título valor está vencido 
+                    if (objectionDueDateInvoice < dateNow && 
+                        Convert.ToInt32(data.CustomizationID) == (int)EventCustomization.ObjectionNonAcceptance)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC75",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC75"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida la fecha del título valor está vigente 
+                    if (objectionDueDateInvoice > dateNow &&
+                        Convert.ToInt32(data.CustomizationID) == (int)EventCustomization.ObjectionNonPayment)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC76",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC76"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    //Valida 15 días calendario posteriores al vencimiento del título valor
+                    if (objectionDueDateInvoice < dateNow)
+                    {
+                        businessDays = BusinessDaysHolidays.BusinessDaysUntil(Convert.ToDateTime(objectionDueDateInvoice), Convert.ToDateTime(dateNow));
+                        if(businessDays > BusinessDaysLimitObjection)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC77",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC77"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                        }                            
                     }
 
                     break;
@@ -6909,7 +6981,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
                     DateTime notificationDebtorPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime notificationDebtorDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime notificationDebtorDueDateInvoice = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (notificationDebtorPaymentDueDate == notificationDebtorDueDateInvoice)
                     {
@@ -6982,7 +7054,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     //validar el campo EndDate contra el campo PaymentDueDate de la factura referenciada.
                     DateTime transferPaymentDueDate = Convert.ToDateTime(data.EndDate).Date;
-                    DateTime paymentDueDateInvoice = Convert.ToDateTime(dataModelPaymentDueDate).Date;
+                    DateTime paymentDueDateInvoice = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (transferPaymentDueDate == paymentDueDateInvoice)
                     {
