@@ -764,6 +764,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var _bande = 0;
 			foreach (var detalle in model)
 			{
+				var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
@@ -800,7 +801,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				var cont = listaCont.Where(x => x.id == element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "ID").FirstOrDefault().Value);
 				var conta = cont.Any() ? cont.FirstOrDefault().numero : "";
 
-                if (_bande < listaCont.Count())
+				decimal ivaVal = decimal.Parse(IvaVal, numinf);
+
+				if (_bande < listaCont.Count())
                 {
 					rowDetalleProductosBuilder.Append($@"
 					<tr>
@@ -811,10 +814,10 @@ namespace Gosocket.Dian.Functions.Pdf
 						<td>{detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value}</td>
 						<td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		            
 						<td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-						<td>{DescDet}</td>
+						<td>{DescDet.ToString("N", formato)}</td>
 						<td>{info[_bande]}</td>
-						<td class='text-right'>{RecDet:n2}</td>
-						<td class='text-right'>{IvaVal:n2}</td>
+						<td class='text-right'>{RecDet.ToString("N", formato)}</td>
+						<td class='text-right'>{ivaVal.ToString("N", formato)}</td>
 						<td class='text-right'>{IvaPor:n2}</td>
 						<td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		
 						<td style='word-wrap: break-word;'>{listaCont[_bande].numero}</td>
@@ -1028,7 +1031,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var totalIvaString = "";
             if (typeDocument.Any())
             {
-				if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27")
+				if (typeDocument.FirstOrDefault().Value == "60" || typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27")
 				{
 					foreach (var item in ivaValorGran)
 					{
