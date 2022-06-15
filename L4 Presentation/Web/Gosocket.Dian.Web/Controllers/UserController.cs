@@ -1548,8 +1548,8 @@ namespace Gosocket.Dian.Web.Controllers
 
             if ((/*contributorInvoice.ContributorTypeId != '4' || */ contributorInvoice.ContributorTypeId != 4) && contributorInvoice.AcceptanceStatusId == 4)
             {
-                ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso la empresa ya se encuentra habilitada como facturador.");
-                return Json(new ResponseMessage("No es posible el ingreso la empresa ya se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                ModelState.AddModelError($"CompanyLoginFailed", "No es posible el ingreso de la empresa ya que se encuentra habilitada como facturador.");
+                return Json(new ResponseMessage("No es posible el ingreso de la empresa ya que se encuentra habilitada como facturador.", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (contributorInvoice.BusinessName == null)
@@ -1710,7 +1710,7 @@ namespace Gosocket.Dian.Web.Controllers
             if ((/*contributor.ContributorTypeId != '4' ||*/ contributor.ContributorTypeId != 4) && contributor.AcceptanceStatusId == 4)
             {
                 ModelState.AddModelError($"PersonLoginFailed", "No es posible el ingreso la persona ya se encuentra habilitada como facturador.");
-                return Json(new ResponseMessage("No es posible el ingreso de la persona, ya que se encuentra habilitada.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
+                return Json(new ResponseMessage("No es posible el ingreso de la persona, ya que se encuentra habilitada como facturador.", "PersonLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
             if (ConfigurationManager.GetValue("Environment") == "Prod" && contributor.AcceptanceStatusId != (int)ContributorStatus.Enabled)
