@@ -6184,7 +6184,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatory"), out bool ValidateManadatory);
-
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateRuleMandatory"), out bool ValidateRuleMandatory);
             int businessDays = 0;
             int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimit"), out int businessDaysLimit);
             int.TryParse(Environment.GetEnvironmentVariable("BusinessDaysLimitObjection"), out int BusinessDaysLimitObjection);
@@ -6813,7 +6813,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateRuleMandatory,
                             ErrorCode = "LGC72",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC72"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
@@ -6901,7 +6901,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = true,
+                            Mandatory = ValidateRuleMandatory,
                             ErrorCode = "LGC76",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC76"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
