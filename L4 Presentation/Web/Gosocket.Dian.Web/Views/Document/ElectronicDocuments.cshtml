@@ -61,7 +61,7 @@
                 Nómina electrónica
             </button>
         }
-        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorTypeIde == 2  && ViewBag.ContributorAcceptanceStatus == 4)
         {
             <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
                 <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />

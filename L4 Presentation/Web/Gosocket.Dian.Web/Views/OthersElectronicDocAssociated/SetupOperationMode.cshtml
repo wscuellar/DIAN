@@ -38,7 +38,7 @@
 
 @section Scripts{
 
-	<script>
+    <script>
 
         $(document).on('change', '#ProviderId', function () {
             let selectedValue = $(this).val();
@@ -52,7 +52,7 @@
             let selectedValue = $(this).val();
             if (selectedValue != null && selectedValue != '') {
                 $('#SoftwareId').val(selectedValue);
-                $('#SoftwareName').val($('#ddlsoftware option:selected').text()); 
+                $('#SoftwareName').val($('#ddlsoftware option:selected').text());
                 $("#validddlSoftwareName").text('');
                 getDataSoftwareSeleccionado(selectedValue);
             }
@@ -73,13 +73,13 @@
                         $('#SoftwarePin').val(result.SoftwarePIN);
                     }
                     else
-                        bootbox.alert("No se pudo realizar la consulta");
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                 },
                 complete: function () {
 
                 },
                 error: function (result) {
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }
@@ -111,13 +111,13 @@
                         });
                     }
                     else
-                        bootbox.alert("No se pudo realizar la consulta");
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                 },
                 complete: function () {
 
                 },
                 error: function (result) {
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }
@@ -224,22 +224,16 @@
                                             showConfirmation(result.message, AlertExec(null))
                                             return;
                                         }
-
-                                        bootbox.dialog({
-                                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se canceló el registro exitosamente</h4></div></div>",
-                                            onEscape: () => {
-                                                location.reload();
-                                             }
-                                        });
+                                        SuccessDialogV2Callback("Se canceló el registro exitosamente", "", () => { location.reload(); });
                                     }
                                     else
-                                        bootbox.alert("No se pudo realizar la cancelación");
+                                        ErrorDialogV2("¡Notificación!", "No se pudo realizar la cancelación.");
                                     },
                                 complete: function () {
 
                                 },
                                 error: function (result) {
-                                    bootbox.alert("Error de conexión al intentar hacer la cancelación");
+                                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar hacer la cancelación.");
                                     console.log(result.status + ' ' + result.statusText);
                                     return false;
                                 }
@@ -250,7 +244,7 @@
                     , "", () => hideLoading('#panel-form')));
             };
 
-            function fnvalidSoftwareName() { 
+            function fnvalidSoftwareName() {
                 $("#validSoftwareName").text('');
                 $("#validddlSoftwareName").text('');
                 if ($("#OperationModeId").val() == "1") {
@@ -319,5 +313,5 @@
 
             }
         });
-	</script>
+    </script>
 }

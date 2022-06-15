@@ -47,21 +47,14 @@
             $('#Email').attr('readonly', true);
 
             $('.btn-save').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea registrase como facturador?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                var form = $('#register-contributor-form');
-                                showLoading('#panel-form', 'Registrando', 'Procesando datos, por favor espere.');
-                                form.submit();
-                            }
-                        },
-                    }
-                });
+                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea registrase como facturador?</strong> <br> 
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => {
+                        var form = $('#register-contributor-form');
+                        showLoading('#panel-form', 'Registrando', 'Procesando datos, por favor espere.');
+                        form.submit();
+                    });
             });
         });
     </script>

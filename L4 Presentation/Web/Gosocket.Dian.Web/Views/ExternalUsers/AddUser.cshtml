@@ -532,13 +532,9 @@
                     showLoading('#panel-form', 'Guardando', 'Procesando datos, por favor espere.');
                     var permissions = getPermissions();
                     if (permissions === "[]") {
+                        hideLoading('#panel-form');
                         var sms = 'Seleccione mínimo un permiso para el Usuario';
-                        bootbox.dialog({
-                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                            onEscape: () => {
-                                hideLoading('#panel-form');
-                            }
-                        });
+                        ErrorDialogV2("¡Notificación!", sms);
                     }
                     else {
                         var model = {
@@ -555,14 +551,10 @@
                             data: model,
                             datatype: "json",
                             success: function (result) {
+                                hideLoading('#panel-form');
                                 if (result.smsresult != '') {
                                     var sms = result.smsresult;
-                                    bootbox.dialog({
-                                        message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                                        onEscape: () => {
-                                            hideLoading('#panel-form');
-                                        }
-                                    });
+                                    ErrorDialogV2("¡Notificación!", sms);
                                 }
                                 else {
                                     showModalSave();
@@ -572,7 +564,7 @@
                             complete: function () { },
                             error: function (result) {
                                 hideLoading('#panel-form');
-                                bootbox.alert("Error de conexión al intentar obtener al valdiación del usuario externo");
+                                ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener al valdiación del usuario externo");
                                 console.log(result.status + ' ' + result.statusText);
                                 return false;
                             }

@@ -184,28 +184,9 @@
             //});
 
             $('.btn-export-excel').click(function () {
-
-
-                bootbox.dialog({                   
-                    message: "<div class='media'><div class='media-body' style='padding:0px 50px -5px 50px !important;  line-height: 100%'><div style='text-align: center;'></div><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div>" +
-                        "<h4 class='sub-title' style='text-align:center !important;'>¿Esta seguro que desea descargar el listado de documentos recibidos?</h4></div></div>",
-                    title: "",
-                    buttons: {
-                        si: {
-                            label: "SI",
-                            className: "btn btn-radian-success",
-                            callback: function () {
-                                sendExport();
-                            }
-                        },
-                        no: {
-                            label: "NO",
-                            className: "btn btn-secondary",
-                            callback: function () {
-                            }
-                        }
-                    }
-                });
+                ConfirmDialogV2("Atención", `¿Esta seguro que desea descargar el listado de documentos recibidos?`,
+                    { confirm: "SI", cancel: "NO" },
+                    sendExport);
 
 
                 //$(this).attr('disabled', 'disabled');
@@ -359,7 +340,7 @@
 
                     }
                     else {
-                        bootbox.alert("No se pudo realizar el exporte de la información");
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar el exporte de la información");
                     }
                 },
                 complete: function () {
@@ -367,7 +348,7 @@
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }

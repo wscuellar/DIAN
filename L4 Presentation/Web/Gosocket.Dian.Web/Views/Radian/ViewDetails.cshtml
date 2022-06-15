@@ -87,19 +87,10 @@
                         if (error) {
                             var messageError = Object.values(error)[0];
                             var id = Object.values(error)[2];
-                            bootbox.alert({
-                                title: "Advertencia",
-                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageError + "</strong></h4></div></div>",
-                                buttons: {
-                                    ok: {
-                                        label: 'Aceptar',
-                                        className: 'btn-success'
-                                    }
-                                },
-                                callback: function () {
-                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = "/Radian/ViewDetails/" + id;
-                                }
+                            ErrorDialogV2Callback("¡Notificación!", messageError, () =>
+                            {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = "/Radian/ViewDetails/" + id;
                             });
                         } else{
                             hideLoading('#panel-form');

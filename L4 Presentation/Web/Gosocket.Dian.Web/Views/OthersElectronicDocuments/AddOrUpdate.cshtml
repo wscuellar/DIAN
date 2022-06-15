@@ -318,10 +318,7 @@
         @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + '@message' + "</h4></div></div>",
-                onEscape: () => { }
-            });
+            ErrorDialogV2("¡Notificación!", "@message");
             </text>
         }
 
@@ -350,10 +347,7 @@
 
             if ('@ViewBag.softwareActive' == 'True') {
                 var sms = 'No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
-                bootbox.dialog({
-                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + sms + "</h4></div></div>",
-                    onEscape: () => { }
-                });
+                ErrorDialogV2("¡Notificación!", sms);
             }
             $('#PinSW').val('')
 
@@ -520,7 +514,7 @@
                 return;
             }
 
-            let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
+            let confirmMessage = "Desea cancelar el registro del participante @(Html.Raw(contributorName)) de @(Html.Raw(electronicDocumentName))";
             if (@Model.ElectronicDocumentId == 3) {
                 confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
             }
@@ -545,14 +539,19 @@
                         if (result.Code != 200) {
 
 							$('.close').click()
-							bootbox.dialog({
-                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + result.Message + "</h4></div></div>",
-								onEscape: () => {
-									var url = window.location.href.split('&');
-									var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
-									window.location.href = ret
-								}
-							});
+                            ErrorDialogV2Callback("¡Notificación!", sms, () => {
+                                var url = window.location.href.split('&');
+                                var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+                                window.location.href = ret
+                            });
+                            // bootbox.dialog({
+                            //  message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + result.Message + "</h4></div></div>",
+							//	onEscape: () => {
+							//		var url = window.location.href.split('&');
+							//		var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+							//		window.location.href = ret
+							//	}
+							//});
 							//
                             return;
                         }
@@ -711,24 +710,24 @@
                                  });
                              }
                              else
-                                 bootbox.alert("No se pudo realizar la consulta");
+                                 ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                          },
                 complete: function () {
 
                          },
                 error: function (result) {
-                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                             console.log(result.status + ' ' + result.statusText);
-                             return false;
-                         }
-                     });  //ajax
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
 
-                 }
+        }
 
-                 function getDataSoftwareSeleccionado(SoftwareId){
+        function getDataSoftwareSeleccionado(SoftwareId){
 
             $.ajax({
-                     url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
+                url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
                 type: "POST",
                 data: { SoftwareId: SoftwareId },
                 datatype: "json",
@@ -739,19 +738,18 @@
                         $('#PinSW').val(result.SoftwarePIN);
                              }
                              else
-                                 bootbox.alert("No se pudo realizar la consulta");
+                                 ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                          },
                 complete: function () {
 
                          },
                 error: function (result) {
-                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                             console.log(result.status + ' ' + result.statusText);
-                             return false;
-                         }
-                     });  //ajax
-
-                 }
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+        }
 
                  function cambiarTextoSelect() {
                      var botones = $(":button");
@@ -798,7 +796,7 @@
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }
