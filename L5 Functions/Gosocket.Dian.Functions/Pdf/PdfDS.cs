@@ -879,6 +879,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			formato.CurrencyGroupSeparator = ".";
 			formato.NumberDecimalSeparator = ",";
 			var cosmos = new CosmosDbManagerPayroll();
+			var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 			var DocumentType = await cosmos.getDocumentType();
 			var FormasPago = await cosmos.getFormapago();
 			var MediosPago = await cosmos.getPaymentMethod();
@@ -986,20 +987,35 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{TasaCambio}", string.Empty);
 
 			var Anticipo = model.Elements(cac + "WithholdingTaxTotal").Elements(cbc + "TaxAmount");
+			decimal anticipos = 0;
 			if (Anticipo.Any())
-				Html = Html.Replace("{Anticipo}", Anticipo.FirstOrDefault().Value);
-			else
-				Html = Html.Replace("{Anticipo}", string.Empty);
-			//ojito ese anticipo esta mal pero es porque en el xpath del excel de anticipos aparece esto asi que se deja
+            {
+				anticipos = decimal.Parse(Anticipo.FirstOrDefault().Value.ToString(), numinf);
+				anticipos = decimal.Round(anticipos, 2);
+				Html = Html.Replace("{Anticipo}", anticipos.ToString("N", formato));
+            }
+            else
+            {
 
+				Html = Html.Replace("{Anticipo}", string.Empty);
+            }
+			//ojito ese anticipo esta mal pero es porque en el xpath del excel de anticipos aparece esto asi que se deja
+			decimal rentencion = 0;
 			var Retenciones = model.Elements(cac + "WithholdingTaxTotal").Elements(cbc + "TaxAmount");
 			if (Retenciones.Any())
-				Html = Html.Replace("{Retenciones}", Retenciones.FirstOrDefault().Value);
-			else
+            {
+				rentencion = decimal.Parse(Retenciones.FirstOrDefault().Value.ToString(), numinf);
+				rentencion = decimal.Round(rentencion, 2);
+				Html = Html.Replace("{Retenciones}", rentencion.ToString("N", formato));
+            }
+            else
+            {
+
 				Html = Html.Replace("{Retenciones}", string.Empty);
+            }
 
 			//falta caculos subtotal
-			var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
+			
 			decimal TotalIVA = 0;
 			decimal impuesto = 0;
 			decimal GlobalDescuento = 0;
@@ -1482,7 +1498,10 @@ namespace Gosocket.Dian.Functions.Pdf
 		{
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
-
+			NumberFormatInfo formato = new CultureInfo("es-AR").NumberFormat;
+			formato.CurrencyGroupSeparator = ".";
+			formato.NumberDecimalSeparator = ",";			
+			var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 
 			var Recargos = model.Elements(cac + "AllowanceCharge").ToList();
 			if (Recargos.Count == 0)
@@ -1503,10 +1522,16 @@ namespace Gosocket.Dian.Functions.Pdf
 				foreach (var detalle in Recargos)
 				{
 
+					decimal amutDeciTotal = 0;
 					var tipo = detalle.Elements(cbc + "ChargeIndicator").FirstOrDefault().Value.ToUpper() == "TRUE" ? "Recargo" : "Descuento";
 					var reason = detalle.Elements(cbc + "AllowanceChargeReasonCode").Any() ? detalle.Elements(cbc + "AllowanceChargeReasonCode").FirstOrDefault().Value : "";
 					var porc = detalle.Elements(cbc + "MultiplierFactorNumeric");
 					var porce = porc.Any() ? porc.FirstOrDefault().Value : "";
+					var amutTotal = detalle.Elements(cbc + "Amount").FirstOrDefault().Value;
+
+					amutDeciTotal = decimal.Parse(amutTotal, numinf);
+					amutDeciTotal = decimal.Round(amutDeciTotal, 2);
+					
 					rowDescuentosYRecargos.Append($@"
                 <tr>
 		            <td class='text-right'>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
@@ -1514,7 +1539,7 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{reason}</td>
 		            <td class='text-left'>{detalle.Elements(cbc + "AllowanceChargeReason").FirstOrDefault().Value}</td>
 		            <td>{porce}</td>
-		            <td class='text-right'>{detalle.Elements(cbc + "Amount").FirstOrDefault().Value:n2}</td>
+		            <td class='text-right'>{amutDeciTotal.ToString("N", formato)}</td>
 	            </tr>");
 				}
 				Html = Html.Replace("{RowsDescuentosYRecargos}", rowDescuentosYRecargos.ToString());
