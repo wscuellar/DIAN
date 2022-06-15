@@ -720,7 +720,7 @@ namespace Gosocket.Dian.Functions.Pdf
 		private static async Task<string> CruzarModeloDetallesProductosContador(string plantillaHtml, List<XElement> model, XElement element)
 		{
 			NumberFormatInfo formato = new CultureInfo("es-AR").NumberFormat;
-
+			var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
 			formato.CurrencyGroupSeparator = ".";
 			formato.NumberDecimalSeparator = ",";
 			var rowDetalleProductosBuilder = new StringBuilder();
@@ -763,8 +763,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 			var _bande = 0;
 			foreach (var detalle in model)
-			{
-				var numinf = new NumberFormatInfo { NumberDecimalSeparator = "." };
+			{				
 				//<td>{Unidad.Where(x=>x.IdSubList.ToString()== detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value).FirstOrDefault().CompositeName}</td>
 				var unit = await cosmos.getUnidad(detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").Attributes("unitCode").FirstOrDefault().Value);
 
@@ -783,12 +782,12 @@ namespace Gosocket.Dian.Functions.Pdf
 					{
 						Reca = item.Elements(cbc + "Amount").FirstOrDefault().Value;
 
-						RecDet = RecDet + decimal.Parse(Reca);
+						RecDet = RecDet + decimal.Parse(Reca, numinf);
 					}
 					else
 					{
 						Desc = item.Elements(cbc + "Amount").FirstOrDefault().Value;
-						DescDet = DescDet + decimal.Parse(Desc);
+						DescDet = DescDet + decimal.Parse(Desc, numinf);
 					}
 				}
 				var fechaPeriodo = detalle.Elements(cac + "InvoicePeriod").Elements(cbc + "StartDate");
@@ -802,6 +801,9 @@ namespace Gosocket.Dian.Functions.Pdf
 				var conta = cont.Any() ? cont.FirstOrDefault().numero : "";
 
 				decimal ivaVal = decimal.Parse(IvaVal, numinf);
+				ivaVal = decimal.Round(ivaVal, 2);
+				DescDet = decimal.Round(DescDet, 2);
+				RecDet = decimal.Round(RecDet, 2);
 
 				if (_bande < listaCont.Count())
                 {
@@ -824,21 +826,30 @@ namespace Gosocket.Dian.Functions.Pdf
 		    
 					</tr>");
 
-					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
-										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
-				}			
-
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString(), numinf) *
+									decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value.ToString(), numinf);
+				}
 				
 				_bande = _bande + 1;
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
+			subTotal = decimal.Round(subTotal, 2);
+			DescDet = decimal.Round(DescDet, 2);
+			RecDet = decimal.Round(RecDet, 2);
 
 			plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString("N", formato));
+			decimal acuerdosPagos = 0;
 
 			if (AcuerdosPagos.Any())
-				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", AcuerdosPagos.FirstOrDefault().Value);
+			{
+				acuerdosPagos = decimal.Parse(AcuerdosPagos.FirstOrDefault().Value, numinf);
+				acuerdosPagos = decimal.Round(acuerdosPagos, 2);
+				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", acuerdosPagos.ToString("N", formato));
+			}
 			else
+			{
 				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", string.Empty);
+			}
 			
 			if (OtrasEntidades.Any())
 				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", OtrasEntidades);
