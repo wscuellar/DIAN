@@ -646,9 +646,10 @@ namespace Gosocket.Dian.Functions.Pdf
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td>{Valortotal.ToString("N", formato)}</td>
+		            
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 					<td>{FechaPeriodofinal:dd/MM/yyyy}</td>
+					<td>{Valortotal.ToString("N", formato)}</td>
 	            </tr>");
 				}
 				else
