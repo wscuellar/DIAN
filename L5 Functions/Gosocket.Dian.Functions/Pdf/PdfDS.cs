@@ -501,6 +501,10 @@ namespace Gosocket.Dian.Functions.Pdf
 		}
 		private static async Task<string> CruzarModeloDetallesProductosComplete(string plantillaHtml, List<XElement> model, string tipoD)
 		{
+			NumberFormatInfo formato = new CultureInfo("es-AR").NumberFormat;
+			formato.CurrencyGroupSeparator = ".";
+			formato.NumberDecimalSeparator = ",";
+
 			var rowDetalleProductosBuilder = new StringBuilder();
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
 			XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
@@ -575,7 +579,15 @@ namespace Gosocket.Dian.Functions.Pdf
 				var desc2 = detalle.Elements(cac + "Item").Elements(cbc + "Description");
 				var des2 = desc2.Any() ? desc2.FirstOrDefault().Value : "";
 
-				
+				var preciounitario = detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount");
+				decimal Preciounitario = decimal.Parse(preciounitario.FirstOrDefault().Value, numinf);
+
+				var valortotal = detalle.Elements(cbc + "LineExtensionAmount");
+				decimal Valortotal = decimal.Parse(valortotal.FirstOrDefault().Value, numinf);
+
+
+				decimal ivaVal = decimal.Parse(IvaVal, numinf);
+
 				if ( tipoD == "Nota" || tipoD == "27"|| tipoD == "32")
 				{
 					rowDetalleProductosBuilder.Append($@"
@@ -585,18 +597,19 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{des2}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
-					<td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td>{Preciounitario.ToString("N", formato)}</td>
+					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
+                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td style='word-wrap: break-word;'>{decimal.Parse(detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()).ToString("N0")}</td>
+		            <td style='word-wrap: break-word;'>{Valortotal.ToString("N", formato)}</td>
 
 	            </tr>");
 				}else if(tipoD == "55" || tipoD == "50")
 				{
+					
 
 					rowDetalleProductosBuilder.Append($@"
 					 <tr>
@@ -605,14 +618,14 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{des2}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString()}</td>
-					<td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td>{Preciounitario.ToString("N", formato)}</td>
+					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
+                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value.ToString()}</td>
+		            <td style='word-wrap: break-word;'>{Valortotal.ToString("N", formato)}</td>
 
 					 </tr>");
 				}
@@ -625,14 +638,14 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-					 <td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+                    <td>{Preciounitario.ToString("N", formato)}</td>
+					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
+                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+		            <td>{Valortotal.ToString("N", formato)}</td>
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 					<td>{FechaPeriodofinal:dd/MM/yyyy}</td>
 	            </tr>");
@@ -646,14 +659,14 @@ namespace Gosocket.Dian.Functions.Pdf
 		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
 		            <td>{unit.CompositeName}</td>
 		            <td>{detalle.Elements(cac + "Price").Elements(cbc + "BaseQuantity").FirstOrDefault().Value}</td>
-                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-					 <td class='text-right'>{Desc:n2}</td>
-                    <td class='text-right'>{Reca:n2}</td>
-		            <td class='text-right'>{IvaVal:n2}</td>
+                   <td>{Preciounitario.ToString("N", formato)}</td>
+					<td class='text-right'>{DescDet.ToString("N", formato)}</td>
+                    <td class='text-right'>{RecDet.ToString("N", formato)}</td>
+		            <td class='text-right'>{ivaVal.ToString("N", formato)}</td>
                     <td class='text-right'>{IvaPor:n2}</td>
 
 
-		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>
+		            <td>{Valortotal.ToString("N", formato)}</td>
 					<td>{Descrip}</td>
 		            <td>{FechaPeriodo:dd/MM/yyyy}</td>
 	            </tr>");
@@ -684,18 +697,18 @@ namespace Gosocket.Dian.Functions.Pdf
 			RecDet = decimal.Round(RecDet, 2);
 			if (tipoD =="55" || tipoD == "50" || tipoD == "45")
             {				
-				plantillaHtml = plantillaHtml.Replace("{SubTotal}", Convert.ToString(subTotal).Replace(",", "."));
-				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", Convert.ToString(DescDet).Replace(",", "."));
-				plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}",Convert.ToString(RecDet).Replace(",", "."));
+				plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString("N", formato));
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString("N", formato));
+				plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString("N", formato));
 
 			}
             else
             {
 
-			  plantillaHtml = plantillaHtml.Replace("{SubTotal}", decimal.Parse(subTotal.ToString().Split('.')[0]).ToString("N0"));
-			  plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
-			  plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", Decimal.Parse(RecDet.ToString().Split('.')[0]).ToString("N0"));
-            }
+			  plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString("N", formato));
+				plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString("N", formato));
+				plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString("N", formato));
+			}
 
 			return plantillaHtml;
 		}
