@@ -8638,44 +8638,47 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 var validateStatusDocRequired = globalRadianContributorEnabledTableManager.FindByPartition<GlobalRadianContributorEnabled>(documentMeta.SenderCode)
                     .OrderByDescending(x => x.Timestamp).FirstOrDefault();
 
-                //Solo para eventos RADIAN
-                if (int.Parse(documentMeta.EventCode) >= (int)EventStatus.SolicitudDisponibilizacion 
-                    && !validateStatusDocRequired.IsActive)
+                if(validateStatusDocRequired != null)
                 {
-                    softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                           documentMeta.SenderCode, false, documentMeta.SoftwareId);
-                    if (softwareProviderRadian != null)
+                    //Solo para eventos RADIAN
+                    if (int.Parse(documentMeta.EventCode) >= (int)EventStatus.SolicitudDisponibilizacion
+                        && !validateStatusDocRequired.IsActive)
                     {
-                        rowKey = softwareProviderRadian.RadianContributorTypeId + "|" + softwareProviderRadian.RowKey;
-                        RadianTestSetResult testSetResult = TableManagerRadianTestSetResult.Find<RadianTestSetResult>(documentMeta.SenderCode, rowKey);
-                        if(testSetResult != null)
+                        softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
+                               documentMeta.SenderCode, false, documentMeta.SoftwareId);
+                        if (softwareProviderRadian != null)
                         {
-                            switch (softwareProviderRadian.SoftwareType)
+                            rowKey = softwareProviderRadian.RadianContributorTypeId + "|" + softwareProviderRadian.RowKey;
+                            RadianTestSetResult testSetResult = TableManagerRadianTestSetResult.Find<RadianTestSetResult>(documentMeta.SenderCode, rowKey);
+                            if (testSetResult != null)
                             {
-                                case 1: //Facturador Electronico
-                                case 2: //Proveedor Tecnologico
-                                case 3: //Sistema de Negociacion
-                                case 4: //Factor
-                                    if ((softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
-                                        || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
-                                        && testSetResult.OperationModeId == 1)
-                                    {
-                                        responses.Clear();
-                                        responses.Add(new ValidateListResponse
+                                switch (softwareProviderRadian.SoftwareType)
+                                {
+                                    case 1: //Facturador Electronico
+                                    case 2: //Proveedor Tecnologico
+                                    case 3: //Sistema de Negociacion
+                                    case 4: //Factor
+                                        if ((softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
+                                            || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
+                                            && testSetResult.OperationModeId == 1)
                                         {
-                                            IsValid = false,
-                                            Mandatory = ValidateRequiredDocRadian,
-                                            ErrorCode = "LGC94",
-                                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC94"),
-                                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                        });
-                                    }
-                                       
-                                    break;
+                                            responses.Clear();
+                                            responses.Add(new ValidateListResponse
+                                            {
+                                                IsValid = false,
+                                                Mandatory = ValidateRequiredDocRadian,
+                                                ErrorCode = "LGC94",
+                                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC94"),
+                                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                            });
+                                        }
+
+                                        break;
+                                }
                             }
-                        }                       
+                        }
                     }
-                }
+                }                
             }
 
             return responses;
