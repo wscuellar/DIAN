@@ -112,22 +112,15 @@
 
             $('.btn-save').click(function () {
                 if ('@isProvider' === 'True') {
-                        bootbox.dialog({
-                        title: "Advertencia",
-                        message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está usted seguro?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
-                        buttons: {
-                            del: {
-                                label: "Aceptar",
-                                className: "btn-gosocket",
-                                callback: function () {
-                                        var form = $('#edit-contributor-form');
-                                        if (form.valid()) {
-                                            showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
-                                            form.submit();
-                                        }
-                                    }
-                                },
-                        }
+                    ConfirmDialogV2("Advertencia", `<strong>¿Está usted seguro?</strong> <br> 
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                        { confirm: "Aceptar", cancel: "Cancelar" },
+                        () => {
+                            var form = $('#edit-contributor-form');
+                            if (form.valid()) {
+                                showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                                form.submit();
+                            }
                         });
                     }
                     else {

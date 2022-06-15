@@ -228,9 +228,13 @@
             }
 
             ul#mainnav-menu li.active ul.collapse {
-                background: #fff !important;
+                background: #F6F7F9 !important;
                 margin: 26px -21px -26px -26px !important;
             }
+
+        ul.collapse li {
+            max-height: 70px !important;
+        }
 
         #mainnav-menu a.parent-active {
             box-shadow: initial !important;
@@ -263,6 +267,10 @@
 
         #btn-back {
             cursor: pointer;
+        }
+
+        ul#mainnav-menu li:not(li.list-divider) {
+            min-height: 50px !important;
         }
     </style>
 </head>
@@ -313,7 +321,7 @@
 
                 <div id="user-info-wrapper">
                     <p class="title">
-                        @if(ViewBag.Title != "Inicio")
+                        @if(ViewBag.Title != "Inicio" && ViewBag.Title != "Tablero")
                         {
                             <i id="btn-back" class="fa fa-arrow-left mr-9" data-tooltip="tooltip" data-placement="bottom" title="Volver"></i> 
                         }

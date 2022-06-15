@@ -97,20 +97,24 @@
         }
 
         function showConfirmation(action) {
-            bootbox.dialog({
-                title: "Advertencia",
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'>¿Está seguro de <strong>" + action + "</strong> la solicitud?</h4></div></div>",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            sendResponse()
-                        }
-                    },
-                }
-            });
+            ConfirmDialogV2("Advertencia", `¿Está seguro de <strong>${action}</strong> la solicitud?`,
+                { confirm: "Aceptar", cancel: "Cancelar" },
+                sendResponse);
+
+            //bootbox.dialog({
+            //    title: "Advertencia",
+            //    message: "<div class='media'><div class='media-body'>" +
+            //        "<h4 class='text-thin'>¿Está seguro de <strong>" + action + "</strong> la solicitud?</h4></div></div>",
+            //    buttons: {
+            //        del: {
+            //            label: "Aceptar",
+            //            className: "btn-gosocket",
+            //            callback: function () {
+            //                sendResponse()
+            //            }
+            //        },
+            //    }
+            //});
         }
 
         function sendResponse() {

@@ -168,6 +168,14 @@
         //$(".modal-backdrop").get(modalBackDropLast).style['z-index'] = 1995;
     }
 
+    function ErrorDialogV2Callback(title, message = null, callback = null) {
+        ErrorDialogV2(title, message);
+        $('#errorModal').on('hidden.bs.modal', () => {
+            if (!callback) return;
+            callback();
+        });
+    }
+
     function SuccessDialogV2(title, message = null, autoClosed = false) {
         $("#successModal-title").text(title || "¡Notificación!");
         $("#successModal-message").html(message || '');

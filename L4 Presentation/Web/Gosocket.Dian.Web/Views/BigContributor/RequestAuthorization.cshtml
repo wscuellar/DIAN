@@ -102,20 +102,24 @@
             $('.btn-save').click(function () {
                 
                 if (form.valid()) {
-                    bootbox.dialog({
-                        title: "Advertencia",
-                        message: "<div class='media'><div class='media-body'>" +
-                            "<h4 class='text-thin'><strong>¿Está seguro de solicitar autorización?</strong></h4></div></div>",
-                        buttons: {
-                            del: {
-                                label: "Aceptar",
-                                className: "btn-gosocket",
-                                callback: function () {
-                                    sendRequest()
-                                }
-                            },
-                        }
-                    });
+                    ConfirmDialogV2("Advertencia", `¿Está seguro de solicitar autorización?`,
+                        { confirm: "Aceptar", cancel: "Cancelar" },
+                        sendRequest);
+
+                    //bootbox.dialog({
+                    //    title: "Advertencia",
+                    //    message: "<div class='media'><div class='media-body'>" +
+                    //        "<h4 class='text-thin'><strong>¿Está seguro de solicitar autorización?</strong></h4></div></div>",
+                    //    buttons: {
+                    //        del: {
+                    //            label: "Aceptar",
+                    //            className: "btn-gosocket",
+                    //            callback: function () {
+                    //                sendRequest()
+                    //            }
+                    //        },
+                    //    }
+                    //});
                 }
             });
         });
