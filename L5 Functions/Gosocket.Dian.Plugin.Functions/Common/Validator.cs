@@ -6957,7 +6957,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     //Valida fecha menor a los eventos Expresa o Tacita
-                    responses.Add(Convert.ToDateTime(data.SigningTime) < Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
+                    responses.Add(Convert.ToDateTime(data.SigningTime) > Convert.ToDateTime(dataModelSigningTime).AddHours(-5)
                        ? new ValidateListResponse
                        {
                            IsValid = true,
