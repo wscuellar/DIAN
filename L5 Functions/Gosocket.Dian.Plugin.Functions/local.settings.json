@@ -100,7 +100,7 @@
     "ErrorMessage_LGC36": "El mandatario no puede enviar este evento ya que no cuenta con un mandato vigente",
     "ErrorMessage_NIE024": "Se debe indicar el CUNE segï¿½n la definiciï¿½n establecida.",
     "ErrorMessage_AAH09_043": "No corresponde a un tipo de documento valido",
-    "ErrorMessage_AAH09": "El tipo de identificador no coincide con el informado en el documento electrï¿½nico.",
+    "ErrorMessage_AAH09": "El tipo de identificador no coincide con el informado en el documento electrónico.",
     "ErrorMessage_DC24g": "No se puede generar el evento Aval antes de la fecha de generaciï¿½n del evento Primera inscripciï¿½n de la factura electrï¿½nica de venta como tï¿½tulo valor en el RADIAN",
     "ErrorMessage_LGC35": "No se cuenta con un mandato vigente a la fecha entre el Mandante y el Mandatario para la transmisiï¿½n de este evento.",
     "ErrorMessage_LGC60": "Mandatario Factor no se encuentra Habilitado",
@@ -221,7 +221,14 @@
     "ErrorMessage_DC24ze": "No se puede generar el evento Protesto antes de la fecha de generación del documento referenciado.",
     "ErrorMessage_AAI07a_049": "El valor no es informado",
     "ErrorMessage_AAI05a_049": "El valor informado es diferente a la sumatoria de los elementos cbc:CorporateStockAmount de quien genera el evento",
-    "ErrorMessage_AAD11a": "No se informo la nota cuando el evento fue generado por un mandato"
+    "ErrorMessage_AAD11a": "No se informo la nota cuando el evento fue generado por un mandato",
+    "ErrorMessage_DC24": "Error en el valor de la fecha y hora de firma. NO corresponde al formato y/o el valor reportado es superior a la fecha del sistema.",
+    "ErrorMessage_LGC72": "No se puede registrar este evento ya que la fecha de vencimiento del título está vigente",
+    "ErrorMessage_LGC75": "No se puede registrar este evento ya que el título valor está vencido",
+    "ErrorMessage_LGC76": "No se puede registrar este evento ya que el título valor está vigente",
+    "BusinessDaysLimitObjection": 15,
+    "ErrorMessage_LGC77": "No se puede registrar este evento ya que supera los 15 días calendario posteriores al vencimiento del título valor",
+    "ErrorMessage_LGC79": "La Factura Electrónica no cumple con los requisitos legales para ser considerada título valor y no podrá ser transferida"
 
 
 
