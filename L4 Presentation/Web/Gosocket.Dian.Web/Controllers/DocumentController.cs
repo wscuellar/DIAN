@@ -1453,6 +1453,7 @@ namespace Gosocket.Dian.Web.Controllers
                 case 4:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentProvider;
                     ViewBag.ViewType = "Provider";
+                    ViewBag.ViewTypeSpanish = "de usuarios";
                     break;
                 default:
                     break;
