@@ -8439,7 +8439,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     foreach (var itemReference in responses)
                     {
-                        if (!itemReference.IsValid)
+                        if (!itemReference.IsValid && itemReference.ErrorCode != "AAH25b" && itemReference.ErrorCode != "AAH26b")
                             validEventRadian = false;
                     }
                     validateResponses.AddRange(responses);
