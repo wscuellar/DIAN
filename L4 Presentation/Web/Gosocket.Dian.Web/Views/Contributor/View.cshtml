@@ -112,7 +112,12 @@
             }
 
             $('.btn-set-to-provider').click(function () {
-                bootbox.dialog({
+                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea operar como proveedor?</strong> <br>
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => { setToProvider(@Model.Id) });
+
+                @*bootbox.dialog({
                     title: "Advertencia",
                     message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea operar como proveedor?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
                     buttons: {
@@ -124,11 +129,15 @@
                             }
                         },
                     }
-                });
+                });*@
             });
 
             $('.btn-sync-to-production').click(function () {
-                bootbox.dialog({
+                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea sincronizar contribuyente a producción?</strong>`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => { syncToProduction(@Model.Id) });
+
+                @*bootbox.dialog({
                     title: "Advertencia",
                     message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
                     buttons: {
@@ -140,7 +149,7 @@
                             }
                         },
                     }
-                });
+                });*@
             });
         });
 

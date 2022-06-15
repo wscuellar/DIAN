@@ -220,23 +220,11 @@
             }
 
             $('.btn-reset').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'>" +
-                        "<h4 class='text-thin'><strong>Está seguro que desea reiniciar el set de pruebas?</strong></h4>" +
-                        "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes.<br>" +
-                        "Todas las estadísticas de la certificación anterior serán reiniciadas." +
-                        "</div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                resetTestSet()
-                            }
-                        },
-                    }
-                });
+                ConfirmDialogV2("Advertencia", `<strong> ¿Está seguro que desea reiniciar el set de pruebas? </strong> <br>
+                    Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes. <br>
+                    Todas las estadísticas de la certificación anterior serán reiniciadas.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    resetTestSet);
             });
 
             function resetTestSet() {
@@ -305,19 +293,9 @@
 
         function removeLine(button) {
             var id = $(button).attr("data-index-contributorOperations")
-            bootbox.dialog({
-                message: "Está seguro que desea eliminar el modo de operación?",
-                title: "Advertencia",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            removeLineAjax(id);
-                        }
-                    },
-                }
-            });
+            ConfirmDialogV2("Advertencia", `Está seguro que desea eliminar el modo de operación`,
+                { confirm: "Aceptar", cancel: "Cancelar" },
+                () => { removeLineAjax(id); });
         }
 
         function removeLineAjax(id) {

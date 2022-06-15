@@ -111,9 +111,7 @@
         @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + '@message' + "</h4></div></div>",
-                        onEscape: () => {  }});
+                ErrorDialogV2("¡Notificación!", "@message");
             </text>
         }
 
