@@ -1061,3 +1061,7 @@ ul.collapse li {
 ul#mainnav-menu li:not(li.list-divider) {
     min-height: 50px !important;
 }
+
+#mainnav-menu .collapse.in li a {
+    line-height: 22px !important;
+}
