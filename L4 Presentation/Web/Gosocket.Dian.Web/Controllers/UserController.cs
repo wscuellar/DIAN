@@ -1639,11 +1639,11 @@ namespace Gosocket.Dian.Web.Controllers
                 };
 
                 tableManager.InsertOrUpdate(logger);
-                ModelState.AddModelError($"PersonLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
-                return View("NotObligedInvoice", modelInvoice);
+                ModelState.AddModelError($"CompanyLoginFailed", $"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}");
+                return Json(new ResponseMessage($"Ha ocurrido un error, por favor intente nuevamente. Id: {requestId}", "CompanyLoginFailed", (int)System.Net.HttpStatusCode.BadRequest), JsonRequestBehavior.AllowGet);
             }
 
-            ModelState.AddModelError($"PersonLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
+            ModelState.AddModelError($"CompanyLoginFailed", "Se ha enviado la ruta de acceso al correo facturacion********@hotmail.com registrado en el RUT de la persona natural que se autentico en el sistema. El acceso estará disponible por 60 minutos.");
 
             /*Si el usuario tiene el campo ContributorTypeId en null 
              * al iniciar sesión por esta sección (Empresa: Representante Legal)
@@ -1665,7 +1665,7 @@ namespace Gosocket.Dian.Web.Controllers
                     </p>    
                 </div>
                 ",
-                "PersonLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
+                "CompanyLoginFailed", (int)System.Net.HttpStatusCode.Accepted), JsonRequestBehavior.AllowGet);
 
         }
 
