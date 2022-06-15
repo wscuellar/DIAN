@@ -113,9 +113,6 @@ namespace Gosocket.Dian.Functions.Pdf
 				}
 
 				if (tipo == "60"){
-
-
-
 					html = await FillTransporteA(html, xelement, xelement.Elements(cbc + "IssueDate").FirstOrDefault().Value);
 					html = await CruzarModeloDetallesProductosContador(html, invoiceLineNodes.ToList(), xelement);
 				}
@@ -704,6 +701,10 @@ namespace Gosocket.Dian.Functions.Pdf
 		
 		private static async Task<string> CruzarModeloDetallesProductosContador(string plantillaHtml, List<XElement> model, XElement element)
 		{
+			NumberFormatInfo formato = new CultureInfo("es-AR").NumberFormat;
+
+			formato.CurrencyGroupSeparator = ".";
+			formato.NumberDecimalSeparator = ",";
 			var rowDetalleProductosBuilder = new StringBuilder();
 
 			XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
@@ -780,34 +781,38 @@ namespace Gosocket.Dian.Functions.Pdf
 				
 				var cont = listaCont.Where(x => x.id == element.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "Services_SPD").Elements(def + "ID").FirstOrDefault().Value);
 				var conta = cont.Any() ? cont.FirstOrDefault().numero : "";
-				
-               
-				rowDetalleProductosBuilder.Append($@"
-                <tr>
-		            <td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
-		            <td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
-		            <td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
-		            <td>{unit.IdSubList}</td>
-		            <td>{detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value}</td>
-		            <td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		            
-                    <td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
-					<td>{DescDet}</td>
-                    <td>{info[_bande]}</td>
-					<td class='text-right'>{RecDet:n2}</td>
-					<td class='text-right'>{IvaVal:n2}</td>
-                    <td class='text-right'>{IvaPor:n2}</td>
-					<td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		
-					<td style='word-wrap: break-word;'>{listaCont[_bande].numero}</td>
-		    
-	            </tr>");
 
-				subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
+                if (_bande < listaCont.Count())
+                {
+					rowDetalleProductosBuilder.Append($@"
+					<tr>
+						<td>{detalle.Elements(cbc + "ID").FirstOrDefault().Value}</td>
+						<td>{detalle.Elements(cac + "Item").Elements(cac + "StandardItemIdentification").Elements(cbc + "ID").FirstOrDefault().Value}</td>
+						<td>{detalle.Elements(cac + "Item").Elements(cbc + "Description").FirstOrDefault().Value}</td>
+						<td>{unit.IdSubList}</td>
+						<td>{detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value}</td>
+						<td>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		            
+						<td>{detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value}</td>
+						<td>{DescDet}</td>
+						<td>{info[_bande]}</td>
+						<td class='text-right'>{RecDet:n2}</td>
+						<td class='text-right'>{IvaVal:n2}</td>
+						<td class='text-right'>{IvaPor:n2}</td>
+						<td style='word-wrap: break-word;'>{detalle.Elements(cbc + "LineExtensionAmount").FirstOrDefault().Value}</td>		
+						<td style='word-wrap: break-word;'>{listaCont[_bande].numero}</td>
+		    
+					</tr>");
+
+					subTotal = subTotal + decimal.Parse(detalle.Elements(cac + "Price").Elements(cbc + "PriceAmount").FirstOrDefault().Value.ToString().Split('.')[0]) *
 										decimal.Parse(detalle.Elements(cbc + "InvoicedQuantity").FirstOrDefault().Value);
+				}			
+
+				
 				_bande = _bande + 1;
 			}
 			plantillaHtml = plantillaHtml.Replace("{RowsDetalleProductos}", rowDetalleProductosBuilder.ToString());
 
-			plantillaHtml = plantillaHtml.Replace("{SubTotal}", String.Format("{0:n}", subTotal.ToString()));
+			plantillaHtml = plantillaHtml.Replace("{SubTotal}", subTotal.ToString("N", formato));
 
 			if (AcuerdosPagos.Any())
 				plantillaHtml = plantillaHtml.Replace("{AcuerdosPagos}", AcuerdosPagos.FirstOrDefault().Value);
@@ -819,11 +824,11 @@ namespace Gosocket.Dian.Functions.Pdf
 			else
 				plantillaHtml = plantillaHtml.Replace("{OtrasEntidades}", string.Empty);
 
-
-			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString());
-			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString());
+			plantillaHtml = plantillaHtml.Replace("{DescuentoDetalle}", DescDet.ToString("N", formato));
+			plantillaHtml = plantillaHtml.Replace("{RecargoDetalle}", RecDet.ToString("N", formato));
 			return plantillaHtml;
 		}
+
 		public static string GenerateQrBase64ForDocument(string code)
 		{
 			//var urlSiteDian = ConfigurationManager.GetValue("SiteDian");
