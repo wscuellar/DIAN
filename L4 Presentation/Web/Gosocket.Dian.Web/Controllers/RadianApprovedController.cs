@@ -135,7 +135,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult Add(RegistrationDataViewModel registrationData)
+        public async Task<JsonResult> Add(RegistrationDataViewModel registrationData)
         {
             RadianTestSet testSet = null;
             if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct)
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
+            var result = await _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -368,7 +368,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         [HttpPost]
-        public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
+        public async Task<JsonResult> UpdateFactorOperationMode(SetOperationViewModel data)
         {
             RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
@@ -397,7 +397,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
             RadianTestSet testSet = _radianAprovedService.GetTestSet(data.SoftwareType.ToString());
-            ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
+            var response = await _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
             if (response.Code != 500 && participant.RadianState != RadianState.Habilitado.GetDescription())
                 _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
 

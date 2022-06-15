@@ -296,7 +296,7 @@ namespace Gosocket.Dian.Application.Tests
         [DataRow(2, DisplayName = "OperationFailOtherInProcess")]
         [DataRow(3, DisplayName = "ExistingSoftware")]
         [DataRow(4, DisplayName = "ExistingSoftware")]
-        public void AddRadianContributorOperationTest(int input)
+        public async void AddRadianContributorOperationTest(int input)
         {
             //arrange
             RadianContributorOperation radianContributorOperation = new RadianContributorOperation()
@@ -337,7 +337,7 @@ namespace Gosocket.Dian.Application.Tests
             }
 
             //act
-            ResponseMessage responseMessage = _current.AddRadianContributorOperation(radianContributorOperation, software, testSet, isInsert, validateOperation);
+            var responseMessage = await _current.AddRadianContributorOperation(radianContributorOperation, software, testSet, isInsert, validateOperation);
 
             //assert
             switch (input)

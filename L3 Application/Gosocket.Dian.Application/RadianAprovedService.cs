@@ -200,7 +200,7 @@ namespace Gosocket.Dian.Application
         /// <param name="isInsert">Si el software es para insertasr</param>
         /// <param name="validateOperation">True = si valida que exita la operacion.</param>
         /// <returns>ResponseMessage</returns>
-        public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
+        public async Task<ResponseMessage> AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
         {
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
@@ -223,17 +223,43 @@ namespace Gosocket.Dian.Application
                 software.Url = ConfigurationManager.GetValue("WebServiceUrl");
                 RadianSoftware soft = _radianCallSoftwareService.CreateSoftware(software);
                 radianContributorOperation.SoftwareId = soft.Id;
+                radianContributorOperation.Software = soft;
             }
-
+            
             if (radianContributorOperation.OperationStatusId != (int)RadianState.Test)
                 radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
+
             int operationId = _radianContributorOperationRepository.Add(radianContributorOperation);
+
+            if ((!isInsert) && (radianContributorOperation.Software == null || radianContributorOperation.Software.Id == Guid.Empty))
+            {
+                if (software.Id == Guid.Empty)
+                {
+                    software = _radianCallSoftwareService.Get(radianContributorOperation.SoftwareId);
+                    radianContributorOperation.Software = software;
+                }
+                else
+                    radianContributorOperation.Software = software;
+            }
+
             existingOperation = _radianContributorOperationRepository.Get(t => t.Id == operationId);
 
             ApplyTestSet(radianContributorOperation, testSet, radianContributor, existingOperation);
 
-            _ = SyncToProductionAsync(radianContributorOperation, radianContributor);
-
+            if (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect)
+            {
+                var response = await SyncToProductionAsync(radianContributorOperation, radianContributor);
+                if (response != null)
+                {
+                    if (response.Success)
+                        return new ResponseMessage(string.Format("{0}{1}{2}",response.Message, Environment.NewLine, TextResources.SuccessSoftware), TextResources.alertType);
+                    else
+                        return new ResponseMessage(response.Message, TextResources.alertType, 500);
+                }
+                else
+                    return new ResponseMessage("Error al enviar a activar contribuyente a producción.", TextResources.alertType, 500);
+            }
+            
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
@@ -248,11 +274,15 @@ namespace Gosocket.Dian.Application
             operation.SoftwareType = existingOperation.SoftwareType;
             operation.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
             operation.Deleted = false;
+            operation.IndirectElectronicInvoicer = (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect);
+            if (operation.IndirectElectronicInvoicer)
+                operation.RadianState = RadianState.Habilitado.GetDescription();
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
                 string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
                 string sType = radianContributor.RadianOperationModeId == 1 ? "1" : operation.SoftwareType.ToString();
+                
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -320,6 +350,12 @@ namespace Gosocket.Dian.Application
                     ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
                     ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired
                 };
+                if (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect)
+                {
+                    setResult.Status = (int)TestSetStatus.Accepted;
+                    setResult.State = TestSetStatus.Accepted.GetDescription();
+                }
+
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
             }
@@ -411,7 +447,7 @@ namespace Gosocket.Dian.Application
         }
 
 
-        private async Task SyncToProductionAsync(RadianContributorOperation radianContributorOperation, RadianContributor radianContributor)
+        private async Task<GlobalContributorActivation> SyncToProductionAsync(RadianContributorOperation radianContributorOperation, RadianContributor radianContributor)
         {
             var pk = radianContributor.Contributor.Code.ToString();
             var rk = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
@@ -434,7 +470,10 @@ namespace Gosocket.Dian.Application
 
                 var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                 var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
+                return response;
+                
             }
+            return new GlobalContributorActivation() { Success = false, Message = "No se encontró el set de pruebas" };
         }
     }
 
