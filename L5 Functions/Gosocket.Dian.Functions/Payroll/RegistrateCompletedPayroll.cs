@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Functions.Payroll
         private static readonly TableManager TableManagerGlobalDocPayrollEmployees = new TableManager("GlobalDocPayrollEmployees");
         private static readonly TableManager TableManagerGlobalDocPayrollRegister = new TableManager("GlobalDocPayrollRegister");
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
+        private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         [FunctionName("RegistrateCompletedPayroll")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -46,7 +47,7 @@ namespace Gosocket.Dian.Functions.Payroll
             };
 
             try
-            {
+            {               
                 var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(data.TrackId);
                 var xmlParser = new XmlParseNomina(xmlBytes);
                 if (!xmlParser.Parser())
@@ -75,6 +76,22 @@ namespace Gosocket.Dian.Functions.Payroll
 
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
                 var numeroDocumento = string.IsNullOrEmpty(docGlobalPayroll.NumeroDocumento) ? "0" : docGlobalPayroll.NumeroDocumento;
+
+                //Registra certificado Autorizado emisores diferentes a SW DIAN
+                if (!docGlobalPayroll.SoftwareID.Contains(ConfigurationManager.GetValue("BillerSoftwareId")))                 
+                {
+                    string authCode = data.AuthCode;                   
+                    if (authCode != docGlobalPayroll.RowKey)
+                    {
+                        //Se inserta en GlobalAuthorization
+                        var auth = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(authCode, docGlobalPayroll.RowKey);
+                        if (auth == null)
+                        {
+                            GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, docGlobalPayroll.RowKey);
+                            arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                        }
+                    }
+                }
 
                 //Registra empleado solo para Nomina Individual
                 if (documentTypeId == (int)DocumentType.IndividualPayroll)
@@ -124,7 +141,7 @@ namespace Gosocket.Dian.Functions.Payroll
                     TipoXML = docGlobalPayroll.TipoXML
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
-
+                            
                 // ...
                 Task.WhenAll(arrayTasks).Wait();
 
@@ -167,12 +184,14 @@ namespace Gosocket.Dian.Functions.Payroll
                 } 
             } 
             return Fecha;
-        }
+        }       
 
         public class RequestObject
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "authCode")]
+            public string AuthCode { get; set; }
         }
     }
 }

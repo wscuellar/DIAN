@@ -544,7 +544,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.Status = (int)TestSetStatus.Rejected;
                         setResultOther.StatusDescription = TestSetStatus.Rejected.GetDescription();
                         setResultOther.State = TestSetStatus.Rejected.GetDescription();
-                        contributorService.OperationRejectOtherDoc(contributor.Id, isPartipantActiveOtherDoc.ContributorTypeId, isPartipantActiveOtherDoc.SoftwareId, isPartipantActiveOtherDoc.OperationModeId);
+                        contributorService.OperationRejectOtherDoc(isPartipantActiveOtherDoc.OtherDocElecContributorId, isPartipantActiveOtherDoc.SoftwareId, isPartipantActiveOtherDoc.OperationModeId);
                     }
                     
                     //Registro en la table Azure

@@ -1416,7 +1416,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         public List<ValidateListResponse> ValidateAvailabilityRequestEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, string totalInvoice, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
-            string senderCode = string.Empty;
+            string senderCode = string.Empty;           
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
 
             //Obtiene legitimo tenedor               
@@ -1431,6 +1431,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstGeneralRegistration
                || Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration)
             {
+                //Validacion Inscripciones 
+                var listInscripciones = documentMeta.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                && (Convert.ToInt32(x.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration
+               || Convert.ToInt32(x.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration) ).ToList();
+                if(listInscripciones != null || listInscripciones.Count > 0)
+                {
+                    foreach(var itemListInscripciones in listInscripciones)
+                    {
+                        var documentDisponibilizacionPrimera = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListInscripciones.Identifier, itemListInscripciones.Identifier, itemListInscripciones.PartitionKey);
+                        if (documentDisponibilizacionPrimera != null)
+                        {
+                           
+                            if(Convert.ToInt32(itemListInscripciones.CustomizationID) == Convert.ToInt32(nitModel.CustomizationId))
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "LGC23",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC23"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
+                            }
+                        }
+                    }                             
+                }
+               
+
                 //Validacion Endosos aprobados
                 var listEndoso = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad
                     || (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia)
