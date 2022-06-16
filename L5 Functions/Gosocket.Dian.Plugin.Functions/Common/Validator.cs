@@ -5109,19 +5109,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             var typeListvalues = typeListInstance.Value.Split(';');
 
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            DateTime startDate = DateTime.UtcNow;
-
-            if (string.IsNullOrWhiteSpace(documentMeta.DocumentReferencedKey))
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = errorCodeReglaUUID,
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
+            DateTime startDate = DateTime.UtcNow;           
 
             if (Convert.ToInt32(documentMeta.EventCode) == (int)EventStatus.TerminacionMandato)
             {
@@ -5202,11 +5190,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     var approved = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(documentMetaRef?.Identifier, documentMetaRef?.Identifier, documentMetaRef?.PartitionKey);
                     if (approved == null)
                     {
+                        responses.Clear();
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
                             Mandatory = true,
-                            ErrorCode = errorCodeReglaUUID,
+                            ErrorCode = "AAH07",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                         });
@@ -6109,7 +6098,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
-            if (validatorDocumentMeta != null)
+            if (validatorDocumentMeta != null && !string.IsNullOrWhiteSpace(validatorDocumentMeta.PartitionKey))
             {
                 //Esto aplica solo para FE
                 if (Convert.ToInt32(validatorDocumentMeta.DocumentTypeId) == (int)DocumentType.Invoice)
@@ -6161,18 +6150,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                 }
-            }
-            else
-            {
-                responses.Add(new ValidateListResponse
-                {
-                    IsValid = false,
-                    Mandatory = true,
-                    ErrorCode = "AAH07",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH07"),
-                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                });
-            }
+            }            
 
             return responses;
         }
