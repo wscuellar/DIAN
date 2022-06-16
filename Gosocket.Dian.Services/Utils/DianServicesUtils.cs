@@ -963,7 +963,7 @@ namespace Gosocket.Dian.Services.Utils
                             stringBuilder.Clear();
                             isValid = false;
                         }
-                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
+                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 51)
                         {
                             stringBuilder.AppendLine(txtRegla + "AAD05a" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());
