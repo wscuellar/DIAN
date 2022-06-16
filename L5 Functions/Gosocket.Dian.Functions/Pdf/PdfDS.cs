@@ -238,11 +238,9 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TipoOperacion = model.Elements(cbc + "CustomizationID");
 			var TipoDoc = model.Elements(cbc + "InvoiceTypeCode");
 			if (TipoOperacion.Any())
-                if (TipoDoc.FirstOrDefault().Value != "32")
-                {
-
+                
 				  plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
-                }
+
 
 			var EmisorRazonSocial = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "RegistrationName");
 			if (EmisorRazonSocial.Any())
