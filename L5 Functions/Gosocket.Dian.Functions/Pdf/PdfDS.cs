@@ -1398,20 +1398,31 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{ValorJuegos}", ValorJuegos.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{ValorJuegos}", string.Empty);
+			var instrumentos = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").ToList();
 
-			var NumeroMesas = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "GameTypeTotal");
-			if (NumeroMesas.Any())
+			if (instrumentos.Any())
 			{
-				var type = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "TypeOfGame");
-				if (type.Any())
-					if (type.FirstOrDefault().Value == "Mesa")
-						Html = Html.Replace("{NumeroMesas}", NumeroMesas.FirstOrDefault().Value);
-					else
+                foreach (var item in instrumentos)
+                {
+					var type = item.Elements(def + "TypeOfGame");
+					var NumeroMesas = item.Elements(def + "GameTypeTotal");
+					if (type.Any())
+                    {
+						if (type.FirstOrDefault().Value == "Mesa")
+							Html = Html.Replace("{NumeroMesas}", NumeroMesas.FirstOrDefault().Value);
+						
+						if (type.FirstOrDefault().Value == "Bingo")
+							Html = Html.Replace("{NumeroBingo}", NumeroMesas.FirstOrDefault().Value);
+					
+					}
+                    else
+                    {
 						Html = Html.Replace("{NumeroMesas}", string.Empty);
-				if (type.FirstOrDefault().Value == "Bingo")
-					Html = Html.Replace("{NumeroBingo}", NumeroMesas.FirstOrDefault().Value);
-				else
-					Html = Html.Replace("{NumeroBingo}", string.Empty);
+						Html = Html.Replace("{NumeroBingo}", string.Empty);
+					}
+						
+				}
+				
 
 			}
 			else
