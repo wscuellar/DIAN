@@ -717,7 +717,7 @@ namespace Gosocket.Dian.Web.Controllers
                 // insert in production.
                 if (ConfigurationManager.GetValue("Environment") == "Hab")
                 {
-                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
+                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorage");
                     var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
                     tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
                 }
