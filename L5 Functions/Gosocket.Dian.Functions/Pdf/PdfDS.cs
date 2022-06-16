@@ -1046,8 +1046,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var totalIvaString = "";
             if (typeDocument.Any())
             {
-				if (typeDocument.FirstOrDefault().Value == "60" || typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27" || typeDocument.FirstOrDefault().Value == "32")
-				{
+				
 					foreach (var item in ivaValorGran)
 					{
 						var tipo = item.Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cac + "TaxScheme").Elements(cbc + "ID").FirstOrDefault().Value;
@@ -1058,7 +1057,15 @@ namespace Gosocket.Dian.Functions.Pdf
 						}
 
 					}
-					TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
+					if (typeDocument.FirstOrDefault().Value != "32")
+					{
+
+					  TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
+					}
+					else
+					{
+					TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxExclusiveAmount");
+					}
 					decimal TotalBrutodocumento = decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value, numinf);
 					decimal TotalNetodocumento = decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value, numinf);
 					decimal Totalfactura = decimal.Parse(TotalFactura.FirstOrDefault().Value, numinf);
@@ -1067,7 +1074,7 @@ namespace Gosocket.Dian.Functions.Pdf
 					Html = Html.Replace("{TotalBrutoDocumento}", TotalBrutodocumento.ToString("N",formato));
 					Html = Html.Replace("{TotalNetoDocumento}", TotalNetodocumento.ToString("N", formato));
 					Html = Html.Replace("{TotalFactura}", Totalfactura.ToString("N", formato));
-				}
+			
 			
 			}
 			else
