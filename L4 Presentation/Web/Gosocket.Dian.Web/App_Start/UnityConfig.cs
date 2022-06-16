@@ -69,7 +69,8 @@ namespace Gosocket.Dian.Web
             container.RegisterType<IRadianPayrollGraphicRepresentationService, RadianPayrollGraphicRepresentationService>();
             container.RegisterType<IElectronicDocumentService, ElectronicDocumentService>();
             container.RegisterType<IAssociateDocuments, AssociateDocumentService>();
-            
+            container.RegisterType<IGlobalAuthorizationService, GlobalAuthorizationService>();
+
             #endregion
 
             #region Managers

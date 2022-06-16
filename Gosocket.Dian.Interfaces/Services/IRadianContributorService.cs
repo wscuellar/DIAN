@@ -9,6 +9,12 @@ namespace Gosocket.Dian.Interfaces.Services
     public interface IRadianContributorService
     {
         /// <summary>
+        /// Obtiene un participante por el id
+        /// </summary>
+        /// <param name="contributorId"></param>
+        /// <returns></returns>
+        Domain.Contributor GetContributor(int contributorId);
+        /// <summary>
         /// Resumen de los contribuyentes de radian
         /// </summary>
         /// <param name="userCode"></param>

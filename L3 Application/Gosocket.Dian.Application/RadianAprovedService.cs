@@ -29,7 +29,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianTestSetResultService _radianTestSetResultService;
         private readonly IRadianCallSoftwareService _radianCallSoftwareService;
         private readonly IGlobalRadianOperationService _globalRadianOperationService;
-
+        private readonly IGlobalAuthorizationService _globalAuthorizationService;
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
                                     IRadianTestSetService radianTestSetService,
@@ -41,7 +41,8 @@ namespace Gosocket.Dian.Application
                                     IContributorOperationsService contributorOperationsService,
                                     IRadianTestSetResultService radianTestSetResultService,
                                     IRadianCallSoftwareService radianCallSoftwareService,
-                                    IGlobalRadianOperationService globalRadianOperationService)
+                                    IGlobalRadianOperationService globalRadianOperationService,
+                                    IGlobalAuthorizationService globalAuthorizationService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -54,6 +55,7 @@ namespace Gosocket.Dian.Application
             _radianTestSetResultService = radianTestSetResultService;
             _radianCallSoftwareService = radianCallSoftwareService;
             _globalRadianOperationService = globalRadianOperationService;
+            _globalAuthorizationService = globalAuthorizationService;
         }
 
 
@@ -470,6 +472,18 @@ namespace Gosocket.Dian.Application
 
                 var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
                 var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
+                if (response.Success)
+                {
+                    Contributor contributorSoftware = _radianContributorService.GetContributor(radianContributorOperation.Software.ContributorId);
+                    if (contributorSoftware != null)
+                    {
+                        //Se inserta en GlobalAuthorization
+                        var auth = _globalAuthorizationService.Find(contributorSoftware.Code, data.Code);
+                        if (auth == null)
+                            _globalAuthorizationService.InsertOrUpdate(new GlobalAuthorization(contributorSoftware.Code, data.Code));
+
+                    }
+                }
                 return response;
                 
             }

@@ -29,6 +29,7 @@ namespace Gosocket.Dian.Application.Tests
         private readonly Mock<IRadianTestSetResultService> _radianTestSetResultService = new Mock<IRadianTestSetResultService>();
         private readonly Mock<IRadianCallSoftwareService> _radianCallSoftwareService = new Mock<IRadianCallSoftwareService>();
         private readonly Mock<IGlobalRadianOperationService> _globalRadianOperationService = new Mock<IGlobalRadianOperationService>();
+        private readonly Mock<IGlobalAuthorizationService> _globalAuthorizationService = new Mock<IGlobalAuthorizationService>();
         RadianAprovedService _current;
 
         [TestInitialize]
@@ -45,7 +46,8 @@ namespace Gosocket.Dian.Application.Tests
                                 _contributorOperationsService.Object,
                                 _radianTestSetResultService.Object,
                                 _radianCallSoftwareService.Object,
-                                _globalRadianOperationService.Object
+                                _globalRadianOperationService.Object,
+                                _globalAuthorizationService.Object
                             );
 
         }

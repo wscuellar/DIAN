@@ -55,6 +55,10 @@ namespace Gosocket.Dian.Application
         }
 
         #region Registro de participantes
+        public Domain.Contributor GetContributor(int contributorId)
+        {
+            return _contributorService.Get(contributorId);
+        }
 
         public NameValueCollection Summary(int contributorId)
         {
