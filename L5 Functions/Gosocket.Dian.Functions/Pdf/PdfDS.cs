@@ -238,7 +238,9 @@ namespace Gosocket.Dian.Functions.Pdf
 			var TipoOperacion = model.Elements(cbc + "CustomizationID");
 			var TipoDoc = model.Elements(cbc + "InvoiceTypeCode");
 			if (TipoOperacion.Any())
-				plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
+                
+				  plantillaHtml = plantillaHtml.Replace("{TipoOperacion}", tipoOper.Where(x => x.IdSubList == TipoOperacion.FirstOrDefault().Value).FirstOrDefault().CompositeName);
+
 
 			var EmisorRazonSocial = model.Elements(cac + "AccountingSupplierParty").Elements(cac + "Party").Elements(cac + "PartyTaxScheme").Elements(cbc + "RegistrationName");
 			if (EmisorRazonSocial.Any())
@@ -527,7 +529,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
 				var ivaPorc = detalle.Elements(cac + "TaxTotal").Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cbc + "Percent");
 				var IvaPor = ivaPorc.Count() == 0 ? "" : ivaPorc.FirstOrDefault().Value;
-				if (tipoD == "55" || tipoD == "50" || tipoD == "45" || tipoD == "27")
+				if (tipoD == "55" || tipoD == "50" || tipoD == "45" || tipoD == "27" || tipoD == "32")
 				{
 					
                     foreach (var item in ivaValorGran)
@@ -1042,8 +1044,7 @@ namespace Gosocket.Dian.Functions.Pdf
 			var totalIvaString = "";
             if (typeDocument.Any())
             {
-				if (typeDocument.FirstOrDefault().Value == "60" || typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "50" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27")
-				{
+				
 					foreach (var item in ivaValorGran)
 					{
 						var tipo = item.Elements(cac + "TaxSubtotal").Elements(cac + "TaxCategory").Elements(cac + "TaxScheme").Elements(cbc + "ID").FirstOrDefault().Value;
@@ -1054,7 +1055,15 @@ namespace Gosocket.Dian.Functions.Pdf
 						}
 
 					}
-					TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
+					if (typeDocument.FirstOrDefault().Value != "32")
+					{
+
+					  TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "LineExtensionAmount");
+					}
+					else
+					{
+					TotalBrutoDocumento = model.Elements(cac + "LegalMonetaryTotal").Elements(cbc + "TaxExclusiveAmount");
+					}
 					decimal TotalBrutodocumento = decimal.Parse(TotalBrutoDocumento.FirstOrDefault().Value, numinf);
 					decimal TotalNetodocumento = decimal.Parse(TotalNetoDocumento.FirstOrDefault().Value, numinf);
 					decimal Totalfactura = decimal.Parse(TotalFactura.FirstOrDefault().Value, numinf);
@@ -1063,7 +1072,7 @@ namespace Gosocket.Dian.Functions.Pdf
 					Html = Html.Replace("{TotalBrutoDocumento}", TotalBrutodocumento.ToString("N",formato));
 					Html = Html.Replace("{TotalNetoDocumento}", TotalNetodocumento.ToString("N", formato));
 					Html = Html.Replace("{TotalFactura}", Totalfactura.ToString("N", formato));
-				}
+			
 			
 			}
 			else
@@ -1132,7 +1141,7 @@ namespace Gosocket.Dian.Functions.Pdf
 
                 if (typeDocument.Any())
                 {
-					if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27")
+					if (typeDocument.FirstOrDefault().Value == "55" || typeDocument.FirstOrDefault().Value == "45" || typeDocument.FirstOrDefault().Value == "27" || typeDocument.FirstOrDefault().Value == "32")
 					{
 						var fab = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
 						var info = fab.Where(x => x.FirstNode.ToString().Contains("InformacionDelFabricanteDelSoftware"));
@@ -1394,20 +1403,31 @@ namespace Gosocket.Dian.Functions.Pdf
 				Html = Html.Replace("{ValorJuegos}", ValorJuegos.FirstOrDefault().Value);
 			else
 				Html = Html.Replace("{ValorJuegos}", string.Empty);
+			var instrumentos = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").ToList();
 
-			var NumeroMesas = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "GameTypeTotal");
-			if (NumeroMesas.Any())
+			if (instrumentos.Any())
 			{
-				var type = model.Elements(ext + "UBLExtensions").Elements(ext + "UBLExtension").Elements(ext + "ExtensionContent").Elements(def + "InfoEstablishment").Elements(def + "GameInformation").Elements(def + "TypeOfGame");
-				if (type.Any())
-					if (type.FirstOrDefault().Value == "Mesa")
-						Html = Html.Replace("{NumeroMesas}", NumeroMesas.FirstOrDefault().Value);
-					else
+                foreach (var item in instrumentos)
+                {
+					var type = item.Elements(def + "TypeOfGame");
+					var NumeroMesas = item.Elements(def + "GameTypeTotal");
+					if (type.Any())
+                    {
+						if (type.FirstOrDefault().Value == "Mesa")
+							Html = Html.Replace("{NumeroMesas}", NumeroMesas.FirstOrDefault().Value);
+						
+						if (type.FirstOrDefault().Value == "Bingo")
+							Html = Html.Replace("{NumeroBingo}", NumeroMesas.FirstOrDefault().Value);
+					
+					}
+                    else
+                    {
 						Html = Html.Replace("{NumeroMesas}", string.Empty);
-				if (type.FirstOrDefault().Value == "Bingo")
-					Html = Html.Replace("{NumeroBingo}", NumeroMesas.FirstOrDefault().Value);
-				else
-					Html = Html.Replace("{NumeroBingo}", string.Empty);
+						Html = Html.Replace("{NumeroBingo}", string.Empty);
+					}
+						
+				}
+				
 
 			}
 			else

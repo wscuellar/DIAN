@@ -195,7 +195,7 @@ namespace Gosocket.Dian.Web.Controllers
                 var identificatioType = User.IdentificationTypeId();
 
                 var pk = identificatioType + "|" + User.UserCode();
-                var rk = User.UserCode();
+                var rk = contributorCode;
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
                 var loginMenu = "";
                 if (auth != null)
