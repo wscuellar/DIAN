@@ -1978,7 +1978,8 @@ namespace Gosocket.Dian.Web.Controllers
             var userIdentificationType = User.IdentificationTypeId();
             var userCode = User.UserCode();
             var partitionKey = $"{userIdentificationType}|{userCode}";
-            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, userCode);
+            var contributorCode = User.ContributorCode();
+            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, contributorCode);
             return auth;
         }
         /************************/
