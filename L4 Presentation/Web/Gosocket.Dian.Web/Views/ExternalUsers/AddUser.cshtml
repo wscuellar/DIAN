@@ -1,7 +1,7 @@
 ﻿@model Gosocket.Dian.Web.Models.ExternalUserViewModel
 
 @{
-    ViewBag.Title = ViewBag.txtAccion;
+    ViewBag.Title = "Crear usuario catálogo";
 }
 
 @section css
@@ -347,7 +347,7 @@
                 <button type="button" id="btnAbrirModalConfirmacion" name="btnAbrirModalConfirmacion" class="btn btn-primary ">
                     @ViewBag.txtAccion
                 </button>
-                @Html.ActionLink("Salir", "AddUser", new { id = "" }, new { @class = "btn btn-secondary" })
+                @Html.ActionLink("Volver", "AddUser", new { id = "" }, new { @class = "btn btn-secondary" })
                 @*<a href="/ExternalUsers/AddUser" class="btn btn-default btn-radian-default cancel-register">Cancelar</a>*@
             </div>
         </div>

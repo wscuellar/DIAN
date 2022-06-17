@@ -22,14 +22,14 @@
                             </div>
                             if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
                             {
-                                <div class="panel-footer text-right">
-                                    <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Registrar</button>
+                                <div class="text-left">
+                                    <button type="button" class="btn btn-primary btn-hover-gosocket btn-save">Registrar</button>
                                 </div>
                             }
                             if (Model.AcceptanceStatusId != (int)ContributorStatus.Pending)
                             {
-                                <div class="panel-footer text-right">
-                                    <a href="@Url.Action("ElectronicDocuments", "Document")" class="btn btn-default btn-hover-gosocket btn-save">Documentos Electronicos</a>
+                                <div class="text-left">
+                                    <a href="@Url.Action("ElectronicDocuments", "Document")" class="btn btn-secondary btn-hover-gosocket btn-save">Documentos Electronicos</a>
                                 </div>
                             }
                         }

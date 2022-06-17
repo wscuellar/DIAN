@@ -200,6 +200,7 @@ table.simple-table tbody tr td.dataTables_empty {
 
     .btn.btn-primary {
         background: #41D78C !important;
+        margin-right: 35px !important;
     }
 
         /*.btn.btn-primary {
@@ -216,6 +217,7 @@ table.simple-table tbody tr td.dataTables_empty {
     .btn.btn-secondary {
         border: 2px solid #41D78C;
         background: #FFF !important;
+        margin-right: 35px !important;
     }
 
         .btn.btn-secondary:hover {
@@ -879,7 +881,8 @@ button.selectpicker .fa-caret-down {
 }
 
 .btn-radian-success {
-    background: #41D78C !important
+    background: #41D78C !important;
+    margin-right: 35px !important;
 }
 
 div#dashboard-report-range {

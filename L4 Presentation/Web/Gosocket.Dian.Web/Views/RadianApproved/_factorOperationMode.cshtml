@@ -107,14 +107,14 @@
                                                 }
                                             </div>
                                         </div>
-                                        <div class="panel-footer-grey text-right">
-                                            @if (operationMode == "2")
-                                            {
-                                                <button type="button" class="btn btn-default btn-radian-default cancel-register">Cancelar registro</button>
-                                            }
+                                        <div class="text-left">
                                             @if (ConfigurationManager.GetValue("Environment") != "Prod")
                                             {
-                                                <button type="submit" id="save-operation-mode" class="btn btn-radian-success">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
+                                                <button type="submit" id="save-operation-mode" class="btn btn-primary btn-radian-success">@(operationMode == "2" ? "Asociar" : "Adicionar")</button>
+                                            }
+                                            @if (operationMode == "2")
+                                            {
+                                                <button type="button" class="btn btn-secondary btn-radian-default cancel-register">Cancelar registro</button>
                                             }
                                         </div>
 

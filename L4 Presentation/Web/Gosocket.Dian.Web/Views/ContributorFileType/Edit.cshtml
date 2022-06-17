@@ -14,10 +14,10 @@
                         @using (Html.BeginForm("Edit", "ContributorFileType", FormMethod.Post, new { id = "edit-contributorFileType-form" }))
                         {
                             @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("View", "ContributorFileType", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
-                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
-                            </div>
+                        <div class="text-left">
+                            <button type="button" class="btn btn-primary btn-hover-gosocket btn-save">Guardar</button>
+                            <a href="@Url.Action("View", "ContributorFileType", new { id = Model.Id })" class="btn btn-secondary">Cancelar</a>
+                         </div>
                         }
                     </div>
                 </div>

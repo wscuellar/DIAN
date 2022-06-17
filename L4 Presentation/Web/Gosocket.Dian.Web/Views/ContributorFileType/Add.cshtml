@@ -13,10 +13,10 @@
                         @using (Html.BeginForm("Add", "ContributorFileType", FormMethod.Post, new { id = "add-contributorFileType-form" }))
                         {
                             @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("List", "ContributorFileType")" class="btn btn-default">Volver</a>
-                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
-                            </div>
+                        <div class="text-left">
+                            <button type="button" class="btn btn-primary btn-hover-gosocket btn-save">Guardar</button>
+                            <a href="@Url.Action("List", "ContributorFileType")" class="btn btn-secondary">Volver</a>
+                        </div>
                         }
                     </div>
                 </div>
