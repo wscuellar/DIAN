@@ -2552,7 +2552,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = ValidateElementsSum,
                     ErrorCode = "AAI05a",
-                    ErrorMessage = "ErrorMessage_AAI05a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
 
