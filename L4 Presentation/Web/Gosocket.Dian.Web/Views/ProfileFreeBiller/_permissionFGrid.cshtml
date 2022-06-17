@@ -3,6 +3,7 @@
 @using Gosocket.Dian.Domain.Common
 @using Gosocket.Dian.Infrastructure
 @{
+    string sesion = Session["loginMenu"].ToString();
     int operationMode = 0;
     if (ViewBag.OperationMode != null)
     {
@@ -73,6 +74,8 @@
     {
         if (@operationMode == 1)
         {
+            if (sesion != "NO OFE")
+            { 
             <div>
                 <div class="col-sm-3" style="display: inline-flex; justify-content: flex-start; flex-direction: row; align-items: center; border: 2px solid #E2E7EB; padding: 15px; margin: 0px 20px 0px 0px;">
                     <img src="~/Content/img/electronic-document-icons/factura-electronica-icon.svg" width="60" />
@@ -275,8 +278,9 @@
                     }
                 </div>
             </div>
+            }
             <br />
-            
+
             <div>
                 <div class="col-sm-3" style="display: inline-flex; justify-content: flex-start; flex-direction: row; align-items: center; border: 2px solid #E2E7EB; padding: 15px; margin: 0px 20px 0px 0px;">
                     <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" width="60" />
