@@ -2612,17 +2612,28 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
-
-            if (validaPago)
-                return responses;
-
-
+       
             XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
             double totalValueSender = 0;
             for (int i = 0; i < valueListSender.Count; i++)
             {
                 string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                if (string.IsNullOrWhiteSpace(valueStockAmount))
+                {
+                    validaPago = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAF19",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }                
             }
 
             XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
@@ -2630,8 +2641,26 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             for (int i = 0; i < valueListReceiver.Count; i++)
             {
                 string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
-                totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                if (string.IsNullOrWhiteSpace(valueStockAmount))
+                {
+                    validaPago = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAG20",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }                
             }
+
+            if (validaPago)
+                return responses;
 
             if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
             {
