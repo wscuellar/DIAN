@@ -366,14 +366,15 @@ namespace Gosocket.Dian.Application
 
             foreach (var item in documents)
             {
-                GlobalDocValidatorDocumentMeta document = documents.LastOrDefault(d => d.DocumentKey == item.DocumentKey);
-
-                if (!string.IsNullOrEmpty(document.EventCode))
+                if (!string.IsNullOrEmpty(item.EventCode))
                 {
-                    Event newEvent = events.LastOrDefault(e => e.DocumentKey == item.DocumentKey);
+                    Event newEvent = events.LastOrDefault(e => e.Code == item.EventCode);
                     if (newEvent != null)
                     {
-                        newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(document.EventCode));
+                        if (string.IsNullOrEmpty(newEvent.CustomizationID))
+                            newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(item.EventCode));
+                        else
+                            newEvent.Description = EnumHelper.GetEnumDescription((EventCustomization)int.Parse(item.CustomizationID));
                         finalEvents.Add(newEvent);
                     }
                 }

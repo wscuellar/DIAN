@@ -24,14 +24,15 @@ namespace Gosocket.Dian.Application
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
         const string PAGADACODES = "045";
-        const string ENDOSOCODES = "037,038,039";
+        const string ENDOSOCODES = "037,038,039,047";
         const string LIMITACIONCODES = "041";
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
         const string PROTESTADACODES = "048";
         const string TRANSFERENCIACODES = "049";
-
+        const string NOTIFICACIONTRANSFERENCIA = "050";
+        const string PAGOTRANSFERENCIA = "051";
         const string CREDITNOTE = "91";
         const string DEBITNOTE = "92";
 
@@ -158,6 +159,11 @@ namespace Gosocket.Dian.Application
                         Title = EnumHelper.GetDescription(SubEventStatus.TerminacionSentencia);
                     if (CustomizationID.Equals("422"))
                         Title = EnumHelper.GetDescription(SubEventStatus.TerminacionAnticipada);
+                    break;
+                case EventStatus.Objection:
+                case EventStatus.TransferEconomicRights:
+                case EventStatus.PaymentOfTransferEconomicRights:
+                    Title = EnumHelper.GetDescription((SubEventStatus)int.Parse(CustomizationID));
                     break;
                 default:
                     Title = EnumHelper.GetEnumDescription(Enum.Parse(typeof(EventStatus), EventCode));
@@ -372,11 +378,15 @@ namespace Gosocket.Dian.Application
             {
                 if (!string.IsNullOrEmpty(item.EventCode))
                 {
-                    resultList.Add(item);
+                    resultList.Add(item);                    
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim()) || PROTESTADACODES.Contains(e.EventCode.Trim()) || TRANSFERENCIACODES.Contains(e.EventCode.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) 
+            || PAGADACODES.Contains(e.EventCode.Trim()) || ENDOSOCODES.Contains(e.EventCode.Trim()) || DISPONIBILIZACIONCODES.Contains(e.EventCode.Trim()) 
+            || ANULACIONENDOSOCODES.Contains(e.EventCode.Trim()) || LIMITACIONCODES.Contains(e.EventCode.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.EventCode.Trim()) 
+            || PROTESTADACODES.Contains(e.EventCode.Trim()) || TRANSFERENCIACODES.Contains(e.EventCode.Trim())
+            || NOTIFICACIONTRANSFERENCIA.Contains(e.EventCode.Trim()) || PAGOTRANSFERENCIA.Contains(e.EventCode.Trim())).ToList();
         }
 
         public GlobalDocPayroll GetPayrollById(string partitionKey)
