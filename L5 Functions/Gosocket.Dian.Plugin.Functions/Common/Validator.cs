@@ -2379,40 +2379,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         });
                     }
 
-                    return responses;
-
-                case (int)EventStatus.Mandato:
-                    if (!documentMetaCude.SendTestSet)
-                    {
-                        //Valida mandante habilitado en RADIAN
-                        var responseVal = ValidateRadianEnabled(documentMetaCude);
-                        if (responseVal != null)
-                        {
-                            foreach (var item in responseVal)
-                            {
-                                responses.Add(new ValidateListResponse
-                                {
-                                    IsValid = item.IsValid,
-                                    Mandatory = item.Mandatory,
-                                    ErrorCode = item.ErrorCode,
-                                    ErrorMessage = item.ErrorMessage,
-                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                                });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        responses.Add(new ValidateListResponse
-                        {
-                            IsValid = true,
-                            Mandatory = true,
-                            ErrorCode = "100",
-                            ErrorMessage = errorMessageParty,
-                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
-                        });
-                    }                   
-                    return responses;
+                    return responses;               
 
                 case (int)EventStatus.Avales:
                     responses.Add(new ValidateListResponse
@@ -2733,6 +2700,39 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                     return responses;
 
+                case (int)EventStatus.Mandato:
+                    if (!documentMetaCude.SendTestSet)
+                    {
+                        //Valida mandante habilitado en RADIAN
+                        var responseVal = ValidateRadianEnabled(documentMetaCude);
+                        if (responseVal != null)
+                        {
+                            foreach (var item in responseVal)
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = item.IsValid,
+                                    Mandatory = item.Mandatory,
+                                    ErrorCode = item.ErrorCode,
+                                    ErrorMessage = item.ErrorMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = true,
+                            Mandatory = true,
+                            ErrorCode = "100",
+                            ErrorMessage = errorMessageParty,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+                    return responses;
+
                 case (int)EventStatus.TerminacionMandato:
                     //Revocación es información del mandante
                     if (party.CustomizationID == "441")
@@ -2904,7 +2904,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
 
-                    // Valida receptor documento AR coincida con DIAN
+                    // Valida receptor documento AR Adquirente/Deudor/aceptante"
                     if (party.ReceiverParty != nitModel.ReceiverCode)
                     {
                         responses.Add(new ValidateListResponse
@@ -2931,6 +2931,154 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     }
 
                     break;
+
+                case (int)EventStatus.EndorsementWithEffectOrdinaryAssignment:
+
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if (documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_037"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+
+                case (int)EventStatus.Objection:
+
+                    //Valida Tenedor legitimo
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAF01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_048"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    // Valida receptor documento AR Adquirente/Deudor/aceptante"
+                    if (party.ReceiverParty != nitModel.ReceiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_046"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+
+                case (int)EventStatus.TransferEconomicRights:
+
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = errorCodeMessage.errorCode,
+                            ErrorMessage = errorCodeMessage.errorMessage,
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if (documentMetaCude.ReceiverCode == documentMetaCude.SenderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_049"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+
+                    break;
+
+                case (int)EventStatus.NotificationDebtorOfTransferEconomicRights:
+
+                    //Valida Tenedor legitimo
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAF01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_050"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    // Valida receptor documento AR Adquirente/Deudor/aceptante"
+                    if (party.ReceiverParty != nitModel.ReceiverCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_050"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    break;
+
+                case (int)EventStatus.PaymentOfTransferEconomicRights:
+
+                    //Valida el Adquirente / Deudor / Aceptante o Tenedor Legítimo
+                    if (party.SenderParty != senderCode)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAF01",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_051"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(party.ReceiverParty) && party.ReceiverParty != "800197268")
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "AAG04",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG04_051"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                    }
+
+
+                    break;
+
             }
             foreach (var r in responses)
                 r.ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds;
@@ -7310,7 +7458,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 response.errorCodeB = "AAF01b";
                 response.errorMessageB = ConfigurationManager.GetValue("ErrorMessage_AAF01b_036");
             }
-            else if (eventCode == "037")
+            else if (eventCode == "037" || eventCode == "047" || eventCode == "049")
             {
                 response.errorCode = "AAF01";
                 response.errorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF01_037");
@@ -8135,7 +8283,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             }
 
             string partyLegalEntityName = null, partyLegalEntityCompanyID = null, availabilityCustomizationId = null;
-            if ((eventCode == (int)EventStatus.EndosoPropiedad && !string.IsNullOrWhiteSpace(availabilityDocumentMeta.PartitionKey)))
+            if (eventCode == (int)EventStatus.EndosoPropiedad
+                && !string.IsNullOrWhiteSpace(availabilityDocumentMeta.PartitionKey))
             {
                 partyLegalEntityName = availabilityDocumentMeta.PartyLegalEntityName;
                 partyLegalEntityCompanyID = availabilityDocumentMeta.PartyLegalEntityCompanyID;

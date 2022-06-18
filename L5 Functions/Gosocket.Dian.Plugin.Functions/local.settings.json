@@ -178,7 +178,7 @@
     "ErrorMessage_AAZD07": "No fue informado el valor aceptado del derecho contenido en el t�tulo",
     "ErrorMessage_AAZD09": "No fue informado el valor pendiente de aceptaci�n del derecho contenido en el t�tulo",
     "ValidateTransferEconomicRights": "true",
-    "ErrorMessage_LGC94": "No es posible la transmisi�n de eventos en el RADIAN debido a que el usuario no cumple con la totalidad de los requisitos contemplados en el art�culo 2.2.2.53.8 del Decreto 1154 de 2020.",
+    "ErrorMessage_LGC94": "No es posible la transmisión de eventos en el RADIAN debido a que el usuario no cumple con la totalidad de los requisitos contemplados en el artículo 2.2.2.53.8 del Decreto 1154 de 2020.",
     "ValidateRequiredDocRadian": "true",
     "ErrorMessage_LGC25": "No se puede registrar este evento si  previamente se ha registrado alguno de los siguientes eventos: Endoso en garant�a, Endoso en procuraci�n, Limitaci�n para circulaci�n, Endoso con efectos de cesi�n ordinaria, Protesto, Transferencia de los derechos econ�micos.",
     "ErrorMessage_LGC28": "No se puede registrar este evento si previamente se ha registrado alguno de los siguientes eventos: Endoso en procuraci�n, Limitaci�n para circulaci�n, Endoso con efectos de cesi�n ordinaria, Protesto, Transferencia de los derechos econ�micos",
@@ -228,7 +228,14 @@
     "ErrorMessage_LGC76": "No se puede registrar este evento ya que el t�tulo valor est� vigente",
     "BusinessDaysLimitObjection": 15,
     "ErrorMessage_LGC77": "No se puede registrar este evento ya que supera los 15 d�as calendario posteriores al vencimiento del t�tulo valor",
-    "ErrorMessage_LGC79": "La Factura Electr�nica no cumple con los requisitos legales para ser considerada t�tulo valor y no podr� ser transferida"
+    "ErrorMessage_LGC79": "La Factura Electr�nica no cumple con los requisitos legales para ser considerada t�tulo valor y no podr� ser transferida",
+    "ErrorMessage_AAF01_037": "No corresponde a la información del Emisor/Facturador electrónico/Tenedor Legítimo",
+    "ErrorMessage_AAF01_048": "No fue informado el Tenedor Legítimo",
+    "ErrorMessage_AAG04_048": "No fue informado el número de identificación.",
+    "ErrorMessage_AAF01_050": "No fue informado el Tenedor Legítimo",
+    "ErrorMessage_AAG04_050": "No fue informado el número de identificación",
+    "ErrorMessage_AAF01_051": "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo",
+    "ErrorMessage_AAG04_051": "No fue informado el número de identificación."
 
 
 
