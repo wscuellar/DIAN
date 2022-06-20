@@ -404,7 +404,8 @@
 
             if (!(model.EventCode == "036" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040" 
                 || (model.CustomizationID == "372" && model.OperationDetails == "")
-                || model.EventCode == "049"))
+                || model.EventCode == "049"
+                || model.EventCode == "050"))
             {
                 template = template.Replace("{classNotes}", "noShow");
             }
