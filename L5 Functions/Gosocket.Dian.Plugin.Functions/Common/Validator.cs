@@ -3068,7 +3068,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 case (int)EventStatus.PaymentOfTransferEconomicRights:
 
                     //Valida el Adquirente / Deudor / Aceptante o Tenedor Legítimo
-                    if (party.SenderParty != senderCode)
+                    if (party.SenderParty != senderCode && party.SenderParty != nitModel.ReceiverCode)
                     {
                         responses.Add(new ValidateListResponse
                         {

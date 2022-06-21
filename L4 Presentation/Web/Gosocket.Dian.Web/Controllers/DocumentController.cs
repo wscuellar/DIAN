@@ -1281,7 +1281,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || PROTESTADACODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
         }
 
 

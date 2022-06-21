@@ -246,7 +246,9 @@
         {
             bool isInEvent = false;
 
-            if (model.EventCode == "035" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "041" || model.EventCode == "042" || model.EventCode == "045" || model.EventCode == "046")
+            if (model.EventCode == "035" || model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" 
+                || model.EventCode == "041" || model.EventCode == "042" || model.EventCode == "045" || model.EventCode == "046" 
+                || model.EventCode == "051")
             {
                 isInEvent = true;
             }
@@ -282,11 +284,10 @@
                         break;
                     case "042":
                         htmlEvent += "{EventTotalValueLimitation}";
-                        break;
+                        break;                   
                     case "045":
-                        htmlEvent += "{EventTotalValuePago}";
-                        break;
                     case "046":
+                    case "051":
                         htmlEvent += "{EventTotalValuePago}";
                         break;
                 }
@@ -303,7 +304,7 @@
                 htmlEvent += "<div id='EventFinishDate' class='text-subtitle text-gray'>Fecha de Terminación: <a class='text-data'>{EventFinishDate} </a></div>";
             }
 
-            if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039")
+            if (model.EventCode == "037" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "047")
             {
                 htmlEvent += "<div id='EventStartDate' class='text-subtitle text-gray'>Fecha de Inicio: <a class='text-data'>{EventStartDate} </a></div>";
             }
@@ -321,7 +322,8 @@
             htmlInvoice += "</td>";
             htmlInvoice += "<td>";
 
-            if (model.EventCode == "036" || model.CustomizationID == "372" || model.EventCode == "038" || model.EventCode == "045")
+            if (model.EventCode == "036" || model.CustomizationID == "372" || model.EventCode == "038" 
+                || model.EventCode == "045" || model.EventCode == "051")
             {
                 htmlInvoice += "<div id='ExpirationDate' class='text-subtitle text-gray'>Fecha de Vencimiento: <a class='text-data'>{EventFinishDate}</a></div>";
             }
@@ -404,8 +406,8 @@
 
             if (!(model.EventCode == "036" || model.EventCode == "038" || model.EventCode == "039" || model.EventCode == "040" 
                 || (model.CustomizationID == "372" && model.OperationDetails == "")
-                || model.EventCode == "049"
-                || model.EventCode == "050"))
+                || model.EventCode == "047" || model.EventCode == "048" || model.EventCode == "049" || model.EventCode == "050"
+                || model.EventCode == "051"))
             {
                 template = template.Replace("{classNotes}", "noShow");
             }
