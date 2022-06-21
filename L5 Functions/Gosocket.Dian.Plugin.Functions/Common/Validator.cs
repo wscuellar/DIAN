@@ -9001,8 +9001,32 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valorAceptadoInformacionProtesto = nitModel.ValorAceptadoInformacionProtesto;
             string valorPendienteInformacionProtesto = nitModel.ValorPendienteInformacionProtesto;
 
+            //Valida valor nuemrico valorTotalInformacionProtesto
+            double numberTotalInformacionProtesto = 0;
+            bool isNumberTotalInformacionProtesto = double.TryParse(valorTotalInformacionProtesto, out numberTotalInformacionProtesto);
+
+            //Valida valor nuemrico valorAceptadoInformacionProtesto
+            double numberAceptadoInformacionProtesto = 0;
+            bool isNumberAceptadoInformacionProtesto = double.TryParse(valorAceptadoInformacionProtesto, out numberAceptadoInformacionProtesto);
+
+            //Valida valor nuemrico valorPendienteInformacionProtesto
+            double numberPendienteInformacionProtesto = 0;
+            bool isNumberPendienteInformacionProtesto = double.TryParse(valorPendienteInformacionProtesto, out numberPendienteInformacionProtesto);
+
             //Valida informacion valorTotalInformacionProtesto
             if (String.IsNullOrEmpty(valorTotalInformacionProtesto))
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD05",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD05"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else if(!isNumberTotalInformacionProtesto)
             {
                 validObjection = true;
                 responses.Add(new ValidateListResponse
@@ -9028,9 +9052,33 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
+            else if(!isNumberAceptadoInformacionProtesto)
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD07",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD07"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            } 
 
             //Valida informacion valorTotalInformacionProtesto
             if (String.IsNullOrEmpty(valorPendienteInformacionProtesto))
+            {
+                validObjection = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAZD09",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAZD09"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            else if (!isNumberPendienteInformacionProtesto)
             {
                 validObjection = true;
                 responses.Add(new ValidateListResponse
