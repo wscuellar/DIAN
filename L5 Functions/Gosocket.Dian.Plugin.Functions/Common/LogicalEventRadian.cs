@@ -3126,7 +3126,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             List<ValidateListResponse> responses = new List<ValidateListResponse>();            
 
             //Valida existe Pago Total FETV
-            if(nitModel.CustomizationId.Equals(EventCustomization.PartialPaymentTransferEconomicRights))
+            if(Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.PartialPaymentTransferEconomicRights)
             {
                var listPagoTotalTransferEconomic = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights
                && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.TotalPaymentTransferEconomicRights)
