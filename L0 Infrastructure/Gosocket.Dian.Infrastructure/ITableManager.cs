@@ -80,5 +80,6 @@ namespace Gosocket.Dian.Infrastructure
         bool Update(TableEntity entity);
         bool Update(TableEntity entity, string partitionKey, string rowKey);
         List<T> FindFirstSurNameByPartition<T>(string partitionKey) where T : ITableEntity, new();
+        List<T> FindhByPartitionKeyRadianState<T>(string partitionKey, bool deleted, string softwareId) where T : ITableEntity, new();        
     }
 }
