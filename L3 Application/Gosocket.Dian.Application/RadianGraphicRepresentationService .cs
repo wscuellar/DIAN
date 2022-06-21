@@ -116,6 +116,13 @@
             string pathServiceData = "https://global-function-docvalidator-sbx.azurewebsites.net/api/GetXpathDataValues?code=tyW3skewKS1q4GuwaOj0PPj3mRHa5OiTum60LfOaHfEMQuLbvms73Q==";
             ResponseXpathDataValue fieldValues = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
+            foreach (KeyValuePair<string, string> element in fieldValues.XpathsValues.Where(xpv => xpv.Key == "Note").ToList())
+            {
+                string _value = Services.Utils.StringUtil.FormatStringDian(element.Value);
+                fieldValues.XpathsValues.Remove(element.Key);
+                fieldValues.XpathsValues.Add(element.Key, _value);
+            }
+
             model = MappingXpathValues(model, fieldValues);
 
             // Set Titles
