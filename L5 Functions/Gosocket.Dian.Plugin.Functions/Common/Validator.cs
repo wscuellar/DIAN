@@ -3127,6 +3127,9 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
 
                 var docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>(cufe, senderCode);
+                if(docsReferenceAttorney == null || docsReferenceAttorney.Count <= 0)
+                    docsReferenceAttorney = TableManagerGlobalDocReferenceAttorney.FindDocumentReferenceAttorney<GlobalDocReferenceAttorney>("01", senderCode);
+
 
                 //Valida existan permisos para firmar evento por mandatario
                 if (docsReferenceAttorney != null)
