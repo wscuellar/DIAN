@@ -8866,23 +8866,27 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             GlobalRadianOperations softwareProviderRadian = null;
-            bool radianEnabled = false;
+            bool radianEnabled = false;            
 
             //Valida sender mandante habilitado en RADIAN
-            softwareProviderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianStatus<GlobalRadianOperations>(
-                            documentMetaCude.SenderCode, false, documentMetaCude.SoftwareId);
-            if (softwareProviderRadian != null)
+            var softwareSenderRadian = TableManagerGlobalRadianOperations.FindhByPartitionKeyRadianState<GlobalRadianOperations>(
+                            documentMetaCude.SenderCode, false, "Habilitado").ToList();
+            if (softwareSenderRadian != null && softwareSenderRadian.Count > 0)
             {
-                switch (softwareProviderRadian.SoftwareType)
+                foreach (var itemSoftwareSenderRadian in softwareSenderRadian)
                 {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        if (softwareProviderRadian.TecnologicalSupplier || softwareProviderRadian.Factor || softwareProviderRadian.NegotiationSystem
-                            || softwareProviderRadian.ElectronicInvoicer || softwareProviderRadian.IndirectElectronicInvoicer)
-                            radianEnabled = true;
-                        break;
+                    switch (itemSoftwareSenderRadian.SoftwareType)
+                    {
+
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            if (itemSoftwareSenderRadian.TecnologicalSupplier || itemSoftwareSenderRadian.Factor || itemSoftwareSenderRadian.NegotiationSystem
+                                || itemSoftwareSenderRadian.ElectronicInvoicer || itemSoftwareSenderRadian.IndirectElectronicInvoicer)
+                                radianEnabled = true;
+                            break;
+                    }
                 }
             }
             if (!radianEnabled)
