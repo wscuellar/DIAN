@@ -8940,16 +8940,16 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             _ns.AddNamespace("cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
 
             XmlNodeList AttachmentBase64List = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", _ns);
-            bool validate = true;
+            bool validate = false;
             if (AttachmentBase64List.Count > 0)
             {
-                for (int i = 0; i < AttachmentBase64List.Count && validate; i++)
+                for (int i = 0; i < AttachmentBase64List.Count && !validate; i++)
                 {
                     string AttachmentBase64 = AttachmentBase64List.Item(i).SelectNodes("/sig:ApplicationResponse/cac:DocumentResponse/cac:LineResponse/cac:LineReference/cac:DocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject", _ns).Item(i)?.InnerText.ToString().Trim();
 
                     if (!IsBase64(AttachmentBase64))
                     {
-                        validate = false;
+                        validate = true;
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
@@ -8966,7 +8966,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         var mimeType = GetMimeFromBytes(data);
                         if (mimeType != pdfMimeType)
                         {
-                            validate = false;
+                            validate = true;
                             responses.Add(new ValidateListResponse
                             {
                                 IsValid = false,
