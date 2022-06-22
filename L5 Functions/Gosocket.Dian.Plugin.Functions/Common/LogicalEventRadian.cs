@@ -2796,7 +2796,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
-            if (nitModel.CustomizationId == "452" || Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.PaymentOfTransferEconomicRights)
+            if (nitModel.CustomizationId == "452" || nitModel.CustomizationId == "512")
             {
                 //Valida Total valor pagado igual al valor actual del titulo valor
                 if (totalValueSender != double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
