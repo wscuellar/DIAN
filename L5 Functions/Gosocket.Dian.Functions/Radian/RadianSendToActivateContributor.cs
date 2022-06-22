@@ -158,8 +158,8 @@ namespace Gosocket.Dian.Functions.Radian
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"Error al enviar a activar contribuyente con id {radianContributor?.Id} en producci�n _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
-                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producci�n.", detail = ex.Message, trace = ex.StackTrace };
+                    log.Error($"Error al enviar a activar contribuyente con id {radianContributor?.Id} en producción _________ {ex.Message} _________ {ex.StackTrace} _________ {ex.Source}", ex);
+                    var failResponse = new { success = false, message = "Error al enviar a activar contribuyente a producción.", detail = ex.Message, trace = ex.StackTrace };
 
                     SetLogger(failResponse, "STA-Exception", " ---------------------------------------- " + ex.Message + " ---> " + ex);
 
@@ -167,7 +167,7 @@ namespace Gosocket.Dian.Functions.Radian
                 }
 
 
-                var response = new { success = true, message = "Contribuyente RADIAN se envi� a activar a producci�n con �xito." };
+                var response = new { success = true, message = "Contribuyente RADIAN se envió a activar a producción con éxito." };
                 return req.CreateResponse(HttpStatusCode.OK, response);
 
             }
