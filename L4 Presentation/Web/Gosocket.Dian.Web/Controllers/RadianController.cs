@@ -277,7 +277,7 @@ namespace Gosocket.Dian.Web.Controllers
                 {
                     RadianContributor result = _radianContributorService.ChangeContributorActiveRequirement(radianAdmin.Contributor.RadianContributorId);
                     if(result == null)
-                        return Json(new { messasge = "Error al actualizar contributor requisitos activos.", success = false, error = "" }, JsonRequestBehavior.AllowGet);
+                        return Json(new { messasge = "Error al actualizar estado requisitos contribuyente.", success = false, error = "" }, JsonRequestBehavior.AllowGet);
                     else if (result.IsActive)
                     {
                         string guid = Guid.NewGuid().ToString();
@@ -289,7 +289,7 @@ namespace Gosocket.Dian.Web.Controllers
                         _ = SendMail(radianAdmin);
 
                         if(_globalRadianContributorEnabledService.Insert(item))
-                            return Json(new { message = "Actualiza requisitos contributor a activos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                            return Json(new { message = "Actualiza estado requisitos contribuyente a activos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                     }                        
                     else if (!result.IsActive)
                     {
@@ -302,7 +302,7 @@ namespace Gosocket.Dian.Web.Controllers
                         _ = SendMail(radianAdmin);
 
                         if(_globalRadianContributorEnabledService.Insert(item))                        
-                            return Json(new { message = "Actualiza requisitos contributor a inactivos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                            return Json(new { message = "Actualiza estado requisitos contribuyente a inactivos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                     }
                     
                 }
