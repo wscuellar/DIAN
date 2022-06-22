@@ -370,7 +370,7 @@ namespace Gosocket.Dian.Web.Controllers
         [HttpPost]
         public async Task<JsonResult> UpdateFactorOperationMode(SetOperationViewModel data)
         {
-            if (string.IsNullOrEmpty(data.SoftwareId))
+            if (string.IsNullOrEmpty(data.SoftwareId) && string.IsNullOrEmpty(data.SoftwareName) && string.IsNullOrEmpty(data.Pin))
                 return Json(new ResponseMessage("Por favor seleccione un software", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
 
             RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
