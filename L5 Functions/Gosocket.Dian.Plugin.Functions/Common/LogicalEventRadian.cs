@@ -2813,6 +2813,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
+            if (nitModel.CustomizationId == "511")
+            {
+                //Valida Total valor pagado igual al valor actual del titulo valor  PAGO PARCIAL
+                if (totalValueSender == double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                {
+                    validPayment = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAF19d",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19d"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
+
             //Valida Total valor pagado no supera el valor actual del titulo valor
             if (totalValueSender > double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
             {
