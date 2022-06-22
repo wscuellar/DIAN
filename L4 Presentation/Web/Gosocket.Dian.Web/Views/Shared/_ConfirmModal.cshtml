@@ -126,6 +126,8 @@
         //$(".modal-backdrop").get(modalBackDropLast).style['z-index'] = 1995;
 
         $("#confirmModal-confirm-button").on('click', () => {
+            console.log(`[INFO] => Clic al botón aceptar en el modal de confirmación`);
+            console.log(confirmCallback);
             if (confirmCallback != null) {
                 confirmCallback();
             }
