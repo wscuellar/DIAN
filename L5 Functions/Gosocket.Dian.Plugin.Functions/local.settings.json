@@ -234,10 +234,10 @@
     "ErrorMessage_AAG04_048": "No fue informado el número de identificación.",
     "ErrorMessage_AAF01_050": "No fue informado el Tenedor Legítimo",
     "ErrorMessage_AAG04_050": "No fue informado el número de identificación",
-    "ErrorMessage_AAF01_051": "No fue informado el Adquirente/Deudor/Aceptante o Tenedor Legítimo",
+    "ErrorMessage_AAF01_051": "No fue informado el Adquirente/Deudor/Aceptante",
     "ErrorMessage_AAG04_051": "No fue informado el número de identificación.",
-    "ErrorMessage_AAK07": "No fue informado el saldo insoluto del valor total a la fecha de este pago"
-
+    "ErrorMessage_AAK07": "No fue informado el saldo insoluto del valor total a la fecha de este pago",
+    "ErrorMessage_AAF19d": "El valor no debe ser igual al valor actual del titulo valor para el tipo de operación 511"
 
 
 
