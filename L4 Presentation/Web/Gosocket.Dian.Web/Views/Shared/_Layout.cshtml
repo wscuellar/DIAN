@@ -536,7 +536,7 @@
                                                 <li id="@Navigation.NavigationEnum.ElectronicDocuments"><a href="@Url.Action("CheckContributorRegister", "Contributor" )">Documentos electrónicos</a></li>
                                                 if (sesion != "NO OFE")
                                                 {
-                                                    <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Facturador</a></li>
+                                                    <li id="@Navigation.NavigationEnum.Client"><a href="@Url.Action("Check", "Contributor")">Registro</a></li>
                                                 }
 
                                                 if (User.ContributorTypeId() == (int)ContributorType.Biller && User.ContributorOperationModeId() == (int)Gosocket.Dian.Domain.Common.OperationMode.Own)

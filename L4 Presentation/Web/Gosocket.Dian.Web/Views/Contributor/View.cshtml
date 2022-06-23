@@ -112,7 +112,7 @@
             }
 
             $('.btn-set-to-provider').click(function () {
-                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea operar como proveedor?</strong> <br>
+                ConfirmDialogV2("<strong>¿Está seguro que desea operar como proveedor?</strong>", `
                         Al realizar esta acción deberá iniciar sesión nuevamente.`,
                     { confirm: "Aceptar", cancel: "Cancelar" },
                     () => { setToProvider(@Model.Id) });
@@ -133,7 +133,7 @@
             });
 
             $('.btn-sync-to-production').click(function () {
-                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea sincronizar contribuyente a producción?</strong>`,
+                ConfirmDialogV2("<strong>¿Está seguro que desea sincronizar contribuyente a producción?</strong>",
                     { confirm: "Aceptar", cancel: "Cancelar" },
                     () => { syncToProduction(@Model.Id) });
 

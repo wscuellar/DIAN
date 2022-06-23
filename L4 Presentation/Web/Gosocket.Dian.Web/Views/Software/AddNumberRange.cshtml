@@ -168,8 +168,7 @@
 
             $('.btn-add-prefix').click(function () {
                 if (preValidateFields()) {
-                    ConfirmDialogV2("Advertencia",
-                        "¿Está seguro que desea asociar el prefijo?",
+                    ConfirmDialogV2("¿Está seguro que desea asociar el prefijo?",
                         { confirm: "Aceptar", cancel: "Cancelar" }, addPrefix);
 
                     //bootbox.dialog({
@@ -230,8 +229,7 @@
         function removeRangeAssociationAlert(button) {
             var pk = $(button).attr("data-pk")
             var rk = $(button).attr("data-rk")
-            ConfirmDialogV2("Advertencia",
-                "¿Está seguro que desea eliminar la asociación del prefijo?",
+            ConfirmDialogV2("¿Está seguro que desea eliminar la asociación del prefijo?",
                 { confirm: "Aceptar", cancel: "Cancelar" }, () => { removeRangeAssociation(pk, rk); });
 
             //bootbox.dialog({
