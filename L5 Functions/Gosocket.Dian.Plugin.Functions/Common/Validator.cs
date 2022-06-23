@@ -6261,7 +6261,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Rejected
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Receipt
                 || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Accepted
-                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.AceptacionTacita);
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.AceptacionTacita
+                || Convert.ToInt32(data.ResponseCode) == (int)EventStatus.Mandato);
 
             //List<InvoiceWrapper> invoiceWrapper = associateDocumentService.GetEventsByTrackId(data.TrackId.ToLower());
             GlobalDocValidatorDocumentMeta validatorDocumentMeta = documentMetaTableManager.Find<GlobalDocValidatorDocumentMeta>(data.TrackId, data.TrackId);
