@@ -171,6 +171,7 @@
                     showConfirmation(confirmMessage, buttons, clName, operationCancel)
                 }
                 createUser(url, 'POST', data, actionError, actionSuccess)
+                $('#dian-loading').hide()
             });
 
         });

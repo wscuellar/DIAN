@@ -41,7 +41,12 @@
                                 var hasOwnSoftwareEnabled = Model.ContributorOperations.Any(x => x.OperationModeId == (int)OperationMode.Own & x.Software?.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
                             }
 
-                            @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
+                            @if (!User.IsInAnyRole("Administrador", "Super") && ConfigurationManager.GetValue("Environment") != "Prod")
+                            {
+                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-success btn-radian-success">Configurar modos de operación</a>
+                            }
+
+                            @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
                             {
                                 <button type="button" data-id="@Model.Id" class="btn btn-secondary btn-sync-to-production">@ConfigurationManager.GetValue("SyncToProdGloss")</button>
                             }
@@ -53,11 +58,6 @@
                             @if (User.IsInAnyRole("Administrador", "Super"))
                             {
                                 <a href="@Url.Action("List", "Contributor", new { type = Model.ContributorTypeId })" class="btn btn-secondary">Volver</a>
-                            }
-
-                            @if (!User.IsInAnyRole("Administrador", "Super") && ConfigurationManager.GetValue("Environment") != "Prod")
-                            {
-                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-success btn-radian-success">Configurar modos de operación</a>
                             }
 
                             @if (User.IsInRole("Administrador") || User.IsInRole("Super"))
