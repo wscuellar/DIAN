@@ -302,7 +302,7 @@
         var contributorType = User.ContributorTypeId();
         var contributorName = User.ContributorName();
         var userFullName = User.UserFullName();
-        string sesion = Session["loginMenu"].ToString();
+        string sesion = Session["loginMenu"]?.ToString();
     }
 
     @if (ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Test")
