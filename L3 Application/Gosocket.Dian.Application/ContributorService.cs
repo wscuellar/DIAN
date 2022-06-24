@@ -271,7 +271,7 @@ namespace Gosocket.Dian.Application
         {
             using (var context = string.IsNullOrWhiteSpace(connectionString) ? new SqlDBContext() : new SqlDBContext(connectionString))
             {
-                var contributorInstance = context.Contributors.FirstOrDefault(c => c.Id == contributor.Id);
+                var contributorInstance = context.Contributors.FirstOrDefault(c => c.Code == contributor.Code);
                 if (contributorInstance != null)
                 {
                     contributorInstance.HabilitationDate = contributorInstance.HabilitationDate ?? contributor.HabilitationDate;
@@ -597,12 +597,11 @@ namespace Gosocket.Dian.Application
             }
         }
 
-        public void OperationRejectOtherDoc(int contributorId, int contributorTypeId, string softwareId, int softwareType)
+        public void OperationRejectOtherDoc(int otherDocElecContributorId, string softwareId, int softwareType)
         {
             using (var context = new SqlDBContext())
             {
-                OtherDocElecContributor otherDoc = context.OtherDocElecContributors.FirstOrDefault(t => t.ContributorId == contributorId
-                                      && t.OtherDocElecContributorTypeId == contributorTypeId);
+                OtherDocElecContributor otherDoc = context.OtherDocElecContributors.FirstOrDefault(t => t.Id == otherDocElecContributorId);
 
                 OtherDocElecContributorOperations otherDocOperation = context.OtherDocElecContributorOperations.FirstOrDefault(
                                                 t => t.OtherDocElecContributorId == otherDoc.Id

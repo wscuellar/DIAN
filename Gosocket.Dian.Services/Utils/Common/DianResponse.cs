@@ -36,7 +36,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         [DataMember]
         public List<string> ErrorMessage { get; set; }
         
-        [DataMember]
-        public string UrlDescarga { get; set; }
+        //[DataMember]
+        //public string UrlDescarga { get; set; }
     }
 }

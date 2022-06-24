@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Caching;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Gosocket.Dian.Services.Utils.Common
 {
@@ -216,6 +217,13 @@ namespace Gosocket.Dian.Services.Utils.Common
             return XPathQuery.Select(xmlDocument, relative);
         }
 
+        private static string CleanInput(string strIn)
+        {
+            // Replace invalid characters with empty strings.
+            return Regex.Replace(strIn, @"[^\w\.@-]", "");
+        }
+
+
         private string GetXmlParserDefinitions()
         {
             var xmlParserDefinitions = "";
@@ -281,13 +289,19 @@ namespace Gosocket.Dian.Services.Utils.Common
             }
 
             var paymentsDateNode = xmlDocument.SelectSingleNode(paymentsDatesPath);
-            if(paymentsDateNode != null)
+            if (paymentsDateNode != null)
             {
                 var datesList = new List<string>();
                 XmlNodeList paymentsDatesList = paymentsDateNode.SelectNodes($"/{rootNodeXPath}/*[local-name()='FechasPagos']");
                 for (int i = 0; i < paymentsDatesList.Count; i++)
                 {
-                    datesList.Add(paymentsDatesList[i]?.InnerText);
+                    int j = 0;
+                    while (j < CleanInput(paymentsDatesList[i]?.InnerText).Length)
+                    {
+                        var initIndex = j;
+                        datesList.Add(CleanInput(paymentsDatesList[i]?.InnerText).Substring(initIndex, 10));
+                        j = initIndex + 10;
+                    }
                 }
                 globalDocPayrolls.FechasPagos = string.Join(";", datesList);
             }
@@ -298,7 +312,7 @@ namespace Gosocket.Dian.Services.Utils.Common
                 globalDocPayrolls.CodigoTrabajador = xNumeroSecuenciaXML[j].Attributes["CodigoTrabajador"]?.InnerText;
                 globalDocPayrolls.Prefijo = xNumeroSecuenciaXML[j].Attributes["Prefijo"]?.InnerText;
                 this.SequenceConsecutive = xNumeroSecuenciaXML[j].Attributes["Consecutivo"]?.InnerText;
-                globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(this.SequenceConsecutive) ? decimal.Parse(this.SequenceConsecutive) : 0);
+                globalDocPayrolls.Consecutivo = (!string.IsNullOrWhiteSpace(this.SequenceConsecutive) ? this.SequenceConsecutive : "0");
                 globalDocPayrolls.Numero = xNumeroSecuenciaXML[j].Attributes["Numero"]?.InnerText;
             }
             XmlNodeList xLugarGeneracionXML = xmlDocument.GetElementsByTagName("LugarGeneracionXML");

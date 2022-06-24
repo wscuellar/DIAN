@@ -98,18 +98,24 @@
                 </div>
                 <div class="col-md-5" style="padding-top: 7px; padding-left: 0">
                     <span class="cufe-text">
-
-                        @if (Model.Document.DocumentTypeId == "05")
+                        @if (Model.Document.DocumentTypeId == "20" || Model.Document.DocumentTypeId == "35" || Model.Document.DocumentTypeId == "40"
+                             || Model.Document.DocumentTypeId == "55" || Model.Document.DocumentTypeId == "60" || Model.Document.DocumentTypeId == "50" || Model.Document.DocumentTypeId == "95" || Model.Document.DocumentTypeId == "27" || Model.Document.DocumentTypeId == "45" || Model.Document.DocumentTypeId == "32")
                         {
                             <span>CUDE:</span>
                         }
-
-                        @if (Model.Document.DocumentTypeId != "05")
+                        else
                         {
-                            <span>CUFE:</span>
+                            if (Model.Document.DocumentTypeId == "05")
+                            {
+                                <span>CUDE:</span>
+                            }
+
+                            if (Model.Document.DocumentTypeId != "05")
+                            {
+                                <span>CUFE:</span>
+                            }
                         }
                         @Model.Document.DocumentKey<br>
-
                     </span>
                 </div>
                 <div class="col-md-4" style="padding-top: 7px; padding-left: 0;">
@@ -122,11 +128,21 @@
                         }
                         Folio: @Model.Document.Number<br>
                         Fecha de emisión de la factura Electrónica: @Model.Document.EmissionDate.ToString("dd-MM-yyyy")<br />
-                        @if (Model.Document.Status != 2 && Model.Document.DocumentTypeId != "05")
+                        @if (Model.Document.DocumentTypeId == "20" || Model.Document.DocumentTypeId == "35" || Model.Document.DocumentTypeId == "40"
+                             || Model.Document.DocumentTypeId == "55" || Model.Document.DocumentTypeId == "60" || Model.Document.DocumentTypeId == "50" || Model.Document.DocumentTypeId == "95" || Model.Document.DocumentTypeId == "27" || Model.Document.DocumentTypeId == "45" || Model.Document.DocumentTypeId == "32")
                         {
-                            <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
+                            <a href="@Url.Action("DownloadPDFDocEquivalente", "Document", new { trackId = Model.Document.Id, FechaValidacionDIAN = Model.Document.EmissionDate, FechaGeneracionDIAN = Model.Document.EmissionDate })" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
                                 <i class="fa fa-download"></i> Descargar PDF
                             </a>
+                        }
+                        else
+                        {
+                            if (Model.Document.Status != 2 && Model.Document.DocumentTypeId != "05")
+                            {
+                                <a href="@Url.Action("DownloadPDF", "Document", new { trackId = Model.Document.Id})" class="downloadPDFUrl" style="font-size:15px; text-decoration:underline;">
+                                    <i class="fa fa-download"></i> Descargar PDF
+                                </a>
+                            }
                         }
                         @if (Model.Document.DocumentTypeId == "05")
                         {

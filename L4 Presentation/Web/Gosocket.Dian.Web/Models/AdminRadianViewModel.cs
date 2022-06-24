@@ -110,6 +110,7 @@ namespace Gosocket.Dian.Web.Models
         public bool SuccessMessage { get; set; }
         public bool IsEdit { get; set; }
         public List<FilesChangeStateViewModel> ListChangeStateFiles { get; set; }
+        public bool IsActive { get; set; }
 
     }
 

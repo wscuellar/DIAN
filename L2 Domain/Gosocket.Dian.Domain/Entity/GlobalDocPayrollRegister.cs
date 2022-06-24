@@ -16,5 +16,7 @@ namespace Gosocket.Dian.Domain.Entity
         public DateTime? FechaPagoFin { get; set; }
         public DateTime? FechaPagoInicio { get; set; }
         public string NumeroDocumento { get; set; }
+        public string CUNE { get; set; }
+        public string TipoXML { get; set; }
     }
 }

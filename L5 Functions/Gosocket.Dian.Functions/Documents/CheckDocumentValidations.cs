@@ -84,7 +84,10 @@ namespace Gosocket.Dian.Functions.Documents
                 TaxAmountIva = globalDocValidatordocumentMeta.TaxAmountIva,
                 TaxAmountIpc = globalDocValidatordocumentMeta.TaxAmountIpc,
                 TaxAmountIca = globalDocValidatordocumentMeta.TaxAmountIca,
-                SoftwareId = globalDocValidatordocumentMeta.SoftwareId
+                SoftwareId = globalDocValidatordocumentMeta.SoftwareId,
+                CustomizationID = globalDocValidatordocumentMeta.CustomizationID,
+                DocumentCurrencyCode=globalDocValidatordocumentMeta.DocumentCurrencyCode
+                
             };
 
             globalDataDocument.TaxesDetail = new TaxesDetail

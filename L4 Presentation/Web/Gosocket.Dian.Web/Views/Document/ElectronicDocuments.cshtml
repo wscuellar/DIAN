@@ -65,7 +65,24 @@
             </div>
         }
 
-        @if (ViewBag.ContributorTypeIde != null)
+       else if ((ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde == 4 || ViewBag.ContributorOpMode != "0"))
+        {
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <div class="card RadianCardContainer" contributorType="2" operationMode="1" id="2">
+                    <a href="@Url.Action("Index", "OthersElectronicDocuments")">
+                        <div class="RadianImgContainer">
+                            <img class="RadianimgSvg" src="~/Content/images/Svg/ProveedorTecnologico.svg" />
+                        </div>
+                        <div class="card-body">
+                            <p class="RadianTittleCard">Nomina Electrónica</p>
+                            <p class="RadianTittleCard2">Nomina Electrónica</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+
+        @*@if (ViewBag.ContributorTypeIde != null)
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
@@ -78,7 +95,7 @@
                     </div>
                 </div>
             </div>
-        }
+        }*@
 
         @if ((ViewBag.ContributorTypeIde != null || ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorOpMode != "0") && ViewBag.ContributorAcceptanceStatus == 4)
         {
@@ -99,8 +116,8 @@
 
             </div>
         }
-
-        @if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
+        
+        @*@if (ViewBag.ContributorTypeIde != null && ViewBag.ContributorTypeIde != 4)
         {
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="card RadianCardContainer" contributorType="3" operationMode="1" id="3"
@@ -109,11 +126,11 @@
                         <img style="height:115px;" class="RadianimgSvg imgSvg110px" src="~/Content/images/Svg/documentos_equivalentes_icono_principal_Mesa_de_trabajo.svg" />
                     </div>
                     <div class="card-body" style="padding: 0 16px;">
-                        <p class="RadianTittleCard">Documentos equivalentes</p>
+                        <p class="RadianTittleCard">Documentos equivalentes </p>
                     </div>
                 </div>
             </div>
-        }
+        }*@
     </div>
 </div>
 

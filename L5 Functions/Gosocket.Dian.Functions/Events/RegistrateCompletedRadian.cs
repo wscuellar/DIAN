@@ -201,18 +201,24 @@ namespace Gosocket.Dian.Functions.Events
             string customizationID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.InnerText.ToString();
             string schemeID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='CustomizationID']").Item(0)?.Attributes["schemeID"].Value;            
             string senderName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='PartyTaxScheme']/*[local-name()='RegistrationName']").Item(0)?.InnerText.ToString();
-            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;
-            string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();
-            string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='SenderParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
+            string listID = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='Response']/*[local-name()='ResponseCode']").Item(0)?.Attributes["listID"].Value;            
+            string firstName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='Person']/*[local-name()='FirstName']").Item(0)?.InnerText.ToString();            
+            string familyName = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='Person']/*[local-name()='FamilyName']").Item(0)?.InnerText.ToString();
             string name = firstName + " " + familyName;
+            string issuerAttorneyPersonId = xmlParser.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PowerOfAttorney']/*[local-name()='AgentParty']/*[local-name()='Person']/*[local-name()='ID']").Item(0)?.InnerText.ToString();
 
             //Registra certificado emisor a mandante
             if (listID == "3")
             {
-                if(authCode != issuerPartyCode)
+                if(authCode != senderCode)
                 {
-                    GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, issuerPartyCode);
-                    arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                    //Se inserta en GlobalAuthorization
+                    var auth = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(authCode, senderCode);
+                    if (auth == null)
+                    {
+                        GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, senderCode);
+                        arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                    } 
                 }              
             }
 
@@ -313,7 +319,8 @@ namespace Gosocket.Dian.Functions.Events
                     SenderName = senderName,
                     IssuerAttorneyName = name,
                     ResponseCodeListID = listID,
-                    SchemeID = schemeID
+                    SchemeID = schemeID,
+                    IssuerAttorneyPersonId = issuerAttorneyPersonId
 
                 };
                 arrayTasks.Add(TableManagerGlobalDocReferenceAttorney.InsertOrUpdateAsync(docReferenceAttorney));

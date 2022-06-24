@@ -86,6 +86,12 @@ namespace Gosocket.Dian.Functions.Events
                         ((int)EventStatus.TerminacionMandato).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.NotificacionPagoTotalParcial).ToString().PadLeft(3, '0'),
                         ((int)EventStatus.ValInfoPago).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.EndorsementWithEffectOrdinaryAssignment).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.Objection).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.TransferEconomicRights).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.NotificationDebtorOfTransferEconomicRights).ToString().PadLeft(3, '0'),
+                        ((int)EventStatus.PaymentOfTransferEconomicRights).ToString().PadLeft(3, '0'),
+
                     };
             //Validate response code is implemented
             if (!eventCodesImplemented.Contains(responseCode))

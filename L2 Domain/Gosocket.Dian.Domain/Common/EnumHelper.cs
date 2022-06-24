@@ -217,6 +217,7 @@ namespace Gosocket.Dian.Domain.Common
     {
         public static bool IsSupportDocument(string documentTypeId)
         {
+            documentTypeId = string.IsNullOrWhiteSpace(documentTypeId) ? "0" : documentTypeId;
             int documentType = Convert.ToInt32(documentTypeId);
             return new int[] {(int)DocumentType.DocumentSupportInvoice, (int)DocumentType.AdjustmentNoteDocumentSupport, }
                 .Contains(documentType);
@@ -331,7 +332,17 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Pago de la Factura Electrónica de Venta como Título Valor")]
         NotificacionPagoTotalParcial = 045,
         [Description("Informe para el pago de la Factura Electrónica de Venta como Título Valor")]
-        ValInfoPago = 046
+        ValInfoPago = 046,
+        [Description("Endoso con efectos de cesión ordinaria")]
+        EndorsementWithEffectOrdinaryAssignment = 047,
+        [Description("Protesto")]
+        Objection = 048,
+        [Description("Transferencia de los derechos económicos")]
+        TransferEconomicRights = 049,
+        [Description("Notificación al deudor sobre la transferencia de los derechos económicos")]
+        NotificationDebtorOfTransferEconomicRights = 050,
+        [Description("Pago de la transferencia de los derechos económicos")]
+        PaymentOfTransferEconomicRights = 051
     }
 
     public enum SubEventStatus
@@ -395,7 +406,24 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Pago parcial de la Factura Electrónica de Venta como Título Valor")]
         PagoParcial = 451,
         [Description("Pago total de la Factura Electrónica de Venta como Título Valor")]
-        PagoTotal = 452
+        PagoTotal = 452,
+
+        [Description("Protesto por falta de aceptación")]
+        ObjectionNonAcceptance = 481,
+        [Description("Protesto por falta de pago")]
+        ObjectionNonPayment = 482,
+        [Description("Transferencia parcial de los derechos económicos con responsabilidad")]
+        PartialTransferOfEconomicRightsWithLiability = 491,
+        [Description("Transferencia total de los derechos económicos con responsabilidad")]
+        FullTransferOfEconomicRightsWithLiability = 492,
+        [Description("Transferencia parcial de los derechos económicos sin responsabilidad")]
+        PartialTransferOfEconomicRightsWithoutLiability = 493,
+        [Description("Transferencia total de los derechos económicos sin responsabilidad")]
+        FullTransferOfEconomicRightsWithoutLiability = 494,
+        [Description("Pago parcial de la transferencia de los derechos económicos")]
+        PartialPaymentTransferEconomicRights = 511,
+        [Description("Pago total de la transferencia de los derechos económicos")]
+        TotalPaymentTransferEconomicRights = 512
     }
 
     public enum ExportStatus
@@ -661,7 +689,11 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Título Valor")]
         SecurityTitle = 5,
         [Description("Factura Electrónica")]
-        ElectronicInvoice = 6
+        ElectronicInvoice = 6,
+        [Description("Transferida")]
+        TransferOfEconomicRights = 7,
+        [Description("Protestada")]
+        Objection = 8
     }
 
 
@@ -757,8 +789,24 @@ namespace Gosocket.Dian.Domain.Common
         [Description("Notificación de pago parcial")]
         PartialPaymentNotification = 451,
         [Description("Pago de la factura electrónica de venta como título valor")]
-        PaymentBillFTV = 452
-        
+        PaymentBillFTV = 452,
+        [Description("Protesto por falta de aceptación")]
+        ObjectionNonAcceptance = 481,
+        [Description("Protesto por falta de pago")]
+        ObjectionNonPayment = 482,
+        [Description("Transferencia parcial de los derechos económicos con responsabilidad")]
+        PartialTransferOfEconomicRightsWithLiability = 491,
+        [Description("Transferencia total de los derechos económicos con responsabilidad")]
+        FullTransferOfEconomicRightsWithLiability = 492,
+        [Description("Transferencia parcial de los derechos económicos sin responsabilidad")]
+        PartialTransferOfEconomicRightsWithoutLiability = 493,
+        [Description("Transferencia total de los derechos económicos sin responsabilidad")]
+        FullTransferOfEconomicRightsWithoutLiability = 494,
+        [Description("Pago parcial de la transferencia de los derechos económicos")]
+        PartialPaymentTransferEconomicRights = 511,
+        [Description("Pago total de la transferencia de los derechos económicos")]
+        TotalPaymentTransferEconomicRights = 512
+
     }
 
     public enum PaymentMethods

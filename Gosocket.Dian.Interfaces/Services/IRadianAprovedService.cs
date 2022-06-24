@@ -4,6 +4,7 @@ using Gosocket.Dian.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Gosocket.Dian.Interfaces.Services
 {
@@ -35,7 +36,7 @@ namespace Gosocket.Dian.Interfaces.Services
         
         RadianTestSet GetTestSet(string softwareType);
 
-        ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation);
+        Task<ResponseMessage> AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation);
 
         RadianTestSetResult RadianTestSetResultByNit(string nit, string idTestSet);
 

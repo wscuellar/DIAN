@@ -112,6 +112,37 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+
+        #region Validate PaymentOfTransferEconomicRights
+        public List<ValidateListResponse> ValidatePaymentOfTransfer(XmlParser xmlParserCude, NitModel nitModel)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Valida monto pago parcial o total
+            var responseListPayment = ValidatePayment(xmlParserCude, nitModel);
+            if (responseListPayment != null)
+            {
+                foreach (var item in responseListPayment)
+                {
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = item.IsValid,
+                        Mandatory = item.Mandatory,
+                        ErrorCode = item.ErrorCode,
+                        ErrorMessage = item.ErrorMessage,
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+            else
+                return null;
+
+            return responses;
+        }
+        #endregion
+
+
         #region ValidatePartialPayment
         public List<ValidateListResponse> ValidatePartialPayment(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
@@ -215,7 +246,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 {
                                     IsValid = false,
                                     Mandatory = true,
-                                    ErrorCode ="LGC45",
+                                    ErrorCode = "LGC45",
                                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC45"),
                                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                 });
@@ -396,7 +427,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta != null ? documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
-                                                                && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration 
+                                                                && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration
                                                                         || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration)
                                                                    ).ToList()
                                                              : null;
@@ -445,6 +476,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC33"),
                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                     });
+                }
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC92",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC92"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
                 }
             }
 
@@ -599,7 +653,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 }
             }
 
-            //Validación de la existencia de Endoso en Propiead o Limitacion de Circulacion / Cancelacion 401 o 402
+            //Validación de la existencia de Endoso en Propiead, protesto o Limitacion de Circulacion / Cancelacion 401 o 402
             if (Convert.ToInt32(eventPrev.CustomizationID) == (int)EventCustomization.CancellationGuaranteeEndorsement
                 || Convert.ToInt32(eventPrev.CustomizationID) == (int)EventCustomization.CancellationEndorsementProcurement)
             {
@@ -635,6 +689,29 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         }
                     }
                 }
+
+                //Valida existe registro evento protesto
+                var listProtesto = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection).ToList();
+                if (listProtesto != null)
+                {
+                    foreach (var itemlistProtesto in listProtesto)
+                    {
+                        var documentInfoProtesto = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemlistProtesto.Identifier, itemlistProtesto.Identifier, itemlistProtesto.PartitionKey);
+                        if (documentInfoProtesto != null)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC68",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC68"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                    }
+                }
+
 
                 //Valida existe endoso en propiedad
                 var endosoPropiedad = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad)).OrderByDescending(x => x.SigningTimeStamp).ToList();
@@ -742,7 +819,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-   
+
             bool validFor = true;
             string errorCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? "LGC27" : "LGC30";
             string messageCode = Convert.ToInt32(nitModel.ResponseCode) == (int)EventStatus.EndosoGarantia ? ConfigurationManager.GetValue("ErrorMessage_LGC27") : ConfigurationManager.GetValue("ErrorMessage_LGC30");
@@ -757,7 +834,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             });
 
             //Consulta existe endoso
-            var documentMeta = documentMetaList.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoPropiedad 
+            var documentMeta = documentMetaList.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoPropiedad
             || Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoProcuracion
             || Convert.ToInt32(x.EventCode) == (int)EventStatus.EndosoGarantia).OrderByDescending(x => x.SigningTimeStamp).FirstOrDefault();
             if (documentMeta != null)
@@ -767,8 +844,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 {
                     //Consulta legitimo tenedor
                     GlobalDocHolderExchange documentHolderExchange = documentHolderExchangeTableManager.FindhByCufeExchange<GlobalDocHolderExchange>(documentMeta.DocumentReferencedKey, true);
-                                   
-                    if(documentHolderExchange != null)
+
+                    if (documentHolderExchange != null)
                     {
                         //Existe mas de un legitimo tenedor requiere un mandatario
                         string[] endosatarios = documentHolderExchange.PartyLegalEntity.Split('|');
@@ -794,7 +871,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             }
                         }
                     }
-                   
+
                     if (validFor)
                     {
                         //Valida existe disponibilizacion posterior
@@ -802,7 +879,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         var listDisponibilizacion = documentMetaList.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
                         && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.GeneralSubsequentRegistration ||
                                 Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PriorDirectSubsequentEnrollment) && t.SenderCode == senderCode
-                           && t.SigningTimeStamp > dateEndorsement ).FirstOrDefault();
+                           && t.SigningTimeStamp > dateEndorsement).FirstOrDefault();
                         if (listDisponibilizacion == null)
                         {
                             responses.Add(new ValidateListResponse
@@ -834,7 +911,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         #endregion
 
         #region ValidateEndorsementProcurement
-        public List<ValidateListResponse> ValidateEndorsementProcurement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev,XmlParser xmlParserCude, NitModel nitModel)
+        public List<ValidateListResponse> ValidateEndorsementProcurement(List<GlobalDocValidatorDocumentMeta> documentMeta, RequestObjectEventPrev eventPrev, XmlParser xmlParserCude, NitModel nitModel)
         {
             DateTime startDate = DateTime.UtcNow;
             string senderCode = string.Empty;
@@ -879,7 +956,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 validForItem = true;
 
             if (listDisponibilizacion != null)
-            {               
+            {
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
@@ -959,7 +1036,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existen Limitaciones activas
             string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights
+            )).ToList();
             if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -981,7 +1062,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                 ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                             });
                             break;
-                        }                      
+                        }
                     }
                 }
             }
@@ -1031,11 +1112,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion && t.SenderCode == senderCode).ToList();
-            if(listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
+            if (listDisponibilizacion == null || listDisponibilizacion.Count <= 0)
                 validForItem = true;
 
             if (listDisponibilizacion != null)
-            {                
+            {
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
@@ -1115,7 +1196,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Valida existen Limitaciones activas
             string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights
+            )).ToList();
             if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -1173,7 +1258,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 validForItem = true;
 
             if (listDisponibilizacion != null)
-            {                
+            {
                 foreach (var itemListDisponibilizacion in listDisponibilizacion)
                 {
                     var documentDisponibilizacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListDisponibilizacion.Identifier, itemListDisponibilizacion.Identifier, itemListDisponibilizacion.PartitionKey);
@@ -1254,7 +1339,11 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string existCancelElectronicEvent = string.Empty;
             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights
+            )).ToList();
             if (listLimitaciones != null)
             {
                 foreach (var itemListLimitaciones in listLimitaciones)
@@ -1292,7 +1381,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
             //Validacion debe exisitir evento Solicitud de Disponibilización
             var listDisponibilizacion = documentMeta != null ? documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion).ToList() : null;
-            
+
             if (listDisponibilizacion != null && listDisponibilizacion.Count() > 0)
             {
                 bool validForItem = false;
@@ -1350,7 +1439,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                         });
                                         break;
-                                    }                                    
+                                    }
                                 }
                             }
                         }
@@ -1371,6 +1460,50 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                                         Mandatory = true,
                                         ErrorCode = "LGC40",
                                         ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC40"),
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+
+                        //Valida existe registrado evento protesto
+                        var listProtesto = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection).ToList();
+                        if (listProtesto != null)
+                        {
+                            foreach (var itemlistProtesto in listProtesto)
+                            {
+                                var documentInfoProtesto = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemlistProtesto.Identifier, itemlistProtesto.Identifier, itemlistProtesto.PartitionKey);
+                                if (documentInfoProtesto != null)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "LGC66",
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC66"),
+                                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+
+                        //Valida existe registrado transferencia de los derechos economicos
+                        var listTransferencia = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights).ToList();
+                        if (listTransferencia != null)
+                        {
+                            foreach (var itemlistTransferencia in listTransferencia)
+                            {
+                                var documentInfoTransferencia = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemlistTransferencia.Identifier, itemlistTransferencia.Identifier, itemlistTransferencia.PartitionKey);
+                                if (documentInfoTransferencia != null)
+                                {
+                                    responses.Add(new ValidateListResponse
+                                    {
+                                        IsValid = false,
+                                        Mandatory = true,
+                                        ErrorCode = "LGC67",
+                                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC67"),
                                         ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                                     });
                                     break;
@@ -1431,6 +1564,35 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             if (Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstGeneralRegistration
                || Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.FirstPriorDirectRegistration)
             {
+                //Validacion Inscripciones 
+                var listInscripciones = documentMeta.Where(x => Convert.ToInt32(x.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
+                && (Convert.ToInt32(x.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration
+               || Convert.ToInt32(x.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration)).ToList();
+                if (listInscripciones != null || listInscripciones.Count > 0)
+                {
+                    foreach (var itemListInscripciones in listInscripciones)
+                    {
+                        var documentDisponibilizacionPrimera = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListInscripciones.Identifier, itemListInscripciones.Identifier, itemListInscripciones.PartitionKey);
+                        if (documentDisponibilizacionPrimera != null)
+                        {
+
+                            if (Convert.ToInt32(itemListInscripciones.CustomizationID) == Convert.ToInt32(nitModel.CustomizationId))
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "LGC23",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC23"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
                 //Validacion Endosos aprobados
                 var listEndoso = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad
                     || (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia)
@@ -1477,7 +1639,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 string validCancelElectronicEvent = string.Empty;
                 var existEndosos = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion)).ToList();
-                if(existEndosos != null)
+                if (existEndosos != null)
                 {
                     foreach (var itemExistEndosos in existEndosos)
                     {
@@ -1494,8 +1656,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida exista previamnete un registro de endoso en propiedad
                 var listEndosoPropiedad = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad).ToList();
-                if(listEndosoPropiedad == null || listEndosoPropiedad.Count <= 0 && !validateExistEndoso)
-                {                   
+                if (listEndosoPropiedad == null || listEndosoPropiedad.Count <= 0 && !validateExistEndoso)
+                {
                     responses.Add(new ValidateListResponse
                     {
                         IsValid = false,
@@ -1544,8 +1706,8 @@ namespace Gosocket.Dian.Plugin.Functions.Common
 
                 //Valida que exista una Primera Disponibilizacion
                 bool validForItemDisponibiliza = false;
-                
-                var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion 
+
+                var listPrimeraDisponibilizacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion
                 && t.SenderCode == senderCode
                 && (Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstGeneralRegistration)
                 || Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.FirstPriorDirectRegistration).ToList();
@@ -1561,7 +1723,13 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                             //Valida existen Limitaciones activas
                             var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
                             || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
-                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice)).ToList();
+                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+                            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights
+                            || (Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                            && Convert.ToInt32(t.CustomizationID) == (int)SubEventStatus.PagoTotal)
+                            )).ToList();
                             if (listLimitaciones != null || listLimitaciones.Count > 0)
                             {
                                 responses.Add(new ValidateListResponse
@@ -1674,6 +1842,20 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     Mandatory = true,
                     ErrorCode = "LGC57",
                     ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC57"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida existe previamente el evento transferencia de los derechos económicos 
+            var transferencia = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights) : null;
+            if (transferencia != null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC87",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC87"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2164,6 +2346,19 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 });
             }
 
+            if (double.Parse(valueTotalInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+            {
+                validateAval = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_035"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
             XmlNodeList valueListIssuerParty = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='DocumentResponse']/*[local-name()='IssuerParty']/*[local-name()='PartyLegalEntity']");
             // En caso de no indicarlo quedan garantizadas las obligaciones de todas las partes del título.
             if (valueListIssuerParty.Count <= 0) return null;
@@ -2185,7 +2380,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     IsValid = false,
                     Mandatory = true,
                     ErrorCode = "AAH32c",
-                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH32c"),                    
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH32c"),
                     ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
                 });
             }
@@ -2206,7 +2401,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             string valuePriceToPay = nitModel.PrecioPagarseFEV;
             string valueDiscountRateEndoso = nitModel.TasaDescuento;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
-            bool validEndoso = false;           
+            bool validEndoso = false;
             bool.TryParse(Environment.GetEnvironmentVariable("ValidateManadatoryEndoso"), out bool ValidateManadatoryEndoso);
 
             //Valida informacion Endoso en propiedad                       
@@ -2259,7 +2454,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 resultNegotiationValue = resultNegotiationValue / 100;
 
                 //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
-                if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)                
+                if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
                 {
                     validEndoso = true;
                     responses.Add(new ValidateListResponse
@@ -2325,6 +2520,215 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         }
         #endregion
 
+        #region ValidateElementsSum
+        public List<ValidateListResponse> ValidateElementsSum(XmlParser xmlParserCude, NitModel nitModel, string eventCode)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            string valueTotalElements = nitModel.ValorTotalEndoso;
+            string valuePriceToPay = nitModel.PrecioPagarseFEV;
+            string valueDiscountRateEndoso = nitModel.TasaDescuento;
+            bool validaPago = false;  
+           
+
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+            bool validElements = false;
+            bool.TryParse(Environment.GetEnvironmentVariable("ValidateElementsSum"), out bool ValidateElementsSum);
+
+            //Valida informacion ValorTotalEndoso
+            if (String.IsNullOrEmpty(valueTotalElements))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI05",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion Endoso  PrecioPagarseFEV                         
+            if (String.IsNullOrEmpty(valuePriceToPay))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI07a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07a"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida informacion Endoso TasaDescuento                       
+            if (String.IsNullOrEmpty(valueDiscountRateEndoso))
+            {
+                validaPago = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "AAI09",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI09"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+       
+            XmlNodeList valueListSender = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueSender = 0;
+            for (int i = 0; i < valueListSender.Count; i++)
+            {
+                string valueStockAmount = valueListSender.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='SenderParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                if (string.IsNullOrWhiteSpace(valueStockAmount))
+                {
+                    validaPago = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAF19",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }                
+            }
+
+            XmlNodeList valueListReceiver = xmlParserCude.XmlDocument.DocumentElement.SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']");
+            double totalValueReceiver = 0;
+            for (int i = 0; i < valueListReceiver.Count; i++)
+            {
+                string valueStockAmount = valueListReceiver.Item(i).SelectNodes("//*[local-name()='ApplicationResponse']/*[local-name()='ReceiverParty']/*[local-name()='PartyLegalEntity']/*[local-name()='CorporateStockAmount']").Item(i)?.InnerText.ToString();
+                if (string.IsNullOrWhiteSpace(valueStockAmount))
+                {
+                    validaPago = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = ValidateElementsSum,
+                        ErrorCode = "AAG20",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+                else
+                {
+                    totalValueReceiver += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                }                
+            }
+
+            if (validaPago)
+                return responses;
+
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAF19",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueReceiver)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAG20",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAG20_Endoso"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            if (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != totalValueSender)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI05a",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI05a"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Calculo valor de la negociación
+            double resultNegotiationValue = (double.Parse(valueTotalElements, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) * (100 - double.Parse(valueDiscountRateEndoso, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture)));
+            resultNegotiationValue = resultNegotiationValue / 100;
+
+            //Se debe comparar el valor de negociación contra el saldo(Nuevo Valor en disponibilización)
+            if (double.Parse(valuePriceToPay, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture) != resultNegotiationValue)
+            {
+                validElements = true;
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = ValidateElementsSum,
+                    ErrorCode = "AAI07b",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAI07b"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+            
+
+            if (validElements)
+                return responses;
+
+            return null;
+        }
+        #endregion
+
+
         #region ValidateEndosoNota
         private List<ValidateListResponse> ValidateEndosoNota(List<GlobalDocValidatorDocumentMeta> documentMetaList, string noteMandato, string eventCode)
         {
@@ -2379,7 +2783,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
         {
             DateTime startDate = DateTime.UtcNow;
             //valor actual total factura TV
-            string valueActualInvoice = nitModel.ValorActualTituloValor;
+            string valueActualInvoice = nitModel.ValorActualTituloValor != "0.00" ? nitModel.ValorActualTituloValor : nitModel.InformacionPagoTransferencia;
             List<ValidateListResponse> responses = new List<ValidateListResponse>();
             bool validPayment = false;
 
@@ -2392,7 +2796,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                 totalValueSender += double.Parse(valueStockAmount, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
             }
 
-            if (nitModel.CustomizationId == "452")
+            if (nitModel.CustomizationId == "452" || nitModel.CustomizationId == "512")
             {
                 //Valida Total valor pagado igual al valor actual del titulo valor
                 if (totalValueSender != double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
@@ -2408,6 +2812,24 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     });
                 }
             }
+
+            if (nitModel.CustomizationId == "511")
+            {
+                //Valida Total valor pagado igual al valor actual del titulo valor  PAGO PARCIAL
+                if (totalValueSender == double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
+                {
+                    validPayment = true;
+                    responses.Add(new ValidateListResponse
+                    {
+                        IsValid = false,
+                        Mandatory = true,
+                        ErrorCode = "AAF19d",
+                        ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAF19d"),
+                        ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                    });
+                }
+            }
+
 
             //Valida Total valor pagado no supera el valor actual del titulo valor
             if (totalValueSender > double.Parse(valueActualInvoice, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture))
@@ -2429,5 +2851,444 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return null;
         }
         #endregion
+
+        #region ValidateEndorsementWithEffectEventPrev
+
+        public List<ValidateListResponse> ValidateEndorsementWithEffectEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Validacion debe exisitir evento Solicitud de Disponibilización
+            var listDisponibilizacion = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion) : null;
+            if (listDisponibilizacion == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC69",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC69"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida existen registro restricciones de Endoso en propiedad, Endoso en garantía, Endoso en procuración,
+            //Limitación para circulación, Protesto, Transferencia de los derechos económicos.            
+            var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoPropiedad
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights
+            )).ToList();
+            if (listLimitaciones != null)
+            {
+                foreach (var itemListLimitaciones in listLimitaciones)
+                {
+                    //Valida exista limitacion aprobada
+                    var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
+                    if (documentLimitacion != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC70",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC70"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC71",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC71"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return responses;
+        }
+
+        #endregion
+
+
+        #region ValidateObjectiontEventPrev
+
+        public List<ValidateListResponse> ValidateObjectiontEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();           
+
+            //Validacion debe exisitir evento Solicitud de Disponibilización
+            var listDisponibilizacion = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.SolicitudDisponibilizacion) : null;
+            if (listDisponibilizacion == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC73",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC73"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida existen registro restricciones de Limitación para circulación, Endoso con efectos de cesión ordinaria, Transferencia de los derechos económicos           
+            var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights)).ToList();
+
+            if (listLimitaciones != null)
+            {
+                foreach (var itemListLimitaciones in listLimitaciones)
+                {
+                    //Valida exista limitacion aprobada
+                    var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
+                    if (documentLimitacion != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC74",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC74"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC78",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC78"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return responses;
+        }
+        #endregion
+
+        #region ValidatelogicalTransferEventPrev
+
+        public List<ValidateListResponse> ValidatelogicalTransferEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Valida existen registro restricciones de Endoso en garantía, Endoso en procuración, Limitación para circulación,
+            //Endoso con efectos de cesión ordinaria, Protesto. .            
+            var listLimitaciones = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoGarantia
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndosoProcuracion
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment
+            || Convert.ToInt32(t.EventCode) == (int)EventStatus.Objection
+            )).ToList();
+            if (listLimitaciones != null)
+            {
+                foreach (var itemListLimitaciones in listLimitaciones)
+                {
+                    //Valida exista limitacion aprobada
+                    var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitaciones.Identifier, itemListLimitaciones.Identifier, itemListLimitaciones.PartitionKey);
+                    if (documentLimitacion != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC80",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC80"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => ((Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV)
+            || (Convert.ToInt32(t.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.TotalPaymentTransferEconomicRights)
+            )).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC81",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC81"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            //Validacion si previamente se ha registrado un evento de transferencia de los derechos económicos
+            var transfereciaPrev = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights) : null;
+            if (transfereciaPrev != null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC82",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC82"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            return responses;
+        }
+
+        #endregion
+
+
+        #region ValidateNotificationTransferEventPrev
+        public List<ValidateListResponse> ValidateNotificationTransferEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Validacion exista previamente un evento de transferencia de los derechos económicos
+            var transfereciaPrev = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.TransferEconomicRights) : null;
+            if (transfereciaPrev == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC83",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC83"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC90",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC90"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return responses;
+
+        }
+        #endregion
+
+
+        #region ValidatePaymentOfTransEventPrev
+        public List<ValidateListResponse> ValidatePaymentOfTransEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta, NitModel nitModel, RequestObjectEventPrev eventPrev)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();            
+
+            //Valida existe Pago Total FETV
+            if(Convert.ToInt32(nitModel.CustomizationId) == (int)EventCustomization.PartialPaymentTransferEconomicRights)
+            {
+               var listPagoTotalTransferEconomic = documentMeta.Where(t => (Convert.ToInt32(t.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights
+               && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.TotalPaymentTransferEconomicRights)
+               ).ToList();
+                if (listPagoTotalTransferEconomic != null)
+                {
+                    foreach (var itemListPagoTotalTransferEconomic in listPagoTotalTransferEconomic)
+                    {
+                        var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotalTransferEconomic.Identifier, itemListPagoTotalTransferEconomic.Identifier, itemListPagoTotalTransferEconomic.PartitionKey);
+                        if (documentInfoPago != null)
+                        {
+                            responses.Add(new ValidateListResponse
+                            {
+                                IsValid = false,
+                                Mandatory = true,
+                                ErrorCode = "LGC84",
+                                ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC84"),
+                                ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+
+
+            //Valida titulo valor tiene una limitación previa (041)
+            string validCancelElectronicEvent = string.Empty;
+            var listLimitacion = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NegotiatedInvoice).ToList();
+            if (listLimitacion != null)
+            {
+                foreach (var itemListLimitacion in listLimitacion)
+                {
+                    var documentLimitacion = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListLimitacion.Identifier, itemListLimitacion.Identifier, itemListLimitacion.PartitionKey);
+                    if (documentLimitacion != null)
+                    {
+                        //No existe cancelacion de la limitacion permite Pago de la factura electrónica de venta título valor con listId 2
+                        validCancelElectronicEvent = ValidateCancelElectronicEvent(documentMeta, documentLimitacion.DocumentKey, nitModel.SenderCode);
+                        if (string.IsNullOrWhiteSpace(validCancelElectronicEvent))
+                        {
+                            if (eventPrev.ListId == "2")
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = true,
+                                    Mandatory = true,
+                                    ErrorCode = "100",
+                                    ErrorMessage = successfulMessage,
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                            else
+                            {
+                                responses.Add(new ValidateListResponse
+                                {
+                                    IsValid = false,
+                                    Mandatory = true,
+                                    ErrorCode = "LGC85",
+                                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC85"),
+                                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                                });
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+            //Validacion debe exisitir evento Notificacion al deudor sobre la transferencia
+            var notificacion = documentMeta != null ? documentMeta.OrderByDescending(t => t.SigningTimeStamp).FirstOrDefault(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificationDebtorOfTransferEconomicRights) : null;
+            if (notificacion == null)
+            {
+                responses.Add(new ValidateListResponse
+                {
+                    IsValid = false,
+                    Mandatory = true,
+                    ErrorCode = "LGC86",
+                    ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC86"),
+                    ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                });
+            }
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC91",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC91"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return responses;
+
+        }
+        #endregion
+
+
+        #region ValidateMandatoEventPrev
+        public List<ValidateListResponse> ValidateMandatoEventPrev(List<GlobalDocValidatorDocumentMeta> documentMeta)
+        {
+            DateTime startDate = DateTime.UtcNow;
+            List<ValidateListResponse> responses = new List<ValidateListResponse>();
+
+            //Valida existe Pago Total FETV
+            var listPagoTotal = documentMeta.Where(t => Convert.ToInt32(t.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+            && Convert.ToInt32(t.CustomizationID) == (int)EventCustomization.PaymentBillFTV).ToList();
+            if (listPagoTotal != null)
+            {
+                foreach (var itemListPagoTotal in listPagoTotal)
+                {
+                    var documentInfoPago = documentValidatorTableManager.FindByDocumentKey<GlobalDocValidatorDocument>(itemListPagoTotal.Identifier, itemListPagoTotal.Identifier, itemListPagoTotal.PartitionKey);
+                    if (documentInfoPago != null)
+                    {
+                        responses.Add(new ValidateListResponse
+                        {
+                            IsValid = false,
+                            Mandatory = true,
+                            ErrorCode = "LGC89",
+                            ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_LGC89"),
+                            ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return responses;
+
+        }
+        #endregion
+
     }
 }

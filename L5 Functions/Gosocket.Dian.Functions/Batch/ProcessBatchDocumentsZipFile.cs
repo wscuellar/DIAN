@@ -431,7 +431,7 @@ namespace Gosocket.Dian.Functions.Batch
                                 try
                                 {
                                     byte[] xmlBytesEvent = null;
-                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId });
+                                    var processRegistrateComplete = ApiHelpers.ExecuteRequest<EventResponse>(ConfigurationManager.GetValue("RegistrateCompletedPayrollUrl"), new { TrackId = trackId, AuthCode = obj.AuthCode });
                                     if (processRegistrateComplete.Code == "100")
                                     {
                                         xmlBytesEvent = Encoding.ASCII.GetBytes(processRegistrateComplete.XmlBytesBase64);
@@ -719,13 +719,14 @@ namespace Gosocket.Dian.Functions.Batch
             var responseListIds = responseXpathDataValue.Select(x => x.XpathsValues["AppResListIDXpath"]).Distinct();
             var responseCustomizationID = responseXpathDataValue.Select(x => x.XpathsValues["AppResCustomizationIDXpath"]).Distinct();
             string documentType = responseXpathDataValue.Select(t => t.XpathsValues["DocumentTypeXpath"]).FirstOrDefault();
-            
+
             /*Si es un documento soporte o una una nota de ajuste del mismo, 
              * el emisor del documento está en el customerParty*/
-            if(OtherDocumentsDocumentType.IsSupportDocument(documentType))
+            if (OtherDocumentsDocumentType.IsSupportDocument(documentType))
             {
                 codes = responseXpathDataValue.Select(x => x.XpathsValues["ReceiverCodeXpath"]).Distinct();
             }
+            
             var log = new GlobalLogger(zipKey, "7.0.1 Validate Data for update set test")
             {
                 Message = DateTime.UtcNow.Subtract(start).TotalSeconds.ToString(CultureInfo.InvariantCulture),
@@ -805,6 +806,11 @@ namespace Gosocket.Dian.Functions.Batch
 
                         if (objGlobalTestSetResult != null)
                         {
+                            if (!objGlobalTestSetResult.SoftwareId.Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
+
                             //Factura Electronica
                             start = DateTime.UtcNow;
                             var checkFE = new GlobalLogger(zipKey, "7.2 checkPermissions")
@@ -854,6 +860,11 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (objGlobalTestSetOthersDocumentResult != null)
                         {
+                            if (!objGlobalTestSetOthersDocumentResult.RowKey.Split('|')[1].Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
+
                             //Otros Docuemntos Electronicos
                             start = DateTime.UtcNow;
                             var checkOtherDoc = new GlobalLogger(zipKey, "7.3 checkPermissions")
@@ -897,6 +908,10 @@ namespace Gosocket.Dian.Functions.Batch
                         }
                         else if (objRadianTestSetResult != null)
                         {
+                            if (!objRadianTestSetResult.SoftwareId.Equals(softwareIdNomina))
+                            {
+                                result.Add(new XmlParamsResponseTrackId { Success = false, SenderCode = "", ProcessedMessage = String.Format("SoftwareID {0} no autorizado para enviar documentos con el set de pruebas {1}", softwareIdNomina, testSetId) });
+                            }
                             // Is Radian
                             var isRadian = false;                          
                             var docEvent = tableManagerGlobalDocEvent.FindpartitionKey<GlobalDocEvent>(eventCode).FirstOrDefault();

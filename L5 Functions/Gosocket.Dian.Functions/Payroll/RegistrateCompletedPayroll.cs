@@ -24,6 +24,7 @@ namespace Gosocket.Dian.Functions.Payroll
         private static readonly TableManager TableManagerGlobalDocPayrollEmployees = new TableManager("GlobalDocPayrollEmployees");
         private static readonly TableManager TableManagerGlobalDocPayrollRegister = new TableManager("GlobalDocPayrollRegister");
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
+        private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
 
         [FunctionName("RegistrateCompletedPayroll")]
         public static async Task<EventResponse> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
@@ -46,7 +47,7 @@ namespace Gosocket.Dian.Functions.Payroll
             };
 
             try
-            {
+            {               
                 var xmlBytes = await Utils.Utils.GetXmlFromStorageAsync(data.TrackId);
                 var xmlParser = new XmlParseNomina(xmlBytes);
                 if (!xmlParser.Parser())
@@ -75,6 +76,22 @@ namespace Gosocket.Dian.Functions.Payroll
 
                 var documentTypeId = int.Parse(documentParsed.DocumentTypeId);
                 var numeroDocumento = string.IsNullOrEmpty(docGlobalPayroll.NumeroDocumento) ? "0" : docGlobalPayroll.NumeroDocumento;
+
+                //Registra certificado Autorizado emisores diferentes a SW DIAN
+                if (!docGlobalPayroll.SoftwareID.Contains(ConfigurationManager.GetValue("BillerSoftwareId")))                 
+                {
+                    string authCode = data.AuthCode;                   
+                    if (authCode != docGlobalPayroll.RowKey)
+                    {
+                        //Se inserta en GlobalAuthorization
+                        var auth = TableManagerGlobalAuthorization.Find<GlobalAuthorization>(authCode, docGlobalPayroll.RowKey);
+                        if (auth == null)
+                        {
+                            GlobalAuthorization globalAuthorization = new GlobalAuthorization(authCode, docGlobalPayroll.RowKey);
+                            arrayTasks.Add(TableManagerGlobalAuthorization.InsertOrUpdateAsync(globalAuthorization));
+                        }
+                    }
+                }
 
                 //Registra empleado solo para Nomina Individual
                 if (documentTypeId == (int)DocumentType.IndividualPayroll)
@@ -120,9 +137,11 @@ namespace Gosocket.Dian.Functions.Payroll
                     FechaPagoInicio = docGlobalPayroll.FechaPagoInicio,
                     NumeroDocumento = numeroDocumento,
                     Timestamp = DateTime.Now,
+                    CUNE = data.TrackId,
+                    TipoXML = docGlobalPayroll.TipoXML
                 };
                 arrayTasks.Add(TableManagerGlobalDocPayrollRegister.InsertOrUpdateAsync(globalDocPayrollRegister));
-
+                            
                 // ...
                 Task.WhenAll(arrayTasks).Wait();
 
@@ -131,15 +150,15 @@ namespace Gosocket.Dian.Functions.Payroll
                 //17/12/2021 Validacion para cuando migre a sql server no falle por el año minimo 1753
                 otherDocElecPayroll.AdmissionDate = ValidateFechaAnio(otherDocElecPayroll.AdmissionDate);
                 otherDocElecPayroll.CreateDate = ValidateFechaAnio(otherDocElecPayroll.CreateDate);
-                otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
+                //otherDocElecPayroll.EndDate = ValidateFechaAnio(otherDocElecPayroll.EndDate);
                 otherDocElecPayroll.EndPaymentDate = ValidateFechaAnio(otherDocElecPayroll.EndPaymentDate);
                 otherDocElecPayroll.GenDate = ValidateFechaAnio(otherDocElecPayroll.GenDate);
-                otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
+                //otherDocElecPayroll.GenPredDate = ValidateFechaAnio(otherDocElecPayroll.GenPredDate);
                 otherDocElecPayroll.Info_DateGen = ValidateFechaAnio(otherDocElecPayroll.Info_DateGen);
-                otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
-                otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
+                //otherDocElecPayroll.SettlementDate = ValidateFechaAnio(otherDocElecPayroll.SettlementDate);
+                //otherDocElecPayroll.StartDate = ValidateFechaAnio(otherDocElecPayroll.StartDate);
                 otherDocElecPayroll.StartPaymentDate = ValidateFechaAnio(otherDocElecPayroll.StartPaymentDate);
-                otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
+                //otherDocElecPayroll.WithdrawalDate = ValidateFechaAnio(otherDocElecPayroll.WithdrawalDate);
 
                 otherDocElecPayroll = otherDocElecPayrollService.CreateOtherDocElecPayroll(otherDocElecPayroll);
             }
@@ -165,12 +184,14 @@ namespace Gosocket.Dian.Functions.Payroll
                 } 
             } 
             return Fecha;
-        }
+        }       
 
         public class RequestObject
         {
             [JsonProperty(PropertyName = "trackId")]
             public string TrackId { get; set; }
+            [JsonProperty(PropertyName = "authCode")]
+            public string AuthCode { get; set; }
         }
     }
 }

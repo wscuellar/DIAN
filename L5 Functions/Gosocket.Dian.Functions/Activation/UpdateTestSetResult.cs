@@ -308,9 +308,41 @@ namespace Gosocket.Dian.Functions.Activation
                     radianTesSetResult.ReportForPaymentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
 
                     SetLogger(null, "Step 19", "Informe para el pago");
+                    SetLogger(null, "Step 19.a", radianTesSetResult.ReportForPaymentAccepted.ToString(), "AR_005");
+                    SetLogger(null, "Step 19.b", radianTesSetResult.ReportForPaymentRejected.ToString(), "AR_006");
 
-                    SetLogger(null, "Step 19.a", radianTesSetResult.ReceiptNoticeAccepted.ToString(), "AR_005");
-                    SetLogger(null, "Step 19.b", radianTesSetResult.ReceiptNoticeTotalAcceptedRequired.ToString(), "AR_006");
+                    ////Resolucion 85
+
+                    ////Endoso con efectos de cesión ordinaria
+                    tipo = (int)EventStatus.EndorsementWithEffectOrdinaryAssignment;
+                    radianTesSetResult.TotalEndorsementWithEffectOrdinaryAssignmentSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
+                    ////Protesto
+                    tipo = (int)EventStatus.Objection;
+                    radianTesSetResult.TotalObjectionSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ObjectionAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.ObjectionRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
+                    ////Transferencia de los derechos económicos 
+                    tipo = (int)EventStatus.TransferEconomicRights;
+                    radianTesSetResult.TotalTransferEconomicRightsSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.TransferEconomicRightsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.TransferEconomicRightsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
+                    ////Notificación al deudor sobre la transferencia de los derechos económicos
+                    tipo = (int)EventStatus.NotificationDebtorOfTransferEconomicRights;
+                    radianTesSetResult.TotalNotificationDebtorOfTransferEconomicRightsSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.NotificationDebtorOfTransferEconomicRightsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.NotificationDebtorOfTransferEconomicRightsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
+                    ////Pago de la transferencia de los derechos económicos 
+                    tipo = (int)EventStatus.PaymentOfTransferEconomicRights;
+                    radianTesSetResult.TotalPaymentOfTransferEconomicRightsSent = allGlobalTestSetTracking.Count(a => Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.PaymentOfTransferEconomicRightsAccepted = allGlobalTestSetTracking.Count(a => a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+                    radianTesSetResult.PaymentOfTransferEconomicRightsRejected = allGlobalTestSetTracking.Count(a => !a.IsValid && Convert.ToInt32(a.DocumentTypeId) == tipo);
+
 
                     Contributor contributor = contributorService.GetByCode(radianTesSetResult.PartitionKey);
                     GlobalRadianOperations isPartipantActive = globalRadianOperationService.GetOperation(radianTesSetResult.PartitionKey, new Guid(globalTestSetTracking.SoftwareId));
@@ -334,6 +366,11 @@ namespace Gosocket.Dian.Functions.Activation
                             && radianTesSetResult.CirculationLimitationAccepted >= radianTesSetResult.CirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.EndCirculationLimitationAccepted >= radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired
                             && radianTesSetResult.ReportForPaymentAccepted >= radianTesSetResult.ReportForPaymentTotalAcceptedRequired
+                            && radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentAccepted >= radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired
+                            && radianTesSetResult.ObjectionAccepted >= radianTesSetResult.ObjectionTotalAcceptedRequired
+                            && radianTesSetResult.TransferEconomicRightsAccepted >= radianTesSetResult.TransferEconomicRightsTotalAcceptedRequired
+                            && radianTesSetResult.NotificationDebtorOfTransferEconomicRightsAccepted >= radianTesSetResult.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired
+                            && radianTesSetResult.PaymentOfTransferEconomicRightsAccepted >= radianTesSetResult.PaymentOfTransferEconomicRightsTotalAcceptedRequired
                             && radianTesSetResult.Status == (int)TestSetStatus.InProcess)
                     {
                         radianTesSetResult.Status = (int)TestSetStatus.Accepted;
@@ -365,6 +402,14 @@ namespace Gosocket.Dian.Functions.Activation
                     int endCirculationLimitationRejected = radianTesSetResult.EndCirculationLimitationTotalRequired > 0 ? radianTesSetResult.EndCirculationLimitationTotalRequired - radianTesSetResult.EndCirculationLimitationTotalAcceptedRequired : radianTesSetResult.EndCirculationLimitationRejected;
                     int reportForPaymentRejected = radianTesSetResult.ReportForPaymentTotalRequired > 0 ? radianTesSetResult.ReportForPaymentTotalRequired - radianTesSetResult.ReportForPaymentTotalAcceptedRequired : radianTesSetResult.ReportForPaymentRejected;
 
+                    ////Resolucion 85
+                    int endorsementWithEffectOrdinaryAssignmentRejected = radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentTotalRequired > 0 ? radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentTotalRequired - radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired : radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentRejected;
+                    int objectionRejected = radianTesSetResult.ObjectionTotalRequired > 0 ? radianTesSetResult.ObjectionTotalRequired - radianTesSetResult.ObjectionTotalAcceptedRequired : radianTesSetResult.ObjectionRejected;
+                    int transferEconomicRightsRejected = radianTesSetResult.TransferEconomicRightsTotalRequired > 0 ? radianTesSetResult.TransferEconomicRightsTotalRequired - radianTesSetResult.TransferEconomicRightsTotalAcceptedRequired : radianTesSetResult.TransferEconomicRightsRejected;
+                    int notificationDebtorOfTransferEconomicRightsRejected = radianTesSetResult.NotificationDebtorOfTransferEconomicRightsTotalRequired > 0 ? radianTesSetResult.NotificationDebtorOfTransferEconomicRightsTotalRequired - radianTesSetResult.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired : radianTesSetResult.NotificationDebtorOfTransferEconomicRightsRejected;
+                    int paymentOfTransferEconomicRightsRejected = radianTesSetResult.PaymentOfTransferEconomicRightsTotalRequired > 0 ? radianTesSetResult.PaymentOfTransferEconomicRightsTotalRequired - radianTesSetResult.PaymentOfTransferEconomicRightsTotalAcceptedRequired : radianTesSetResult.PaymentOfTransferEconomicRightsRejected;
+
+
                     SetLogger(null, "Step 19.f", expressAcceptanceRejected + " - " + radianTesSetResult.ExpressAcceptanceTotalRequired + 
                         " - " + radianTesSetResult.ExpressAcceptanceTotalAcceptedRequired + " - " + radianTesSetResult.ExpressAcceptanceRejected + 
                         " - " + paymentNotificationRejected + " - " + radianTesSetResult.PaymentNotificationTotalRequired + " - " +
@@ -387,6 +432,11 @@ namespace Gosocket.Dian.Functions.Activation
                         || radianTesSetResult.CirculationLimitationRejected > circulationLimitationRejected
                         || radianTesSetResult.EndCirculationLimitationRejected > endCirculationLimitationRejected
                         || radianTesSetResult.ReportForPaymentRejected > reportForPaymentRejected
+                        || radianTesSetResult.EndorsementWithEffectOrdinaryAssignmentRejected > endorsementWithEffectOrdinaryAssignmentRejected
+                        || radianTesSetResult.ObjectionRejected > objectionRejected
+                        || radianTesSetResult.TransferEconomicRightsRejected > transferEconomicRightsRejected
+                        || radianTesSetResult.NotificationDebtorOfTransferEconomicRightsRejected > notificationDebtorOfTransferEconomicRightsRejected
+                        || radianTesSetResult.PaymentOfTransferEconomicRightsRejected > paymentOfTransferEconomicRightsRejected
                         )
                     {
                         SetLogger(null, "Step 19.g", expressAcceptanceRejected.ToString(), "AR_010.1");
@@ -544,7 +594,7 @@ namespace Gosocket.Dian.Functions.Activation
                         setResultOther.Status = (int)TestSetStatus.Rejected;
                         setResultOther.StatusDescription = TestSetStatus.Rejected.GetDescription();
                         setResultOther.State = TestSetStatus.Rejected.GetDescription();
-                        contributorService.OperationRejectOtherDoc(contributor.Id, isPartipantActiveOtherDoc.ContributorTypeId, isPartipantActiveOtherDoc.SoftwareId, isPartipantActiveOtherDoc.OperationModeId);
+                        contributorService.OperationRejectOtherDoc(isPartipantActiveOtherDoc.OtherDocElecContributorId, isPartipantActiveOtherDoc.SoftwareId, isPartipantActiveOtherDoc.OperationModeId);
                     }
                     
                     //Registro en la table Azure

@@ -25,6 +25,7 @@ namespace Gosocket.Dian.Domain
         [NotMapped]
         public ICollection<RadianSoftware> RadianSoftwares { get; set; }
         public virtual ICollection<RadianContributorOperation> RadianContributorOperations { get; set; }
+        public bool IsActive { get; set; }
         
     }
 

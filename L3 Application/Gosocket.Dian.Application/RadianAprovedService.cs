@@ -10,6 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Gosocket.Dian.Services.Utils.Helpers;
 
 namespace Gosocket.Dian.Application
 {
@@ -26,7 +29,7 @@ namespace Gosocket.Dian.Application
         private readonly IRadianTestSetResultService _radianTestSetResultService;
         private readonly IRadianCallSoftwareService _radianCallSoftwareService;
         private readonly IGlobalRadianOperationService _globalRadianOperationService;
-
+        private readonly IGlobalAuthorizationService _globalAuthorizationService;
 
         public RadianAprovedService(IRadianContributorRepository radianContributorRepository,
                                     IRadianTestSetService radianTestSetService,
@@ -38,7 +41,8 @@ namespace Gosocket.Dian.Application
                                     IContributorOperationsService contributorOperationsService,
                                     IRadianTestSetResultService radianTestSetResultService,
                                     IRadianCallSoftwareService radianCallSoftwareService,
-                                    IGlobalRadianOperationService globalRadianOperationService)
+                                    IGlobalRadianOperationService globalRadianOperationService,
+                                    IGlobalAuthorizationService globalAuthorizationService)
         {
             _radianContributorRepository = radianContributorRepository;
             _radianTestSetService = radianTestSetService;
@@ -51,6 +55,7 @@ namespace Gosocket.Dian.Application
             _radianTestSetResultService = radianTestSetResultService;
             _radianCallSoftwareService = radianCallSoftwareService;
             _globalRadianOperationService = globalRadianOperationService;
+            _globalAuthorizationService = globalAuthorizationService;
         }
 
 
@@ -197,7 +202,7 @@ namespace Gosocket.Dian.Application
         /// <param name="isInsert">Si el software es para insertasr</param>
         /// <param name="validateOperation">True = si valida que exita la operacion.</param>
         /// <returns>ResponseMessage</returns>
-        public ResponseMessage AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
+        public async Task<ResponseMessage> AddRadianContributorOperation(RadianContributorOperation radianContributorOperation, RadianSoftware software, RadianTestSet testSet, bool isInsert, bool validateOperation)
         {
             if (testSet == null)
                 return new ResponseMessage(TextResources.ModeWithoutTestSet, TextResources.alertType, 500);
@@ -220,15 +225,43 @@ namespace Gosocket.Dian.Application
                 software.Url = ConfigurationManager.GetValue("WebServiceUrl");
                 RadianSoftware soft = _radianCallSoftwareService.CreateSoftware(software);
                 radianContributorOperation.SoftwareId = soft.Id;
+                radianContributorOperation.Software = soft;
             }
-
+            
             if (radianContributorOperation.OperationStatusId != (int)RadianState.Test)
                 radianContributorOperation.OperationStatusId = (int)(radianContributor.RadianState == RadianState.Habilitado.GetDescription() ? RadianState.Test : RadianState.Registrado);
+
             int operationId = _radianContributorOperationRepository.Add(radianContributorOperation);
+
+            if ((!isInsert) && (radianContributorOperation.Software == null || radianContributorOperation.Software.Id == Guid.Empty))
+            {
+                if (software.Id == Guid.Empty)
+                {
+                    software = _radianCallSoftwareService.Get(radianContributorOperation.SoftwareId);
+                    radianContributorOperation.Software = software;
+                }
+                else
+                    radianContributorOperation.Software = software;
+            }
+
             existingOperation = _radianContributorOperationRepository.Get(t => t.Id == operationId);
 
             ApplyTestSet(radianContributorOperation, testSet, radianContributor, existingOperation);
 
+            if (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect)
+            {
+                var response = await SyncToProductionAsync(radianContributorOperation, radianContributor);
+                if (response != null)
+                {
+                    if (response.Success)
+                        return new ResponseMessage(string.Format("{0}{1}{2}",response.Message, Environment.NewLine, TextResources.SuccessSoftware), TextResources.alertType);
+                    else
+                        return new ResponseMessage(response.Message, TextResources.alertType, 500);
+                }
+                else
+                    return new ResponseMessage("Error al enviar a activar contribuyente a producción.", TextResources.alertType, 500);
+            }
+            
             return new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType);
         }
 
@@ -243,11 +276,15 @@ namespace Gosocket.Dian.Application
             operation.SoftwareType = existingOperation.SoftwareType;
             operation.RadianContributorTypeId = radianContributor.RadianContributorTypeId;
             operation.Deleted = false;
+            operation.IndirectElectronicInvoicer = (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect);
+            if (operation.IndirectElectronicInvoicer)
+                operation.RadianState = RadianState.Habilitado.GetDescription();
 
             if (_globalRadianOperationService.Insert(operation, existingOperation.Software))
             {
                 string key = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
                 string sType = radianContributor.RadianOperationModeId == 1 ? "1" : operation.SoftwareType.ToString();
+                
                 RadianTestSetResult setResult = new RadianTestSetResult(contributor.Code, key)
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -313,8 +350,29 @@ namespace Gosocket.Dian.Application
                     EndCirculationLimitationTotalAcceptedRequired = testSet.EndCirculationLimitationTotalAcceptedRequired,
                     //Reporte para el pago
                     ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
-                    ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired
+                    ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired,
+                    //Transferencia de los derechos económicos 
+                    TransferEconomicRightsTotalRequired = testSet.TransferEconomicRightsTotalRequired,
+                    TransferEconomicRightsTotalAcceptedRequired = testSet.TransferEconomicRightsTotalAcceptedRequired,
+                    //Notificación al deudor sobre la transferencia de los derechos económicos
+                    NotificationDebtorOfTransferEconomicRightsTotalRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                    NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                    //Pago de la transferencia de los derechos económicos  
+                    PaymentOfTransferEconomicRightsTotalRequired = testSet.PaymentOfTransferEconomicRightsTotalRequired,
+                    PaymentOfTransferEconomicRightsTotalAcceptedRequired = testSet.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                    //Endoso con efectos de cesión ordinaria
+                    EndorsementWithEffectOrdinaryAssignmentTotalRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                    EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                    //Protesto
+                    ObjectionTotalRequired = testSet.ObjectionTotalRequired,
+                    ObjectionTotalAcceptedRequired = testSet.ObjectionTotalAcceptedRequired,
                 };
+                if (radianContributor.RadianOperationModeId == (int)Gosocket.Dian.Domain.Common.RadianOperationMode.Indirect)
+                {
+                    setResult.Status = (int)TestSetStatus.Accepted;
+                    setResult.State = TestSetStatus.Accepted.GetDescription();
+                }
+
                 _ = _radianTestSetResultService.InsertTestSetResult(setResult);
 
             }
@@ -404,5 +462,86 @@ namespace Gosocket.Dian.Application
             operation.OperationStatusId = (int)RadianState.Test; //=en proceso
             return _radianContributorOperationRepository.Update(operation);
         }
+
+
+        private async Task<GlobalContributorActivation> SyncToProductionAsync(RadianContributorOperation radianContributorOperation, RadianContributor radianContributor)
+        {
+            var pk = radianContributor.Contributor.Code.ToString();
+            var rk = radianContributor.RadianContributorTypeId.ToString() + "|" + radianContributorOperation.SoftwareId;
+            RadianTestSetResult testSetResult = _radianTestSetResultService.GetTestSetResult(pk, rk);
+            if (testSetResult != null)
+            {
+                var data = new RadianActivationRequest();
+                data.Code = radianContributor.Contributor.Code; 
+                data.ContributorId = radianContributor.ContributorId; 
+                data.ContributorTypeId = radianContributor.RadianContributorTypeId;  
+                data.Pin = radianContributorOperation.Software.Pin;
+                data.SoftwareId = radianContributorOperation.SoftwareId.ToString();
+                data.SoftwareName = radianContributorOperation.Software.Name; 
+                data.SoftwarePassword = radianContributorOperation.Software.SoftwarePassword; 
+                data.SoftwareType = radianContributorOperation.SoftwareType.ToString();
+                data.SoftwareUser = radianContributorOperation.Software.SoftwareUser; 
+                data.TestSetId = testSetResult.Id;
+                data.Url = radianContributorOperation.Software.Url;
+                data.Enabled = true;
+
+                var function = ConfigurationManager.GetValue("SendToActivateRadianOperationUrl");
+                var response = await ApiHelpers.ExecuteRequestAsync<GlobalContributorActivation>(function, data);
+                if (response.Success)
+                {
+                    Contributor contributorSoftware = _radianContributorService.GetContributor(radianContributorOperation.Software.ContributorId);
+                    if (contributorSoftware != null)
+                    {
+                        //Se inserta en GlobalAuthorization
+                        var auth = _globalAuthorizationService.Find(contributorSoftware.Code, data.Code);
+                        if (auth == null)
+                            _globalAuthorizationService.InsertOrUpdate(new GlobalAuthorization(contributorSoftware.Code, data.Code));
+
+                    }
+                }
+                return response;
+                
+            }
+            return new GlobalContributorActivation() { Success = false, Message = "No se encontró el set de pruebas" };
+        }
+    }
+
+    class RadianActivationRequest
+    {
+        [JsonProperty(PropertyName = "code")]
+        public string Code { get; set; }
+
+        [JsonProperty(PropertyName = "contributorId")]
+        public int ContributorId { get; set; }
+
+        [JsonProperty(PropertyName = "contributorTypeId")]
+        public int ContributorTypeId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareId")]
+        public string SoftwareId { get; set; }
+
+        [JsonProperty(PropertyName = "softwareType")]
+        public string SoftwareType { get; set; }
+
+        [JsonProperty(PropertyName = "softwareUser")]
+        public string SoftwareUser { get; set; }
+
+        [JsonProperty(PropertyName = "softwarePassword")]
+        public string SoftwarePassword { get; set; }
+
+        [JsonProperty(PropertyName = "pin")]
+        public string Pin { get; set; }
+
+        [JsonProperty(PropertyName = "softwareName")]
+        public string SoftwareName { get; set; }
+
+        [JsonProperty(PropertyName = "url")]
+        public string Url { get; set; }
+
+        [JsonProperty(PropertyName = "testSetId")]
+        public string TestSetId { get; set; }
+
+        [JsonProperty(PropertyName = "enabled")]
+        public bool Enabled { get; set; }
     }
 }

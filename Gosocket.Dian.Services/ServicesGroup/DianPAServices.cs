@@ -620,12 +620,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     }
 
                     if (response.IsValid || applicationResponseExist)
-                    if (response.IsValid)
+                    //if (response.IsValid)
                     {
                         response.IsValid = true;
                         response.StatusCode = "00";
                         response.StatusMessage = message;
-                        response.StatusDescription = "Procesado Correctamente.";
+                        response.StatusDescription = "Procesado Correctamente.";                   
                     }
                     else
                     {
@@ -1354,7 +1354,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
             try
             {
                 var authEntity = GetAuthorization(accountCode, authCode);
-                if (authEntity != null && authEntity.PartitionKey != accountCodeT)
+                var authCodeNew = authCode?.Trim().Substring(0, authCode.Trim().Length - 1);
+                if (authEntity != null && authEntity.PartitionKey != accountCodeT && authCodeNew != accountCodeT)
                 {
                     verificationResult.OperationCode = "401";
                     verificationResult.OperationDescription = $"NIT: {authCode} del certificado no autorizado para consultar rangos de numeración asociados del NIT: {accountCodeT}";
@@ -1817,7 +1818,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             if (response.IsCorrect)
             {
                 dianResponse.StatusDescription = $"La solicitud {trackId} se encuentra en estado: {response.State}, {response.Response}";
-                dianResponse.UrlDescarga = response.UrlFileCsv;
+                //dianResponse.UrlDescarga = response.UrlFileCsv;
             }
             else
             {

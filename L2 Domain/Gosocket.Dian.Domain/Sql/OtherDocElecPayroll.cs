@@ -24,7 +24,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string CompensationE { get; set; }
 		public string CompensationO { get; set; }
 		public string TotalVoucher { get; set; }
-		public decimal Consecutive { get; set; }
+		public string Consecutive { get; set; }
 		public short? DV { get; set; }
 		public string DeductionsTotal { get; set; }
 		public string StateDepartment { get; set; }
@@ -107,7 +107,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string Pri_Payment { get; set; }
 		public string Pri_PaymentNS { get; set; }
 		public string ViaticoManuAlojS { get; set; }
-		public DateTime? WithdrawalDate { get; set; }
+		public string WithdrawalDate { get; set; }
 		public string BonusS { get; set; }
 		public string BonusNS { get; set; }
 		public string RetentionSource { get; set; }
@@ -115,13 +115,13 @@ namespace Gosocket.Dian.Domain.Sql
 		public string Ces_InterestPayment { get; set; }
 		public string Ces_Percentage { get; set; }
 		public string Commissions { get; set; }
-		public DateTime? GenPredDate { get; set; }
+		public string GenPredDate { get; set; }
 		public string Notes { get; set; }
 		public string NumberPred { get; set; }
 		public short TypeNote { get; set; }
 		public string Quantity { get; set; }
-		public DateTime? EndDate { get; set; }
-		public DateTime? StartDate { get; set; }
+		public string EndDate { get; set; }
+		public string StartDate { get; set; }
 		public string Payment { get; set; }
 		public string CompanyOtherNames { get; set; }
 		public string ViaticoManuAlojNS { get; set; }
@@ -131,7 +131,7 @@ namespace Gosocket.Dian.Domain.Sql
 		public string ProvFirstName { get; set; }
 		public string ProvSecondSurname { get; set; }
 		public string FP_BaseValue { get; set; }
-		public DateTime? SettlementDate { get; set; }
+		public string SettlementDate { get; set; }
 		public string PayrollType { get; set; }
 		public string S_BaseValue { get; set; }
 	}

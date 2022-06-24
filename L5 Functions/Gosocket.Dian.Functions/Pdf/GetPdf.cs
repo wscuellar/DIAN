@@ -136,7 +136,7 @@ namespace Gosocket.Dian.Functions.Pdf
                 // File.WriteAllText(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.html", Html_Content);
 
                 // Salvar PDF generado de HTML en el Storage
-                var pdfBytes = PdfCreator.Instance.PdfRender(Html_Content, trackId, getPaperSize(typeFormat));
+                var pdfBytes = await PdfCreator.Instance.PdfRenderAsync(Html_Content, trackId, getPaperSize(typeFormat));
 
                 // Guardar en disco el pdf generado
                 // File.WriteAllBytes(@"D:\Users\wsuser41\Desktop\Dian\Documents\NUEVO.pdf", pdfBytes);

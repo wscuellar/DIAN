@@ -34,142 +34,21 @@ namespace Gosocket.Dian.Application
                 OtherDocElecPayroll otherDocElecPayrollInstance =
                     context.OtherDocElecPayroll.FirstOrDefault(c => c.CUNE == otherDocElecPayroll.CUNE);
 
-                if (otherDocElecPayrollInstance != null)
-                {
-                    otherDocElecPayrollInstance.CreateDate = otherDocElecPayroll.CreateDate;
-                    otherDocElecPayrollInstance.HighPensionRisk = otherDocElecPayroll.HighPensionRisk;
-                    otherDocElecPayrollInstance.Environment = otherDocElecPayroll.Environment;
-                    otherDocElecPayrollInstance.AuxTransport = otherDocElecPayroll.AuxTransport;
-                    otherDocElecPayrollInstance.Bank = otherDocElecPayroll.Bank;
-                    otherDocElecPayrollInstance.BonusNS = otherDocElecPayroll.BonusNS;
-                    otherDocElecPayrollInstance.BonusS = otherDocElecPayroll.BonusS;
-                    otherDocElecPayrollInstance.Quantity = otherDocElecPayroll.Quantity;
-                    otherDocElecPayrollInstance.Ces_Paymet = otherDocElecPayroll.Ces_Paymet;
-                    otherDocElecPayrollInstance.Ces_InterestPayment = otherDocElecPayroll.Ces_InterestPayment;
-                    otherDocElecPayrollInstance.Ces_Percentage = otherDocElecPayroll.Ces_Percentage;
-                    otherDocElecPayrollInstance.WorkerCode = otherDocElecPayroll.WorkerCode;
-                    otherDocElecPayrollInstance.Commissions = otherDocElecPayroll.Commissions;
-                    otherDocElecPayrollInstance.CompensationE = otherDocElecPayroll.CompensationE;
-                    otherDocElecPayrollInstance.CompensationO = otherDocElecPayroll.CompensationO;
-                    otherDocElecPayrollInstance.TotalVoucher = otherDocElecPayroll.TotalVoucher;
-                    otherDocElecPayrollInstance.Consecutive = otherDocElecPayroll.Consecutive;
-                    otherDocElecPayrollInstance.CUNE = otherDocElecPayroll.CUNE;
-                    otherDocElecPayrollInstance.CUNENov = otherDocElecPayroll.CUNENov;
-                    otherDocElecPayrollInstance.CUNEPred = otherDocElecPayroll.CUNEPred;
-                    otherDocElecPayrollInstance.DeductionsTotal = otherDocElecPayroll.DeductionsTotal;
-                    otherDocElecPayrollInstance.StateDepartment = otherDocElecPayroll.StateDepartment;
-                    otherDocElecPayrollInstance.AccruedTotal = otherDocElecPayroll.AccruedTotal;
-                    otherDocElecPayrollInstance.WorkedDays = otherDocElecPayroll.WorkedDays;
-                    otherDocElecPayrollInstance.DV = otherDocElecPayroll.DV;
-                    otherDocElecPayrollInstance.CompanyStateDepartment = otherDocElecPayroll.CompanyStateDepartment;
-                    otherDocElecPayrollInstance.CompanyAddress = otherDocElecPayroll.CompanyAddress;
-                    otherDocElecPayrollInstance.CompanyDV = otherDocElecPayroll.CompanyDV;
-                    otherDocElecPayrollInstance.CompanyCityMunicipality = otherDocElecPayroll.CompanyCityMunicipality;
-                    otherDocElecPayrollInstance.CompanyNIT = otherDocElecPayroll.CompanyNIT;
-                    otherDocElecPayrollInstance.CompanyOtherNames = otherDocElecPayroll.CompanyOtherNames;
-                    otherDocElecPayrollInstance.CompanyCountry = otherDocElecPayroll.CompanyCountry;
-                    otherDocElecPayrollInstance.CompanySurname = otherDocElecPayroll.CompanySurname;
-                    otherDocElecPayrollInstance.CompanyFirstName = otherDocElecPayroll.CompanyFirstName;
-                    otherDocElecPayrollInstance.CompanyBusinessName = otherDocElecPayroll.CompanyBusinessName;
-                    otherDocElecPayrollInstance.CompanySecondSurname = otherDocElecPayroll.CompanySecondSurname;
-                    otherDocElecPayrollInstance.EncripCUNE = otherDocElecPayroll.EncripCUNE;
-                    otherDocElecPayrollInstance.EndDate = otherDocElecPayroll.EndDate;
-                    otherDocElecPayrollInstance.GenDate = otherDocElecPayroll.GenDate;
-                    otherDocElecPayrollInstance.GenPredDate = otherDocElecPayroll.GenPredDate;
-                    otherDocElecPayrollInstance.AdmissionDate = otherDocElecPayroll.AdmissionDate;
-                    otherDocElecPayrollInstance.StartDate = otherDocElecPayroll.StartDate;
-                    otherDocElecPayrollInstance.SettlementDate = otherDocElecPayroll.SettlementDate;
-                    otherDocElecPayrollInstance.EndPaymentDate = otherDocElecPayroll.EndPaymentDate;
-                    otherDocElecPayrollInstance.StartPaymentDate = otherDocElecPayroll.StartPaymentDate;
-                    otherDocElecPayrollInstance.WithdrawalDate = otherDocElecPayroll.WithdrawalDate;
-                    otherDocElecPayrollInstance.PaymentDate = otherDocElecPayroll.PaymentDate;
-                    otherDocElecPayrollInstance.Shape = otherDocElecPayroll.Shape;
-                    otherDocElecPayrollInstance.FP_Deduction = otherDocElecPayroll.FP_Deduction;
-                    otherDocElecPayrollInstance.FP_Percentage = otherDocElecPayroll.FP_Percentage;
-                    otherDocElecPayrollInstance.FSP_Deduction = otherDocElecPayroll.FSP_Deduction;
-                    otherDocElecPayrollInstance.FSP_DeductionSub = otherDocElecPayroll.FSP_DeductionSub;
-                    otherDocElecPayrollInstance.FSP_Percentage = otherDocElecPayroll.FSP_Percentage;
-                    otherDocElecPayrollInstance.FSP_PercentageSub = otherDocElecPayroll.FSP_PercentageSub;
-                    otherDocElecPayrollInstance.HED = otherDocElecPayroll.HED;
-                    otherDocElecPayrollInstance.HEDDF = otherDocElecPayroll.HEDDF;
-                    otherDocElecPayrollInstance.HEN = otherDocElecPayroll.HEN;
-                    otherDocElecPayrollInstance.HENDF = otherDocElecPayroll.HENDF;
-                    otherDocElecPayrollInstance.GenTime = otherDocElecPayroll.GenTime;
-                    otherDocElecPayrollInstance.HRDDF = otherDocElecPayroll.HRDDF;
-                    otherDocElecPayrollInstance.HRN = otherDocElecPayroll.HRN;
-                    otherDocElecPayrollInstance.HRNDF = otherDocElecPayroll.HRNDF;
-                    otherDocElecPayrollInstance.Idiom = otherDocElecPayroll.Idiom;
-                    otherDocElecPayrollInstance.Inc_Quantity = otherDocElecPayroll.Inc_Quantity;
-                    otherDocElecPayrollInstance.Inc_Payment = otherDocElecPayroll.Inc_Payment;
-                    otherDocElecPayrollInstance.Info_DateGen = otherDocElecPayroll.Info_DateGen;
-                    otherDocElecPayrollInstance.WorkplaceStateDepartment = otherDocElecPayroll.WorkplaceStateDepartment;
-                    otherDocElecPayrollInstance.WorkplaceAddress = otherDocElecPayroll.WorkplaceAddress;
-                    otherDocElecPayrollInstance.WorkplaceMunicipalityCity = otherDocElecPayroll.WorkplaceMunicipalityCity;
-                    otherDocElecPayrollInstance.PlaceWorkCountry = otherDocElecPayroll.PlaceWorkCountry;
-                    otherDocElecPayrollInstance.Method = otherDocElecPayroll.Method;
-                    otherDocElecPayrollInstance.CityMunicipality = otherDocElecPayroll.CityMunicipality;
-                    otherDocElecPayrollInstance.NIT = otherDocElecPayroll.NIT;
-                    otherDocElecPayrollInstance.Notes = otherDocElecPayroll.Notes;
-                    otherDocElecPayrollInstance.Novelty = otherDocElecPayroll.Novelty;
-                    otherDocElecPayrollInstance.SerialNumber = otherDocElecPayroll.SerialNumber;
-                    otherDocElecPayrollInstance.AccountNumber = otherDocElecPayroll.AccountNumber;
-                    otherDocElecPayrollInstance.DocumentNumber = otherDocElecPayroll.DocumentNumber;
-                    otherDocElecPayrollInstance.NumberPred = otherDocElecPayroll.NumberPred;
-                    otherDocElecPayrollInstance.OtherNames = otherDocElecPayroll.OtherNames;
-                    otherDocElecPayrollInstance.Payment = otherDocElecPayroll.Payment;
-                    otherDocElecPayrollInstance.Country = otherDocElecPayroll.Country;
-                    otherDocElecPayrollInstance.PayrollPeriod = otherDocElecPayroll.PayrollPeriod;
-                    otherDocElecPayrollInstance.SerialPrefix = otherDocElecPayroll.SerialPrefix;
-                    otherDocElecPayrollInstance.Surname = otherDocElecPayroll.Surname;
-                    otherDocElecPayrollInstance.FirstName = otherDocElecPayroll.FirstName;
-                    otherDocElecPayrollInstance.Pri_Quantity = otherDocElecPayroll.Pri_Quantity;
-                    otherDocElecPayrollInstance.Pri_Payment = otherDocElecPayroll.Pri_Payment;
-                    otherDocElecPayrollInstance.Pri_PaymentNS = otherDocElecPayroll.Pri_PaymentNS;
-                    otherDocElecPayrollInstance.ProvOtherNames = otherDocElecPayroll.ProvOtherNames;
-                    otherDocElecPayrollInstance.ProvSurname = otherDocElecPayroll.ProvSurname;
-                    otherDocElecPayrollInstance.ProvFirstName = otherDocElecPayroll.ProvFirstName;
-                    otherDocElecPayrollInstance.Prov_CompanyName = otherDocElecPayroll.Prov_CompanyName;
-                    otherDocElecPayrollInstance.ProvSecondSurname = otherDocElecPayroll.ProvSecondSurname;
-                    otherDocElecPayrollInstance.RetentionSource = otherDocElecPayroll.RetentionSource;
-                    otherDocElecPayrollInstance.ComprehensiveSalary = otherDocElecPayroll.ComprehensiveSalary;
-                    otherDocElecPayrollInstance.SalaryWorked = otherDocElecPayroll.SalaryWorked;
-                    otherDocElecPayrollInstance.SecondSurname = otherDocElecPayroll.SecondSurname;
-                    otherDocElecPayrollInstance.SoftwareID = otherDocElecPayroll.SoftwareID;
-                    otherDocElecPayrollInstance.SoftwareSC = otherDocElecPayroll.SoftwareSC;
-                    otherDocElecPayrollInstance.WorkerSubType = otherDocElecPayroll.WorkerSubType;
-                    otherDocElecPayrollInstance.Salary = otherDocElecPayroll.Salary;
-                    otherDocElecPayrollInstance.S_Deduction = otherDocElecPayroll.S_Deduction;
-                    otherDocElecPayrollInstance.S_Percentage = otherDocElecPayroll.S_Percentage;
-                    otherDocElecPayrollInstance.TimeWorked = otherDocElecPayroll.TimeWorked;
-                    otherDocElecPayrollInstance.ContractType = otherDocElecPayroll.ContractType;
-                    otherDocElecPayrollInstance.AccountType = otherDocElecPayroll.AccountType;
-                    otherDocElecPayrollInstance.DocumentType = otherDocElecPayroll.DocumentType;
-                    otherDocElecPayrollInstance.CurrencyType = otherDocElecPayroll.CurrencyType;
-                    otherDocElecPayrollInstance.TypeNote = otherDocElecPayroll.TypeNote;
-                    otherDocElecPayrollInstance.WorkerType = otherDocElecPayroll.WorkerType;
-                    otherDocElecPayrollInstance.XMLType = otherDocElecPayroll.XMLType;
-                    otherDocElecPayrollInstance.JobCodeWorker = otherDocElecPayroll.JobCodeWorker;
-                    otherDocElecPayrollInstance.TRM = otherDocElecPayroll.TRM;
-                    otherDocElecPayrollInstance.Version = otherDocElecPayroll.Version;
-                    otherDocElecPayrollInstance.ViaticoManuAlojNS = otherDocElecPayroll.ViaticoManuAlojNS;
-                    otherDocElecPayrollInstance.ViaticoManuAlojS = otherDocElecPayroll.ViaticoManuAlojS;
-
-                    context.Entry(otherDocElecPayrollInstance).State = System.Data.Entity.EntityState.Modified;
-                }
-                else
+                if(otherDocElecPayrollInstance == null)
                 {
                     otherDocElecPayroll.Id = Guid.NewGuid();
                     context.Entry(otherDocElecPayroll).State = System.Data.Entity.EntityState.Added;
+
+                    context.SaveChanges();
                 }
 
-                context.SaveChanges();
-
                 return otherDocElecPayroll;
+
             }
         }
 
-        public List<OtherDocElecPayroll> Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(int take, DateTime? monthStart, 
-            DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart, 
+        public List<OtherDocElecPayroll> Find_ByMonth_EnumerationRange_EmployeeDocType_EmployeeDocNumber_FirstSurname_EmployeeSalaryRange_EmployerCity(int take, DateTime? monthStart,
+            DateTime? monthEnd, double? enumerationStart, double? enumerationEnd, string employeeDocType, string employeeDocNumber, string firstSurname, double? employeeSalaryStart,
             double? employeeSalaryEnd, string employeeCity)
         {
             string sqlQuery = string.Empty;
@@ -189,7 +68,7 @@ namespace Gosocket.Dian.Application
             string sqlQueryConditions = string.Empty;
             string sqlQueryOrderBy = "ORDER BY CreateDate DESC";
 
-            if (enumerationStart.HasValue)
+            if (enumerationStart.HasValue && enumerationStart.Value > 0)
             {
                 sqlQueryConditions += $" Convert(bigint,Consecutive) BETWEEN {enumerationStart.Value} AND {enumerationEnd.Value} AND ";
             }
