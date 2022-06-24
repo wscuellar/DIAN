@@ -201,6 +201,7 @@
     <Compile Include="Entity\GlobalNumberRange.cs" />
     <Compile Include="Entity\GlobalBatchFileResult.cs" />
     <Compile Include="Entity\GlobalOtherDocElecOperation.cs" />
+    <Compile Include="Entity\GlobalRadianContributorEnabled.cs" />
     <Compile Include="Entity\GlobalRadianOperations.cs" />
     <Compile Include="Entity\GlobalRejectedDocument.cs" />
     <Compile Include="Entity\GlobalSoftware.cs" />

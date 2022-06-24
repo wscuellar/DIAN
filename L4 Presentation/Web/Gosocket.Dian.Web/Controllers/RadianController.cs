@@ -14,17 +14,19 @@ using Gosocket.Dian.Domain.Entity;
 using System.Text;
 using Gosocket.Dian.Interfaces.Services;
 using Gosocket.Dian.Common.Resources;
+using Gosocket.Dian.Application;
 
 namespace Gosocket.Dian.Web.Controllers
 {
     public class RadianController : Controller
     {
         private readonly IRadianContributorService _radianContributorService;
-        private readonly UserService userService = new UserService();
+        private readonly IGlobalRadianContributorEnabledService _globalRadianContributorEnabledService = new GlobalRadianContributorEnabledService();        
+        private readonly UserService userService = new UserService();       
 
         public RadianController(IRadianContributorService radianContributorService)
         {
-            _radianContributorService = radianContributorService;
+            _radianContributorService = radianContributorService;            
         }
 
 
@@ -99,7 +101,7 @@ namespace Gosocket.Dian.Web.Controllers
                     TradeName = c.TradeName,
                     BusinessName = c.BusinessName,
                     AcceptanceStatusName = c.AcceptanceStatusName,
-                    RadianState = c.RadianState
+                    RadianState = c.RadianState                    
 
                 }).ToList(),
                 RadianType = radianAdmin.Types.Select(c => new SelectListItem
@@ -210,6 +212,7 @@ namespace Gosocket.Dian.Web.Controllers
                     Name = u.Name,
                     Email = u.Email
                 }).ToList(),
+                IsActive = radianAdmin.Contributor.IsActive
 
             };
 
@@ -268,27 +271,70 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
                 RadianAdmin radianAdmin = _radianContributorService.ContributorSummary(id);
-                RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
-                if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
-                    return Json(new { message = TextResources.TestNotRemove, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
-
-                if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
-                    return Json(new { message = TextResources.AllSoftware, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
-
-                if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
+                
+                //Requisitos vencidos
+                if(approveState == "2")
                 {
-                    int counter = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
-                    if (counter > 0)
+                    RadianContributor result = _radianContributorService.ChangeContributorActiveRequirement(radianAdmin.Contributor.RadianContributorId);
+                    if(result == null)
+                        return Json(new { messasge = "Error al actualizar estado requisitos contribuyente.", success = false, error = "" }, JsonRequestBehavior.AllowGet);
+                    else if (result.IsActive)
                     {
-                        string message = string.Format(TextResources.WithCustomerList, counter);
-                        return Json(new { message, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        string guid = Guid.NewGuid().ToString();
+                        GlobalRadianContributorEnabled item = new GlobalRadianContributorEnabled(radianAdmin.Contributor.Code, guid)
+                        {
+                            IsActive = true,
+                            UpdateBy = User.Identity.Name
+                        };
+                        _ = SendMail(radianAdmin);
+
+                        if(_globalRadianContributorEnabledService.Insert(item))
+                            return Json(new { message = "Actualiza estado requisitos contribuyente a activos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                    }                        
+                    else if (!result.IsActive)
+                    {
+                        string guid = Guid.NewGuid().ToString();
+                        GlobalRadianContributorEnabled item = new GlobalRadianContributorEnabled(radianAdmin.Contributor.Code, guid)
+                        {
+                            IsActive = false,
+                            UpdateBy = User.Identity.Name
+                        };
+                        _ = SendMail(radianAdmin);
+
+                        if(_globalRadianContributorEnabledService.Insert(item))                        
+                            return Json(new { message = "Actualiza estado requisitos contribuyente a inactivos.", success = true, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
                     }
+                    
                 }
+                else
+                {
+                    RadianState stateProcess = approveState == "1" ? RadianState.Cancelado : RadianState.Test;
 
-                _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+                    //Participantes en pruebas no pueden ser cancelados
+                    if (radianAdmin.Contributor.RadianState == RadianState.Test.GetDescription() && stateProcess == RadianState.Cancelado)
+                        return Json(new { message = TextResources.TestNotRemove, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
 
-                if (stateProcess == RadianState.Test && radianAdmin.Contributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
-                    _radianContributorService.UpdateRadianOperation(radianAdmin.Contributor.RadianContributorId, (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware);
+                    //Todos los archivos soporte deben estar aceptados 
+                    if (stateProcess == RadianState.Test && radianAdmin.Files.Any(n => n.Status != 2 && n.RadianContributorFileType.Mandatory))
+                        return Json(new { message = TextResources.AllSoftware, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+
+                    //El SW de la operacion tiene clientes asociados
+                    if (radianAdmin.Contributor.RadianState == RadianState.Habilitado.GetDescription() && stateProcess == RadianState.Cancelado)
+                    {
+                        int counter = _radianContributorService.GetAssociatedClients(radianAdmin.Contributor.RadianContributorId);
+                        if (counter > 0)
+                        {
+                            string message = string.Format(TextResources.WithCustomerList, counter);
+                            return Json(new { message, success = false, id = radianAdmin.Contributor.RadianContributorId }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+
+                    _ = _radianContributorService.ChangeParticipantStatus(radianAdmin.Contributor.Id, stateProcess.GetDescription(), radianAdmin.Contributor.RadianContributorTypeId, radianState, description);
+
+                    if (stateProcess == RadianState.Test && radianAdmin.Contributor.RadianOperationModeId == (int)Domain.Common.RadianOperationMode.Direct)
+                        _radianContributorService.UpdateRadianOperation(radianAdmin.Contributor.RadianContributorId, (int)Domain.Common.RadianOperationModeTestSet.OwnSoftware);
+
+                }
 
                 _ = SendMail(radianAdmin);
 
@@ -390,7 +436,23 @@ namespace Gosocket.Dian.Web.Controllers
             // Terminación limitación  
             events.Add(new EventCountersViewModel() { EventName = EventStatus.AnulacionLimitacionCirculacion.GetDescription(), Counter1 = result.EndCirculationLimitationTotalAcceptedRequired, Counter2 = result.EndCirculationLimitationAccepted, Counter3 = result.EndCirculationLimitationRejected });
 
+
             events.Add(new EventCountersViewModel() { EventName = EventStatus.ValInfoPago.GetDescription(), Counter1 = result.ReportForPaymentTotalAcceptedRequired, Counter2 = result.ReportForPaymentAccepted, Counter3 = result.ReportForPaymentRejected });
+
+            //Endoso con efectos de cesión ordinaria
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.EndorsementWithEffectOrdinaryAssignment.GetDescription(), Counter1 = result.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, Counter2 = result.EndorsementWithEffectOrdinaryAssignmentAccepted, Counter3 = result.EndorsementWithEffectOrdinaryAssignmentRejected });
+
+            //Protesto
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.Objection.GetDescription(), Counter1 = result.ObjectionTotalAcceptedRequired, Counter2 = result.ObjectionAccepted, Counter3 = result.ObjectionRejected });
+
+            //Transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.TransferEconomicRights.GetDescription(), Counter1 = result.TransferEconomicRightsTotalAcceptedRequired, Counter2 = result.TransferEconomicRightsAccepted, Counter3 = result.TransferEconomicRightsRejected });
+
+            //Notificación al deudor sobre la transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificationDebtorOfTransferEconomicRights.GetDescription(), Counter1 = result.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = result.NotificationDebtorOfTransferEconomicRightsAccepted, Counter3 = result.NotificationDebtorOfTransferEconomicRightsRejected });
+
+            //Pago de la transferencia de los derechos económicos 
+            events.Add(new EventCountersViewModel() { EventName = EventStatus.PaymentOfTransferEconomicRights.GetDescription(), Counter1 = result.PaymentOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = result.PaymentOfTransferEconomicRightsAccepted, Counter3 = result.PaymentOfTransferEconomicRightsRejected });
 
             return Json(events, JsonRequestBehavior.AllowGet);
         }

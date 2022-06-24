@@ -197,10 +197,12 @@
     <Compile Include="Common\CertificateExtensions.cs" />
     <Compile Include="Common\RedisExtensions.cs" />
     <Compile Include="ElectronicDocumentService.cs" />
+    <Compile Include="GlobalAuthorizationService.cs" />
     <Compile Include="GlobalDocPayrollService.cs" />
     <Compile Include="GlobalOtherDocElecOperationService.cs" />
     <Compile Include="FreeBiller\ClaimsDbService.cs" />
     <Compile Include="FreeBiller\ProfileService.cs" />
+    <Compile Include="GlobalRadianContributorEnabledService.cs" />
     <Compile Include="GlobalRadianOperationService.cs" />
     <Compile Include="Managers\TestSetOthersDocumentsResultManager.cs" />
     <Compile Include="Managers\TestSetOthersDocumentsManager.cs" />

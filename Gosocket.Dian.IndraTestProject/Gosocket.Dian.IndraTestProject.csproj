@@ -138,6 +138,7 @@
     <Compile Include="Services\GlobalDocPayrollServiceTests.cs" />
     <Compile Include="Services\GlobalDocValidatorDocumentServiceTests.cs" />
     <Compile Include="Services\GlobalDocValidatorTrackingServiceTests.cs" />
+    <Compile Include="Services\GlobalRadianContributorEnabledServiceTest.cs" />
     <Compile Include="Services\GlobalRadianOperationServiceTests.cs" />
     <Compile Include="Services\GlobalOtherDocElecOperationServiceTests.cs" />
     <Compile Include="Services\GlobalDocValidationDocumentMetaServiceTests.cs" />
