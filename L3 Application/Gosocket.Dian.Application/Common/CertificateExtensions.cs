@@ -108,7 +108,7 @@ namespace Gosocket.Dian.Application.Common
                 }
                 catch (PkixCertPathBuilderException e)
                 {
-                    Debug.WriteLine(e.InnerException?.Message ?? e.Message);
+                    Trace.TraceError("IsTrusted: "+e.InnerException?.Message ?? e.Message);
                     if (!witheListPkixCertPathBuilderException.Contains(e.InnerException?.Message))
                     {
                         value = new Tuple<string, bool>(key, false);
