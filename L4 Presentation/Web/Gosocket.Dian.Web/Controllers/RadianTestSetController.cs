@@ -56,6 +56,16 @@ namespace Gosocket.Dian.Web.Controllers
                     PaymentNotificationTotalRequired = x.PaymentNotificationTotalRequired,
                     CirculationLimitationTotalRequired = x.CirculationLimitationTotalRequired,
                     EndCirculationLimitationTotalRequired = x.EndCirculationLimitationTotalRequired,
+                    TransferEconomicRightsTotalRequired = x.TransferEconomicRightsTotalRequired,
+                    TransferEconomicRightsTotalAcceptedRequired = x.TransferEconomicRightsTotalAcceptedRequired,
+                    NotificationDebtorOfTransferEconomicRightsTotalRequired = x.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                    NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = x.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                    PaymentOfTransferEconomicRightsTotalRequired = x.PaymentOfTransferEconomicRightsTotalRequired,
+                    PaymentOfTransferEconomicRightsTotalAcceptedRequired = x.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                    EndorsementWithEffectOrdinaryAssignmentTotalRequired = x.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                    EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = x.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                    ObjectionTotalRequired = x.ObjectionTotalRequired,
+                    ObjectionTotalAcceptedRequired = x.ObjectionTotalAcceptedRequired,
                     TestSetId = x.TestSetId.ToString(),
                     UpdateBy = x.UpdateBy,
                     OperationModeId = int.Parse(x.PartitionKey)
@@ -91,7 +101,17 @@ namespace Gosocket.Dian.Web.Controllers
                 CirculationLimitationTotalRequired = 0,
                 EndCirculationLimitationTotalRequired = 0,
                 ReportForPaymentTotalRequired = 0,
-                ReportForPaymentTotalAcceptedRequired = 0
+                ReportForPaymentTotalAcceptedRequired = 0,
+                TransferEconomicRightsTotalRequired = 0,
+                TransferEconomicRightsTotalAcceptedRequired = 0,
+                NotificationDebtorOfTransferEconomicRightsTotalRequired = 0,
+                NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = 0,
+                PaymentOfTransferEconomicRightsTotalRequired = 0,
+                PaymentOfTransferEconomicRightsTotalAcceptedRequired = 0,
+                EndorsementWithEffectOrdinaryAssignmentTotalRequired = 0,
+                EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = 0,
+                ObjectionTotalRequired = 0,
+                ObjectionTotalAcceptedRequired = 0
             };
             ViewBag.CurrentPage = Navigation.NavigationEnum.RadianSetPruebas;
             return View(model);
@@ -157,7 +177,17 @@ namespace Gosocket.Dian.Web.Controllers
                 EndCirculationLimitationTotalAcceptedRequired = model.EndCirculationLimitationTotalAcceptedRequired,
                 EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired,
                 ReportForPaymentTotalRequired = model.ReportForPaymentTotalRequired,
-                ReportForPaymentTotalAcceptedRequired = model.ReportForPaymentTotalAcceptedRequired
+                ReportForPaymentTotalAcceptedRequired = model.ReportForPaymentTotalAcceptedRequired,
+                TransferEconomicRightsTotalRequired = model.TransferEconomicRightsTotalRequired,
+                TransferEconomicRightsTotalAcceptedRequired = model.TransferEconomicRightsTotalAcceptedRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalRequired = model.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = model.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                PaymentOfTransferEconomicRightsTotalRequired = model.PaymentOfTransferEconomicRightsTotalRequired,
+                PaymentOfTransferEconomicRightsTotalAcceptedRequired = model.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalRequired = model.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = model.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                ObjectionTotalRequired = model.ObjectionTotalRequired,
+                ObjectionTotalAcceptedRequired = model.ObjectionTotalAcceptedRequired
             }
             );
             if (result)
@@ -223,6 +253,16 @@ namespace Gosocket.Dian.Web.Controllers
                 EndCirculationLimitationTotalRequired = testSet.EndCirculationLimitationTotalRequired,
                 ReportForPaymentTotalRequired = testSet.ReportForPaymentTotalRequired,
                 ReportForPaymentTotalAcceptedRequired = testSet.ReportForPaymentTotalAcceptedRequired,
+                TransferEconomicRightsTotalRequired = testSet.TransferEconomicRightsTotalRequired,
+                TransferEconomicRightsTotalAcceptedRequired = testSet.TransferEconomicRightsTotalAcceptedRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = testSet.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                PaymentOfTransferEconomicRightsTotalRequired = testSet.PaymentOfTransferEconomicRightsTotalRequired,
+                PaymentOfTransferEconomicRightsTotalAcceptedRequired = testSet.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = testSet.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                ObjectionTotalRequired = testSet.ObjectionTotalRequired,
+                ObjectionTotalAcceptedRequired = testSet.ObjectionTotalAcceptedRequired,
                 TestSetId = testSet.TestSetId.ToString(),
                 OperationModeId = int.Parse(testSet.PartitionKey)
             };
@@ -282,6 +322,16 @@ namespace Gosocket.Dian.Web.Controllers
                 EndCirculationLimitationTotalRequired = model.EndCirculationLimitationTotalRequired,
                 ReportForPaymentTotalRequired = model.ReportForPaymentTotalRequired,
                 ReportForPaymentTotalAcceptedRequired = model.ReportForPaymentTotalAcceptedRequired,
+                TransferEconomicRightsTotalRequired = model.TransferEconomicRightsTotalRequired,
+                TransferEconomicRightsTotalAcceptedRequired = model.TransferEconomicRightsTotalAcceptedRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalRequired = model.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired = model.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                PaymentOfTransferEconomicRightsTotalRequired = model.PaymentOfTransferEconomicRightsTotalRequired,
+                PaymentOfTransferEconomicRightsTotalAcceptedRequired = model.PaymentOfTransferEconomicRightsTotalAcceptedRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalRequired = model.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired = model.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                ObjectionTotalRequired = model.ObjectionTotalRequired,
+                ObjectionTotalAcceptedRequired = model.ObjectionTotalAcceptedRequired,
                 UpdateBy = User.Identity.Name,
                 Date = DateTime.UtcNow
             });
@@ -353,6 +403,21 @@ namespace Gosocket.Dian.Web.Controllers
 
                 // Informe para el pago
                 events.Add(new EventCountersViewModel() { EventName = EventStatus.ValInfoPago.GetDescription(), Counter1 = testSet.ReportForPaymentTotalAcceptedRequired, Counter2 = testSet.ReportForPaymentTotalRequired, Counter3 = 0 });
+
+                // Endoso con efectos de cesión ordinaria
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.EndorsementWithEffectOrdinaryAssignment.GetDescription(), Counter1 = testSet.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, Counter2 = testSet.EndorsementWithEffectOrdinaryAssignmentTotalRequired, Counter3 = 0 });
+
+                // Protesto
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.Objection.GetDescription(), Counter1 = testSet.ObjectionTotalAcceptedRequired, Counter2 = testSet.ObjectionTotalRequired, Counter3 = 0 });
+
+                // Transferencia de los derechos económicos
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.TransferEconomicRights.GetDescription(), Counter1 = testSet.TransferEconomicRightsTotalAcceptedRequired, Counter2 = testSet.TransferEconomicRightsTotalRequired, Counter3 = 0 });
+
+                // Notificación al deudor sobre la transferencia de los derechos económicos
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.NotificationDebtorOfTransferEconomicRights.GetDescription(), Counter1 = testSet.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = testSet.NotificationDebtorOfTransferEconomicRightsTotalRequired, Counter3 = 0 });
+
+                // Pago de la transferencia de los derechos económicos
+                events.Add(new EventCountersViewModel() { EventName = EventStatus.PaymentOfTransferEconomicRights.GetDescription(), Counter1 = testSet.PaymentOfTransferEconomicRightsTotalAcceptedRequired, Counter2 = testSet.PaymentOfTransferEconomicRightsTotalRequired, Counter3 = 0 });
 
             }
             return Json(events, JsonRequestBehavior.AllowGet);
