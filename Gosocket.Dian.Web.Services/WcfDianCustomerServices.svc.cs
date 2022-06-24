@@ -101,14 +101,14 @@ namespace Gosocket.Dian.Web.Services
                         {
                             DianResponse response = JsonConvert.DeserializeObject<DianResponse>(previusResult);
                             if (!response.IsValid || response.XmlBase64Bytes == null)
-                                response = customerDianPa.GetStatus(trackId.ToLower());
+                                response = await customerDianPa.GetStatus(trackId.ToLower());
                             Log($"{authCode} {email}", (int)InsightsLogType.Info, "GetStatus(p) " + DateTime.UtcNow.Subtract(start).TotalSeconds);
                             customerDianPa = null;
                             return response;
                         }
                     }
 
-                    var result = customerDianPa.GetStatus(trackId.ToLower());
+                    var result = await customerDianPa.GetStatus(trackId.ToLower());
                     customerDianPa = null;
 
                     if (result.StatusCode == "66")
