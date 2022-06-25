@@ -303,8 +303,8 @@
         });
 
         $('.btn-sync-to-production').click(function () {
-            ConfirmDialogV2("Advertencia",
-                "¿Está seguro que desea sincronizar contribuyente a producción?",
+            ConfirmDialogV2("¿Está seguro que desea sincronizar contribuyente a producción?",
+                "",
                 { confirm: "Aceptar", cancel: "Cancelar" }, () => { syncToProduction(@Model.Nit, @Model.RadianContributorTypeId, @Model.ContributorId); });
 
             @*bootbox.dialog({

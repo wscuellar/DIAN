@@ -37,6 +37,9 @@
         font-weight: normal !important;
         font-size: 75% !important;
     }
+    div#confirmModal #confirmModal-message, div#errorModal #errorModal-message, div#successModal #successModal-message {
+    text-align:center;
+    }
 </style>
 <div id="page-content" data-target="#page-content" data-toggle="panel-overlay" style="padding:0;">
     <div class="row margin-horizontal-0">
@@ -454,8 +457,8 @@
             var habilitationDate = $("#habilitationDate").val();
             var productionDate = $("#productionDate").val();
 
-            ConfirmDialogV2("Advertencia", `<strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong> <br>
-                Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.`,
+            ConfirmDialogV2("Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.", `
+                <span style="text-align:center;">Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<span>`,
                 { confirm: "Aceptar", cancel: "Cancelar" },
                 () => { setProductionDate(habilitationDate, productionDate); });
 

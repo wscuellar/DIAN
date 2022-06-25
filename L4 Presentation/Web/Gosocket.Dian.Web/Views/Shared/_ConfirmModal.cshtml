@@ -76,7 +76,7 @@
             <div class="modal-body flex-direction-column align-items-center justify-content-center">
                 <img height="170" src="~/Content/Images/icon-warning.svg" />
                 <span id="confirmModal-title" class="sub-title">Titulo</span>
-                <p id="confirmModal-message">Mensaje</p>
+                <p id="confirmModal-message"></p>
             </div>
             <div class="modal-footer text-center">
                 <button id="confirmModal-confirm-button" class="btn btn-primary">Confirmar</button>
@@ -94,7 +94,7 @@
                 <img height="170" src="~/Content/Images/icon-warning-warn.svg"/>
                 <div class="dian-alert dian-alert-danger flex-direction-column align-items-center mt-28">
                     <span id="errorModal-title" class="sub-title text-center">Titulo</span>
-                    <p id="errorModal-message" style="word-break: break-all;">Mensaje</p>
+                    <p id="errorModal-message" style="word-break: break-all;"></p>
                 </div>
             </div>
         </div>
@@ -108,7 +108,7 @@
             <div class="modal-body flex-direction-column align-items-center justify-content-center">
                 <img height="170" src="~/Content/Images/icon-check-confirmation.svg" />
                 <span id="successModal-title" class="sub-title text-center">Titulo</span>
-                <p id="successModal-message">Mensaje</p>
+                <p id="successModal-message"></p>
             </div>
         </div>
     </div>
@@ -116,8 +116,8 @@
 
 <script>
     function ConfirmDialogV2(title, message, buttons, confirmCallback, cancelCallback = null) {
-        $("#confirmModal-title").text(title || "Confirmación");
-        $("#confirmModal-message").html(message || "¿Está seguro que desea realizar esta operación?");
+        $("#confirmModal-title").text(title || "¿Está seguro que desea realizar esta operación?");
+        $("#confirmModal-message").html(message || "");
         $("#confirmModal-confirm-button").text(buttons?.confirm ?? "Confimar");
         $("#confirmModal-cancel-button").text(buttons?.cancel ?? "Cancelar");
 
@@ -154,14 +154,14 @@
     }
 
     function ErrorDialogV2(title, message = null) {
-        $("#errorModal-title").text(title || "¡Notificación!");
-        $("#errorModal-message").html(message || '');
+        $("#errorModal-title").text(title || (message || ''));
+        @*$("#errorModal-message").html(message || '');
         if (!message) {
             $("#errorModal-message").hide();
         } else {
             $("#errorModal-message").show();
-        }
-        
+        }*@
+
 
         $("#errorModal").modal("show");
         const modalBackDropLast = $(".modal-backdrop").length - 1;
