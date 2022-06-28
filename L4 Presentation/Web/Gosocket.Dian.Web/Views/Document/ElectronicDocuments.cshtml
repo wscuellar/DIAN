@@ -110,6 +110,16 @@
     <script src="~/Content/js/Radian/RadianIndex.js"></script>
 
     <script>
+        //se agrega esto debido al bug 15772 en donde se identifico, que el usuario al ingresar al sistema e irse a documentos electronicos,
+        //se pintaba las vistas de nomina y doc equivalentes sin haber pasado el set de pruebas como facturador, esto solo para usuarios OFE.
+        $(document).ready(function () {
+            var statusContributorAcceptance = @ViewBag.ContributorAcceptanceStatus;
+            var LoginMenuIs = '@ViewBag.LoginMenu';
+            if (statusContributorAcceptance == 3 && LoginMenuIs == "OFE"){
+                document.getElementById("2").hidden = true;
+                document.getElementById("3").hidden = true;
+            }
+        });
         var operationClick = false;
         function EnabledSupportDocumentForNoOfe() {
             showLoading('#panel-form', 'Cargando', 'Procesando datos, por favor espere.');
