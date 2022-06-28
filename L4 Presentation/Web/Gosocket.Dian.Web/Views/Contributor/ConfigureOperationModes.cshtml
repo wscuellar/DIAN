@@ -62,7 +62,7 @@
                                         <div class="col-sm-12 table-toolbar-left padding-left-0 panel-heading padding-bottom-0" style="max-height:30px;">
                                             <h3 class="panel-title" style="padding:0px;">Datos de empresa y software </h3>
                                         </div>
-                                    </div>                                  
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div id="providers" class="col-sm-3 padding-xs-0" style="display:none;">
@@ -109,18 +109,25 @@
                                 </div>
                                 @if (User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Pending)
                                 {
-                                    <div class="alert custom-alert-danger fade in">
-                                        <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                                        No puede agregar modo de operación si se encuentra pendiente de registro.
+                                    <div class="dian-alert dian-alert-danger">
+                                        <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                                        <p>
+                                            <strong>¡Importante!</strong> <br>
+                                            No puede agregar modo de operación si se encuentra pendiente de registro.
+                                        </p>
                                     </div>
                                 }
                             </div>
                             <div class="panel-footer text-left" style="padding: 0px 20px 20px 20px;">
-                                @if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && !Model.ContributorOperations.Any(c => (c.StatusId == (int)TestSetStatus.InProcess || c.StatusId == (int)TestSetStatus.Rejected) && !c.Deleted))
+                                <button type="button" class="btn btn-success btn-radian-success btn-save @(User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && !Model.ContributorOperations.Any(c => (c.StatusId == (int)TestSetStatus.InProcess || c.StatusId == (int)TestSetStatus.Rejected) && !c.Deleted) ? "" : "disabled")">
+                                    Asociar
+                                </button>                            
+                                @*@if (User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && !Model.ContributorOperations.Any(c => (c.StatusId == (int)TestSetStatus.InProcess || c.StatusId == (int)TestSetStatus.Rejected) && !c.Deleted))
                                 {
-                                    <button type="button" class="btn btn-success btn-radian-success btn-save" style="margin-right:20px;">Adicionar</button>
-                                }
-                                <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-secondary">Volver</a>
+                                    <button type="button" class="btn btn-success btn-radian-success btn-save">
+                                        Asociar
+                                    </button>
+                                }*@
                             </div>
                         }
 
@@ -129,13 +136,14 @@
                     @if (!string.IsNullOrEmpty(Model.TestSetResultRejected.PartitionKey))
                     {
                         @*@Html.AntiForgeryToken()*@
-                        <div class="row padding-10 padding-bottom-0">
-                            <div class="alert custom-alert-danger col-sm-12 margin-bottom-0">
-                                <h4><i class="fa fa-info-circle" aria-hidden"true"=""></i> Importante!</h4>
-                                Usted se encuentra en el proceso de pruebas de validación, su set de pruebas se encuentra <strong style='font-size: 14px; font-weight: bold;'>Rechazado</strong>
-                                <br />
+                        <div class="dian-alert dian-alert-danger mt-12">
+                            <i class="fa fa-info-circle" style="margin-right: 15px;"></i>
+                            <p>
+                                <strong>¡Importante!</strong> <br>
+                                Usted se encuentra en el proceso de pruebas de validación, su set de pruebas se encuentra <strong>Rechazado</strong>.
+                                <br><br>
                                 <button type="button" class="btn custom-btn-danger btn-reset">Reiniciar</button>
-                            </div>
+                            </p>
                         </div>
                     }
 
@@ -144,10 +152,13 @@
                 <div class="row margin-horizontal-0 margin-vertical-30">
                     @Html.Partial("_listOperationModes")
                 </div>
+
+                <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-secondary">Volver</a>
             </div>
         </div>
     </div>
 </div>
+
 
 
 @section scripts
@@ -220,23 +231,11 @@
             }
 
             $('.btn-reset').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'>" +
-                        "<h4 class='text-thin'><strong>Está seguro que desea reiniciar el set de pruebas?</strong></h4>" +
-                        "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes.<br>" +
-                        "Todas las estadísticas de la certificación anterior serán reiniciadas." +
-                        "</div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                resetTestSet()
-                            }
-                        },
-                    }
-                });
+                ConfirmDialogV2("Advertencia", `<strong> ¿Está seguro que desea reiniciar el set de pruebas? </strong> <br>
+                    Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes. <br>
+                    Todas las estadísticas de la certificación anterior serán reiniciadas.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    resetTestSet);
             });
 
             function resetTestSet() {
@@ -263,6 +262,8 @@
             }
 
             $('.btn-save').click(function () {
+                const canAsociateAOperationMode = "@(User.ContributorAcceptanceStatusId() != (int)ContributorStatus.Pending && !Model.ContributorOperations.Any(c => (c.StatusId == (int)TestSetStatus.InProcess || c.StatusId == (int)TestSetStatus.Rejected) && !c.Deleted) ? "yes" : "no")";
+                if (canAsociateAOperationMode == "no") return;
                 var form = $('#add-operation-mode-form');
                 if (form.valid()) {
                     showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
@@ -305,19 +306,9 @@
 
         function removeLine(button) {
             var id = $(button).attr("data-index-contributorOperations")
-            bootbox.dialog({
-                message: "Está seguro que desea eliminar el modo de operación?",
-                title: "Advertencia",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            removeLineAjax(id);
-                        }
-                    },
-                }
-            });
+            ConfirmDialogV2("Advertencia", `Está seguro que desea eliminar el modo de operación`,
+                { confirm: "Aceptar", cancel: "Cancelar" },
+                () => { removeLineAjax(id); });
         }
 
         function removeLineAjax(id) {

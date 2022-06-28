@@ -84,6 +84,7 @@ namespace Gosocket.Dian.Web.Controllers
                     totalMonthAll += (int)total;
                 }
                 model.JsonMonthSumAll += String.Format(CultureInfo.InvariantCulture, "{0:#,#}", totalMonthAll).Replace(",", ".");
+                model.JsonMonthSumAll = !string.IsNullOrWhiteSpace(model.JsonMonthSumAll) ? model.JsonMonthSumAll : "0";
 
                 model.JsonMonthDate = JsonConvert.SerializeObject(arrayMonthDate);
                 model.JsonMonthAll = JsonConvert.SerializeObject(arrayMonthAll);
@@ -128,6 +129,7 @@ namespace Gosocket.Dian.Web.Controllers
                     totalAll += (int)total;
                 }
                 model.JsonSumAll += string.Format(CultureInfo.InvariantCulture, "{0:#,#}", totalAll).Replace(",", ".");
+                model.JsonSumAll = !string.IsNullOrWhiteSpace(model.JsonSumAll) ? model.JsonSumAll : "0";
 
                 model.JsonDate = JsonConvert.SerializeObject(arrayDate);
                 model.JsonAll = JsonConvert.SerializeObject(arrayAll);
@@ -144,6 +146,9 @@ namespace Gosocket.Dian.Web.Controllers
                 model.ContributorAcceptanceStatusId = (int)ContributorStatus.Pending;
                 model.ContributorHabilitationDate = DateTime.UtcNow;
                 model.ContributorProductionDate = DateTime.UtcNow;
+
+                var loginMenu = "OFE";
+                Session["loginMenu"] = loginMenu;
             }
             else
             {
@@ -158,7 +163,7 @@ namespace Gosocket.Dian.Web.Controllers
                         <div class='dian-alert dian-alert-info mb-20'>
                             <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
                             <p>
-                                Estimado contribuyente: <br>
+                                <strong>Estimado contribuyente:</strong> <br>
                                 Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.InProcess)}</strong> <br>
                                 Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
                                 Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
@@ -173,7 +178,7 @@ namespace Gosocket.Dian.Web.Controllers
                         <div class='dian-alert dian-alert-danger mb-20'>
                             <i class='fa fa-info-circle' style='margin-right: 15px;'></i>
                             <p>
-                                Estimado contribuyente <br>
+                                <strong>Estimado contribuyente:</strong> <br>
                                 Su empresa se encuentra en el proceso de pruebas de validación, el set de pruebas se encuentra <strong>{Domain.Common.EnumHelper.GetEnumDescription(TestSetStatus.Rejected)}</strong> <br>
                                 Usted debe proporcionar el identificador del set de pruebas (TestSetId) <strong>{testSetResult.Id}</strong> en el web services para el envío de su set de pruebas. <br>
                                 Para dar seguimiento al proceso haga click <a href='{Url.Action("Tracking", "TestSet", new { contributorCode, contributorTypeId, softwareId })}'>aquí</a>.
@@ -190,11 +195,22 @@ namespace Gosocket.Dian.Web.Controllers
                 var identificatioType = User.IdentificationTypeId();
 
                 var pk = identificatioType + "|" + User.UserCode();
-                var rk = User.UserCode();
+                var rk = contributorCode;
                 var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
-                ViewBag.LoginMenu = auth.LoginMenu;
+                var loginMenu = "";
+                if (auth != null)
+                {
+                    loginMenu = auth.LoginMenu;
+                }
+                else
+                {
+                    auth = dianAuthTableManager.FindPartitionKey<AuthToken>(pk);
+                    loginMenu = auth.LoginMenu;
+                }
 
-                if(auth.LoginMenu == "NO OFE")
+                Session["loginMenu"] = loginMenu;
+
+                if (auth.LoginMenu == "NO OFE")
                 {
                     Session["Login_ContributorType"] = "- No OFE";
                 }

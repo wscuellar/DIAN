@@ -13,9 +13,7 @@
 }
 
 <div class="page-content margin-15">
-    <div class="panel-heading">
-        <h3 class="panel-title">@ViewBag.Title</h3>
-    </div>
+    
     <div class="row margin-horizontal-0">
         <div class="panel padding-20">
 
@@ -65,7 +63,7 @@
                             <a href="@Url.Action("Edit", "TestSet", new { operationModeId = Model.OperationModeId })" class="btn btn-primary btn-hover-gosocket">Editar</a>
                             <a href="@Url.Action("List", "TestSet")" class="btn btn-secondary">Volver</a>
                         }
-                        else if (User.ContributorTypeId() == (int)ContributorType.Biller)
+                        else if (User.ContributorTypeId() == (int)ContributorType.Biller || User.ContributorTypeId() == (int)ContributorType.BillerNoObliged)
                         {
                             <a href="@Url.Action("Tracking", "TestSet", new { contributorCode = ViewBag.ContributorCode, softwareId = ViewBag.SoftwareId, contributorTypeId = User.ContributorTypeId() })" class="btn btn-primary btn-hover-gosocket">Detalles</a>
                             <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = ViewBag.ContributorId })" class="btn btn-secondary">Volver</a>

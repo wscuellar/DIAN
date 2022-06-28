@@ -7,17 +7,17 @@
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel" style="background:transparent;">
             <div class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0" style="padding: 20px;">
                         @using (Html.BeginForm("Edit", "User", FormMethod.Post, new { id = "edit-user-form" }))
                         {
                             @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("View", "User", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
-                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
-                            </div>
+                        <div class="text-left">
+                            <button type="button" class="btn btn-success btn-radian-success btn-save">Guardar</button>
+                            <a href="@Url.Action("View", "User", new { id = Model.Id })" class="btn btn-secondary">Cancelar</a>
+                        </div>
                         }
                     </div>
                 </div>
@@ -97,19 +97,23 @@
 
             var code = $(button).parent().parent().attr("data-code")
 
-            bootbox.dialog({
-                    message: "Está seguro que desea eliminar la relación con la empresa?",
-                    title: "Advertencia",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                removeLineAjax(code);
-                            }
-                        },
-                    }
-                });
+            ConfirmDialogV2("Advertencia",
+                "¿Está seguro que desea eliminar la relación con la empresa?",
+                { confirm: "Aceptar", cancel: "Cancelar" }, () => { removeLineAjax(code); });
+
+            //bootbox.dialog({
+            //        message: "Está seguro que desea eliminar la relación con la empresa?",
+            //        title: "Advertencia",
+            //        buttons: {
+            //            del: {
+            //                label: "Aceptar",
+            //                className: "btn-gosocket",
+            //                callback: function () {
+            //                    removeLineAjax(code);
+            //                }
+            //            },
+            //        }
+            //    });
             
         }
 

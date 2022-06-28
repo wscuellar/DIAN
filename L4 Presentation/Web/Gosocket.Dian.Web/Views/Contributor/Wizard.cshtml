@@ -43,9 +43,9 @@
                                         @Html.Partial("_default")
                                         @Html.Partial("_finished")
                                     </div>
-                                    <div class="panel-footer text-right">
+                                    <div class="text-left">
                                         <a href="@Url.Action("View", "TestSet", new { operationModeId = Model.OperationModeId, contributorId = User.ContributorId(), contributorCode = User.ContributorCode(), softwareId = Model.Software.Id })" class="btn btn-default">Set de Pruebas</a>
-                                        <a href="javascript:void(0)" class="btn btn-default btn-reset-certification">Reiniciar</a>
+                                        <a href="javascript:void(0)" class="btn btn-primary btn-reset-certification">Reiniciar</a>
                                     </div>
                                 </div>
                             }
@@ -79,7 +79,7 @@
 {
     @Scripts.Render("~/bundles/jqueryval")
 
-    <script>
+<script>
         $(document).ready(function ($) {
             disableFields();
             $('.software').css('display', '');
@@ -119,23 +119,29 @@
             }
 
             $('.btn-reset-certification').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'>" +
-                        "<h4 class='text-thin'><strong>Está seguro que desea reiniciar la set de pruebas?</strong></h4>" +
-                        "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes.<br>" +
-                        "Todas las estadísticas de la certificación anterior serán reiniciadas." +
-                        "</div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                resetCertification()
-                            }
-                        },
-                    }
-                });
+                ConfirmDialogV2("Advertencia", `<strong>¿Está seguro que desea reiniciar la set de pruebas?</strong> <br>
+                    Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes. <br>
+                    Todas las estadísticas de la certificación anterior serán reiniciadas.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    resetCertification);
+
+                //bootbox.dialog({
+                //    title: "Advertencia",
+                //    message: "<div class='media'><div class='media-body'>" +
+                //        "<h4 class='text-thin'><strong>Está seguro que desea reiniciar la set de pruebas?</strong></h4>" +
+                //        "Al realizar esta acción deberá enviar otro set de pruebas con documentos diferentes.<br>" +
+                //        "Todas las estadísticas de la certificación anterior serán reiniciadas." +
+                //        "</div></div>",
+                //    buttons: {
+                //        del: {
+                //            label: "Aceptar",
+                //            className: "btn-gosocket",
+                //            callback: function () {
+                //                resetCertification()
+                //            }
+                //        },
+                //    }
+                //});
             });
         });
 
@@ -175,5 +181,5 @@
                 form.submit();
             }
         });
-    </script>
+</script>
 }

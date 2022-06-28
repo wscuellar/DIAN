@@ -41,7 +41,12 @@
                                 var hasOwnSoftwareEnabled = Model.ContributorOperations.Any(x => x.OperationModeId == (int)OperationMode.Own & x.Software?.AcceptanceStatusSoftwareId == (int)SoftwareStatus.Production);
                             }
 
-                            @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
+                            @if (!User.IsInAnyRole("Administrador", "Super") && ConfigurationManager.GetValue("Environment") != "Prod")
+                            {
+                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-success btn-radian-success">Configurar modos de operación</a>
+                            }
+
+                            @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local" || ConfigurationManager.GetValue("Environment") == "Test") && Model.AcceptanceStatusId == (int)ContributorStatus.Enabled && !User.IsInRole("Administrador"))
                             {
                                 <button type="button" data-id="@Model.Id" class="btn btn-secondary btn-sync-to-production">@ConfigurationManager.GetValue("SyncToProdGloss")</button>
                             }
@@ -53,11 +58,6 @@
                             @if (User.IsInAnyRole("Administrador", "Super"))
                             {
                                 <a href="@Url.Action("List", "Contributor", new { type = Model.ContributorTypeId })" class="btn btn-secondary">Volver</a>
-                            }
-
-                            @if (!User.IsInAnyRole("Administrador", "Super") && ConfigurationManager.GetValue("Environment") != "Prod")
-                            {
-                                <a href="@Url.Action("ConfigureOperationModes", "Contributor", new { id = Model.Id})" class="btn btn-success btn-radian-success">Configurar modos de operación</a>
                             }
 
                             @if (User.IsInRole("Administrador") || User.IsInRole("Super"))
@@ -112,7 +112,12 @@
             }
 
             $('.btn-set-to-provider').click(function () {
-                bootbox.dialog({
+                ConfirmDialogV2("<strong>¿Está seguro que desea operar como proveedor?</strong>", `
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => { setToProvider(@Model.Id) });
+
+                @*bootbox.dialog({
                     title: "Advertencia",
                     message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea operar como proveedor?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
                     buttons: {
@@ -124,11 +129,15 @@
                             }
                         },
                     }
-                });
+                });*@
             });
 
             $('.btn-sync-to-production').click(function () {
-                bootbox.dialog({
+                ConfirmDialogV2("<strong>¿Está seguro que desea sincronizar contribuyente a producción?</strong>",
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => { syncToProduction(@Model.Id) });
+
+                @*bootbox.dialog({
                     title: "Advertencia",
                     message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea sincronizar contribuyente a producción?</strong></h4></div></div>",
                     buttons: {
@@ -140,7 +149,7 @@
                             }
                         },
                     }
-                });
+                });*@
             });
         });
 

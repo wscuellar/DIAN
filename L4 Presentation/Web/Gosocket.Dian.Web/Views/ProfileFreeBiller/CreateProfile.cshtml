@@ -104,9 +104,9 @@
 
                                                     </div>
 
-                                                    <div class="panel-footer-grey text-right submit-container">
-                                                        <button id="btnCancel" type="button" class="btn btn-success btn-radian-default">Cancelar</button>
+                                                    <div class="text-left submit-container">
                                                         <button id="btnSend" type="submit" class="btn btn-success btn-radian-success">Crear Perfil</button>
+                                                        <button id="btnCancel" type="button" class="btn btn-secondary btn-radian-default">Cancelar</button>
                                                     </div>
 
                                                 </div>
@@ -171,6 +171,7 @@
                     showConfirmation(confirmMessage, buttons, clName, operationCancel)
                 }
                 createUser(url, 'POST', data, actionError, actionSuccess)
+                $('#dian-loading').hide()
             });
 
         });

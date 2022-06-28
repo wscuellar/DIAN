@@ -53,6 +53,7 @@
     "RegisterCompletedPayrollCosmosUrl": "http://localhost:7071/api/RegisterCompletedPayrollCosmos",
     "SendEmailFunction": "https://gtpa-biller-functions-test-utnxse.azurewebsites.net/api/SendEmailFunction?code=mLenfEfv7baUR9ad3igwXxlXSpLqX7DxpV1KEF53BBieiwwUQSNfyg==",
     "InsertNotification": "https://gtpa-biller-functions-test-utnxse.azurewebsites.net/api/InsertNotificationsFunction?code=aLaI056aRttSiDDwhgCCmIGMAXj3k/RQB7KFHKwhnfVk21hASSMPDw==",
+    "InsertNotificationProd": "https://gtpa-biller-functions-test-utnxse.azurewebsites.net/api/InsertNotificationsFunction?code=aLaI056aRttSiDDwhgCCmIGMAXj3k/RQB7KFHKwhnfVk21hASSMPDw==",
     "LogNotification": "https://gtpa-biller-functions-test-utnxse.azurewebsites.net/api/LogNotificationsFunction?code=L2YDFxKFGUtNXVOREqPOf8Qomvfee4xBaRytFDSGSQzfV0GSZKe53g==",
     "AccountByNit": " https://gtpa-biller-functions-test-uat-utnxse.azurewebsites.net/api/AccountByNit?code=NMo3/4NXT54JPXDdpb2ra0s0bQWf0Kjkj0ZTCn4n5x3U8wdOtFYxIg=="
 

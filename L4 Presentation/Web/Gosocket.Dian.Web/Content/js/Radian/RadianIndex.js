@@ -94,26 +94,42 @@ function CallExecutionWithData(callMethod, url, jsonvalue, method, showMessage, 
 
 
 function showConfirmation(confirmMessage, buttons, className, operationCancel) {
-    bootbox.dialog({
-        className: className && className,
-        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
-        buttons: buttons,
-        onEscape: () => {
-            operationCancel ? operationCancel() : window.location.reload();
-        }
-    });
+    if (!buttons) {
+        SuccessDialogV2Callback(confirmMessage, "", operationCancel);
+        return;
+    }
+
+    if (Object.keys(buttons).length <= 1) {
+        ErrorDialogV2Callback("", confirmMessage, operationCancel);
+        return;
+    }
+    
+    ConfirmDialogV2(confirmMessage, " ",
+        { confirm: buttons.del.label, cancel: buttons.del1.label },
+        buttons.del.callback, buttons.del1.callback);
+
+    //bootbox.dialog({
+    //    className: className && className,
+    //    message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4></div></div>",
+    //    buttons: buttons,
+    //    onEscape: () => {
+    //        operationCancel ? operationCancel() : window.location.reload();
+    //    }
+    //});
 
 }
 
-function showConfirmationComplement(confirmMessage, buttons, className, operationCancel, complement){
-    bootbox.dialog({
-        className: className && className,
-        message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4> <p class='text-center subtitle-modal'>" + complement + "</p></div></div>",
-        buttons: buttons,
-        onEscape: () => {
-            operationCancel ? operationCancel() : window.location.reload();
-        }
-    });
+function showConfirmationComplement(confirmMessage, buttons, className, operationCancel, complement) {
+    showConfirmation(`${confirmMessage} <br> ${complement}`, buttons, className, operationCancel);
+
+    //bootbox.dialog({
+    //    className: className && className,
+    //    message: "<div class='media'><div class='media-body'>" + "<h4 class='text-thin'>" + confirmMessage + "</h4> <p class='text-center subtitle-modal'>" + complement + "</p></div></div>",
+    //    buttons: buttons,
+    //    onEscape: () => {
+    //        operationCancel ? operationCancel() : window.location.reload();
+    //    }
+    //});
 }
 
 function ConfirmExec(operation, param, operationCancel) {

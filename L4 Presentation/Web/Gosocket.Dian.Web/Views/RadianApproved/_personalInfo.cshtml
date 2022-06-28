@@ -24,10 +24,9 @@
 @if (Request.Params["RadianOperationMode"] != "2")
 {
     <div class="row radian-subtitle-container">
-        <p class="subtitle-view">
+        <p class="subtitle-view" style="padding: 8px 0px 20px 8px;">
             @ViewBag.title
-        </p>
-        <div class="radian-subtitle-line"></div>
+        </p>       
     </div>
 }
 <div class="row radian-personal-info">
@@ -77,9 +76,9 @@
     @if ((ConfigurationManager.GetValue("Environment") == "Hab" || ConfigurationManager.GetValue("Environment") == "Local") && Model.RadianState == "Habilitado" && !User.IsInRole("Administrador") && ConfigurationManager.GetValue("BotonSincronizar") == "true")
         {
             <div id="panel" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
-                <div class="panel-body text-right">
+                <div class="text-left">
                     <div class="col-md-3 col-md-offset-9">
-                        <button type="button" class="btn btn-default btn-sync-to-production">Sincronizar a Producción</button>
+                        <button type="button" class="btn btn-secondary btn-sync-to-production">Sincronizar a Producción</button>
                     </div>
                 </div>
             </div>

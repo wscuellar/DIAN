@@ -12,7 +12,7 @@
     <link href="~/Content/plugins/chosen/chosen.min.css" rel="stylesheet">
     <style type="text/css">
         .modal-body .close, .modal-header .close {
-            background-color: #348441 !important;
+            background-color: none !important;
         }
 
         .btnCloseOtherDocument {
@@ -111,9 +111,7 @@
         @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
-                        onEscape: () => {  }});
+                ErrorDialogV2("¡Notificación!", "@message");
             </text>
         }
 
@@ -171,33 +169,33 @@
 							if (ContributorIdType == 1 || ContributorIdType == 2) {
                                 hideLoading('#panel-form');
                               //  $("#dialogModeOperation").modal('show');
+                                setTimeout(() => {
+								    CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModelEmisor,
+                                        function (param) {
+                                            // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
+										    if (ContributorIdType == 1 || ContributorIdType == 2)
+                                            {
+                                                hideLoading('#panel-form');
 
-								CallExecution("POST", '@Url.Action("Validation", "OthersElectronicDocuments")', ValidacionOtherElectronicDocumentsViewModelEmisor,
-                                    function (param) {
-                                        // ContributorIdType == 2 es Proveedor Tecnólogico, no aplica mostrar el combo de selección.
-										if (ContributorIdType == 1 || ContributorIdType == 2)
-                                        {
-                                            hideLoading('#panel-form');
+                                               var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
+                                                + `?ElectronicDocumentId=${electronicDocumentId}`
+                                                + "&OperationModeId=0"
+                                                + "&ContributorIdType=" + ContributorIdType
+                                                + "&ContributorId=" + @ViewBag.ContributorId;
 
-                                           var url = "@Url.Action("AddOrUpdate", "OthersElectronicDocuments")"
-                                            + `?ElectronicDocumentId=${electronicDocumentId}`
-                                            + "&OperationModeId=0"
-                                            + "&ContributorIdType=" + ContributorIdType
-                                            + "&ContributorId=" + @ViewBag.ContributorId;
+                                                window.location.href = url;
 
-                                            window.location.href = url;
+                                              //  $("#dialogModeOperation").modal('show');
 
-                                          //  $("#dialogModeOperation").modal('show');
-
-                                        }
-                                        //else {
-                                        //    // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".
-                                        //    $("#OperationMode").val(1);
-                                        //    $("#btnOperationMode").trigger('click');
-                                        //}
-                                     }, true, () => hideLoading('#panel-form')
-                                );
-
+                                            }
+                                            //else {
+                                            //    // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".
+                                            //    $("#OperationMode").val(1);
+                                            //    $("#btnOperationMode").trigger('click');
+                                            //}
+                                         }, true, () => hideLoading('#panel-form')
+                                    );
+                                }, 500)
                             }
                             //else {
                             //    // Cuando es Proveedor Tecnólogico se asume por defecto 1="Software Propio".

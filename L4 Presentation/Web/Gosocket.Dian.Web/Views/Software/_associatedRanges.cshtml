@@ -9,10 +9,10 @@
                 <th>Proveedor</th>
                 <th>Software</th>
                 <th>Código del Software</th>
-                <th class="text-center">Prefijo Asociado</th>
-                <th class="text-center">Fecha Asociación</th>
-                <th class="text-center">Fecha Expiración</th>
-                <th class="text-center"></th>
+                <th class="text-left">Prefijo Asociado</th>
+                <th class="text-left">Fecha Asociación</th>
+                <th class="text-left">Fecha Expiración</th>
+                <th class="text-left"></th>
             </tr>
         </thead>
         <tbody>
@@ -43,14 +43,14 @@
                     <td class="largeText iffyTip"><a>@r.SoftwareOwner</a></td>
                     <td class="largeText iffyTip"><a>@r.SoftwareName</a></td>
                     <td class="largeText iffyTip"><a>@r.SoftwareId</a></td>
-                    <td class="text-center smallText iffyTip"><a>@r.Serie</a></td>
-                    <td class="text-center smallText iffyTip"><a>@r.AssociationDate</a></td>
-                    <td class="text-center">
+                    <td class="text-left smallText iffyTip"><a>@r.Serie</a></td>
+                    <td class="text-left smallText iffyTip"><a>@r.AssociationDate</a></td>
+                    <td class="text-left">
                         <a class="label label-table @expireDateLabel add-tooltip" data-placement="top" data-original-title="@expireDateTooltipTitle">@r.ExpirationDate</a>
                     </td>
-                    <td class="text-center">
-                        <button class="btn btn-secondary">
-                            <i href="javascript:void(0)" class="text-center" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></i>
+                    <td class="text-left">
+                        <button class="btn btn-xs">
+                            <i href="javascript:void(0)" class="text-left" data-pk="@r.PartitionKey" data-rk="@r.RowKey" onclick="removeRangeAssociationAlert(this)"> <i class="fa fa-trash add-tooltip" data-original-title="Eliminar asociación"></i></i>
                         </button>
                             
                     </td>

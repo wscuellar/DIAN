@@ -18,10 +18,10 @@
                         @using (Html.BeginForm("Add", "RadianTestSet", FormMethod.Post, new { id = "add-testset-form" }))
                         {
                             @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-default btn-radian-default">Volver</a>
-                                <button type="submit" class="btn btn-success btn-radian-success">Guardar</button>
-                            </div>
+                        <div class="text-left">
+                            <button type="submit" class="btn btn-primary btn-success btn-radian-success">Guardar</button>
+                            <a href="@Url.Action("Index", "RadianTestSet")" class="btn btn-secondary btn-radian-default">Volver</a>
+                        </div>
                         }
                     </div>
                 </div>

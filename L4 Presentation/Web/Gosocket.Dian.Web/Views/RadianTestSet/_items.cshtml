@@ -4,12 +4,12 @@
     var htmlPartial = JsonConvert.SerializeObject(Html.Partial("_detailsTestSet").ToString());
 }
 <div class="table-responsive">
-    <table class="documents-table text-center table table-striped table-hover align-middle margin-bottom-0" data-int="0">
+    <table class="simple-table documents-table table table-striped table-hover align-middle margin-bottom-0" data-int="0">
         @if (Model.RadianTestSets.Count == 0)
         {
             <tr style="background-color: transparent !important;">
                 <td class="text-nowrap text-center" colspan="12" style="padding-left: 0 !important; padding-right: 0 !important;">
-                    <div class="alert panel-footer-grey">
+                    <div class="alert dataTables_empty">
                         Ningún set de pruebas disponible para mostrar.
                     </div>
                 </td>
@@ -35,7 +35,7 @@
                     <td class="text-nowrap"><a>@set.OperationModeName</a></td>
                     <td class="text-nowrap"><a>@set.Description</a></td>
                     <td class="text-nowrap"><a>@set.TotalDocumentRequired</a></td>
-                    <td class="text-nowrap"><a class="btn btn-link text-underline" href="javascript:showDetails(@htmlPartial, '@set.OperationModeName', '@Url.Action("GetTestSetSummary","RadianTestSet")');">Ver</a></td>
+                    <td class="text-nowrap"><a class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Ver" href="javascript:showDetails(@htmlPartial, '@set.OperationModeName', '@Url.Action("GetTestSetSummary","RadianTestSet")');"><i class="fa fa-eye"></i></a></td>
                     <td class="text-nowrap">
                         @{
                             var text_color = set.Active ? "text-gosocket" : "text-red";

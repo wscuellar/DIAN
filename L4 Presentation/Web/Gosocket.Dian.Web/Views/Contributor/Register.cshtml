@@ -24,8 +24,8 @@
                             </div>
                             if (Model.AcceptanceStatusId == (int)ContributorStatus.Pending)
                             {
-                                <div class="panel-footer text-right">
-                                    <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Registrar</button>
+                                <div class="text-left">
+                                    <button type="button" class="btn btn-primary btn-hover-gosocket btn-save" style="padding: 20px 20px 20px 20px;">Registrar</button>
                                 </div>
                             }
                         }
@@ -47,21 +47,14 @@
             $('#Email').attr('readonly', true);
 
             $('.btn-save').click(function () {
-                bootbox.dialog({
-                    title: "Advertencia",
-                    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea registrase como facturador?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
-                    buttons: {
-                        del: {
-                            label: "Aceptar",
-                            className: "btn-gosocket",
-                            callback: function () {
-                                var form = $('#register-contributor-form');
-                                showLoading('#panel-form', 'Registrando', 'Procesando datos, por favor espere.');
-                                form.submit();
-                            }
-                        },
-                    }
-                });
+                ConfirmDialogV2("¿Está seguro que desea registrase como facturador?", `
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                    { confirm: "Aceptar", cancel: "Cancelar" },
+                    () => {
+                        var form = $('#register-contributor-form');
+                        showLoading('#panel-form', 'Registrando', 'Procesando datos, por favor espere.');
+                        form.submit();
+                    });
             });
         });
     </script>

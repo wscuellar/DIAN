@@ -4,32 +4,69 @@
 @using Gosocket.Dian.Infrastructure
 
 @{
-    ViewBag.Title = "Inicio";
+    ViewBag.Title = !User.IsInAnyRole("Administrador", "Super") ? "Inicio" : "Tablero";
 }
+<style>
+    .modal-header:after {
+    border:none !important;
+    }
+    .modal-content {
+    padding:0px 20px;
+    }
+    .modal-body {
+    padding:0px 0px 0px 10px;
+    }
 
-<div id="page-content" data-target="#page-content" data-toggle="panel-overlay" class="page-content margin-15">
+    .panel-chart {
+        width: calc(50% - 12px);
+        background: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        display: inline-block;
+        margin-bottom: 16px;
+    }
+    .panel-chart:nth-child(even) {
+        margin-left: 16px !important;
+    }
+    .panel-chart .sub-title {
+        font-size: 18px !important;
+        display: flex;
+        justify-content: space-between;
+    }
+    .panel-chart .sub-title small {
+        font-weight: normal !important;
+        font-size: 75% !important;
+    }
+    div#confirmModal #confirmModal-message, div#errorModal #errorModal-message, div#successModal #successModal-message {
+    text-align:center;
+    }
+</style>
+<div id="page-content" data-target="#page-content" data-toggle="panel-overlay" style="padding:0;">
     <div class="row margin-horizontal-0">
 
         <div class="">
-            <div class="panel-body">
+            <div class="">
                 <div class="row margin-horizontal-0">
                     @if (User.IsInAnyRole("Administrador", "Super"))
                     {
-                        <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dia margin-bottom-0  ">
-                            <div class="panel-body padding-0 padding-bottom-0">
-                                <div class="row">
-                                    <div id="contributor-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-                                    <div id="global-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-                                    <div id="global-monthly-stats-chart" class="col-sm-4 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-
-                                </div>
-                                <div class="row padding-top-30">
-                                    <div id="global-daily-stats-chart" class="col-sm-12 padding-xs-0" style="height:320px; margin: 0 auto"></div>
-
-                                </div>
-                            </div>
+                        <div class="panel-chart">
+                            <p class="sub-title">Resumen general de contribuyentes por estado <small>Total contribuyentes: <strong>@Model.TotalContributors</strong></small></p>
+                            <div id="contributor-stats-chart" style="height:320px; margin: 0 auto"></div>
+                        </div>
+                        <div class="panel-chart">
+                            <p class="sub-title">Resumen general de documentos recibidos <small>Total documentos: <strong>@Model.GlobalTotal</strong></small></p>
+                            <div id="global-stats-chart" style="height:320px; margin: 0 auto"></div>
+                        </div>
+                        <div class="panel-chart">
+                            <p class="sub-title">Resumen de documentos recibidos diariamente <small>Total: <strong>@Model.JsonSumAll</strong></small></p>
+                            <div id="global-daily-stats-chart" style="height:320px; margin: 0 auto"></div>
+                        </div>
+                        <div class="panel-chart">
+                            <p class="sub-title">Resumen de documentos recibidos mensualmente <small>Total: <strong>@Model.JsonMonthSumAll</strong></small></p>
+                            <div id="global-monthly-stats-chart" style="height:320px; margin: 0 auto"></div>
                         </div>
                     }
+
                     @if (!string.IsNullOrEmpty(Model.ContributorTestSetMessageInfo))
                     {
                         @Html.Raw(Model.ContributorTestSetMessageInfo)
@@ -146,24 +183,24 @@
                         type: 'pie'
                     },
                     title: {
-                        text: 'Resumen general de documentos recibidos'
+                        text: ''
                     },
                      subtitle: {
-                         text: 'Existen un total de : ' + '<span style="font-weight: bold">@Model.GlobalTotal</span>' +' documentos'
+                         text: ''
                      },
                     tooltip: {
                         pointFormat: '<b>{point.name}</b>:{point.y}'
                     },
-                    colors: ['#348441', '#D7B707', '#DC2D08'],
+                    colors: ['#41D78C', '#FED064', '#F54E41'],
                     plotOptions: {
                         pie: {
                             allowPointSelect: true,
                             cursor: 'pointer',
                             dataLabels: {
-                                enabled: true,
+                                enabled: false,
                                 format: '<b>{point.name}</b>:{point.y}',
                                 style: {
-                                    color: ['#348441', '#D7B707', '#DC2D08']
+                                    color: ['#41D78C', '#FED064', '#F54E41']
                                 }
                             }
                         }
@@ -180,184 +217,202 @@
                             y: @Model.GlobalTotalRejected,
                         }],
                         showInLegend: true
-                    }]
+                    }],
+                    legend: {
+                        symbolRadius: 0,
+                    },
                 });
 
-            //Contributor Stats Chart
-             Highcharts.chart('contributor-stats-chart', {
-                credits: {
-                    enabled: false
-                },
-                navigation: {
-                    buttonOptions: {
+                //Contributor Stats Chart
+                 Highcharts.chart('contributor-stats-chart', {
+                    credits: {
                         enabled: false
-                    }
-                },
-                chart: {
-                    plotBackgroundColor: null,
-                    plotBorderWidth: null,
-                    plotShadow: false,
-                    type: 'pie'
-                },
-                title: {
-                    text: 'Resumen general de contribuyentes por estado'
-                 },
-                 subtitle: {
-                     text: 'Existen un total de : ' + '<span style="font-weight: bold"> @Model.TotalContributors </span>'+' contribuyentes'
-                 },
-                tooltip: {
-                    pointFormat: '<b>{point.name}</b>:{point.y}'
-                },
-                 colors: ['#D7B707', '#0778D7', '#348441'],
-                plotOptions: {
-                    pie: {
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true,
-                            format: '<b>{point.name}</b>:{point.y}',
-                            style: {
-                                color: ['#D7B707', '#0778D7', '#348441']
+                    },
+                    navigation: {
+                        buttonOptions: {
+                            enabled: false
+                        }
+                    },
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: ''
+                     },
+                     subtitle: {
+                         text: ''
+                     },
+                    tooltip: {
+                        pointFormat: '<b>{point.name}</b>:{point.y}'
+                    },
+                     colors: ['#FED064', '#1DB4DC', '#41D78C'],
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: false,
+                                format: '<b>{point.name}</b>:{point.y}',
+                                style: {
+                                    color: ['#FED064', '#1DB4DC', '#41D78C']
+                                }
                             }
                         }
-                    }
-                },
-                series: [{
-                    data: [{
-                            name: 'Pendientes',
-                        y: @Model.PendingContributors,
-                    }, {
-                            name: 'Registrados',
-                        y: @Model.RegisteredContributors,
-                    }, {
-                            name: 'Habilitados',
-                        y: @Model.EnabledContributors,
-                    }],
-                    showInLegend: true
-                }]
-            });
+                    },
+                    series: [{
+                        data: [
+                            {
+                                name: 'Pendientes',
+                                y: @Model.PendingContributors,
+                            },
+                            {
+                                name: 'Registrados',
+                                y: @Model.RegisteredContributors,
+                            },
+                            {
+                                name: 'Habilitados',
+                                y: @Model.EnabledContributors,
+                            },
+                        ],
+                        showInLegend: true
+                     }],
+                     legend: {
+                         symbolRadius: 0,
+                     }
+                });
 
-            //Global Monthly Stats Chart
-             Highcharts.chart('global-monthly-stats-chart', {
-                credits: {
-                   enabled: false
-                },
-                navigation: {
-                   buttonOptions: {
-                        enabled: false
-                    }
-                },
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Resumen de documentos recibidos mensualmente'
-                },
-                subtitle: {
-                    text: 'En los últimos cuatro meses existen un total de '  + '<span style="font-weight: bold">@Model.JsonMonthSumAll</span>'+' documento.'
-                },
-                xAxis: {
-                    categories:@Html.Raw(@Model.JsonMonthDate),
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
+                //Global Monthly Stats Chart
+                 Highcharts.chart('global-monthly-stats-chart', {
+                    credits: {
+                       enabled: false
+                    },
+                    navigation: {
+                       buttonOptions: {
+                            enabled: false
+                        }
+                    },
+                    chart: {
+                        type: 'column'
+                    },
                     title: {
                         text: ''
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                        '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
-                },
-                plotOptions: {
-                    column: {
-                        pointPadding: 0.2,
-                        borderWidth: 0
-                    }
-                }, colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories:@Html.Raw(@Model.JsonMonthDate),
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                            '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                        footerFormat: '</table>',
+                        shared: true,
+                        useHTML: true
+                    },
+                    plotOptions: {
+                        column: {
+                            pointPadding: 0.2,
+                            borderWidth: 0
+                        }
+                    },
+                     colors: ['#1DB4DC', '#41D78C', '#FED064', '#F54E41'],
+                    series: [
+                        {
+                            name: 'Total',
+                            data: @Model.JsonMonthAll,
+                        },
+                        {
+                            name: 'Aceptados',
+                            data: @Model.JsonMonthAccepted,
+                        },
+                        {
+                            name: 'Con notificaciones',
+                            data: @Model.JsonMonthNotification,
+                        },
+                        {
+                            name: 'Rechazados',
+                            data: @Model.JsonMonthRejected,
+                        }
+                    ],
+                     legend: {
+                         symbolRadius: 0,
+                     }
+                });
 
-                series: [{
-                    name: 'Total',
-                    data: @Model.JsonMonthAll,
-
-                }, {
-                    name: 'Aceptados',
-                    data: @Model.JsonMonthAccepted,
-
-                }, {
-                    name: 'Con notificaciones',
-                    data: @Model.JsonMonthNotification,
-
-                }, {
-                    name: 'Rechazados',
-                    data: @Model.JsonMonthRejected,
-
-                }]
-            });
-
-            //Global Daily Stats Chart
-             Highcharts.chart('global-daily-stats-chart', {
-                credits: {
-                   enabled: false
-                },
-                navigation: {
-                   buttonOptions: {
-                        enabled: false
-                    }
-                },
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Resumen de documentos recibidos diariamente'
-                },
-                subtitle: {
-                    text: 'En los últimos catorce dias existen un total de ' +'<span style="font-weight: bold">@Model.JsonSumAll</span>'+' recibidos'
-                },
-                xAxis: {
-                    categories:@Html.Raw(@Model.JsonDate),
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
+                //Global Daily Stats Chart
+                 Highcharts.chart('global-daily-stats-chart', {
+                    credits: {
+                       enabled: false
+                    },
+                    navigation: {
+                       buttonOptions: {
+                            enabled: false
+                        }
+                    },
+                    chart: {
+                        type: 'column'
+                    },
                     title: {
                         text: ''
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                        '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
-                },
-                plotOptions: {
-                    column: {
-                        pointPadding: 0.2,
-                        //borderWidth: 0
-                    }
-                }, colors: ['#0778D7', '#348441', '#D7B707', '#DC2D08'],
-                series: [{
-                    name: 'Total',
-                    data: @Model.JsonAll,
-                }, {
-                    name: 'Aceptados',
-                    data: @Model.JsonAccepted,
-                }, {
-                    name: 'Con notificaciones',
-                    data: @Model.JsonNotification,
+                    },
+                    subtitle: {
+                        text: ''
+                    },
+                    xAxis: {
+                        categories:@Html.Raw(@Model.JsonDate),
+                        crosshair: true
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                            '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+                        footerFormat: '</table>',
+                        shared: true,
+                        useHTML: true
+                    },
+                    plotOptions: {
+                        column: {
+                            pointPadding: 0.2,
+                            //borderWidth: 0
+                        }
+                     },
+                     colors: ['#1DB4DC', '#41D78C', '#FED064', '#F54E41'],
+                    series: [{
+                        name: 'Total',
+                        data: @Model.JsonAll,
+                    }, {
+                        name: 'Aceptados',
+                        data: @Model.JsonAccepted,
+                    }, {
+                        name: 'Con notificaciones',
+                        data: @Model.JsonNotification,
 
-                }, {
-                    name: 'Rechazados',
-                    data: @Model.JsonRejected,
-                }]
-            });
+                    }, {
+                        name: 'Rechazados',
+                        data: @Model.JsonRejected,
+                         }],
+                     legend: {
+                         symbolRadius: 0,
+                     }
+                });
 
                 </Text>
             }
@@ -365,20 +420,20 @@
 
         function showRegisterProductionDateModal() {
             bootbox.dialog({
-                title: "Registrar fecha de inicio salida a producción",
+                title: "<h4 class='sub-title padding-0'><strong>Registrar fecha de inicio salida a producción</strong></h4>",
                 message: "<div class='row'>" +
                             "<div class= 'col-md-12'>" +
                                 "<form class= 'form-horizontal' >" +
-                                    "<div class='form-group'>" +
-                                        "<label class='col-md-4 control-label' for='name'>Habilitación</label>" +
-                                        "<div class='col-md-4'>" +
+                                    "<div>" + 
+                    "<div class='col-md-11' style='padding: 0px 0px 0px 10px;'>" +
+                    "<label class='col-md-4 control-label' for='name'>Habilitación</label>" +
                                             "<input id='habilitationDate' name='habilitationDate' type='text' value='@Model.ContributorHabilitationDate.Value.ToString("dd-MM-yyyy")' class='form-control input-md' readonly>" +
                                                 "<span class='help-block'><small>Fecha de habilitación</small></span>" +
                                         "</div>" +
                                     "</div>" +
-                                    "<div class='form-group'>" +
-                                        "<label class='col-md-4 control-label' for='name'>Producción</label>" +
-                                        "<div class='col-md-4'>" +
+                                    "<div>" +                                        
+                    "<div class='col-md-11' style='padding: 0px 0px 0px 10px;'>" +
+                    "<label class='col-md-4 control-label' for='name'>Producción</label>" +
                                             "<input id='productionDate' name='productionDate' type='text' value='@DateTime.UtcNow.ToString("dd-MM-yyyy")' class='form-control input-md'>" +
                                             "<span class='help-block'><small>Fecha inicio real producción</small></span>" +
                                         "</div>" +
@@ -389,7 +444,7 @@
                 buttons: {
                     del: {
                         label: "Aceptar",
-                        className: "btn-gosocket",
+                        className: "btn btn-success btn-radian-success",
                         callback: function () {
                             showConfirmSetProductionDate();
                         }
@@ -401,22 +456,29 @@
         function showConfirmSetProductionDate() {
             var habilitationDate = $("#habilitationDate").val();
             var productionDate = $("#productionDate").val();
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body'>" +
-                    "<h4 class='text-thin'><strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong></h4>" +
-                    "Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<br>" +
-                    "</div></div>",
-                title: "Advertencia",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            setProductionDate(habilitationDate, productionDate);
-                        }
-                    },
-                }
-            });
+
+            ConfirmDialogV2("Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.", `
+                <span style="text-align:center;">Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<span>`,
+                { confirm: "Aceptar", cancel: "Cancelar" },
+                () => { setProductionDate(habilitationDate, productionDate); });
+
+            //bootbox.dialog({
+            //    message: "<div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div>" +
+            //        "<div class='media'><div style='padding: 10px 80px 20px 80px;'>" +
+            //        "<h4 class='title' style='font-size:21px !important;line-height:24px !important;text-align:center !important;margin-bottom: 20px !important;'><strong>Responsabilidad “52-Facturador Electrónico” en el RUT será actualizada con la fecha registrada.</strong></h4>" +
+            //        "Esta fecha no se puede modificar posteriormente, ya que con esta fecha se realiza la actualización de la responsabilidad “52-Facturador Electrónico” en el RUT.<br>" +
+            //        "</div></div>",
+            //    title: "<h4 class='sub-title padding-0'><strong>Advertencia</strong></h4>",
+            //    buttons: {
+            //        del: {
+            //            label: "Aceptar",
+            //            className: "btn btn-success btn-radian-success",
+            //            callback: function () {
+            //                setProductionDate(habilitationDate, productionDate);
+            //            }
+            //        },
+            //    }
+            //});
         }
 
         function setProductionDate(habilitationDate, productionDate) {

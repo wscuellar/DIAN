@@ -4,18 +4,24 @@
     ViewBag.Title = "Representante legal";
 }
 
+
+<style>
+    .panel-body {
+        padding: 25px 2px !important;
+    }
+</style>
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel">
+        <div class="panel" style="background:transparent;">
 
             <div id="panel-body" data-target="#panel-body" data-toggle="panel-overlay" class="panel-body padding-top-20">
                 <div class="row margin-horizontal-0">
-                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0">
+                    <div id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" class="panel panel-bordered-dian margin-bottom-0" style="padding: 20px;">
                         @Html.Partial("_form")
-                        <div class="panel-footer text-right">
-                            <a href="@Url.Action("List", "User")" class="btn btn-default">Volver</a>
-                            <a href="@Url.Action("Edit", "User", new { id = Model.Id })" class="btn btn-default btn-hover-gosocket">Editar</a>
-                        </div>
+                        <div class="text-left">
+                            <a href="@Url.Action("Edit", "User", new { id = Model.Id })" class="btn btn-success btn-radian-success">Editar</a>
+                            <a href="@Url.Action("List", "User")" class="btn btn-secondary">Volver</a>
+                            </div>
                     </div>
                 </div>
                 @if (Model.Contributors.Count > 0)

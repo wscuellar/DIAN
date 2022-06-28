@@ -61,7 +61,7 @@
                 Nómina electrónica
             </button>
         }
-        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 && ViewBag.ContributorAcceptanceStatus == 4)
+        else if (ViewBag.LoginMenu == "OFE" && ViewBag.ContributorTypeIde == 1 || ViewBag.ContributorTypeIde == 2  && ViewBag.ContributorAcceptanceStatus == 4)
         {
             <button class="hab-menu-button" onclick="window.location.href='@Url.Action("Index", "OthersElectronicDocuments")'" contributorType="2" operationMode="1" id="2">
                 <img src="~/Content/img/electronic-document-icons/nomina-electronica-icon.svg" height="130" />
@@ -117,20 +117,6 @@
                 operationClick = true;
 
                 var electronicDocumentId = 3;
-
-
-                // Se redirige automaticamente ya que para el documento de soporte no es necesario lanzar la confirmacion del usuario
-                @*var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
-                    window.location.href = url;
-                    return;*@
-
-
-
-				@*if ("@ViewBag.ContributorIsOfe".toLowerCase() == "true") {
-                    var url = `@Url.Action("AddOrUpdate", "OthersElectronicDocuments")?ElectronicDocumentId=${electronicDocumentId}&OperationModeId=0&ContributorIdType=1&ContributorId=@ViewBag.ContributorId`
-                    window.location.href = url;
-                    return;
-                }*@
 
                 var ValidacionOtherDocsElecViewModel = {
                     UserCode: '@ViewBag.UserCode',

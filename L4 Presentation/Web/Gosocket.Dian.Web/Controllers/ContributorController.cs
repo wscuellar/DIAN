@@ -265,8 +265,9 @@ namespace Gosocket.Dian.Web.Controllers
             var contributorAcceptanceStatusId = contributor.AcceptanceStatusId;
             var contributorTypeId = contributor.ContributorTypeId;
             
-            AuthToken auth = GetAuthData();
-            var contributorLoggedByOfe = auth.LoginMenu == "OFE";
+            var auth = Session["loginMenu"].ToString();
+
+            var contributorLoggedByOfe = (auth == "OFE");
 
             if (contributorAcceptanceStatusId == (int)ContributorStatus.Pending)
             {
@@ -716,7 +717,7 @@ namespace Gosocket.Dian.Web.Controllers
                 // insert in production.
                 if (ConfigurationManager.GetValue("Environment") == "Hab")
                 {
-                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorageProduction");
+                    var globalStorageConnectionStringProduction = ConfigurationManager.GetValue("GlobalStorage");
                     var tableManagerExchangeEmailProdcution = new TableManager("GlobalExchangeEmail", globalStorageConnectionStringProduction);
                     tableManagerExchangeEmailProdcution.InsertOrUpdate(globalExchangeEmail);
                 }
@@ -1977,7 +1978,8 @@ namespace Gosocket.Dian.Web.Controllers
             var userIdentificationType = User.IdentificationTypeId();
             var userCode = User.UserCode();
             var partitionKey = $"{userIdentificationType}|{userCode}";
-            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, userCode);
+            var contributorCode = User.ContributorCode();
+            var auth = dianAuthTableManager.Find<AuthToken>(partitionKey, contributorCode);
             return auth;
         }
         /************************/

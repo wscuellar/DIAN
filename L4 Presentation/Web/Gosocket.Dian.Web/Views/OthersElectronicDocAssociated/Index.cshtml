@@ -227,27 +227,27 @@
     </style>
 }
 <div class="page-content radian-view margin-20 margin-page-content">
-    <div class="title-container">
-        <div class="back-button"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })"><i class="fa fa-chevron-left"></i> Volver</a></div>
-    </div>
-    <div class="row margin-horizontal-0 margin-top-50">
-        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay">
-            <div class="padding-top-20">
+    
+    <div class="row margin-horizontal-0 margin-top-20">
+        <div class="panel" id="panel-form" data-target="#panel-form" data-toggle="panel-overlay" style="background:none;">
+            <div>
                 <div class="margin-20 padding-bottom-25">
-                    @if (Model.EsEquivalentDocument)
-                    {
-                        <div class="form-group col-sm-4">
-                            <label for="equivalentElectronicDocumentId" class="control-label">Tipo de documento</label>
-                            @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange="equivalentDocumentSelected(this)" })
-                        </div>
-                    }
-                    <div id="steps-otherdocELectAssociate">
-                        <div class="radian-personal-info">
+                    <div class="row">
+                        @if (Model.EsEquivalentDocument)
+                        {
+                            <div class="form-group col-sm-4" style="padding: 0px 0px 20px 40px;">
+                                <label for="equivalentElectronicDocumentId" class="control-label">Tipo de documento</label>
+                                @Html.DropDownList("equivalentElectronicDocumentId", EquivalentElectronicDocument, new { id = "equivalentElectronicDocumentId", Name = "equivalentElectronicDocumentId", @class = "form-control", onchange = "equivalentDocumentSelected(this)" })
+                            </div>
+                        }
+                    </div>
+                    <div>
+                        <div class="radian-personal-info" style="background:white;border-radius:25px 25px 0px 0px;">
                             @Html.Partial("_personalInfo")
                         </div>
                         @if (Model.Step > 0)
                         {
-                            <div class="panel-footer">
+                            <div class="panel-footer" style="border-radius: 0px 0px 25px 25px;padding: 0px 30px 30px 30px !important;">
                                 <button name="SubmitPrueba" id="btnDetalleSetPruebas"
                                         class="btn btn-primary Set-Prueba mr-9">
                                     Set de pruebas
@@ -266,16 +266,19 @@
                                 </button>
                             </div>
                         }
+                        <!--
+                    <h3><span class="name-state">Ingreso de solicitud</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Ingreso de solicitud</span></h3>
-                        <section>
-                        </section>
+                    <h3><span class="name-state">Pruebas de aceptación</span></h3>
+                    <section>
+                    </section>
 
-                        <h3><span class="name-state">Pruebas de aceptación</span></h3>
-                        <section>
-                        </section>
+                                    <h3></h3>
+                                        -->
 
-                        <h3></h3>
+
                         <section>
                             @*@Html.Partial("_finish")*@ @*Aparece con Step == 2*@
                         </section>
@@ -295,7 +298,9 @@
             </div>
 
         </div>
-
+        <div class="title-container" style="float: left;">
+            <div class="back-button btn btn-secondary"><a href="@Url.Action("AddOrUpdate","OthersElectronicDocuments", new { ElectronicDocumentId = Model.ElectronicDocId,OperationModeId=0,ContributorIdType=Model.ContributorTypeId,ContributorId=Model.ContributorId })">Volver</a></div>
+        </div>
         @*Modal*@
 
 
@@ -346,26 +351,23 @@
                                 if (result != null) {
 
                                     if (result.Code != 200) {
-                                        bootbox.alert(result.Message);
+                                        ErrorDialogV2("¡Notificación!", result.Message);
                                         return;
                                     }
 
-                                    bootbox.dialog({
-                                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>Se canceló el registro exitosamente</h4></div></div>",
-                                    onEscape: () => {
+                                    SuccessDialogV2Callback("Se canceló el registro exitosamente", "", () => {
                                         var url = "@Url.Action("Index", "OthersElectronicDocuments")";
                                         window.location.href = url;
-                                     }
                                     });
                                 }
                                 else
-                                    bootbox.alert("No se pudo realizar la cancelación");
+                                    ErrorDialogV2("¡Notificación!",  "No se pudo realizar la cancelación");
                             },
                             complete: function () {
 
                             },
                             error: function (result) {
-                                bootbox.alert("Error de conexión al intentar hacer la cancelación");
+                                ErrorDialogV2("¡Notificación!", "Error de conexión al intentar hacer la cancelación");
                                 console.log(result.status + ' ' + result.statusText);
                                 return false;
                             }
@@ -400,13 +402,18 @@
 
                                     CallExecutionWithData("POST", '@Url.Action("EnviarContributor", "OthersElectronicDocAssociated")', entity,
                                          function (param, data) {
-                                             bootbox.dialog({
+                                             SuccessDialogV2Callback(data.message, "", () => {
+                                                var url = "@Url.Action("Index", "OthersElectronicDocAssociated")";
+                                                window.location.href = url;
+                                             });
+
+                                             @*bootbox.dialog({
                                                  message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>" + data.message+"</h4></div></div>",
                                                  onEscape: () => {
                                                         var url = "@Url.Action("Index", "OthersElectronicDocAssociated")";
                                                         window.location.href = url;
                                                  }
-                                                });
+                                                });*@
                                          }, false, () => hideLoading('#panel-form')
                                      );
                      }
@@ -422,11 +429,7 @@
                     return;
                 }
                 if (!equivalentDocumentSelected) {
-                    bootbox.dialog({
-                        message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
-                            + "Debe especificar un documento equivalente para poder visualizar el set de pruebas"
-                            + "</h4></div></div>"
-                    });
+                    ErrorDialogV2("¡Notificación!", "Debe especificar un documento equivalente para poder visualizar el set de pruebas");
                     return;
                 }
                 var url = `@Url.Action("GetSetTestResultEquivalentDocument", "OthersElectronicDocAssociated")?Id=@ViewBag.Id&equivalentElectronicDocumentId=${equivalentDocumentSelected}`;
@@ -438,11 +441,7 @@
                     equivalentDocumentSelected = $("#equivalentElectronicDocumentId").val();
 
                 if (isEquivalentDocument && !equivalentDocumentSelected) {
-                    bootbox.dialog({
-                        message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
-                            + "Debe especificar un documento equivalente para poder reiniciar el set de pruebas"
-                            + "</h4></div></div>"
-                    });
+                    ErrorDialogV2("¡Notificación!", "Debe especificar un documento equivalente para poder reiniciar el set de pruebas.");
                     return;
                 }
 
@@ -526,11 +525,7 @@
                     equivalentDocumentSelected = $("#equivalentElectronicDocumentId").val();
 
                 if (isEquivalentDocument && !equivalentDocumentSelected) {
-                    bootbox.dialog({
-                        message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
-                            + "Debe especificar un documento equivalente para poder sincronizarlo a producción"
-                            + "</h4></div></div>"
-                    });
+                    ErrorDialogV2("¡Notificación!", "Debe especificar un documento equivalente para poder sincronizarlo a producción.");
                     return;
                 }
 
@@ -583,19 +578,11 @@
                         hideLoading('#panel-form');
                         if (data.success) {
                             /*showNotification('success', 'fa fa-check-circle fa-2x', 'floating', 'Aviso', data.message);*/
-                            bootbox.dialog({
-                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>"
-                                    + data.message
-                                    + "</h4></div></div>"
-                            });
+                            SuccessDialogV2(data.message, "");
                         }
                         if (!data.success) {
                             /*showNotification('danger', 'fa fa-exclamation-circle fa-2x', 'floating', 'Error', data.message);*/
-                            bootbox.dialog({
-                                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-warning iconcheckcircle'></i><br><br><h4 class='text-thin'>"
-                                    + data.message
-                                    + "</h4></div></div>"
-                            });
+                            ErrorDialogV2("¡Notificación!", data.message);
                         }
                     }
                 });

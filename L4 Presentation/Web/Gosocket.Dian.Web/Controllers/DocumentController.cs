@@ -1453,6 +1453,7 @@ namespace Gosocket.Dian.Web.Controllers
                 case 4:
                     ViewBag.CurrentPage = Navigation.NavigationEnum.DocumentProvider;
                     ViewBag.ViewType = "Provider";
+                    ViewBag.ViewTypeSpanish = "de usuarios";
                     break;
                 default:
                     break;
@@ -1775,7 +1776,7 @@ namespace Gosocket.Dian.Web.Controllers
             var identificatioType = User.IdentificationTypeId();
 
             var pk = identificatioType + "|" + User.UserCode();
-            var rk = User.UserCode();
+            var rk = User.ContributorCode();
             var auth = dianAuthTableManager.Find<AuthToken>(pk, rk);
             ViewBag.LoginMenu = auth.LoginMenu;
 

@@ -7,9 +7,7 @@
 
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
-        <div class="panel-heading">
-            <h3 class="panel-title">@ViewBag.Title</h3>
-        </div>
+        
         <div class="panel">
 
 
@@ -170,19 +168,22 @@
 
             $('.btn-add-prefix').click(function () {
                 if (preValidateFields()) {
-                    bootbox.dialog({
-                        title: "Advertencia",
-                        message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea asociar el prefijo?</strong></h4></div></div>",
-                        buttons: {
-                            del: {
-                                label: "Aceptar",
-                                className: "btn-gosocket",
-                                callback: function () {
-                                    addPrefix();
-                                }
-                            },
-                        }
-                    });
+                    ConfirmDialogV2("¿Está seguro que desea asociar el prefijo?",
+                        { confirm: "Aceptar", cancel: "Cancelar" }, addPrefix);
+
+                    //bootbox.dialog({
+                    //    title: "Advertencia",
+                    //    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea asociar el prefijo?</strong></h4></div></div>",
+                    //    buttons: {
+                    //        del: {
+                    //            label: "Aceptar",
+                    //            className: "btn-gosocket",
+                    //            callback: function () {
+                    //                addPrefix();
+                    //            }
+                    //        },
+                    //    }
+                    //});
                 }
             });
         });
@@ -228,19 +229,22 @@
         function removeRangeAssociationAlert(button) {
             var pk = $(button).attr("data-pk")
             var rk = $(button).attr("data-rk")
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea eliminar la asociación del prefijo?</strong></h4></div></div>",
-                title: "Advertencia",
-                buttons: {
-                    del: {
-                        label: "Aceptar",
-                        className: "btn-gosocket",
-                        callback: function () {
-                            removeRangeAssociation(pk, rk);
-                        }
-                    },
-                }
-            });
+            ConfirmDialogV2("¿Está seguro que desea eliminar la asociación del prefijo?",
+                { confirm: "Aceptar", cancel: "Cancelar" }, () => { removeRangeAssociation(pk, rk); });
+
+            //bootbox.dialog({
+            //    message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está seguro que desea eliminar la asociación del prefijo?</strong></h4></div></div>",
+            //    title: "Advertencia",
+            //    buttons: {
+            //        del: {
+            //            label: "Aceptar",
+            //            className: "btn-gosocket",
+            //            callback: function () {
+            //                removeRangeAssociation(pk, rk);
+            //            }
+            //        },
+            //    }
+            //});
         }
 
         function removeRangeAssociation(pk, rk) {

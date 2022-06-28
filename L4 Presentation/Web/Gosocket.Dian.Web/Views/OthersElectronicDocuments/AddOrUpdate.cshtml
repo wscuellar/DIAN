@@ -85,7 +85,7 @@
         }
 
         .modal-body .close, .modal-header .close {
-            background-color: #348441 !important;
+            background-color: none !important;
             /*top: 20px !important;
             right: -25px !important;*/
         }
@@ -164,15 +164,15 @@
                                 <table class="simple-table" data-int="0">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">Modo de operación</th>
-                                            <th class="text-center">Documento Electrónico</th>
-                                            <th class="text-center">Registro</th>
-                                            <th class="text-center">Estado</th>
-                                            <th class="text-center">Nombre del Software</th>
-                                            <th class="text-center">ID</th>
-                                            <th class="text-center">PIN del SW </th>
-                                            <th class="text-center">URL</th>
-                                            <th class="text-center">Acciones</th>
+                                            <th class="text-left">Modo de operación</th>
+                                            <th class="text-left">Documento Electrónico</th>
+                                            <th class="text-left">Registro</th>
+                                            <th class="text-left">Estado</th>
+                                            <th class="text-left">Nombre del Software</th>
+                                            <th class="text-left">ID</th>
+                                            <th class="text-left">PIN del SW </th>
+                                            <th class="text-left">URL</th>
+                                            <th class="text-left">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -186,32 +186,32 @@
                                                         @item.OperationMode @if (isElectronicPayroll)
                                                         {<span>- @item.ContributorType</span>}
                                                     </td>
-                                                    <td nowrap class="text-center">@item.ElectronicDoc</td>
-                                                    <td nowrap class="text-center">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-                                                    <td class="text-center">@item.StateSoftware</td>
-                                                    <td class="text-center">@item.Software</td>
-                                                    <td class="text-center">@item.SoftwareId</td>
-                                                    <td class="text-center">@item.PinSW</td>
-                                                    <td class="text-center">  @item.Url  </td>
+                                                    <td nowrap class="text-left">@item.ElectronicDoc</td>
+                                                    <td nowrap class="text-left">@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                                                    <td class="text-left">@item.StateSoftware</td>
+                                                    <td class="text-left">@item.Software</td>
+                                                    <td class="text-left">@item.SoftwareId</td>
+                                                    <td class="text-left">@item.PinSW</td>
+                                                    <td class="text-left">  @item.Url  </td>
                                                     <td nowrap class="text-center">
                                                         @*<a class="delete" href="#" data-contributor-id="@(item.ContributorId)"><i title="Eliminar" class="fa fa-trash fa-1" style="font-size: 22px;color: #348441;"></i></a>*@
-                                                        <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Pruebas de aceptación" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })">
+                                                        <a class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Pruebas de aceptación" href="@Url.Action("Index","OthersElectronicDocAssociated", new { Id =  @item.Id })">
                                                             <i class="fa fa-eye"></i>
                                                         </a>
                                                         @if(ConfigurationManager.GetValue("Environment") != "Prod")
                                                         {
                                                             if (isElectronicPayroll || isElectronicPayrollNoOfe || (ViewBag.IsSupportDocument && Model.ContributorIsOfe))
                                                             {
-                                                                <a onclick="EliminarRegistro(@item.Id)" class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
+                                                                <a onclick="EliminarRegistro(@item.Id)" class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Eliminar modo de operación"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
                                                             }
                                                             else
                                                             {
-                                                                <a class="btn btn-xs @(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" data-tooltip="tooltip" data-placement="top" title="Eliminar"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
+                                                                <a class="btn btn-xs add-tooltip @(item.StateSoftware != "En pruebas" ? "disabled" : "")" onclick="EliminarRegistro(@item.Id)" data-tooltip="tooltip" data-placement="bottom" title="Eliminar  modo de operación"><i class="fa fa-times-circle" style="color:#262944 !important"></i></a>
                                                             }
                                                         }
                                                         @if (ViewBag.IsEquivalentDocument)
                                                         {
-                                                            <a class="btn btn-xs" data-tooltip="tooltip" data-placement="top" title="Documentos habilitados" onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)">
+                                                            <a class="btn btn-xs add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Documentos habilitados" onclick="OpenModalShowEquivalentDocumentsEnabled(@item.Id)">
                                                                 <i style="color:#262944 !important" class="fa fa-check-circle"></i>
                                                             </a>
                                                         }
@@ -283,11 +283,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="bootbox-close-button close" data-dismiss="modal" aria-hidden="true" style="top: 20px;">×</button>
-                <h4 class="modal-title" style="padding-bottom: 1px;border-bottom: 3px solid #62C7AB;font-size: 20px;">&nbsp; Documentos equivalentes habilitados</h4>
+                <h4 class="sub-title">Documentos equivalentes habilitados</h4>
             </div>
             <div class="modal-body" style="width: 100%;">
                 <div class="table-responsive" style="width:inherit">
-                    <table id="equivalents-documents-enabled-table" class="documents-table table table-striped table-hover align-middle margin-bottom-0" style="margin-bottom: 50px; font-size:14px">
+                    <table id="equivalents-documents-enabled-table" class="documents-table table table-striped simple-table table-hover align-middle margin-bottom-0" style="margin-bottom: 50px; font-size:14px">
                         <thead>
                             <tr>
                                 <th style="text-align: left;">Documento</th>
@@ -318,10 +318,7 @@
         @if (!string.IsNullOrWhiteSpace(message))
         {
             <text>
-            bootbox.dialog({
-                message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + '@message' + "</h4></div></div>",
-                onEscape: () => { }
-            });
+            ErrorDialogV2("¡Notificación!", "@message");
             </text>
         }
 
@@ -329,7 +326,7 @@
 			return {
 				del: {
 					label: "Aceptar",
-					className: "btn-radian-default",
+                    className: "btn-radian-default btn-radian-success",
 					callback: function () {
 						param ? operation(param) : operation();
 						operationClick = false;
@@ -337,7 +334,7 @@
 				},
 				del1: {
 					label: "Cancelar",
-					className: "btn-radian-default btn-radian-success",
+					className: "btn-secundary btn-radian-success",
 					callback: function () {
 						$(' .close').click()
 					}
@@ -350,10 +347,7 @@
 
             if ('@ViewBag.softwareActive' == 'True') {
                 var sms = 'No se puede ' + '@ViewBag.title' + ', ya que tiene uno en estado: "En Proceso"';
-                bootbox.dialog({
-                    message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + sms + "</h4></div></div>",
-                    onEscape: () => { }
-                });
+                ErrorDialogV2("¡Notificación!", sms);
             }
             $('#PinSW').val('')
 
@@ -376,10 +370,10 @@
                 /*Esta validación aplica cuando el modo de operacion es SP o PT*/
                 if ((SoftwaresIds.find(s => s == $('#SoftwareId').val()) || SoftwaresIds.find(s => s == $('#SoftwareIdPr').val()))
                     && $('#OperationModeSelectedId').val() != 3 ) {
-                    showConfirmation("El participante ya tiene asociado el software asignado!!!", AlertExec(null));
+                    showConfirmation("<div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><br>El participante ya tiene asociado el software asignado!!!", AlertExec(null));
                     return;
                 }
-                
+
                 if ($('#OperationModeSelectedId').val() == 1) {
                     $('#ErrorSoftwareName').hide()
                     $('#ErrorPinSW').hide()
@@ -492,7 +486,7 @@
                     function () {
                         removeOperationAsociated(id);
                     }
-                , "", () => hideLoading('#panel-wrapper')));
+                    , "", () => hideLoading('#panel-wrapper')));
             }
             else
             {
@@ -520,7 +514,7 @@
                 return;
             }
 
-            let confirmMessage = "Desea cancelar el registro del participante @(contributorName) de @(electronicDocumentName)";
+            let confirmMessage = "Desea cancelar el registro del participante @(Html.Raw(contributorName)) de @(Html.Raw(electronicDocumentName))";
             if (@Model.ElectronicDocumentId == 3) {
                 confirmMessage = "Estás seguro de eliminar el modo de operación asociado";
             }
@@ -542,54 +536,57 @@
                     hideLoading("#panel-wrapper");
                     if (result != null) {
 
-						if (result.Code != 200) {
+                        if (result.Code != 200) {
 
 							$('.close').click()
-							bootbox.dialog({
-								message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><i class='fa fa-times-circle iconcheckcircle'></i><br><br><h4 class='text-thin'>" + result.Message + "</h4></div></div>",
-								onEscape: () => {
-									var url = window.location.href.split('&');
-									var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
-									window.location.href = ret
-								}
-							});
+                            ErrorDialogV2Callback("¡Notificación!", sms, () => {
+                                var url = window.location.href.split('&');
+                                var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+                                window.location.href = ret
+                            });
+                            // bootbox.dialog({
+                            //  message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%;text-align: center;'><br><div class='text-center'><img src='/Content/images/icon-warning.svg' width='200'></div><h4 class='sub-title'>" + result.Message + "</h4></div></div>",
+							//	onEscape: () => {
+							//		var url = window.location.href.split('&');
+							//		var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
+							//		window.location.href = ret
+							//	}
+							//});
 							//
                             return;
                         }
 
-                        bootbox.dialog({
-                            message: "<div class='media'><div class='media-body' style='padding: 40px 30px 55px 30px !important;  line-height: 100%'><div style='text-align: center;'><i class='fa fa-check-circle iconcheckcircle'></i></div><br><h4 class='text-thin'>El modo de operación ha sido eliminado exitosamente</h4></div></div>",
-                            onEscape: () => {
-                                var url = "@Url.Action("Index", "OthersElectronicDocuments")";
-                                if (@Model.ElectronicDocumentId == 14) {
-                                    window.location.reload();
-                                    return;
-                                }
-                                if (@Model.ElectronicDocumentId == 3) {
-                                    window.location.reload();
-                                    return;
-                                }
-                                if (@Model.ElectronicDocumentId == 13) {
-                                    if (result.ExistOperationModeAsociated) {
-                                        window.location.reload();
-                                    } else {
-                                        window.location.href = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
-                                    }
-                                    return;
-                                }
-                                window.location.href = url;
+                        SuccessDialogV2Callback("El modo de operación ha sido eliminado exitosamente", "", () => {
+                            var url = "@Url.Action("Index", "OthersElectronicDocuments")";
+                            if (@Model.ElectronicDocumentId == 14) {
+                                window.location.reload();
+                                return;
                             }
+                            if (@Model.ElectronicDocumentId == 3) {
+                                window.location.reload();
+                                return;
+                            }
+                            if (@Model.ElectronicDocumentId == 13) {
+                                if (result.ExistOperationModeAsociated) {
+                                    window.location.reload();
+                                } else {
+                                    window.location.href = "@Url.Action("AddParticipants", "OthersElectronicDocuments", new { electronicDocumentId = Model.ElectronicDocumentId })";
+                                }
+                                return;
+                            }
+                            window.location.href = url;
                         });
                     }
-                    else
-                        bootbox.alert("No se pudo realizar la Cancelación");
+                    else {
+                        ErrorDialogV2("¡Notificación!", "No se pudo realizar la Cancelación");
+                    }
                 },
                 complete: function () {
                     hideLoading("#panel-wrapper");
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de Software");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }
@@ -713,24 +710,24 @@
                                  });
                              }
                              else
-                                 bootbox.alert("No se pudo realizar la consulta");
+                                 ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                          },
                 complete: function () {
 
                          },
                 error: function (result) {
-                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                             console.log(result.status + ' ' + result.statusText);
-                             return false;
-                         }
-                     });  //ajax
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
 
-                 }
+        }
 
-                 function getDataSoftwareSeleccionado(SoftwareId){
+        function getDataSoftwareSeleccionado(SoftwareId){
 
             $.ajax({
-                     url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
+                url: "@Url.Action("GetDataBySoftwareId", "OthersElectronicDocuments")",
                 type: "POST",
                 data: { SoftwareId: SoftwareId },
                 datatype: "json",
@@ -741,19 +738,18 @@
                         $('#PinSW').val(result.SoftwarePIN);
                              }
                              else
-                                 bootbox.alert("No se pudo realizar la consulta");
+                                 ErrorDialogV2("¡Notificación!", "No se pudo realizar la consulta");
                          },
                 complete: function () {
 
                          },
                 error: function (result) {
-                             bootbox.alert("Error de conexión al intentar obtener el listado de Software");
-                             console.log(result.status + ' ' + result.statusText);
-                             return false;
-                         }
-                     });  //ajax
-
-                 }
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de Software");
+                    console.log(result.status + ' ' + result.statusText);
+                    return false;
+                }
+            });  //ajax
+        }
 
                  function cambiarTextoSelect() {
                      var botones = $(":button");
@@ -800,7 +796,7 @@
                 },
                 error: function (result) {
                     hideLoading("#panel-wrapper");
-                    bootbox.alert("Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
+                    ErrorDialogV2("¡Notificación!", "Error de conexión al intentar obtener el listado de documentos equivalentes habilitados");
                     console.log(result.status + ' ' + result.statusText);
                     return false;
                 }

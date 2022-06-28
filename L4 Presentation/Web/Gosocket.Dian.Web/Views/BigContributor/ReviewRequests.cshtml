@@ -9,7 +9,7 @@
 <div class="page-content margin-15">
     <div class="row margin-horizontal-0">
 
-        <div class="panel">
+        <div class="panel" style="background: transparent;">
             <div class="panel-body padding-top-20">
 
                 <div class="pad-btm padding-bottom-0">
@@ -32,8 +32,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                        <div class="text-left" style="padding:20px;">
+                                            <button type="button" class="btn btn-radian-success btn-hover-gosocket btn-search">Buscar</button>
                                         </div>
 
                                     </div>
@@ -43,7 +43,7 @@
                             <div class="row margin-horizontal-0">
                                 <div class="col-md-9 table-toolbar-left padding-left-0">
                                 </div>
-                                <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+                                <!--<div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
                                     @if (Model.Requests.Count > 0)
                                     {
                                         <span class="text-muted">
@@ -58,7 +58,7 @@
                                             </a>
                                         </div>
                                     }
-                                </div>
+                                </div>-->
                             </div>
                         }
                     </div>
@@ -68,12 +68,12 @@
 
                 @if (!Model.Requests.Any())
                 {
-                    <div class="alert panel-footer-grey text-center contributor-alert">
+                    <div class="alert dataTables_empty text-center contributor-alert">
                         Ningún resultado disponible para mostrar.
                     </div>
                 }
 
-                <div class="pull-right table-pagination padding-top-10">
+                <!--<div class="pull-right table-pagination padding-top-10">
                     @if (Model.Requests.Any())
                     {
                         <span class="text-muted">
@@ -88,7 +88,7 @@
                             </a>
                         </div>
                     }
-                </div>
+                </div>-->
 
             </div>
         </div>

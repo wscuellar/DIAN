@@ -25,10 +25,10 @@
                         @using (Html.BeginForm("Edit", "Contributor", FormMethod.Post, new { id = "edit-contributor-form" }))
                         {
                             @Html.Partial("_form")
-                            <div class="panel-footer text-right">
-                                <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-default">Cancelar</a>
-                                <button type="button" class="btn btn-default btn-hover-gosocket btn-save">Guardar</button>
-                            </div>
+                        <div class="text-left">
+                            <button type="button" class="btn btn-primary btn-hover-gosocket btn-save">Guardar</button>
+                            <a href="@Url.Action("View", "Contributor", new { id = Model.Id })" class="btn btn-secondary">Cancelar</a>
+                        </div>
                         }
                     </div>
                 </div>
@@ -68,8 +68,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-default btn-gosocket btn-modal">Guardar</button>
+                    <button type="button" class="btn btn-primary btn-modal">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
             }
         </div>
@@ -112,22 +112,15 @@
 
             $('.btn-save').click(function () {
                 if ('@isProvider' === 'True') {
-                        bootbox.dialog({
-                        title: "Advertencia",
-                        message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>Está usted seguro?</strong></h4>Al realizar esta acción deberá iniciar sesión nuevamente.</div></div>",
-                        buttons: {
-                            del: {
-                                label: "Aceptar",
-                                className: "btn-gosocket",
-                                callback: function () {
-                                        var form = $('#edit-contributor-form');
-                                        if (form.valid()) {
-                                            showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
-                                            form.submit();
-                                        }
-                                    }
-                                },
-                        }
+                    ConfirmDialogV2("Advertencia", `<strong>¿Está usted seguro?</strong> <br> 
+                        Al realizar esta acción deberá iniciar sesión nuevamente.`,
+                        { confirm: "Aceptar", cancel: "Cancelar" },
+                        () => {
+                            var form = $('#edit-contributor-form');
+                            if (form.valid()) {
+                                showLoading('#panel-form', 'Editando', 'Procesando datos, por favor espere.');
+                                form.submit();
+                            }
                         });
                     }
                     else {

@@ -76,8 +76,9 @@
 
                                 <tr>
                                     <td>                                     
-
-                                            <span class="fa fa fa-download add-tooltip download-eventos" data-id="@item.Code" id="@item.DocumentKey" code="@item.Date"></span>
+                                        <button class="btn btn-xs add-tooltip download-eventos" data-id="@item.Code" id="@item.DocumentKey" code="@item.Date">
+                                            <i style="color:#2B323D" class="fa fa fa-download" data-tooltip="tooltip" data-placement="bottom" title="Descargar documento"></i>
+                                        </button>
                                       
                                     </td>
                                     <td class="text-nowrap">
@@ -136,7 +137,9 @@
                             <td>
                                 @if (document.DocumentTypeId == "05")
                                 {
-                                    <span class="fa fa fa-download add-tooltip download-support-document" data-original-title="Documento soporte" data-id="@document.Id" id="@document.Id"></span>
+                                    <button class="btn btn-xs download-support-document" data-id="@document.Id" id="@document.Id">
+                                        <id style="color:#2B323D" class="fa fa fa-download add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Documento soporte"></id>
+                                    </button>
                                 }
                                 else
                                 {
@@ -146,17 +149,24 @@
                                         document.DocumentTypeId == "27" || document.DocumentTypeId == "50" || document.DocumentTypeId == "60" ||
                                         document.DocumentTypeId == "94" || document.DocumentTypeId == "45" || document.DocumentTypeId == "32")
                                     {
-                                        <span class="fa fa fa-download add-tooltip download-equivalente-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")"></span>
+                                        <button class="btn btn-xs add-tooltip download-document add-tooltip download-equivalente-document" data-id="@document.Id" id="@document.Id" documenTypeId="@document.DocumentTypeId" EmissionDate="@document.EmissionDate.ToString("yyyy-MM-dd hh:mm:ss")" GenerationDate="@document.GenerationDate.ToString("yyyy-MM-dd hh:mm:ss")">
+                                            <i style="color:#2B323D" class="fa fa fa-download" data-tooltip="tooltip" data-placement="bottom" title="Descargar elementos"></i>
+                                        </button>
                                     }
                                     else
                                     {
                                         if (document.Status != 2 && document.DocumentTypeId != "12" && document.DocumentTypeId != "101")
                                         {
-                                            <span class="fa fa fa-download add-tooltip download-document" data-original-title="Descargar elementos" data-id="@document.Id" id="@document.Id"></span>
+                                            <button class="btn btn-xs add-tooltip download-document" data-id="@document.Id" id="@document.Id">
+                                                <i style="color:#2B323D" class="fa fa fa-download" data-tooltip="tooltip" data-placement="bottom" title="Descargar elementos"></i>
+                                            </button>
+
                                         }
                                         else
                                         {
-                                            <span class="fa fa fa-close add-tooltip" data-original-title="Descarga desahabilitada"></span>
+                                            <button class="btn btn-xs disabled">
+                                                <i class="fa fa fa-close add-tooltip" data-tooltip="tooltip" data-placement="bottom" title="Descarga desahabilitada"></i>
+                                            </button>
                                         }
                                     }
                                 }
@@ -263,7 +273,7 @@
 <div class="row margin-horizontal-0 padding-top-0">
     <div class="col-md-9 table-toolbar-left padding-left-0">
     </div>
-    <div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
+    <!--<div class="col-md-3 table-toolbar-right padding-right-0 table-pagination">
         @if (Model.Documents.Any())
         {
             <span class="text-muted">
@@ -278,5 +288,5 @@
                 </a>
             </div>
         }
-    </div>
+    </div>-->
 </div>

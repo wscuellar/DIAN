@@ -19,11 +19,11 @@
                         <div class="panel-body padding-20 padding-bottom-10">
                             @Html.Partial("_default")
                         </div>
-                        <div class="panel-footer adm-radian-view text-left">
-                            <button type="button" onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-default btn-radian-default">Volver</button>
+                        <div class="adm-radian-view text-left">
+                            <button type="button" onclick="location.href='@Url.Action("AdminRadianView", "Radian")'" class="btn btn-secondary btn-radian-default">Volver</button>
                             @if (Model.RadianState != "Cancelado")
                             {
-                                <button type="button" class="btn btn-success btn-radian-success button-change-state">Guardar cambios</button>
+                                <button type="button" class="btn btn-primary btn-radian-success button-change-state">Guardar cambios</button>
                             }
                         </div>
                     </div>
@@ -87,19 +87,10 @@
                         if (error) {
                             var messageError = Object.values(error)[0];
                             var id = Object.values(error)[2];
-                            bootbox.alert({
-                                title: "Advertencia",
-                                message: "<div class='media'><div class='media-body'><h4 class='text-thin'><strong>" + messageError + "</strong></h4></div></div>",
-                                buttons: {
-                                    ok: {
-                                        label: 'Aceptar',
-                                        className: 'btn-success'
-                                    }
-                                },
-                                callback: function () {
-                                    showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
-                                    window.location.href = "/Radian/ViewDetails/" + id;
-                                }
+                            ErrorDialogV2Callback("¡Notificación!", messageError, () =>
+                            {
+                                showLoading('#panel-form', 'Configuración', 'Procesando datos, por favor espere.');
+                                window.location.href = "/Radian/ViewDetails/" + id;
                             });
                         } else{
                             hideLoading('#panel-form');

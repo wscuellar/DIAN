@@ -52,11 +52,11 @@
                                             </div>
                                         </div>
 
-                                        <div class="panel-footer-grey text-right">
-                                            <button type="button" class="btn btn-default btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
+                                        <div class="text-left">
+                                            <button type="button" class="btn btn-primary btn-hover-gosocket btn-search"><i class="fa fa-filter"></i>&nbsp;&nbsp;Buscar</button>
                                             @if (Model.AcceptanceStatusId == (int)ContributorStatus.Registered && Model.ContributorTestSetResults.Any(t => t.Status == (int)TestSetStatus.Accepted))
                                             {
-                                                <button type="button" class="btn btn-default btn-hover-gosocket btn-activate"><i class="fa fa-check"></i>&nbsp;&nbsp;Activar</button>
+                                                <button type="button" class="btn btn-secondary btn-hover-gosocket btn-activate"><i class="fa fa-check"></i>&nbsp;&nbsp;Activar</button>
                                             }
                                         </div>
 
