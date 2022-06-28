@@ -315,7 +315,9 @@ namespace Gosocket.Dian.Web.Controllers
                 bool contributorIsOfeAndIsSupportDocument = User.ContributorTypeId() == (int)Domain.Common.ContributorType.Biller
                     && operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.SupportDocument;
 
-                if (!contributorIsOfeAndIsSupportDocument)
+                bool electronicDocumentIsPayrollNoOfe = operation.OtherDocElecContributor.ElectronicDocumentId == (int)ElectronicsDocuments.ElectronicPayrollNoOFE;
+
+                if (!contributorIsOfeAndIsSupportDocument && !electronicDocumentIsPayrollNoOfe)
                 {
                     result.Code = 500;
                     result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
@@ -326,6 +328,15 @@ namespace Gosocket.Dian.Web.Controllers
                     //    message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.",
                     //    success = true,
                     //}, JsonRequestBehavior.AllowGet);
+                }
+                
+                var quantityOperationModeAsociated = operation.OtherDocElecContributor.Contributor.OtherDocElecContributors
+                    .Count(t => t.ElectronicDocumentId == operation.OtherDocElecContributor.ElectronicDocumentId && t.OtherDocElecContributorOperations.Any(x => !x.Deleted));
+                if (electronicDocumentIsPayrollNoOfe && quantityOperationModeAsociated <= 1)
+                {
+                    result.Code = 500;
+                    result.Message = $"Modo de operación se encuentra en estado '{ OtherDocElecState.Habilitado.GetDescription() }', no se permite eliminar.";
+                    return result;
                 }
             }
 

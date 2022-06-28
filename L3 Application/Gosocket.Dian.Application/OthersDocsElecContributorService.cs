@@ -401,7 +401,7 @@ namespace Gosocket.Dian.Application
                 result.Message = "Se canceló el registro exitosamente";
 
                 result.ExistOperationModeAsociated = operation.OtherDocElecContributor.Contributor.OtherDocElecContributors
-                    .Any(t => t.ElectronicDocumentId == operation.OtherDocElecContributor.ElectronicDocumentId && !t.OtherDocElecContributorOperations.Any(x => x.Deleted));
+                    .Any(t => t.ElectronicDocumentId == operation.OtherDocElecContributor.ElectronicDocumentId && t.OtherDocElecContributorOperations.Any(x => !x.Deleted));
 
                 if (re1 > 0) //Update operations state
                 {

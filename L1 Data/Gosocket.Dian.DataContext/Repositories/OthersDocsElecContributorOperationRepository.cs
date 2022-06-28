@@ -30,6 +30,7 @@ namespace Gosocket.Dian.DataContext.Repositories
         public OtherDocElecContributorOperations Get(Expression<Func<OtherDocElecContributorOperations, bool>> expression)
         {
             var query = _sqlDBContext.OtherDocElecContributorOperations.Include("OtherDocElecContributor").Include("Software")
+                .Include(t => t.OtherDocElecContributor.Contributor.OtherDocElecContributors)
                 .Where(expression);
             return query.FirstOrDefault();
         }
