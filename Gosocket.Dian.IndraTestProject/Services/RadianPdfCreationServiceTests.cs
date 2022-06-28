@@ -20,7 +20,7 @@ namespace Gosocket.Dian.Application.Tests
         {
             _current = new RadianPdfCreationService(
                               _queryAssociatedEventsService.Object,
-                              _fileManager.Object,
+                              //_fileManager.Object,
                               _globalDocValidationDocumentMetaService.Object,
                               _associateDocuments.Object
                             );
