@@ -1041,6 +1041,31 @@ namespace Gosocket.Dian.Infrastructure
             return entities.FirstOrDefault();
         }
 
+
+        public List<T> FindhByPartitionKeyRadianState<T>(string partitionKey, bool deleted, string radianState) where T : ITableEntity, new()
+        {
+            var query = new TableQuery<T>();
+
+            var prefixCondition = TableQuery.CombineFilters(
+                TableQuery.GenerateFilterCondition("PartitionKey",
+                    QueryComparisons.Equal,
+                    partitionKey),
+                TableOperators.And,
+                TableQuery.GenerateFilterConditionForBool("Deleted",
+                    QueryComparisons.Equal,
+                    deleted));
+            prefixCondition = TableQuery.CombineFilters(
+                prefixCondition,
+                TableOperators.And,
+                TableQuery.GenerateFilterCondition("RadianState",
+                    QueryComparisons.Equal,
+                    radianState));
+
+            var entities = CloudTable.ExecuteQuery(query.Where(prefixCondition));
+
+            return entities.ToList();
+        }
+
         public T FindhByCufeExchange<T>(string partitionKey, bool Active) where T : ITableEntity, new()
         {
 

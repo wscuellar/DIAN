@@ -135,7 +135,7 @@ namespace Gosocket.Dian.Web.Controllers
         }
 
         [HttpPost]
-        public JsonResult Add(RegistrationDataViewModel registrationData)
+        public async Task<JsonResult> Add(RegistrationDataViewModel registrationData)
         {
             RadianTestSet testSet = null;
             if (registrationData.RadianOperationMode == Domain.Common.RadianOperationMode.Direct)
@@ -166,7 +166,7 @@ namespace Gosocket.Dian.Web.Controllers
                 SoftwareType = (int)RadianOperationModeTestSet.OwnSoftware,
                 Timestamp = DateTime.Now
             };
-            ResponseMessage result = _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
+            var result = await _radianAprovedService.AddRadianContributorOperation(radianContributorOperation, software, testSet, true, false);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -329,6 +329,21 @@ namespace Gosocket.Dian.Web.Controllers
             testSetResult.TotalDocumentsRejected = 0;
             testSetResult.ReportForPaymentAccepted = 0;
             testSetResult.ReportForPaymentRejected = 0;
+            testSetResult.TransferEconomicRightsAccepted = 0;
+            testSetResult.TransferEconomicRightsRejected = 0;
+            testSetResult.TotalTransferEconomicRightsSent = 0;
+            testSetResult.NotificationDebtorOfTransferEconomicRightsAccepted = 0;
+            testSetResult.NotificationDebtorOfTransferEconomicRightsRejected = 0;
+            testSetResult.TotalNotificationDebtorOfTransferEconomicRightsSent = 0;
+            testSetResult.PaymentOfTransferEconomicRightsAccepted = 0;
+            testSetResult.PaymentOfTransferEconomicRightsRejected = 0;
+            testSetResult.TotalPaymentOfTransferEconomicRightsSent = 0;
+            testSetResult.EndorsementWithEffectOrdinaryAssignmentAccepted = 0;
+            testSetResult.EndorsementWithEffectOrdinaryAssignmentRejected = 0;
+            testSetResult.TotalEndorsementWithEffectOrdinaryAssignmentSent = 0;
+            testSetResult.ObjectionAccepted = 0;
+            testSetResult.ObjectionRejected = 0;
+            testSetResult.TotalObjectionSent = 0;
             testSetResult.State = "En proceso";
             testSetResult.Status = 0;
             testSetResult.StatusDescription = "En proceso";
@@ -368,9 +383,13 @@ namespace Gosocket.Dian.Web.Controllers
 
 
         [HttpPost]
-        public JsonResult UpdateFactorOperationMode(SetOperationViewModel data)
+        public async Task<JsonResult> UpdateFactorOperationMode(SetOperationViewModel data)
         {
+            if (string.IsNullOrEmpty(data.SoftwareId) && string.IsNullOrEmpty(data.SoftwareName) && string.IsNullOrEmpty(data.Pin))
+                return Json(new ResponseMessage("Por favor seleccione un software", TextResources.alertType, 500), JsonRequestBehavior.AllowGet);
+
             RadianContributor participant = _radianAprovedService.GetRadianContributor(data.RadianContributorId);
+            
             RadianContributorOperation contributorOperation = new RadianContributorOperation()
             {
                 RadianContributorId = data.RadianContributorId,
@@ -397,7 +416,7 @@ namespace Gosocket.Dian.Web.Controllers
 
 
             RadianTestSet testSet = _radianAprovedService.GetTestSet(data.SoftwareType.ToString());
-            ResponseMessage response = _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
+            var response = await _radianAprovedService.AddRadianContributorOperation(contributorOperation, software, testSet, !string.IsNullOrEmpty(data.SoftwareName), true);
             if (response.Code != 500 && participant.RadianState != RadianState.Habilitado.GetDescription())
                 _radianContributorService.ChangeParticipantStatus(participant.ContributorId, RadianState.Test.GetDescription(), participant.RadianContributorTypeId, participant.RadianState, string.Empty);
 

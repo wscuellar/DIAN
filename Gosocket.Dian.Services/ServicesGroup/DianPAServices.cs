@@ -455,7 +455,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         public async Task<List<DianResponse>> GetBatchStatus(string trackId)
         {
             var batchStatus = TableManagerGlobalBatchFileStatus.Find<GlobalBatchFileStatus>(trackId, trackId);
-            if (batchStatus == null) return GetStatusZip(trackId);
+            if (batchStatus == null) return await GetStatusZip(trackId);
 
             var responses = new List<DianResponse>();
 
@@ -470,7 +470,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             }
 
             var resultsEntities = TableManagerGlobalBatchFileResult.FindByPartition<GlobalBatchFileResult>(trackId);
-            if (resultsEntities.Count == 1) return GetStatusZip(trackId);
+            if (resultsEntities.Count == 1) return await GetStatusZip (trackId);
 
             var exist = fileManager.Exists(blobContainer, $"{blobContainerFolder}/applicationResponses/{trackId}.zip");
             if (!exist)
@@ -501,7 +501,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public DianResponse GetStatus(string trackId)
+        public async  Task<DianResponse> GetStatus(string trackId)
         {
             var globalStart = DateTime.UtcNow;
             DateTime start;
@@ -524,13 +524,12 @@ namespace Gosocket.Dian.Services.ServicesGroup
                     var validations = new List<GlobalDocValidatorTracking>();
                     List<Task> arrayTasks = new List<Task>();
 
-                    Task firstLocalRun = Task.Run(() =>
-                    {
-                        var applicationResponse = ApiHelpers.ExecuteRequest<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
-                        response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
-                        if (!applicationResponse.Success)
-                            Debug.WriteLine(applicationResponse.Message);
-                    });
+                    
+                    var applicationResponse = await ApiHelpers.ExecuteRequestAsync<ResponseGetApplicationResponse>(ConfigurationManager.GetValue("GetAppResponseUrl"), new { trackId });
+                    response.XmlBase64Bytes = !applicationResponse.Success ? null : applicationResponse.Content;
+                    if (!applicationResponse.Success)
+                        Debug.WriteLine(applicationResponse.Message);
+                    
 
                     Task secondLocalRun = Task.Run(() =>
                     {
@@ -546,7 +545,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                         //validations = ApiHelpers.ExecuteRequest<List<GlobalDocValidatorTracking>>(ConfigurationManager.GetValue("GetValidationsByTrackIdUrl"), new { trackId });
                     });
 
-                    arrayTasks.Add(firstLocalRun);
+                    
                     arrayTasks.Add(secondLocalRun);
                     arrayTasks.Add(fourLocalRun);
                     Task.WhenAll(arrayTasks).Wait();
@@ -666,7 +665,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
         /// </summary>
         /// <param name="trackId"></param>
         /// <returns></returns>
-        public List<DianResponse> GetStatusZip(string trackId)
+        public async Task<List<DianResponse>> GetStatusZip(string trackId)
         {
             var globalStart = DateTime.UtcNow;
             var responses = new List<DianResponse>();
@@ -690,7 +689,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
                             responses.Add(response);
                             continue;
                         }
-                        response = GetStatus(item.RowKey);
+                        response = await GetStatus(item.RowKey);
                         responses.Add(response);
                     }
                     catch (Exception ex)
