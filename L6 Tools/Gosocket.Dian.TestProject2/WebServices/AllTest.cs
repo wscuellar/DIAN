@@ -35,7 +35,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         public void GetStatus_Success_Test()
         {
             var trackId = "424e7dc7df2719f6923d402365d467fc1abf7507995e5c0a2a036cbb86db530cc3ebae05a963e4dff1335605e787ac91";
-            var response = service.GetStatus(trackId);
+            var response = service.GetStatus(trackId).Result;
             Assert.IsTrue(response.IsValid);
             Assert.AreEqual("00", response.StatusCode);
             Assert.AreEqual("Procesado Correctamente.", response.StatusDescription);
@@ -46,7 +46,7 @@ namespace Gosocket.Dian.TestProject.WebServices
         public void GetStatus_Fail_Test()
         {
             var trackId = "424e7dc7df2719f6923d402365d467fc1abf7507995e5c0a2a036cbb86db530cc3ebae05a963e4dff1335605e787ac911";
-            var response = service.GetStatus(trackId);
+            var response = service.GetStatus(trackId).Result;
             Assert.IsFalse(response.IsValid);
             Assert.AreEqual("66", response.StatusCode);
             Assert.AreEqual("TrackId no existe en los registros de la DIAN.", response.StatusDescription);

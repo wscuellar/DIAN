@@ -15,6 +15,7 @@ namespace Gosocket.Dian.Application
     using System.Drawing;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml;
@@ -61,9 +62,13 @@ namespace Gosocket.Dian.Application
                 ResponseXpathDataValue fieldValues = await ApiHelpers.ExecuteRequestAsync<ResponseXpathDataValue>(pathServiceData, xpathRequest);
 
                 Dictionary<string, string> newFieldValues = new Dictionary<string, string>();
-                foreach (KeyValuePair<string, string> element in fieldValues.XpathsValues)
+                foreach (KeyValuePair<string, string> element in fieldValues.XpathsValues.Where(xpv => xpv.Key != "Note"))
                 {
                     newFieldValues.Add(element.Key, getUtfEncode(element.Value));
+                }
+                foreach (KeyValuePair<string, string> element in fieldValues.XpathsValues.Where(xpv => xpv.Key == "Note"))
+                {
+                    newFieldValues.Add(element.Key, getUtfEncode(Services.Utils.StringUtil.FormatStringDian(element.Value)));
                 }
                 fieldValues.XpathsValues = newFieldValues;
 

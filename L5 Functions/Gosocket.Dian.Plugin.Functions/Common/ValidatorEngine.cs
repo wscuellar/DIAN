@@ -188,7 +188,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             //Obtiene información factura referenciada Endoso electronico, Solicitud Disponibilización AR CUDE
             if (Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.SolicitudDisponibilizacion || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoGarantia
                 || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoPropiedad || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndosoProcuracion
-                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial)
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Avales || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificacionPagoTotalParcial
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.EndorsementWithEffectOrdinaryAssignment 
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.Objection
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.TransferEconomicRights
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.NotificationDebtorOfTransferEconomicRights
+                || Convert.ToInt32(eventPrev.EventCode) == (int)EventStatus.PaymentOfTransferEconomicRights)
             {
                 //Obtiene XML Factura electronica CUFE
                 var xmlBytes = await GetXmlFromStorageAsync(eventPrev.TrackId);
@@ -858,6 +863,15 @@ namespace Gosocket.Dian.Plugin.Functions.Common
             return validateResponses;
         }
 
+        public async Task<List<ValidateListResponse>> StartValidateRequiredDocRadianAsync(string trackId)
+        {
+            var validateResponses = new List<ValidateListResponse>();
+            var validator = new Validator();
+
+            validateResponses.AddRange(await validator.ValidateRequiredDocRadianAsync(trackId));            
+
+            return validateResponses;
+        }
         #region Private methods
         private Dictionary<string, string> CreateTaxLevelCodeXpathsRequestObject(string trackId)
         {

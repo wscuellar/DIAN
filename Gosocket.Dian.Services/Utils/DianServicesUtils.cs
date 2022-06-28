@@ -942,7 +942,8 @@ namespace Gosocket.Dian.Services.Utils
                 else if (!(eventCode == "030" || eventCode == "031" || eventCode == "032" || eventCode == "033" || eventCode == "034"
                    || eventCode == "035" || eventCode == "036" || eventCode == "037" || eventCode == "038" || eventCode == "039"
                    || eventCode == "040" || eventCode == "041" || eventCode == "042" || eventCode == "043" || eventCode == "044"
-                   || eventCode == "045" || eventCode == "046"))
+                   || eventCode == "045" || eventCode == "046" || eventCode == "047" || eventCode == "048" || eventCode == "049" 
+                   || eventCode == "050" || eventCode == "051"))
                 {
                     stringBuilder.AppendLine(txtRegla + "AAH03" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAH03"));
                     errors.Add(stringBuilder.ToString());
@@ -963,7 +964,7 @@ namespace Gosocket.Dian.Services.Utils
                             stringBuilder.Clear();
                             isValid = false;
                         }
-                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 46)
+                        if (Convert.ToInt32(eventCode) >= 35 && Convert.ToInt32(eventCode) <= 51)
                         {
                             stringBuilder.AppendLine(txtRegla + "AAD05a" + txtRechazo + ConfigurationManager.GetValue("ErrorMessage_AAD05a"));
                             errors.Add(stringBuilder.ToString());

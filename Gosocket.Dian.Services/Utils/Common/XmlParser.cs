@@ -265,7 +265,7 @@ namespace Gosocket.Dian.Services.Utils.Common
         private string GetXmlParserDefinitions()
         {
             var xmlParserDefinitions = "";
-            var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitions");
+            var cacheItem = xmlParserDefinitionsInstanceCache.GetCacheItem("XmlParserDefinitions");            
             if (cacheItem == null)
             {
                 
@@ -278,6 +278,9 @@ namespace Gosocket.Dian.Services.Utils.Common
             }
             else
                 xmlParserDefinitions = (string)cacheItem.Value;
+            
+
+
             return xmlParserDefinitions;
         }
     }

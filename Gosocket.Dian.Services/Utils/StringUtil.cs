@@ -140,5 +140,63 @@ namespace Gosocket.Dian.Services.Utils
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_text"></param>
+        /// <returns></returns>
+        public static string FormatStringDian(string _text)
+        {
+            if ((string.IsNullOrEmpty(_text)) || !_text.Contains("Ã"))
+                return _text;
+
+            StringBuilder sb = new StringBuilder(_text.Length);
+            string _cadena = "";
+            List<Tuple<string, string>> _items = new List<Tuple<string, string>>();
+            Tuple<string, string> itemChar = null;
+            _items.Add(new Tuple<string, string>("Ã¡", "á"));
+            _items.Add(new Tuple<string, string>("Ã©", "é"));
+            _items.Add(new Tuple<string, string>("Ã­", "í"));
+            _items.Add(new Tuple<string, string>("Ã³", "ó"));
+            _items.Add(new Tuple<string, string>("Ãº", "ú"));
+            _items.Add(new Tuple<string, string>("Ã\u0081", "Á"));
+            _items.Add(new Tuple<string, string>("Ã\u0089", "É"));
+            _items.Add(new Tuple<string, string>("Ã\u008d", "Í"));
+            _items.Add(new Tuple<string, string>("Ã\u0093", "Ó"));
+            _items.Add(new Tuple<string, string>("Ã\u009a", "Ú"));
+            _items.Add(new Tuple<string, string>("Ã\u0091", "Ñ"));
+            _items.Add(new Tuple<string, string>("Ã±", "ñ"));
+
+            foreach (char c in _text)
+            {
+                switch (c.ToString())
+                {
+                    case "Ã":
+                        _cadena = "Ã";
+                        break;
+                    default:
+                        _cadena += c.ToString();
+                        break;
+                }
+                if (!_cadena.StartsWith("Ã"))
+                {
+                    sb.Append(c.ToString());
+                }
+                else
+                {
+                    itemChar = _items.FirstOrDefault(i => i.Item1 == _cadena);
+                    if (itemChar != null)
+                    {
+                        sb.Append(itemChar.Item2);
+                        _cadena = String.Empty;
+                    }
+                    else if (_cadena != "Ã")
+                        _cadena = String.Empty;
+                }
+            }
+
+            return sb.ToString();
+        }
+
     }
 }
