@@ -8,8 +8,8 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Services.ServicesGroup;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -21,7 +21,6 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -59,6 +58,9 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
         private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        private readonly IOthersDocsElecContributorService _otherDocContributorService;
+        private readonly ContributorOperationsService _contributorOperationsService;
+        private readonly IRadianContributorOperationRepository _radianContributorRepository;
 
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
@@ -105,7 +107,10 @@ namespace Gosocket.Dian.Web.Controllers
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
                                   IRadianSupportDocument radianSupportDocument, FileManager fileManager,
                                   IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService,
-                                  IAssociateDocuments associateDocuments)
+                                  IAssociateDocuments associateDocuments, 
+                                  IOthersDocsElecContributorService otherDocContributorService, 
+                                  ContributorOperationsService contributorOperationsService, 
+                                  IRadianContributorOperationRepository radianContributorRepository)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -115,6 +120,9 @@ namespace Gosocket.Dian.Web.Controllers
             _fileManager = fileManager;
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
             _associateDocuments = associateDocuments;
+            _otherDocContributorService = otherDocContributorService;
+            _contributorOperationsService = contributorOperationsService;
+            _radianContributorRepository = radianContributorRepository;
         }
 
         #endregion
@@ -1761,18 +1769,22 @@ namespace Gosocket.Dian.Web.Controllers
             return ElectronicDocuments();
         }
 
+        private List<ContributorOperations> _contributorsOperations;
+        private List<OtherDocElecContributor> _otherContributor;
+        private List<RadianContributorOperation> _radianContributor;
         /// <summary>
         /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
         /// </summary>
         /// <returns></returns>
         public ActionResult ElectronicDocuments()
         {
-
+            var systemEnvironment = ConfigurationManager.GetValue("Environment");
+            var contributorId = User.ContributorId();
             ViewBag.UserCode = User.UserCode();
-            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorId = contributorId;
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
-            ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
+            ViewBag.configurationManager = systemEnvironment;
             var identificatioType = User.IdentificationTypeId();
 
             var pk = identificatioType + "|" + User.UserCode();
@@ -1781,10 +1793,30 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.LoginMenu = auth.LoginMenu;
 
             ContributorOperationsService contributorOperationsService = new ContributorOperationsService();
-            var opes = contributorOperationsService.GetContributor(User.ContributorId());
+            var opes = contributorOperationsService.GetContributor(contributorId);
             ViewBag.ContributorAcceptanceStatus = opes.AcceptanceStatusId;
 
+            _contributorsOperations = _contributorOperationsService
+                .GetContributorOperations(contributorId);
 
+            _otherContributor = _otherDocContributorService
+                .GetDocElecContributorsByContributorId(contributorId);
+
+            _radianContributor = _radianContributorRepository
+                .List(t => t.RadianContributor.ContributorId == contributorId
+                    && t.RadianContributor.RadianState == RadianState.Habilitado.ToString() 
+                    && !t.Deleted && t.OperationStatusId == (int)RadianState.Habilitado);
+
+            ViewBag.CanShowElectronicBillerButton =
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { 98 });
+            ViewBag.CanShowElectronicPayrollButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.ElectronicPayroll, (int)ElectronicsDocuments.ElectronicPayrollNoOFE });
+            ViewBag.CanShowSupportDocumentButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.SupportDocument });
+            ViewBag.CanShowRadianEventsButton =
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { 99 });
+            ViewBag.CanShowEquivalentDocumentsButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.ElectronicEquivalent });
 
             return View();
         }
@@ -1825,6 +1857,35 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 return null;
             }
+        }
+    
+
+        private bool ContributorIsEnabledForElectronicDocument(string systemEnvironment, int[] electronicDocumentsId)
+        {
+            if (systemEnvironment == "Prod")
+            {
+                /*De manera temporal el id del documento electrónico factura electrónica será el 98*/
+                if (electronicDocumentsId.Contains(98)) 
+                {
+                    var electronicBillerOperationsEnabled = 
+                        User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled 
+                        &&  _contributorsOperations.Any(t => !t.Deleted);
+                    return electronicBillerOperationsEnabled;
+                }
+
+                /*De manera temporal el id del documento electrónico eventos radian será el 99*/
+                if (electronicDocumentsId.Contains(99)) 
+                {
+                    var radianOperationsEnabled = _radianContributor;
+                    return radianOperationsEnabled.Any();
+                }
+
+                var operationsEnabled = _otherContributor
+                    .Where(t => electronicDocumentsId.Contains(t.ElectronicDocumentId) && t.State == OtherDocElecState.Habilitado.ToString());
+                return operationsEnabled.Any();
+            }
+
+            return true;
         }
     }
 }
