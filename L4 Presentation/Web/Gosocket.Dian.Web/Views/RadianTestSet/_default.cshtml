@@ -174,7 +174,43 @@
             </div>
         </div>
     </div>
-
+    <div class="row">
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalRequired).ToString()) })
+                @Html.TextBoxFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ObjectionTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.ObjectionTotalRequired).ToString()) })
+                @Html.TextBoxFor(m => m.ObjectionTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.ObjectionTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.TransferEconomicRightsTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.TransferEconomicRightsTotalRequired).ToString()) })
+                @Html.TextBoxFor(m => m.TransferEconomicRightsTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.TransferEconomicRightsTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalRequired).ToString()) })
+                @Html.TextBoxFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.PaymentOfTransferEconomicRightsTotalRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.PaymentOfTransferEconomicRightsTotalRequired).ToString()) })
+                @Html.TextBoxFor(m => m.PaymentOfTransferEconomicRightsTotalRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.PaymentOfTransferEconomicRightsTotalRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="docAcepted">
@@ -266,6 +302,9 @@
                 @Html.ValidationMessageFor(m => m.PaymentNotificationTotalAcceptedRequired, "", new { @class = "control-label" })
             </div>
         </div>
+
+    </div>
+    <div class="row">
         <div class="col-sm-3 padding-xs-0">
             <div class="form-group">
                 @Html.LabelFor(m => m.CirculationLimitationTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.CirculationLimitationTotalAcceptedRequired).ToString()) })
@@ -317,6 +356,43 @@
 
 
        
+    </div>
+    <div class="row">
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired).ToString()) })
+                @Html.TextBoxFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.ObjectionTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.ObjectionTotalAcceptedRequired).ToString()) })
+                @Html.TextBoxFor(m => m.ObjectionTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.ObjectionTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.TransferEconomicRightsTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.TransferEconomicRightsTotalAcceptedRequired).ToString()) })
+                @Html.TextBoxFor(m => m.TransferEconomicRightsTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.TransferEconomicRightsTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired).ToString()) })
+                @Html.TextBoxFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
+        <div class="col-sm-2 padding-xs-0">
+            <div class="form-group">
+                @Html.LabelFor(m => m.PaymentOfTransferEconomicRightsTotalAcceptedRequired, new { @class = "control-label claseLabel", @title = HttpUtility.HtmlDecode(Html.DisplayNameFor(m => m.PaymentOfTransferEconomicRightsTotalAcceptedRequired).ToString()) })
+                @Html.TextBoxFor(m => m.PaymentOfTransferEconomicRightsTotalAcceptedRequired, defaultHtmlAttr)
+                @Html.ValidationMessageFor(m => m.PaymentOfTransferEconomicRightsTotalAcceptedRequired, "", new { @class = "control-label" })
+            </div>
+        </div>
     </div>
 </div>
 

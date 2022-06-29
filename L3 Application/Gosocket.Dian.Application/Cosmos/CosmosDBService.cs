@@ -804,7 +804,8 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                        ).Max(b => b.TimeStamp)
                                                  && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
                                                         || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndorsementWithEffectOrdinaryAssignment}")))
                                                      )
                                                      ||
                                                      ( //si en mi ultimpa osicion de fecah tengo una anulacion de endoso
@@ -827,7 +828,8 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                        ).Max(b => b.TimeStamp)
                                                  && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
                                                         || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndorsementWithEffectOrdinaryAssignment}")))
                                                      )
 
                                                      ||
@@ -839,7 +841,8 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                        !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
                                                  && (a.Code.Equals($"0{(int)EventStatus.EndosoGarantia}")
                                                         || a.Code.Equals($"0{(int)EventStatus.EndosoProcuracion}")
-                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")))
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndosoPropiedad}")
+                                                        || a.Code.Equals($"0{(int)EventStatus.EndorsementWithEffectOrdinaryAssignment}")))
                                                      )
                                                  );
                         break;
@@ -849,7 +852,8 @@ namespace Gosocket.Dian.Application.Cosmos
                                                                                        !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
                                                                                        !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
-                                                 && a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}"))
+                                                 && a.Code.Equals($"0{(int)EventStatus.NotificacionPagoTotalParcial}")
+                                                    || a.Code.Equals($"0{(int)EventStatus.PaymentOfTransferEconomicRights}"))
                                                  );
                         break;
                     case 5: //limitacion
@@ -913,7 +917,26 @@ namespace Gosocket.Dian.Application.Cosmos
                             predicate = predicate.And(g => (!g.Events.Any()) || (g.Events.Any() && !g.Events.Any(t => t.Code.Equals($"0{(int)EventStatus.Accepted}"))));
                         }
                         break;
-                    case 7:
+                    case 7: //Transferida
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                    a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                      !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                      !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                      !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                                && a.Code.Equals($"0{(int)EventStatus.TransferEconomicRights}"))
+                                                );
+
+                        break;
+                    case 8: //Protestada
+                        predicate = predicate.And(g => g.Events.Any(a =>
+                                                   a.TimeStamp == g.Events.Where(t => !t.Code.Equals($"0{(int)EventStatus.Avales}") &&
+                                                                                     !t.Code.Equals($"0{(int)EventStatus.Mandato}") &&
+                                                                                     !t.Code.Equals($"0{(int)EventStatus.ValInfoPago}") &&
+                                                                                     !t.Code.Equals($"0{(int)EventStatus.TerminacionMandato}")).Max(b => b.TimeStamp)
+                                               && a.Code.Equals($"0{(int)EventStatus.Objection}"))
+                                               );
+                        break;
+                    case 9://No Aplica
                         predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.AIUInvoice} ")));
                         predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.Invoice}")));
                         predicate = predicate.And(g => !(g.DocumentTypeId.Equals($"0{(int)DocumentType.MandateInvoice}")));

@@ -12,6 +12,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -166,7 +167,7 @@ namespace Gosocket.Dian.Web.Controllers.Tests
         [DataRow(2, DisplayName = "Create user With operation mode indirect")]
         [DataRow(3, DisplayName = "Create user Without software")]
         [DataRow(4, DisplayName = "Create user With operation")]
-        public void AddTest(int input)
+        public async void AddTest(int input)
         {
             //arrange
             RegistrationDataViewModel registrationData = new RegistrationDataViewModel();
@@ -205,12 +206,12 @@ namespace Gosocket.Dian.Web.Controllers.Tests
                                                 registrationData.RadianContributorType,
                                                 registrationData.RadianOperationMode,
                                                 It.IsAny<string>())).Returns(radianContributor);
-                    _radianAprovedService.Setup(t => t.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(), It.IsAny<RadianSoftware>(), It.IsAny<RadianTestSet>(), true, false)).Returns(new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType));
+                    _radianAprovedService.Setup(t => t.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(), It.IsAny<RadianSoftware>(), It.IsAny<RadianTestSet>(), true, false)).Returns(new Task<ResponseMessage>(() => new ResponseMessage(TextResources.SuccessSoftware, TextResources.alertType)));
                     break;
             }
 
             //act
-            JsonResult result = _current.Add(registrationData);
+            var result = await _current.Add(registrationData);
             ResponseMessage message = result.Data as ResponseMessage;
 
             //assert
@@ -382,17 +383,17 @@ namespace Gosocket.Dian.Web.Controllers.Tests
 
 
         [TestMethod]
-        public void UpdateFactorOperationModeTest()
+        public async void UpdateFactorOperationModeTest()
         {
             //arrange
             SetOperationViewModel data = new SetOperationViewModel();
             _radianAprovedService.Setup(t => t.GetRadianContributor(It.IsAny<int>())).Returns(new RadianContributor());
             _radianAprovedService.Setup(t => t.GetTestSet(data.SoftwareType.ToString())).Returns(new RadianTestSet());
-            _radianAprovedService.Setup(t => t.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(), It.IsAny<RadianSoftware>(), It.IsAny<RadianTestSet>(), false, true)).Returns(new ResponseMessage("Test", "test"));
+            _radianAprovedService.Setup(t => t.AddRadianContributorOperation(It.IsAny<RadianContributorOperation>(), It.IsAny<RadianSoftware>(), It.IsAny<RadianTestSet>(), false, true)).Returns(new Task<ResponseMessage>(() => new ResponseMessage("Test", "test")));
             _radianContributorService.Setup(t => t.ChangeParticipantStatus(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
             //act
-            JsonResult jsonResult = _current.UpdateFactorOperationMode(data);
+            var jsonResult = await _current.UpdateFactorOperationMode(data);
             ResponseMessage message = jsonResult.Data as ResponseMessage;
 
             //assert

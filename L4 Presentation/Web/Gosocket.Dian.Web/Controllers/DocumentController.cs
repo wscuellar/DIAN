@@ -64,12 +64,15 @@ namespace Gosocket.Dian.Web.Controllers
 
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
-        const string PAGADACODES = "045";
-        const string ENDOSOCODES = "037,038,039";
+        const string PAGADACODES = "045,051";
+        const string ENDOSOCODES = "037,038,039,047";
         const string LIMITACIONCODES = "041";
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+        const string PROTESTADACODES = "048";
+        const string TRANSFERENCIACODES = "049";
+        
 
         private static readonly FileManager fileManager = new FileManager();
         private static readonly string blobContainer = "global";
@@ -1159,7 +1162,7 @@ namespace Gosocket.Dian.Web.Controllers
                 ViewBag.idevento = model.DocumentTypeId;
                 model.DocumentTypeId = "00";
             }
-            if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus > 0 && model.RadianStatus < 9 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
             (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
@@ -1316,7 +1319,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
             }
-            if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus == 9 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 
             model.IsNextPage = cosmosResponse.hasMoreResults;
@@ -1343,7 +1346,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || TRANSFERENCIACODES.Contains(e.Code.Trim()) || PROTESTADACODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
         }
 
 
@@ -1403,6 +1406,18 @@ namespace Gosocket.Dian.Web.Controllers
                 if (LIMITACIONCODES.Contains(documentMeta.Code.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
+                    index++;
+                }
+
+                if (TRANSFERENCIACODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.TransferOfEconomicRights.GetDescription()}");
+                    index++;
+                }
+
+                if (PROTESTADACODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Objection.GetDescription()}");
                     index++;
                 }
             }
