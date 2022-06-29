@@ -6617,7 +6617,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     DateTime paymentDueDateFacturaEndoso = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (int.Parse(data.EventCode) == (int)EventStatus.EndosoPropiedad 
-                        && endDatePaymentDueDateEndoso > paymentDueDateFacturaEndoso)
+                        && signingTimeEndoso.Date > paymentDueDateFacturaEndoso)
                     {
                         responses.Add(new ValidateListResponse
                         {
