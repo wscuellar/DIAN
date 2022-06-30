@@ -6622,7 +6622,7 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = false,
+                            Mandatory = true,
                             ErrorCode = "AAH59a",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59a"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
