@@ -276,7 +276,7 @@ function customDialog(htmlPartial, data, url) {
             html += '<li>\
             <div class="set-details"><span>' + element.EventName + '</span><div><span><a class="badge custom-badget-blue">' + element.Counter1 + '</a></span><span> <a class="badge custom-badget-green">' + element.Counter2 + '</a></span><span> <a class="badge custom-badget-red">' + element.Counter3 + '</a></span></div></div>\
             </li >';
-            if ((index + 1) % 6 == 0) {
+            if ((index + 1) % 8 == 0) {
                 $(".list-unstyled-" + columns).append(html);
                 columns++;
                 html = "";

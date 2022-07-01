@@ -8,8 +8,8 @@ using Gosocket.Dian.Domain.Entity;
 using Gosocket.Dian.Domain.Sql;
 using Gosocket.Dian.Infrastructure;
 using Gosocket.Dian.Infrastructure.Utils;
+using Gosocket.Dian.Interfaces.Repositories;
 using Gosocket.Dian.Interfaces.Services;
-using Gosocket.Dian.Services.ServicesGroup;
 using Gosocket.Dian.Services.Utils.Common;
 using Gosocket.Dian.Services.Utils.Helpers;
 using Gosocket.Dian.Web.Common;
@@ -21,7 +21,6 @@ using Microsoft.Azure.EventGrid.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -59,15 +58,21 @@ namespace Gosocket.Dian.Web.Controllers
         private readonly IRadianPayrollGraphicRepresentationService _radianPayrollGraphicRepresentationService;
         private static readonly OtherDocElecPayrollService otherDocElecPayrollService = new OtherDocElecPayrollService();
         private static readonly TableManager dianAuthTableManager = new TableManager("AuthToken");
+        private readonly IOthersDocsElecContributorService _otherDocContributorService;
+        private readonly ContributorOperationsService _contributorOperationsService;
+        private readonly IRadianContributorOperationRepository _radianContributorRepository;
 
         const string TITULOVALORCODES = "030, 032, 033, 034";
         const string DISPONIBILIZACIONCODES = "036";
-        const string PAGADACODES = "045";
-        const string ENDOSOCODES = "037,038,039";
+        const string PAGADACODES = "045,051";
+        const string ENDOSOCODES = "037,038,039,047";
         const string LIMITACIONCODES = "041";
         const string ANULACIONENDOSOCODES = "040";
         const string ANULACIONLIMITACIONCODES = "042";
         const string MANDATOCODES = "043";
+        const string PROTESTADACODES = "048";
+        const string TRANSFERENCIACODES = "049";
+        
 
         private static readonly FileManager fileManager = new FileManager();
         private static readonly string blobContainer = "global";
@@ -105,7 +110,10 @@ namespace Gosocket.Dian.Web.Controllers
                                   IQueryAssociatedEventsService queryAssociatedEventsService,
                                   IRadianSupportDocument radianSupportDocument, FileManager fileManager,
                                   IRadianPayrollGraphicRepresentationService radianPayrollGraphicRepresentationService,
-                                  IAssociateDocuments associateDocuments)
+                                  IAssociateDocuments associateDocuments, 
+                                  IOthersDocsElecContributorService otherDocContributorService, 
+                                  ContributorOperationsService contributorOperationsService, 
+                                  IRadianContributorOperationRepository radianContributorRepository)
         {
             _radianSupportDocument = radianSupportDocument;
             _radianPdfCreationService = radianPdfCreationService;
@@ -115,6 +123,9 @@ namespace Gosocket.Dian.Web.Controllers
             _fileManager = fileManager;
             _radianPayrollGraphicRepresentationService = radianPayrollGraphicRepresentationService;
             _associateDocuments = associateDocuments;
+            _otherDocContributorService = otherDocContributorService;
+            _contributorOperationsService = contributorOperationsService;
+            _radianContributorRepository = radianContributorRepository;
         }
 
         #endregion
@@ -1151,7 +1162,7 @@ namespace Gosocket.Dian.Web.Controllers
                 ViewBag.idevento = model.DocumentTypeId;
                 model.DocumentTypeId = "00";
             }
-            if (model.RadianStatus > 0 && model.RadianStatus < 7 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus > 0 && model.RadianStatus < 9 && model.DocumentTypeId.Equals("00"))
                 model.DocumentTypeId = "01";
 
             (bool hasMoreResults, string continuation, List<GlobalDataDocument> globalDataDocuments) cosmosResponse =
@@ -1308,7 +1319,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
 
             }
-            if (model.RadianStatus == 7 && model.DocumentTypeId.Equals("00"))
+            if (model.RadianStatus == 9 && model.DocumentTypeId.Equals("00"))
                 model.Documents.RemoveAll(d => d.DocumentTypeId.Equals("01"));
 
             model.IsNextPage = cosmosResponse.hasMoreResults;
@@ -1335,7 +1346,7 @@ namespace Gosocket.Dian.Web.Controllers
                 }
             }
 
-            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
+            return resultList.Where(e => TITULOVALORCODES.Contains(e.Code.Trim()) || TRANSFERENCIACODES.Contains(e.Code.Trim()) || PROTESTADACODES.Contains(e.Code.Trim()) || PAGADACODES.Contains(e.Code.Trim()) || ENDOSOCODES.Contains(e.Code.Trim()) || DISPONIBILIZACIONCODES.Contains(e.Code.Trim()) || ANULACIONENDOSOCODES.Contains(e.Code.Trim()) || LIMITACIONCODES.Contains(e.Code.Trim()) || ANULACIONLIMITACIONCODES.Contains(e.Code.Trim())).ToList();
         }
 
 
@@ -1395,6 +1406,18 @@ namespace Gosocket.Dian.Web.Controllers
                 if (LIMITACIONCODES.Contains(documentMeta.Code.Trim()))
                 {
                     statusValue.Add(index, $"{RadianDocumentStatus.Limited.GetDescription()}");
+                    index++;
+                }
+
+                if (TRANSFERENCIACODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.TransferOfEconomicRights.GetDescription()}");
+                    index++;
+                }
+
+                if (PROTESTADACODES.Contains(documentMeta.Code.Trim()))
+                {
+                    statusValue.Add(index, $"{RadianDocumentStatus.Objection.GetDescription()}");
                     index++;
                 }
             }
@@ -1761,18 +1784,22 @@ namespace Gosocket.Dian.Web.Controllers
             return ElectronicDocuments();
         }
 
+        private List<ContributorOperations> _contributorsOperations;
+        private List<OtherDocElecContributor> _otherContributor;
+        private List<RadianContributorOperation> _radianContributor;
         /// <summary>
         /// Action GET encargada de inicializar la vista de ingreso a RADIAN, Consulta la informacion del contribuyente postulante.
         /// </summary>
         /// <returns></returns>
         public ActionResult ElectronicDocuments()
         {
-
+            var systemEnvironment = ConfigurationManager.GetValue("Environment");
+            var contributorId = User.ContributorId();
             ViewBag.UserCode = User.UserCode();
-            ViewBag.ContributorId = User.ContributorId();
+            ViewBag.ContributorId = contributorId;
             ViewBag.ContributorTypeIde = User.ContributorTypeId();
             ViewBag.ContributorOpMode = GetContributorOperation(ViewBag.ContributorId);
-            ViewBag.configurationManager = ConfigurationManager.GetValue("Environment");
+            ViewBag.configurationManager = systemEnvironment;
             var identificatioType = User.IdentificationTypeId();
 
             var pk = identificatioType + "|" + User.UserCode();
@@ -1781,10 +1808,30 @@ namespace Gosocket.Dian.Web.Controllers
             ViewBag.LoginMenu = auth.LoginMenu;
 
             ContributorOperationsService contributorOperationsService = new ContributorOperationsService();
-            var opes = contributorOperationsService.GetContributor(User.ContributorId());
+            var opes = contributorOperationsService.GetContributor(contributorId);
             ViewBag.ContributorAcceptanceStatus = opes.AcceptanceStatusId;
 
+            _contributorsOperations = _contributorOperationsService
+                .GetContributorOperations(contributorId);
 
+            _otherContributor = _otherDocContributorService
+                .GetDocElecContributorsByContributorId(contributorId);
+
+            _radianContributor = _radianContributorRepository
+                .List(t => t.RadianContributor.ContributorId == contributorId
+                    && t.RadianContributor.RadianState == RadianState.Habilitado.ToString() 
+                    && !t.Deleted && t.OperationStatusId == (int)RadianState.Habilitado);
+
+            ViewBag.CanShowElectronicBillerButton =
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { 98 });
+            ViewBag.CanShowElectronicPayrollButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.ElectronicPayroll, (int)ElectronicsDocuments.ElectronicPayrollNoOFE });
+            ViewBag.CanShowSupportDocumentButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.SupportDocument });
+            ViewBag.CanShowRadianEventsButton =
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { 99 });
+            ViewBag.CanShowEquivalentDocumentsButton = 
+                ContributorIsEnabledForElectronicDocument(systemEnvironment, new int[] { (int)ElectronicsDocuments.ElectronicEquivalent });
 
             return View();
         }
@@ -1825,6 +1872,35 @@ namespace Gosocket.Dian.Web.Controllers
             {
                 return null;
             }
+        }
+    
+
+        private bool ContributorIsEnabledForElectronicDocument(string systemEnvironment, int[] electronicDocumentsId)
+        {
+            if (systemEnvironment == "Prod")
+            {
+                /*De manera temporal el id del documento electrónico factura electrónica será el 98*/
+                if (electronicDocumentsId.Contains(98)) 
+                {
+                    var electronicBillerOperationsEnabled = 
+                        User.ContributorAcceptanceStatusId() == (int)ContributorStatus.Enabled 
+                        &&  _contributorsOperations.Any(t => !t.Deleted);
+                    return electronicBillerOperationsEnabled;
+                }
+
+                /*De manera temporal el id del documento electrónico eventos radian será el 99*/
+                if (electronicDocumentsId.Contains(99)) 
+                {
+                    var radianOperationsEnabled = _radianContributor;
+                    return radianOperationsEnabled.Any();
+                }
+
+                var operationsEnabled = _otherContributor
+                    .Where(t => electronicDocumentsId.Contains(t.ElectronicDocumentId) && t.State == OtherDocElecState.Habilitado.ToString());
+                return operationsEnabled.Any();
+            }
+
+            return true;
         }
     }
 }

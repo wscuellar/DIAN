@@ -128,9 +128,25 @@
 
     <div class="row dropdown-state">
         <div class="col-sm-3 padding-xs-0">
+            @if (Model.IsActive)
+            {
+                <div>
+                    <ul class="list-inline radian-conventions">
+                        <li class="list-inline-item"><img src="~/Content/images/Svg/EstadoFacturaElectronica.svg">Cumple Requisitos</li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <ul class="list-inline radian-conventions">
+                        <li class="list-inline-item"><img src="~/Content/images/Svg/EstadoFacturaRadian1.svg">No cumple Requisitos</li>
+                    </ul>
+                </div>
+            }
             <div class="form-group">
                 @Html.LabelFor(m => m.RadianApprovalState, new { @class = "control-label" })
-                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccióne el estado de la aprobación", validation )
+                @Html.EnumDropDownListFor(m => m.RadianApprovalState, "Seleccione el estado de la aprobación", validation)
             </div>
         </div>
     </div>

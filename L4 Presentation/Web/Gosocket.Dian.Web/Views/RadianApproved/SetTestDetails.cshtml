@@ -118,8 +118,16 @@
                             '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndosoGarantia))',
                             '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndosoProcuracion))',
                             '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.NegotiatedInvoice))',
-                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.ValInfoPago))'
-                        ]
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.ValInfoPago))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.EndorsementWithEffectOrdinaryAssignment))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.Objection))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.TransferEconomicRights))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.NotificationDebtorOfTransferEconomicRights))',
+                            '@Html.Raw(help.EnumHelper.GetDescription(help.EventStatus.PaymentOfTransferEconomicRights))'
+                        ],
+                        labels: {
+                            step: 1
+                        }
                     },
                     yAxis: {
                         min: 0,
@@ -161,7 +169,12 @@
                                 dataChart.EndorsementGuaranteeTotalRequired,
                                 dataChart.EndorsementProcurementTotalRequired,
                                 dataChart.CirculationLimitationTotalRequired,
-                                dataChart.ReportForPaymentTotalRequired
+                                dataChart.ReportForPaymentTotalRequired,
+                                dataChart.EndorsementWithEffectOrdinaryAssignmentTotalRequired,
+                                dataChart.ObjectionTotalRequired,
+                                dataChart.TransferEconomicRightsTotalRequired,
+                                dataChart.NotificationDebtorOfTransferEconomicRightsTotalRequired,
+                                dataChart.PaymentOfTransferEconomicRightsTotalRequired
                             ]
                         },
                         {
@@ -185,7 +198,12 @@
                                 dataChart.EndorsementGuaranteeTotalAcceptedRequired,
                                 dataChart.EndorsementProcurementTotalAcceptedRequired,
                                 dataChart.CirculationLimitationTotalAcceptedRequired,
-                                dataChart.ReportForPaymentTotalAcceptedRequired
+                                dataChart.ReportForPaymentTotalAcceptedRequired,
+                                dataChart.EndorsementWithEffectOrdinaryAssignmentTotalAcceptedRequired,
+                                dataChart.ObjectionTotalAcceptedRequired,
+                                dataChart.TransferEconomicRightsTotalAcceptedRequired,
+                                dataChart.NotificationDebtorOfTransferEconomicRightsTotalAcceptedRequired,
+                                dataChart.PaymentOfTransferEconomicRightsTotalAcceptedRequired
                             ]
                         },
                         {
@@ -209,8 +227,12 @@
                                 dataChart.TotalEndorsementGuaranteeSent,
                                 dataChart.TotalEndorsementProcurementSent,
                                 dataChart.TotalCirculationLimitationSent,
-                                dataChart.TotalReportForPaymentSent
-
+                                dataChart.TotalReportForPaymentSent,
+                                dataChart.TotalEndorsementWithEffectOrdinaryAssignmentSent,
+                                dataChart.TotalObjectionSent,
+                                dataChart.TotalTransferEconomicRightsSent,
+                                dataChart.TotalNotificationDebtorOfTransferEconomicRightsSent,
+                                dataChart.TotalPaymentOfTransferEconomicRightsSent
                             ]
                         },
                         {
@@ -234,7 +256,12 @@
                                 dataChart.EndorsementGuaranteeAccepted,
                                 dataChart.EndorsementProcurementAccepted,
                                 dataChart.CirculationLimitationAccepted,
-                                dataChart.ReportForPaymentAccepted
+                                dataChart.ReportForPaymentAccepted,
+                                dataChart.EndorsementWithEffectOrdinaryAssignmentAccepted,
+                                dataChart.ObjectionAccepted,
+                                dataChart.TransferEconomicRightsAccepted,
+                                dataChart.NotificationDebtorOfTransferEconomicRightsAccepted,
+                                dataChart.PaymentOfTransferEconomicRightsAccepted
                             ]
                         },
                         {
@@ -258,7 +285,12 @@
                                 dataChart.EndorsementGuaranteeRejected,
                                 dataChart.EndorsementProcurementRejected,
                                 dataChart.CirculationLimitationRejected,
-                                dataChart.ReportForPaymentRejected
+                                dataChart.ReportForPaymentRejected,
+                                dataChart.EndorsementWithEffectOrdinaryAssignmentRejected,
+                                dataChart.ObjectionRejected,
+                                dataChart.TransferEconomicRightsRejected,
+                                dataChart.NotificationDebtorOfTransferEconomicRightsRejected,
+                                dataChart.PaymentOfTransferEconomicRightsRejected
                             ]
                         }
                     ]

@@ -539,7 +539,7 @@
                         if (result.Code != 200) {
 
 							$('.close').click()
-                            ErrorDialogV2Callback("¡Notificación!", sms, () => {
+                            ErrorDialogV2Callback("", result.Message, () => {
                                 var url = window.location.href.split('&');
                                 var ret = url[0] + '&' + url[1] + '&' + url[2] + '&' + url[3];
                                 window.location.href = ret

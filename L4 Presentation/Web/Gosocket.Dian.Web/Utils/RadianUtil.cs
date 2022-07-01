@@ -21,7 +21,9 @@ namespace Gosocket.Dian.Web.Utils
             [Display(Name = "En pruebas")]
             Test,
             [Display(Name = "Cancelado")]
-            Canceled
+            Canceled,
+            [Display(Name = "Actualiza estado requisitos")]
+            MissingRequirement
         }
 
         public enum DocumentStates

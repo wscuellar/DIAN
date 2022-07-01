@@ -18,6 +18,7 @@ namespace Gosocket.Dian.Application.Common
         private static readonly string[] witheListPkixCertPathBuilderException = { "Certificate has unsupported critical extension.", "Subject alternative name extension could not be decoded." };
         private static readonly MemoryCache cache=MemoryCache.Default;
         private static readonly string CACHE_KEY = "CERT-";
+        private static readonly string CACHE_KEY_ISTRUST = "CERT-TRUST-";
         /// <summary>
         /// 
         /// </summary>
@@ -77,30 +78,54 @@ namespace Gosocket.Dian.Application.Common
         /// <returns></returns>
         public static bool IsTrusted(this X509Certificate certificate, IEnumerable<X509Certificate> chainCertificates)
         {
-            try
+          
+            string key = CACHE_KEY_ISTRUST + certificate.SerialNumber.ToString();
+            Tuple<string, bool> value = cache.Get(key) as Tuple<string, bool>;
+
+            if (value != null)
             {
-                var tupple = LoadCertificates(chainCertificates);
-
-                var trustedRoots = tupple.Item1;
-                var intermediates = tupple.Item2;
-
-                var selector = new X509CertStoreSelector { Certificate = certificate };
-
-                var builderParams = new PkixBuilderParameters(trustedRoots, selector) { IsRevocationEnabled = false };
-                builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(intermediates)));
-                builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(new[] { certificate })));
-
-                var builder = new PkixCertPathBuilder();
-                var result = builder.Build(builderParams);
+                return value.Item2;
             }
-            catch (PkixCertPathBuilderException e)
+            else
             {
-                Debug.WriteLine(e.InnerException?.Message ?? e.Message);
-                if (!witheListPkixCertPathBuilderException.Contains(e.InnerException?.Message))
-                    return false;
+                value = new Tuple<string, bool>(key, true);
+                try
+                {
+                    var tupple = LoadCertificates(chainCertificates);
+
+                    var trustedRoots = tupple.Item1;
+                    var intermediates = tupple.Item2;
+
+                    var selector = new X509CertStoreSelector { Certificate = certificate };
+
+                    var builderParams = new PkixBuilderParameters(trustedRoots, selector) { IsRevocationEnabled = false };
+                    builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(intermediates)));
+                    builderParams.AddStore(X509StoreFactory.Create(CertificatesCollection, new X509CollectionStoreParameters(new[] { certificate })));
+
+                    var builder = new PkixCertPathBuilder();
+                    var result = builder.Build(builderParams);
+                    
+                }
+                catch (PkixCertPathBuilderException e)
+                {
+                    Trace.TraceError("IsTrusted: "+e.InnerException?.Message ?? e.Message);
+                    if (!witheListPkixCertPathBuilderException.Contains(e.InnerException?.Message))
+                    {
+                        value = new Tuple<string, bool>(key, false);
+                    }
+                        
+                }
+                CacheItemPolicy policy = new CacheItemPolicy
+                {
+                    AbsoluteExpiration = DateTimeOffset.Now.AddHours(2)
+                };
+                cache.Set(key, value, policy);
+                
+                return value.Item2;
             }
 
-            return true;
+
+            
         }
 
         /// <summary>

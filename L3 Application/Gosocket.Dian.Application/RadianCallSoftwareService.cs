@@ -38,6 +38,10 @@ namespace Gosocket.Dian.Application
             return _RadianSoftwareRepository.List(t => t.ContributorId == id, 0, 0).Results;
         }
 
+        public List<RadianSoftware> List(Guid id)
+        {
+            return _RadianSoftwareRepository.List(t => t.Id == id, 0, 0).Results;
+        }
 
         public RadianSoftware CreateSoftware(RadianSoftware software)
         {
@@ -52,6 +56,18 @@ namespace Gosocket.Dian.Application
             software.Status = false;
             software.Deleted = true;
             return _RadianSoftwareRepository.AddOrUpdate(software);
+        }
+        
+        public Guid DeleteSoftwareCancelaRegistro(Guid id)
+        {
+            RadianSoftware software = _RadianSoftwareRepository.Get(t => t.Id == id && t.RadianSoftwareStatusId == (int)Domain.Common.RadianSoftwareStatus.InProcess);
+            if(software != null)
+            {
+                software.Status = false;
+                software.Deleted = true;
+                return _RadianSoftwareRepository.AddOrUpdate(software);
+            }
+            return id;
         }
 
         public void SetToProduction(RadianSoftware software)

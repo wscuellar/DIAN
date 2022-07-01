@@ -373,7 +373,14 @@ namespace Gosocket.Dian.Application
                     Event newEvent = events.LastOrDefault(e => e.DocumentKey == item.DocumentKey);
                     if (newEvent != null)
                     {
-                        newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(document.EventCode));
+                        if(newEvent.Code == "030" || newEvent.Code == "031" || newEvent.Code == "032" || newEvent.Code == "033" 
+                            || newEvent.Code == "034" || newEvent.Code == "035" || newEvent.Code == "038" || newEvent.Code == "039"
+                            || newEvent.Code == "046" || newEvent.Code == "047" || newEvent.Code == "050")
+                            
+                            newEvent.Description = EnumHelper.GetEnumDescription((EventStatus)int.Parse(document.EventCode));
+                        else
+                            newEvent.Description = EnumHelper.GetEnumDescription((EventCustomization)int.Parse(item.CustomizationID));
+
                         finalEvents.Add(newEvent);
                     }
                 }
