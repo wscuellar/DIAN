@@ -6676,12 +6676,12 @@ namespace Gosocket.Dian.Plugin.Functions.Common
                     DateTime paymentDueDateFacturaEndoso = Convert.ToDateTime(paymentDueDateFE).Date;
 
                     if (int.Parse(data.EventCode) == (int)EventStatus.EndosoPropiedad 
-                        && endDatePaymentDueDateEndoso > paymentDueDateFacturaEndoso)
+                        && signingTimeEndoso.Date > paymentDueDateFacturaEndoso)
                     {
                         responses.Add(new ValidateListResponse
                         {
                             IsValid = false,
-                            Mandatory = false,
+                            Mandatory = true,
                             ErrorCode = "AAH59a",
                             ErrorMessage = ConfigurationManager.GetValue("ErrorMessage_AAH59a"),
                             ExecutionTime = DateTime.UtcNow.Subtract(startDate).TotalSeconds
