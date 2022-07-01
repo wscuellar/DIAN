@@ -1068,3 +1068,9 @@ ul#mainnav-menu li:not(li.list-divider) {
 #mainnav-menu .collapse.in li a {
     line-height: 22px !important;
 }
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+    opacity: 1;
+    background: #BEC8D2 !important;
+    border: none !important;
+    color: white !important;
+}
