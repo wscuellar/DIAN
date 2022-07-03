@@ -35,6 +35,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         private static readonly TableManager TableManagerGlobalNumberRange = new TableManager("GlobalNumberRange");
         private static readonly TableManager TableManagerGlobalAuthorization = new TableManager("GlobalAuthorization");
+        private static readonly TableManager GlobalDocValidatorRuntimeTableManager = new TableManager("GlobalDocValidatorRuntime");
 
         private static readonly TableManager TableManagerGlobalLogger = new TableManager("GlobalLogger");
 
@@ -1721,8 +1722,8 @@ namespace Gosocket.Dian.Services.ServicesGroup
 
         public async static Task<byte[]> GetXmlFromStorage(string trackId)
         {
-            var tableManager = new TableManager("GlobalDocValidatorRuntime");
-            var documentStatusValidation = tableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
+            
+            var documentStatusValidation = GlobalDocValidatorRuntimeTableManager.Find<GlobalDocValidatorRuntime>(trackId, "UPLOAD");
             if (documentStatusValidation == null)
                 return null;
 
@@ -1731,7 +1732,7 @@ namespace Gosocket.Dian.Services.ServicesGroup
             var fileName = $"docvalidator/{documentStatusValidation.Category}/{documentStatusValidation.Timestamp.Date.Year}/{documentStatusValidation.Timestamp.Date.Month.ToString().PadLeft(2, '0')}/{trackId}.xml";
             var xmlBytes = await GlobalFileManager.GetBytesAsync( fileName);
 
-            tableManager = null;
+            
             return xmlBytes;
         }
 

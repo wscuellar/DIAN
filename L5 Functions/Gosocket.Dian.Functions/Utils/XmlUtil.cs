@@ -396,7 +396,7 @@ namespace Gosocket.Dian.Functions.Utils
             
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
             var exist = DianFileManager.Exists(fileName);
-            //var xmlBytes = fileManager.GetBytes(container, fileName);
+            
             if (!exist)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
@@ -426,10 +426,15 @@ namespace Gosocket.Dian.Functions.Utils
             else
                 fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-            xmlBytes = await DianFileManager.GetBytesAsync(fileName);
-            if (xmlBytes == null)
+            
+            var exists = DianFileManager.Exists(fileName);
+            if (!exists)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+                xmlBytes = await DianFileManager.GetBytesAsync(fileName);
+            }
+            else
+            {
                 xmlBytes = await DianFileManager.GetBytesAsync(fileName);
             }
             if (xmlBytes != null) responseBytes = xmlBytes;

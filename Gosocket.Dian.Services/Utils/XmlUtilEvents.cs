@@ -386,10 +386,15 @@ namespace Gosocket.Dian.Services.Utils
             
             var fileName = $"responses/{documentMeta.Timestamp.Year}/{documentMeta.Timestamp.Month.ToString().PadLeft(2, '0')}/{documentMeta.Timestamp.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
 
-            xmlBytes = DianFileManager.GetBytes(fileName);
-            if (xmlBytes == null)
+            
+            var exists = DianFileManager.Exists(fileName);
+            if (!exists)
             {
                 fileName = $"responses/{documentMeta.EmissionDate.Year}/{documentMeta.EmissionDate.Month.ToString().PadLeft(2, '0')}/{documentMeta.EmissionDate.Day.ToString().PadLeft(2, '0')}/{isValidFolder}/{documentMeta.SenderCode}/{documentMeta.DocumentTypeId}/{serieFolder}/{documentMeta.Number}/{documentMeta.PartitionKey}.xml";
+                xmlBytes = DianFileManager.GetBytes(fileName);
+            }
+            else
+            {
                 xmlBytes = DianFileManager.GetBytes(fileName);
             }
             if (xmlBytes != null) responseBytes = xmlBytes;
